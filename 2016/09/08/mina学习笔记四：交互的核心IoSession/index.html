@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>mina学习笔记四：交互的核心IoSession | Jeeson&#39;s Blog | Write the code. Change the world.</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  <meta name="theme-color" content="#3F51B5">
+  
+  
+  <meta name="keywords" content="java mina">
+  <meta name="description" content="原文：http://blog.csdn.net/yoara/article/details/37568027     这一章讲的就是IoSession，session这个词做web应用的人应该都是耳熟能详，在mina中IoSession也是起着相同的作用。mina为每个客户端提供了会话session，session是服务器端和客户端的连接持有者，直到连接中断session才会被销毁。 IoSess">
+<meta name="keywords" content="java mina">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mina学习笔记四：交互的核心IoSession">
+<meta property="og:url" content="https://smuwjs.github.io/2016/09/08/mina学习笔记四：交互的核心IoSession/index.html">
+<meta property="og:site_name" content="Jeeson&#39;s Blog">
+<meta property="og:description" content="原文：http://blog.csdn.net/yoara/article/details/37568027     这一章讲的就是IoSession，session这个词做web应用的人应该都是耳熟能详，在mina中IoSession也是起着相同的作用。mina为每个客户端提供了会话session，session是服务器端和客户端的连接持有者，直到连接中断session才会被销毁。 IoSess">
+<meta property="og:image" content="http://opesdt6ii.bkt.clouddn.com/17-5-5/80907734-file_1493965083462_ab65.jpg">
+<meta property="og:image" content="http://opesdt6ii.bkt.clouddn.com/17-5-5/97950260-file_1493965242301_10746.png">
+<meta property="og:updated_time" content="2017-05-05T09:32:25.209Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="mina学习笔记四：交互的核心IoSession">
+<meta name="twitter:description" content="原文：http://blog.csdn.net/yoara/article/details/37568027     这一章讲的就是IoSession，session这个词做web应用的人应该都是耳熟能详，在mina中IoSession也是起着相同的作用。mina为每个客户端提供了会话session，session是服务器端和客户端的连接持有者，直到连接中断session才会被销毁。 IoSess">
+<meta name="twitter:image" content="http://opesdt6ii.bkt.clouddn.com/17-5-5/80907734-file_1493965083462_ab65.jpg">
+  
+    <link rel="alternative" href="/atom.xml" title="Jeeson&#39;s Blog" type="application/atom+xml">
+  
+  <meta name="summary" content="null">
+  <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="loading" class="active"></div>
+
+  <nav id="menu" class="hide" >
+   <div class="inner flex-row-vertical">
+  <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+      <i class="icon icon-lg icon-close"></i>
+  </a>
+  <div class="brand-wrap">
+    <div class="brand">
+      <a href="/" class="avatar"><img src="/img/head.png"></a>
+      <hgroup class="introduce">
+        <h5 class="nickname">Jeeson</h5>
+        <a href="mailto:smuwjs@163.com" title="smuwjs@163.com" class="mail">smuwjs@163.com</a>
+      </hgroup>
+    </div>
+  </div>
+  <div class="scroll-wrap flex-col">
+    <ul class="nav">
+      
+          <li class="waves-block waves-effect">
+            <a href="/"  >
+              <i class="icon icon-lg icon-home"></i>
+              博客首页
+            </a>
+          </li>
+      
+          <li class="waves-block waves-effect">
+            <a href="/archives"  >
+              <i class="icon icon-lg icon-archives"></i>
+              文章归档
+            </a>
+          </li>
+      
+          <li class="waves-block waves-effect">
+            <a href="/tags"  >
+              <i class="icon icon-lg icon-tags"></i>
+              我的标签
+            </a>
+          </li>
+      
+          <li class="waves-block waves-effect">
+            <a href="https://github.com/smuwjs" target="_blank" >
+              <i class="icon icon-lg icon-github"></i>
+              Github
+            </a>
+          </li>
+      
+          <li class="waves-block waves-effect">
+            <a href="http://www.weibo.com/ysweb" target="_blank" >
+              <i class="icon icon-lg icon-weibo"></i>
+              微博
+            </a>
+          </li>
+      
+    </ul>
+
+    <footer class="footer">
+  <p><a rel="license" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0;vertical-align:middle;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAAAPCAMAAABEF7i9AAAAllBMVEUAAAD///+rsapERER3d3eIiIjMzMzu7u4iIiKUmZO6v7rKzsoODg4RERFVVVUNDQ0NDg0PEA8zMzNLTEtbXltmZmZydnF9gn2AgICPkI+ZmZmqqqq7u7vFxsXIzMgNDQwZGRkgICAhISEkJSMnKCcuMC4xMzE5Ozk7PTtBQkFCQkJDQ0Nna2eGhoaHh4ezuLLGysbd3d1wVGpAAAAA4UlEQVR42q2T1xqCMAyFk7QsBQeKA9x7j/d/OSm22CpX0nzcpA1/T05aAOuBVkMAScQFHLnEwoCo2f1TnQIGoVMewjZEjVFN4GH1Ue1Cn2jWqwfsOOj6wDwGvotsl/c8lv7KIq1eLOsT0HMFHMIE/RZyHnlphryT9zyV+8WH5e8yQw3wnQvgAFxPTKUVi555SHR/lOfLMgVTeDlSfN+TaoUsiTyeIm+bCkHvCA2FUKG48LDtYBZBknsYP/G8NTw0gaaHyuQf4H5pecrB/FYCT2sL9zAfy1Xyjou6L8X2W7YcLyBZCRtnq/zfAAAAAElFTkSuQmCC" /></a></p>
+  <p>Jeeson&#39;s Blog &copy; 2017</p>
+  <p>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme
+  <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></p>
+  <a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-2x icon-rss-square"></i></a>
+</footer>
+
+  </div>
+</div>
+
+  </nav>
+  <main id="main">
+    <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">mina学习笔记四：交互的核心IoSession</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input " autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-share">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header">
+  <div class="container">
+    <h1 class="author">mina学习笔记四：交互的核心IoSession</h1>
+    <h5 class="subtitle">
+        
+            <time datetime="2016-09-08T20:12:16.000Z" itemprop="datePublished" class="page-time">
+  2016-09-08
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/mina/">mina</a></li></ul>
+
+        
+    </h5>
+  </div>
+</header>
+
+    <div class="container body-wrap">
+      <article id="post-mina学习笔记四：交互的核心IoSession" 
+  class="article article-type-post" itemprop="blogPost">
+    <div class="post-meta flex-row">
+        
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java-mina/">java mina</a></li></ul>
+
+    </div>
+    <div class="post-body">
+        <aside class="post-widget" id="post-widget">
+
+            
+            <div class="post-share" id="post-share">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+            
+
+            
+            <nav class="post-toc-wrap" id="post-toc">
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#1-IoSession在服务器端的创建第一步：accept-processor-handle"><span class="post-toc-text">1. IoSession在服务器端的创建第一步：accept(processor,handle)</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#1-1-IoFuture"><span class="post-toc-text">1.1 IoFuture</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#1-2-IoSession的过滤器链"><span class="post-toc-text">1.2 IoSession的过滤器链</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#2-IoSession在服务器端的创建第二步：initSession-session-null-null"><span class="post-toc-text">2. IoSession在服务器端的创建第二步：initSession(session, null, null)</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#3-IoSession在服务器端的创建第三步：session-getProcessor-add-session"><span class="post-toc-text">3. IoSession在服务器端的创建第三步：session.getProcessor().add(session);</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#4-SimpleIoProcessorPool、IoProcess和NioSocketAcceptor之间的关系"><span class="post-toc-text">4. SimpleIoProcessorPool、IoProcess和NioSocketAcceptor之间的关系</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#结语"><span class="post-toc-text">结语</span></a></li></ol>
+            </nav>
+            
+        </aside>
+
+        <div class="post-main">
+
+            <div class="post-content" id="post-content" itemprop="postContent">
+            <p><a href="http://blog.csdn.net/yoara/article/details/37568027" target="_blank" rel="external">原文：http://blog.csdn.net/yoara/article/details/37568027</a>    </p>
+<p>这一章讲的就是IoSession，session这个词做web应用的人应该都是耳熟能详，在mina中IoSession也是起着相同的作用。mina为每个客户端提供了会话session，session是服务器端和客户端的连接持有者，直到连接中断session才会被销毁。</p>
+<pre><code>IoSession不仅是connection的相关信息，同时，服务器端还能通过他存储其他可能需要的数据信息。好，让我们一步一步剖析IoSession那不平凡的一生吧。
+</code></pre><h1 id="1-IoSession在服务器端的创建第一步：accept-processor-handle"><a href="#1-IoSession在服务器端的创建第一步：accept-processor-handle" class="headerlink" title="1. IoSession在服务器端的创建第一步：accept(processor,handle)"></a>1. IoSession在服务器端的创建第一步：accept(processor,handle)</h1><pre><code>接着上节说，我们已经知道，NioSocketAcceptor.bind()后，最终会生成一个在自身维护的executor线程池内提交的任务Acceptor（单一线程），该任务不断的轮询判断服务是否关闭、同时等待新的连接接入。当有新的连接接入时：
+</code></pre><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">Acceptor.run()&#123;</div><div class="line">	...</div><div class="line">	<span class="comment">//selectedHandles()获取一个selector中注册的服务监听的serversocketchannel的迭代器</span></div><div class="line">	processHandles(selectedHandles());</div><div class="line">	...</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<pre><code>创建session、并为其分配指定IoProcessor的秘密都在AbstractPollingIoAcceptor.processHandles()这个方法中。我们接着看：
+</code></pre><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">processHandles</span><span class="params">(Iterator&lt;ServerSocketChannel&gt; handles)</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line">           <span class="keyword">while</span> (handles.hasNext()) &#123;</div><div class="line">               H handle = handles.next();</div><div class="line">               handles.remove();</div><div class="line"></div><div class="line">               <span class="comment">// 创建session并将本地的processor处理池当参数传递给session</span></div><div class="line">	<span class="comment">// 注意这里还未分配具体的processor</span></div><div class="line">               S session = accept(processor, handle);</div><div class="line"></div><div class="line">               <span class="keyword">if</span> (session == <span class="keyword">null</span>) &#123;</div><div class="line">                   <span class="keyword">continue</span>;</div><div class="line">               &#125;</div><div class="line">	<span class="comment">// 初始化Session</span></div><div class="line">               initSession(session, <span class="keyword">null</span>, <span class="keyword">null</span>);</div><div class="line"></div><div class="line">               <span class="comment">// 将session分配给具体的processor</span></div><div class="line">               session.getProcessor().add(session);</div><div class="line">           &#125;</div><div class="line">       &#125;</div></pre></td></tr></table></figure>
+<pre><code>第一步accept(processor,handle)方法，调用子类实现的NioSession accept(...)方法，判断了SelectionKey的有效性后，获得连接的通道SocketChannel ch = handle.accept();最后以此为传参创建IoSession对象return new NioSocketSession(this, processor, ch);我们看下构造函数做了什么（为了方便起见，相关的父类构造函数都写在一块了）：
+</code></pre><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line">   <span class="function"><span class="keyword">public</span> <span class="title">NioSocketSession</span><span class="params">(IoService service, IoProcessor&lt;NioSession&gt; processor, SocketChannel channel)</span> </span>&#123;</div><div class="line"><span class="comment">//AbstractIoSession(IoService service)</span></div><div class="line">       <span class="keyword">this</span>.service = service;</div><div class="line">       <span class="keyword">this</span>.handler = service.getHandler();</div><div class="line"></div><div class="line">       <span class="comment">//保存当前的处理时间信息</span></div><div class="line">       <span class="keyword">long</span> currentTime = System.currentTimeMillis();</div><div class="line">       creationTime = currentTime;</div><div class="line">       lastThroughputCalculationTime = currentTime;</div><div class="line">       lastReadTime = currentTime;</div><div class="line">       lastWriteTime = currentTime;</div><div class="line">       lastIdleTimeForBoth = currentTime;</div><div class="line">       lastIdleTimeForRead = currentTime;</div><div class="line">       lastIdleTimeForWrite = currentTime;</div><div class="line"></div><div class="line">       <span class="comment">//在关闭时的动作，下面以此展开对IoFuture的探讨。</span></div><div class="line">       closeFuture.addListener(SCHEDULED_COUNTER_RESETTER);</div><div class="line"></div><div class="line">       <span class="comment">//为session创建唯一的ID</span></div><div class="line">       sessionId = idGenerator.incrementAndGet();</div><div class="line"><span class="comment">//END AbstractIoSession(IoService service)</span></div><div class="line"></div><div class="line"><span class="comment">//NioSession(IoProcessor&lt;NioSession&gt; processor, IoService service, Channel channel)</span></div><div class="line"><span class="comment">//即当前session的SocketChannel</span></div><div class="line"><span class="keyword">this</span>.channel = channel;</div><div class="line"><span class="comment">//这是ioservice中的processor池哦</span></div><div class="line">       <span class="keyword">this</span>.processor = processor;</div><div class="line"><span class="comment">//这步过滤器链厉害了，后面细说</span></div><div class="line">       filterChain = <span class="keyword">new</span> DefaultIoFilterChain(<span class="keyword">this</span>);</div><div class="line"><span class="comment">//END NioSession(IoProcessor&lt;NioSession&gt; processor, IoService service, Channel channel)</span></div><div class="line"></div><div class="line"><span class="comment">//设置各种初始参数</span></div><div class="line">       config = <span class="keyword">new</span> SessionConfigImpl();</div><div class="line">       <span class="keyword">this</span>.config.setAll(service.getSessionConfig());</div><div class="line">   &#125;</div></pre></td></tr></table></figure>
+<pre><code>右边这张图是IoSession的类图结构，比较清晰。
+</code></pre><p><img src="http://opesdt6ii.bkt.clouddn.com/17-5-5/80907734-file_1493965083462_ab65.jpg" alt=""></p>
+<pre><code>我们细细的分析一下NioSocketSession在初始化时做了哪些工作，首先持有了sevice及其处理类引用，并设置了一些初始时间信息，然后他在关闭时注册了监听操作closeFuture.addListener(SCHEDULED_COUNTER_RESETTER)。
+</code></pre><h2 id="1-1-IoFuture"><a href="#1-1-IoFuture" class="headerlink" title="1.1 IoFuture"></a>1.1 IoFuture</h2><pre><code>我们已经很多次看到IoFuture，有必要来详细了解一下IoFuture的作用。那用过Executor的同学都知道，submit()提交Callback的任务后将返回一个Future表示这个任务的操作结果，这里的IoFuture的作用是类似的，他代表一次相关于IoSession的操作的操作结果，同时，还可以在他完成时获取定义相关的操作。我们看下他的子类结构图 
+</code></pre><p>图4.1 IoFuture子类结构图</p>
+<pre><code>由图中可见，对session相关的操作例如关闭、连接、写、读等操作，IoFuture全都有子类去支持。session的操作可以很方便的通过IoFuture查看处理的结果。我们看下IoFuture接口的API清单：
+</code></pre><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">addListener(IoFutureListener&lt;?&gt;)</div><div class="line">await()</div><div class="line">await(<span class="keyword">long</span>)</div><div class="line">await(<span class="keyword">long</span>, TimeUnit)</div><div class="line">awaitUninterruptibly()</div><div class="line">awaitUninterruptibly(<span class="keyword">long</span>)</div><div class="line">awaitUninterruptibly(<span class="keyword">long</span>, TimeUnit)</div><div class="line">getSession()</div><div class="line">isDone()</div><div class="line">removeListener(IoFutureListener&lt;?&gt;)</div></pre></td></tr></table></figure>
+<pre><code>从清单我们了解到：1.IoFuture支持添加操作完成的监听器，2.IoFuture支持可中断、可设置超时时间的阻塞式操作。3.isDone()则返回操作的完成状态。 
+</code></pre><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">IoFutureListener</span>&lt;<span class="title">F</span> <span class="keyword">extends</span> <span class="title">IoFuture</span>&gt; <span class="keyword">extends</span> <span class="title">EventListener</span> </span>&#123;</div><div class="line">    <span class="function"><span class="keyword">void</span> <span class="title">operationComplete</span><span class="params">(F future)</span></span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<pre><code>在他的直接实现子类DefaultIoFuture里面，我们看一下该类很主要一个实现方法setValue(Object newValue)，所有其他子类都会调用该方法以完成具体的操作：
+</code></pre><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setValue</span><span class="params">(Object newValue)</span> </span>&#123;</div><div class="line">       <span class="keyword">synchronized</span> (lock) &#123;</div><div class="line">           <span class="comment">// 已经完成则直接返回</span></div><div class="line">           <span class="keyword">if</span> (ready) &#123;</div><div class="line">               <span class="keyword">return</span>;</div><div class="line">           &#125;</div><div class="line">    <span class="comment">//设置结果</span></div><div class="line">           result = newValue;</div><div class="line">    <span class="comment">//设置完成状态</span></div><div class="line">           ready = <span class="keyword">true</span>;</div><div class="line">    <span class="comment">//唤醒所有等待线程</span></div><div class="line">           <span class="keyword">if</span> (waiters &gt; <span class="number">0</span>) &#123;</div><div class="line">               lock.notifyAll();</div><div class="line">           &#125;</div><div class="line">       &#125;</div><div class="line"><span class="comment">//通知监听器执行完成操作</span></div><div class="line">       notifyListeners();</div><div class="line">   &#125;</div></pre></td></tr></table></figure>
+<p>DefaultIoFuture中个还有一个检查死锁的方法，大家有兴趣可以看下是怎么判断死锁的：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">checkDeadLock</span><span class="params">()</span> </span>&#123;</div><div class="line">    <span class="comment">// Only read / write / connect / write future can cause dead lock. </span></div><div class="line">    <span class="keyword">if</span> (!(<span class="keyword">this</span> <span class="keyword">instanceof</span> CloseFuture || <span class="keyword">this</span> <span class="keyword">instanceof</span> WriteFuture || <span class="keyword">this</span> <span class="keyword">instanceof</span> ReadFuture || <span class="keyword">this</span> <span class="keyword">instanceof</span> ConnectFuture)) &#123;</div><div class="line">        <span class="keyword">return</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">// Get the current thread stackTrace. </span></div><div class="line">    <span class="comment">// Using Thread.currentThread().getStackTrace() is the best solution,</span></div><div class="line">    <span class="comment">// even if slightly less efficient than doing a new Exception().getStackTrace(),</span></div><div class="line">    <span class="comment">// as internally, it does exactly the same thing. The advantage of using</span></div><div class="line">    <span class="comment">// this solution is that we may benefit some improvement with some</span></div><div class="line">    <span class="comment">// future versions of Java.</span></div><div class="line">    StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();</div><div class="line"></div><div class="line">    <span class="comment">// Simple and quick check.</span></div><div class="line">    <span class="keyword">for</span> (StackTraceElement s : stackTrace) &#123;</div><div class="line">        <span class="keyword">if</span> (AbstractPollingIoProcessor.class.getName().equals(s.getClassName())) &#123;</div><div class="line">            IllegalStateException e = <span class="keyword">new</span> IllegalStateException(<span class="string">"t"</span>);</div><div class="line">            e.getStackTrace();</div><div class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">"DEAD LOCK: "</span> + IoFuture.class.getSimpleName()</div><div class="line">                    + <span class="string">".await() was invoked from an I/O processor thread.  "</span> + <span class="string">"Please use "</span></div><div class="line">                    + IoFutureListener.class.getSimpleName() + <span class="string">" or configure a proper thread model alternatively."</span>);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">// And then more precisely.</span></div><div class="line">    <span class="keyword">for</span> (StackTraceElement s : stackTrace) &#123;</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            Class&lt;?&gt; cls = DefaultIoFuture.class.getClassLoader().loadClass(s.getClassName());</div><div class="line">            <span class="keyword">if</span> (IoProcessor.class.isAssignableFrom(cls)) &#123;</div><div class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">"DEAD LOCK: "</span> + IoFuture.class.getSimpleName()</div><div class="line">                        + <span class="string">".await() was invoked from an I/O processor thread.  "</span> + <span class="string">"Please use "</span></div><div class="line">                        + IoFutureListener.class.getSimpleName()</div><div class="line">                        + <span class="string">" or configure a proper thread model alternatively."</span>);</div><div class="line">            &#125;</div><div class="line">        &#125; <span class="keyword">catch</span> (Exception cnfe) &#123;</div><div class="line">            <span class="comment">// Ignore</span></div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="1-2-IoSession的过滤器链"><a href="#1-2-IoSession的过滤器链" class="headerlink" title="1.2 IoSession的过滤器链"></a>1.2 IoSession的过滤器链</h2><pre><code>IoSession是有状态的，它包括：
+</code></pre><ul>
+<li>Connected ：IoSession已被创建且生效。</li>
+<li>Idle ：会话在一定时间内没有处理任何请求，它包括下面三个子状态：<ul>
+<li>Idle for read ： 一段时间内没有接受数据。</li>
+<li>Idle for write ： 一段时间内没有发送数据。</li>
+<li>Idle for both ： 一段时间内没有产生接受或发送数据的操作。</li>
+</ul>
+</li>
+<li>Closing : IoSession正在关闭中。</li>
+<li>Closed : session已经被关闭。</li>
+</ul>
+<p><img src="http://opesdt6ii.bkt.clouddn.com/17-5-5/97950260-file_1493965242301_10746.png" alt="图4.2 IoSession状态变化图"></p>
+<pre><code>每个状态都会引起一系列的过滤器的对应的操作，从这句代码中我们了解到，每个IoSession都有他自己的过滤器链，即我们可以为每个session定制过滤器链。
+</code></pre><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">filterChain = <span class="keyword">new</span> DefaultIoFilterChain(<span class="keyword">this</span>);</div></pre></td></tr></table></figure>
+<pre><code>IoSession会先继承IoService的过滤器链，过滤器链将放在下一节统一分析。
+</code></pre><h1 id="2-IoSession在服务器端的创建第二步：initSession-session-null-null"><a href="#2-IoSession在服务器端的创建第二步：initSession-session-null-null" class="headerlink" title="2. IoSession在服务器端的创建第二步：initSession(session, null, null)"></a>2. IoSession在服务器端的创建第二步：initSession(session, null, null)</h1><pre><code>这一步initSession(session, null, null);主要的有两段可配置的属性，一个就是存储attribute属性键值对的Map，默认是ConcurrentHashMap；另一个就是发送队列，默认是ConcurrentLinkedQueue。若要实现自己的数据结构，需要重写接口IoSessionDataStructureFactory或继承DefaultIoSessionDataStructureFactory。
+</code></pre><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">try</span> &#123;  </div><div class="line">    ((AbstractIoSession) session).setAttributeMap(session.getService().getSessionDataStructureFactory()  </div><div class="line">            .getAttributeMap(session));  </div><div class="line">&#125; <span class="keyword">catch</span> (IoSessionInitializationException e) &#123;  </div><div class="line">    <span class="keyword">throw</span> e;  </div><div class="line">&#125; <span class="keyword">catch</span> (Exception e) &#123;  </div><div class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> IoSessionInitializationException(<span class="string">"Failed to initialize an attributeMap."</span>, e);  </div><div class="line">&#125;  </div><div class="line">  </div><div class="line"><span class="keyword">try</span> &#123;  </div><div class="line">    ((AbstractIoSession) session).setWriteRequestQueue(session.getService().getSessionDataStructureFactory()  </div><div class="line">            .getWriteRequestQueue(session));  </div><div class="line">&#125; <span class="keyword">catch</span> (IoSessionInitializationException e) &#123;  </div><div class="line">    <span class="keyword">throw</span> e;  </div><div class="line">&#125; <span class="keyword">catch</span> (Exception e) &#123;  </div><div class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> IoSessionInitializationException(<span class="string">"Failed to initialize a writeRequestQueue."</span>, e);  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h1 id="3-IoSession在服务器端的创建第三步：session-getProcessor-add-session"><a href="#3-IoSession在服务器端的创建第三步：session-getProcessor-add-session" class="headerlink" title="3. IoSession在服务器端的创建第三步：session.getProcessor().add(session);"></a>3. IoSession在服务器端的创建第三步：session.getProcessor().add(session);</h1><pre><code>这一步就是为我们新生成的IoSession在IoService的Processor池中指定一个Processor处理。分配的方式就是取模分配，完成后在分配Processor中增加该IoSession的引用。SimpleIoProcessorPool中的代码如下：
+</code></pre><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title">add</span><span class="params">(S session)</span> </span>&#123;  </div><div class="line"><span class="comment">//请注意这里是两步，第一步getProcessor(session)在下面段代码，创建（若没有）并返回Processor  </span></div><div class="line"><span class="comment">//第二步在该Processor中add(session),这里就是调用AbstractPollingIoProcessor.add()，后面有更多描述  </span></div><div class="line">       getProcessor(session).add(session);  </div><div class="line">   &#125;</div></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">private</span> IoProcessor&lt;S&gt; <span class="title">getProcessor</span><span class="params">(S session)</span> </span>&#123;  </div><div class="line">    IoProcessor&lt;S&gt; processor = (IoProcessor&lt;S&gt;) session.getAttribute(PROCESSOR);  </div><div class="line">  </div><div class="line">    <span class="keyword">if</span> (processor == <span class="keyword">null</span>) &#123;  </div><div class="line">        <span class="keyword">if</span> (disposed || disposing) &#123;  </div><div class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">"A disposed processor cannot be accessed."</span>);  </div><div class="line">        &#125;  </div><div class="line">  </div><div class="line">        processor = pool[Math.abs((<span class="keyword">int</span>) session.getId()) % pool.length];  </div><div class="line">  </div><div class="line">        <span class="keyword">if</span> (processor == <span class="keyword">null</span>) &#123;  </div><div class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">"A disposed processor cannot be accessed."</span>);  </div><div class="line">        &#125;  </div><div class="line">  </div><div class="line">        session.setAttributeIfAbsent(PROCESSOR, processor);  </div><div class="line">    &#125;  </div><div class="line">  </div><div class="line">    <span class="keyword">return</span> processor;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h1 id="4-SimpleIoProcessorPool、IoProcess和NioSocketAcceptor之间的关系"><a href="#4-SimpleIoProcessorPool、IoProcess和NioSocketAcceptor之间的关系" class="headerlink" title="4. SimpleIoProcessorPool、IoProcess和NioSocketAcceptor之间的关系"></a>4. SimpleIoProcessorPool、IoProcess和NioSocketAcceptor之间的关系</h1><pre><code>上节我们留了个悬念，SimpleIoProcessorPool、IoProcess和IoServices之间的到底是关系呢？我们从SimpleIoProcessorPool初始化池说起：
+</code></pre><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; pool.length; i++) &#123;  </div><div class="line">    ...  </div><div class="line">    pool[i] = processorConstructor.newInstance(<span class="keyword">this</span>.executor);  </div><div class="line">    ...  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<pre><code>这段代码将生成的线程池当做构造传参传递给所有的NioProcess，即数组池中所有NioProcess都是共享一个Executro线程池的（newCashedThreadPool）。AbstractPollingIoProcessor.add()方法做了这些工作：
+</code></pre><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title">add</span><span class="params">(S session)</span> </span>&#123;  </div><div class="line">      <span class="keyword">if</span> (disposed || disposing) &#123;  </div><div class="line">          <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">"Already disposed."</span>);  </div><div class="line">      &#125;  </div><div class="line">  </div><div class="line">      <span class="comment">// 将session添加到ConcurrentLinkedQueue的队列中，并启动Processor 的worker线程  </span></div><div class="line">      newSessions.add(session);  </div><div class="line"><span class="comment">//启动Processor线程  </span></div><div class="line">tartupProcessor();   </div><div class="line">  &#125;</div></pre></td></tr></table></figure>
+<pre><code>我们很有必要具体看一下Processor线程做了什么：
+</code></pre><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">Processor</span> <span class="keyword">implements</span> <span class="title">Runnable</span> </span>&#123;  </div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;  </div><div class="line"> ...  </div><div class="line">        <span class="keyword">for</span> (;;) &#123;  </div><div class="line">            <span class="keyword">try</span> &#123;  </div><div class="line">                <span class="comment">// 监控空闲时间  </span></div><div class="line">                <span class="keyword">long</span> t0 = System.currentTimeMillis();  </div><div class="line">                <span class="keyword">int</span> selected = select(<span class="number">1000</span>);  </div><div class="line">                <span class="keyword">long</span> t1 = System.currentTimeMillis();  </div><div class="line">                <span class="keyword">long</span> delta = (t1 - t0);  </div><div class="line">  </div><div class="line">                ...  </div><div class="line">                <span class="comment">// 注册新的session连接，并初始化session信息，如过滤器链，  </span></div><div class="line">  <span class="comment">// 通知service的监听器  </span></div><div class="line">                nSessions += handleNewSessions();  </div><div class="line">  ...  </div><div class="line">                <span class="comment">// 处理新的请求  </span></div><div class="line">                <span class="keyword">if</span> (selected &gt; <span class="number">0</span>) &#123;  </div><div class="line">                    process();  </div><div class="line">                &#125;  </div><div class="line">  ...  </div><div class="line">                <span class="comment">// 移除  </span></div><div class="line">                nSessions -= removeSessions();  </div><div class="line">  </div><div class="line">                <span class="comment">// 通知空闲监听器  </span></div><div class="line">                notifyIdleSessions(currentTime);  </div><div class="line">  </div><div class="line">                ...  </div><div class="line">  <span class="comment">//关闭  </span></div><div class="line">                <span class="keyword">if</span> (isDisposing()) &#123;  </div><div class="line">                    <span class="keyword">for</span> (Iterator&lt;S&gt; i = allSessions(); i.hasNext();) &#123;  </div><div class="line">                        scheduleRemove(i.next());  </div><div class="line">                    &#125;  </div><div class="line">  </div><div class="line">                    wakeup();  </div><div class="line">                &#125;  </div><div class="line">            &#125; <span class="keyword">catch</span> ...  </div><div class="line">        &#125;  </div><div class="line"> ...  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<pre><code>其中，handlesNewSessions()做了如下工作：
+</code></pre><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">    <span class="comment">//在selector上注册感兴趣的相应集合读操作  </span></div><div class="line">        SelectableChannel ch = (SelectableChannel) session.getChannel();  </div><div class="line">        ch.configureBlocking(<span class="keyword">false</span>);  </div><div class="line">        session.setSelectionKey(ch.register(selector, SelectionKey.OP_READ, session));  </div><div class="line">  </div><div class="line">   <span class="comment">//将service的过滤器链设置在session上  </span></div><div class="line">        IoFilterChainBuilder chainBuilder = session.getService().getFilterChainBuilder();  </div><div class="line">        chainBuilder.buildFilterChain(session.getFilterChain());  </div><div class="line">    <span class="comment">//回调监听器  </span></div><div class="line">        IoServiceListenerSupport listeners = ((AbstractIoService) session.getService()).getListeners();  </div><div class="line">        listeners.fireSessionCreated(session);</div></pre></td></tr></table></figure>
+<pre><code>至此SimpleIoProcessorPool、IoProcess和IoServices的关系就清晰了。
+</code></pre><ul>
+<li>SimpleIoProcessorPool维护一组IoProcess[] ，每个IoProcess都在线程池中绑定了工作线程，该工作线程开启一个selector并监听session交互OP_READ。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="title">NioProcessor</span><span class="params">(Executor executor)</span> </span>&#123;  </div><div class="line">    <span class="keyword">super</span>(executor);  </div><div class="line">  </div><div class="line">    <span class="keyword">try</span> &#123;  </div><div class="line">        selector = Selector.open();  </div><div class="line">    &#125; <span class="keyword">catch</span> (IOException e) &#123;  </div><div class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeIoException(<span class="string">"Failed to open a selector."</span>, e);  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<ul>
+<li><p>NioSocketAcceptor持有一个pool的引用</p>
+</li>
+<li><p>NioSocketAcceptor自身也有个单线程的executor，用于监听新的session的链接OP_ACCEPT。</p>
+</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">NioSocketAcceptor.init() <span class="keyword">throws</span> Exception &#123;  </div><div class="line">    selector = Selector.open();  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h1 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h1><pre><code>今天分析了IoSession后，mina的框架体系就比较清晰了，不过还有重要的filter、handler等，我们接下来几章继续探讨。
+</code></pre><p>版权声明：本文为博主原创文章，未经博主允许不得转载。</p>
+
+            <blockquote>
+                <p>
+                本文地址：
+                <a href="https://smuwjs.github.io/2016/09/08/mina学习笔记四：交互的核心IoSession/" target="_blank" rel="external">https://smuwjs.github.io/2016/09/08/mina学习笔记四：交互的核心IoSession/</a>
+                </p>
+                <footer><cite><a href="https://smuwjs.github.io">@Jeeson's Blog</a></cite></footer>
+            </blockquote>
+            </div>
+            
+<nav class="post-nav">
+  
+    <div class="waves-block waves-effect prev fl">
+      <a href="/2016/09/08/mina学习笔记五：做嫁衣的IoFilter和IoListener/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">mina学习笔记五：做嫁衣的IoFilter和IoListener</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next fr">
+      <a href="/2016/09/08/mina学习笔记三：一切的源头IoService/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">mina学习笔记三：一切的源头IoService</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+            
+            
+<div class="duoshuo">
+	<!-- 多说评论框 start -->
+	<div class="ds-thread" data-thread-key="mina学习笔记四：交互的核心IoSession" data-title="mina学习笔记四：交互的核心IoSession" data-url="https://smuwjs.github.io/2016/09/08/mina学习笔记四：交互的核心IoSession/index.html"></div>
+	<!-- 多说评论框 end -->
+	<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+	<script type="text/javascript">
+	var duoshuoQuery = {short_name:"smuwjs"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+	<!-- 多说公共JS代码 end -->
+</div>
+
+
+
+
+
+        </div>
+    </div>
+</article>
+    </div>
+  </main>
+<div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+<script>
+var BLOG_SHARE = {
+    title: "mina学习笔记四：交互的核心IoSession",
+    pic: "/img/head.png",
+    summary: document.getElementsByName('summary')[0].content,
+    url: "https://smuwjs.github.io/2016/09/08/mina学习笔记四：交互的核心IoSession/index.html"
+};
+</script>
+<div class="global-share" id="global-share">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+<script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+
+<script src="/js/main.js"></script>
+
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<script type="text/template" id="search-tpl">
+<li class="item">
+    <a href="/{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</script>
+
+<script src="/js/search.js"></script>
+
+
+
+
+
+
+
+
+
+</body>
+</html>
