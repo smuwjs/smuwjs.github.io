@@ -162,11 +162,9 @@
 
     
           原文：http://blog.csdn.net/yoara/article/details/37726817  
-   1.基于java.comm的串口编程   以前做过一个针对串口扫描枪解析的项目，当时是用的java.comm包。回忆一下当时是怎么做的。
-
-第一步：下载comm包，它包含有三个文件win32com.dll、comm.jar、javax.comm.properties
-
-第二步
+   1.基于java.comm的串口编程  以前做过一个针对串口扫描枪解析的项目，当时是用的java.comm包。回忆一下当时是怎么做的。 
+ 第一步：下载comm包，它包含有三个文件win32com.dll、comm.jar、javax.comm.properties 
+ 第二
     
     
         <a href="/2016/09/08/mina学习笔记七：串口编程/" class="post-more waves-effect waves-button">
@@ -210,8 +208,8 @@
 
     
           原文：http://blog.csdn.net/yoara/article/details/37612703  
-   补充一些可能没讲到的细节。 
-   1.WriteRequest   每一个session.write()操作都会被封装成writeRequest并被添加到WriteRequestQueue队列中。过滤器的每一次责任链流转都是以writeRequest为传参的。我们的老祖父A
+ 补充一些可能没讲到的细节。 
+   1.WriteRequest  每一个session.write()操作都会被封装成writeRequest并被添加到WriteRequestQueue队列中。过滤器的每一次责任链流转都是以writeRequest为传参的。我们的老祖父Abst
     
     
         <a href="/2016/09/08/mina学习笔记六：补刀/" class="post-more waves-effect waves-button">
@@ -344,10 +342,10 @@
 
     
           原文:http://blog.csdn.net/yoara/article/details/37382137  
-   1.IoService介绍   从上节的例子已经了解到，创建服务端服务第一步是：
-        1      IoAcceptor acceptor =  new  NioSocketAcceptor();      
+   1.IoService介绍  从上节的例子已经了解到，创建服务端服务第一步是： 
+      1      IoAcceptor acceptor =  new  NioSocketAcceptor();      
  而创建客户端连接的第一步是： 
-      1   
+      1     
     
     
         <a href="/2016/09/08/mina学习笔记三：一切的源头IoService/" class="post-more waves-effect waves-button">
@@ -392,9 +390,9 @@
     
           原文：http://blog.csdn.net/yoara/article/details/37324821      
  本节内容只介绍mina总体架构，同时给出官方的几个实用TCP、UDP的经典服务端客户端例子。 
-   mina体系结构   mina位于用户程序和网络处理之间，将用户从复杂的网络处理中解耦，那我们就可以更加关注业务领域。
-     
-  让我们再深入进去，mina框架内部
+   mina体系结构  mina位于用户程序和网络处理之间，将用户从复杂的网络处理中解耦，那我们就可以更加关注业务领域。 
+   
+ 让我们再深入进去，mina框架内部的各个
     
     
         <a href="/2016/09/08/mina学习笔记二：从官方例子开始/" class="post-more waves-effect waves-button">
@@ -403,49 +401,6 @@
     </div>
     
 	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java-mina/">java mina</a></li></ul>
-
-</article>
-
-    </li>
-  
-    <li class="post-list-item">
-        <article id="post-GitHub+Hexo"
-  class="article article-type-post" itemprop="blogPost">
-     
-
-
-  
-    <h3 class="post-title" itemprop="name">
-      <a class="post-title-link" href="/2016/09/08/GitHub+Hexo/">使用GitHub搭建Hexo博客</a>
-    </h3>
-  
-
-
-
-    <div class="post-meta">
-        <time datetime="2016-09-08T20:12:13.000Z" itemprop="datePublished" class="post-time">
-  2016-09-08
-</time>
-
-        
-	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Hexo/">Hexo</a></li></ul>
-
-
-
-    </div>
-
-    <div class="post-content" id="post-content" itemprop="postContent" >
-
-    
-         来到GitHub这么长时间，才开始真真的了解GitHub，这个国外的代码托管平台，充满着大牛的身影。 国内也有不多少的代码托管平台，本文将就用GitHub的GitHub Pages 功能来搭建，我的个性博客，最近在学习JS后端Node.js, 现在火的不行, 异步IO的机制, 所以在学习过程中发现了 hexo 是由Node.js驱动的一款快速、简单且功能强大的博客框架。 比起WordPress，hexo的搭建更加简洁，配合上markdown的使用，更加便捷的管理自己的学习文档。 
-    
-    
-        <a href="/2016/09/08/GitHub+Hexo/" class="post-more waves-effect waves-button">
-            阅读全文...
-        </a>
-    </div>
-    
-	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Hexo/">Hexo</a></li></ul>
 
 </article>
 
@@ -490,6 +445,49 @@
     </div>
     
 	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java-mina/">java mina</a></li></ul>
+
+</article>
+
+    </li>
+  
+    <li class="post-list-item">
+        <article id="post-GitHub+Hexo"
+  class="article article-type-post" itemprop="blogPost">
+     
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a class="post-title-link" href="/2016/09/08/GitHub+Hexo/">使用GitHub搭建Hexo博客</a>
+    </h3>
+  
+
+
+
+    <div class="post-meta">
+        <time datetime="2016-09-08T20:12:12.000Z" itemprop="datePublished" class="post-time">
+  2016-09-08
+</time>
+
+        
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Hexo/">Hexo</a></li></ul>
+
+
+
+    </div>
+
+    <div class="post-content" id="post-content" itemprop="postContent" >
+
+    
+         来到GitHub这么长时间，才开始真真的了解GitHub，这个国外的代码托管平台，充满着大牛的身影。 国内也有不多少的代码托管平台，本文将就用GitHub的GitHub Pages 功能来搭建，我的个性博客，最近在学习JS后端Node.js, 现在火的不行, 异步IO的机制, 所以在学习过程中发现了 hexo 是由Node.js驱动的一款快速、简单且功能强大的博客框架。 比起WordPress，hexo的搭建更加简洁，配合上markdown的使用，更加便捷的管理自己的学习文档。 
+    
+    
+        <a href="/2016/09/08/GitHub+Hexo/" class="post-more waves-effect waves-button">
+            阅读全文...
+        </a>
+    </div>
+    
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Hexo/">Hexo</a></li></ul>
 
 </article>
 
