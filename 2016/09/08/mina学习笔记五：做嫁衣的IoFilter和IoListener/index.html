@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>mina学习笔记五：做嫁衣的IoFilter和IoListener | Jeeson&#39;s Blog | Write the code. Change the world.</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  <meta name="theme-color" content="#3F51B5">
+  
+  
+  <meta name="keywords" content="java mina">
+  <meta name="description" content="原文：http://blog.csdn.net/yoara/article/details/37597141     总有那么一群人，他们默默无闻的工作在自己的岗位上，你永远都接触不到他们，可是离了他们完整的做好一件事。譬如只注意在荧光屏上的明星，却不知道谁给他们打得灯光、谁给他们踩得位、谁给他们化妆端茶送水等等。IoFilter也是这群人中的一员，每个session的请求和事件离不了他们，IoF">
+<meta name="keywords" content="java mina">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mina学习笔记五：做嫁衣的IoFilter和IoListener">
+<meta property="og:url" content="https://smuwjs.github.io/2016/09/08/mina学习笔记五：做嫁衣的IoFilter和IoListener/index.html">
+<meta property="og:site_name" content="Jeeson&#39;s Blog">
+<meta property="og:description" content="原文：http://blog.csdn.net/yoara/article/details/37597141     总有那么一群人，他们默默无闻的工作在自己的岗位上，你永远都接触不到他们，可是离了他们完整的做好一件事。譬如只注意在荧光屏上的明星，却不知道谁给他们打得灯光、谁给他们踩得位、谁给他们化妆端茶送水等等。IoFilter也是这群人中的一员，每个session的请求和事件离不了他们，IoF">
+<meta property="og:image" content="http://opesdt6ii.bkt.clouddn.com/17-5-5/15329899-file_1493966521689_24fe.png">
+<meta property="og:updated_time" content="2017-05-09T10:02:16.469Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="mina学习笔记五：做嫁衣的IoFilter和IoListener">
+<meta name="twitter:description" content="原文：http://blog.csdn.net/yoara/article/details/37597141     总有那么一群人，他们默默无闻的工作在自己的岗位上，你永远都接触不到他们，可是离了他们完整的做好一件事。譬如只注意在荧光屏上的明星，却不知道谁给他们打得灯光、谁给他们踩得位、谁给他们化妆端茶送水等等。IoFilter也是这群人中的一员，每个session的请求和事件离不了他们，IoF">
+<meta name="twitter:image" content="http://opesdt6ii.bkt.clouddn.com/17-5-5/15329899-file_1493966521689_24fe.png">
+  
+    <link rel="alternative" href="/atom.xml" title="Jeeson&#39;s Blog" type="application/atom+xml">
+  
+  <meta name="summary" content="null">
+  <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="loading" class="active"></div>
+
+  <nav id="menu" class="hide" >
+   <div class="inner flex-row-vertical">
+  <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+      <i class="icon icon-lg icon-close"></i>
+  </a>
+  <div class="brand-wrap">
+    <div class="brand">
+      <a href="/" class="avatar"><img src="/img/head.png"></a>
+      <hgroup class="introduce">
+        <h5 class="nickname">Jeeson</h5>
+        <a href="mailto:smuwjs@163.com" title="smuwjs@163.com" class="mail">smuwjs@163.com</a>
+      </hgroup>
+    </div>
+  </div>
+  <div class="scroll-wrap flex-col">
+    <ul class="nav">
+      
+          <li class="waves-block waves-effect">
+            <a href="/"  >
+              <i class="icon icon-lg icon-home"></i>
+              博客首页
+            </a>
+          </li>
+      
+          <li class="waves-block waves-effect">
+            <a href="/archives"  >
+              <i class="icon icon-lg icon-archives"></i>
+              文章归档
+            </a>
+          </li>
+      
+          <li class="waves-block waves-effect">
+            <a href="/tags"  >
+              <i class="icon icon-lg icon-tags"></i>
+              我的标签
+            </a>
+          </li>
+      
+          <li class="waves-block waves-effect">
+            <a href="https://github.com/smuwjs" target="_blank" >
+              <i class="icon icon-lg icon-github"></i>
+              Github
+            </a>
+          </li>
+      
+          <li class="waves-block waves-effect">
+            <a href="http://www.weibo.com/ysweb" target="_blank" >
+              <i class="icon icon-lg icon-weibo"></i>
+              微博
+            </a>
+          </li>
+      
+    </ul>
+
+    <footer class="footer">
+  <p><a rel="license" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0;vertical-align:middle;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAAAPCAMAAABEF7i9AAAAllBMVEUAAAD///+rsapERER3d3eIiIjMzMzu7u4iIiKUmZO6v7rKzsoODg4RERFVVVUNDQ0NDg0PEA8zMzNLTEtbXltmZmZydnF9gn2AgICPkI+ZmZmqqqq7u7vFxsXIzMgNDQwZGRkgICAhISEkJSMnKCcuMC4xMzE5Ozk7PTtBQkFCQkJDQ0Nna2eGhoaHh4ezuLLGysbd3d1wVGpAAAAA4UlEQVR42q2T1xqCMAyFk7QsBQeKA9x7j/d/OSm22CpX0nzcpA1/T05aAOuBVkMAScQFHLnEwoCo2f1TnQIGoVMewjZEjVFN4GH1Ue1Cn2jWqwfsOOj6wDwGvotsl/c8lv7KIq1eLOsT0HMFHMIE/RZyHnlphryT9zyV+8WH5e8yQw3wnQvgAFxPTKUVi555SHR/lOfLMgVTeDlSfN+TaoUsiTyeIm+bCkHvCA2FUKG48LDtYBZBknsYP/G8NTw0gaaHyuQf4H5pecrB/FYCT2sL9zAfy1Xyjou6L8X2W7YcLyBZCRtnq/zfAAAAAElFTkSuQmCC" /></a></p>
+  <p>Jeeson&#39;s Blog &copy; 2017</p>
+  <p>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme
+  <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></p>
+  <a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-2x icon-rss-square"></i></a>
+</footer>
+
+  </div>
+</div>
+
+  </nav>
+  <main id="main">
+    <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">mina学习笔记五：做嫁衣的IoFilter和IoListener</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input " autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-share">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header">
+  <div class="container">
+    <h1 class="author">mina学习笔记五：做嫁衣的IoFilter和IoListener</h1>
+    <h5 class="subtitle">
+        
+            <time datetime="2016-09-08T20:12:17.000Z" itemprop="datePublished" class="page-time">
+  2016-09-08
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/mina/">mina</a></li></ul>
+
+        
+    </h5>
+  </div>
+</header>
+
+    <div class="container body-wrap">
+      <article id="post-mina学习笔记五：做嫁衣的IoFilter和IoListener" 
+  class="article article-type-post" itemprop="blogPost">
+    <div class="post-meta flex-row">
+        
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java-mina/">java mina</a></li></ul>
+
+    </div>
+    <div class="post-body">
+        <aside class="post-widget" id="post-widget">
+
+            
+            <div class="post-share" id="post-share">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+            
+
+            
+            <nav class="post-toc-wrap" id="post-toc">
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#1-IoFilter的一家子"><span class="post-toc-text">1.IoFilter的一家子</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#2-IoFilter执行顺序"><span class="post-toc-text">2.IoFilter执行顺序</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#2-1-messageSent顺序调用过滤器链"><span class="post-toc-text">2.1 messageSent顺序调用过滤器链</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#2-2-session-write逆序调用过滤器链"><span class="post-toc-text">2.2 session.write逆序调用过滤器链</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#3-IoHandler-API"><span class="post-toc-text">3.IoHandler API</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#4-IoFilter-API"><span class="post-toc-text">4. IoFilter API</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#5-IoListener"><span class="post-toc-text">5. IoListener</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#5-1-IoServiceListener"><span class="post-toc-text">5.1 IoServiceListener</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#5-1-IoFutureListener"><span class="post-toc-text">5.1 IoFutureListener</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#6-结语"><span class="post-toc-text">6. 结语</span></a></li></ol>
+            </nav>
+            
+        </aside>
+
+        <div class="post-main">
+
+            <div class="post-content" id="post-content" itemprop="postContent">
+            <p><a href="http://blog.csdn.net/yoara/article/details/37597141" target="_blank" rel="external">原文：http://blog.csdn.net/yoara/article/details/37597141</a>    </p>
+<p>总有那么一群人，他们默默无闻的工作在自己的岗位上，你永远都接触不到他们，可是离了他们完整的做好一件事。譬如只注意在荧光屏上的明星，却不知道谁给他们打得灯光、谁给他们踩得位、谁给他们化妆端茶送水等等。IoFilter也是这群人中的一员，每个session的请求和事件离不了他们，IoFilter在IoService和IoHandler之间提供了各个层面的切面支持，让其他两个组件安心做自己的事而不用关注其他细节。软件工程的魅力也在于此——解耦。</p>
+<h1 id="1-IoFilter的一家子"><a href="#1-IoFilter的一家子" class="headerlink" title="1.IoFilter的一家子"></a>1.IoFilter的一家子</h1><p>IoFilter家族的类图结构非常简单明快，mina非常贴心的为广大使用者提供了丰富的Filter实现子类，很多标准服务我们都不需要自己实现。 </p>
+<p>图5.1 IoFilter类图     我们先简单介绍一下这个家族成员和他们各自的作用吧：<br>| Filter                       | class                                    | Description                              |<br>| —————————- | —————————————- | —————————————- |<br>| Blacklist                    | <a href="http://mina.apache.org/mina-project/xref/org/apache/mina/filter/firewall/BlacklistFilter.html" target="_blank" rel="external">BlacklistFilter</a> | 黑名单过滤器                                   |<br>| BufferedWrite                | <a href="http://mina.apache.org/mina-project/xref/org/apache/mina/filter/buffer/BufferedWriteFilter.html" target="_blank" rel="external">BufferedWriteFilter</a> | 发送缓存过滤器，缓存发送的消息，避免短小消息频繁发送               |<br>| Compression                  | <a href="http://mina.apache.org/mina-project/xref/org/apache/mina/filter/compression/CompressionFilter.html" target="_blank" rel="external">CompressionFilter</a> | 数据压缩过滤器                                  |<br>| ConnectionThrottle           | <a href="http://mina.apache.org/mina-project/xref/org/apache/mina/filter/firewall/ConnectionThrottleFilter.html" target="_blank" rel="external">ConnectionThrottleFilter</a> | 连接控制过滤器，对同一IP地址频繁的创建连接的时间间隔进行控制          |<br>| ErrorGenerating              | <a href="http://mina.apache.org/mina-project/xref/org/apache/mina/filter/errorgenerating/ErrorGeneratingFilter.html" target="_blank" rel="external">ErrorGeneratingFilter</a> | 花数据过滤器，增加、修改、移除接受的数据包内容，可作为加密的方式         |<br>| Executor                     | <a href="http://mina.apache.org/mina-project/xref/org/apache/mina/filter/executor/ExecutorFilter.html" target="_blank" rel="external">ExecutorFilter</a> | 处理线程池过滤器，让每个请求或者事件都通过线程池去执行              |<br>| FileRegionWrite              | <a href="http://mina.apache.org/mina-project/xref/org/apache/mina/filter/stream/FileRegionWriteFilter.html" target="_blank" rel="external">FileRegionWriteFilter</a> | 文件转换过滤器，通常应该由IoProcess做这件事，但若需要压缩或者修改时，可通过过滤器链之间的配合来实现 |<br>| KeepAlive                    | <a href="http://mina.apache.org/mina-project/xref/org/apache/mina/filter/keepalive/KeepAliveFilter.html" target="_blank" rel="external">KeepAliveFilter</a> | 心跳包过滤器，在idle状态时发送心跳包，并能对超时进行处理           |<br>| Logging                      | <a href="http://mina.apache.org/mina-project/xref/org/apache/mina/filter/logging/LoggingFilter.html" target="_blank" rel="external">LoggingFilter</a> | 日志记录过滤器，最常用之一                            |<br>| MDC Injection                | <a href="http://mina.apache.org/mina-project/xref/org/apache/mina/filter/logging/MdcInjectionFilter.html" target="_blank" rel="external">MdcInjectionFilter</a> | 日志信息注入过滤器，MDC(Mapped Diagnostic Context有译作线程映射表)是日志框架维护的一组信息键值对，可向日志输出信息中插入一些想要显示的内容。 |<br>| Noop                         | <a href="http://mina.apache.org/mina-project/xref/org/apache/mina/filter/util/NoopFilter.html" target="_blank" rel="external">NoopFilter</a> | 用作内部测试的filter，什么也没做                      |<br>| Profiler                     | <a href="http://mina.apache.org/mina-project/xref/org/apache/mina/filter/statistic/ProfilerTimerFilter.html" target="_blank" rel="external">ProfilerTimerFilter</a> | 时间分析过滤器，记录各种事件消耗的时间                      |<br>| ProtocolCodec                | <a href="http://mina.apache.org/mina-project/xref/org/apache/mina/filter/codec/ProtocolCodecFilter.html" target="_blank" rel="external">ProtocolCodecFilter</a> | 编解码过滤器，最常用之二                             |<br>| Proxy                        | <a href="http://mina.apache.org/mina-project/xref/org/apache/mina/proxy/filter/ProxyFilter.html" target="_blank" rel="external">ProxyFilter</a> | 是IoConnector在连接握手时自动加入的过滤器，握手成功后就透明了     |<br>| Reference counting           | <a href="http://mina.apache.org/mina-project/xref/org/apache/mina/filter/util/ReferenceCountingFilter.html" target="_blank" rel="external">ReferenceCountingFilter</a> | 引用数过滤器，能记录该过滤器被加入或移除过滤器链的次数，真实使用是继承他。    |<br>| RequestResponse              | <a href="http://mina.apache.org/mina-project/xref/org/apache/mina/filter/reqres/RequestResponseFilter.html" target="_blank" rel="external">RequestResponseFilter</a> | 继承WriteRequest                           |<br>| SessionAttributeInitializing | <a href="http://mina.apache.org/mina-project/xref/org/apache/mina/filter/util/SessionAttributeInitializingFilter.html" target="_blank" rel="external">SessionAttributeInitializingFilter</a> | 初始化过滤器                                   |<br>| StreamWrite                  | <a href="http://mina.apache.org/mina-project/xref/org/apache/mina/filter/stream/StreamWriteFilter.html" target="_blank" rel="external">StreamWriteFilter</a> | InputStream直接转换成IoBuffer的过滤器             |<br>| SslFilter                    | <a href="http://mina.apache.org/mina-project/xref/org/apache/mina/filter/ssl/SslFilter.html" target="_blank" rel="external">SslFilter</a> | TCP/IP层面的SSl加解密过滤器                       |<br>| WriteRequest                 | <a href="http://mina.apache.org/mina-project/xref/org/apache/mina/filter/util/WriteRequestFilter.html" target="_blank" rel="external">WriteRequestFilter</a> | 简化IoFilter IoEventType.WRITE事件的实现的抽象过滤器  |</p>
+<p>还有两个FIlter是mina自带并且不为用户管理的，当生成过滤器链自动注入：</p>
+<ul>
+<li>HeadFilter（当发生write操作时，将写buffer加入到session.scheduledWriteMessages队列，并执行发送调用IoProcessor执行write()操作），位于过滤器链头。</li>
+<li>TailFilter（当所有过滤器都处理完后，他将调用IoHandler的对应方法）。位于过滤器链尾。</li>
+</ul>
+<h1 id="2-IoFilter执行顺序"><a href="#2-IoFilter执行顺序" class="headerlink" title="2.IoFilter执行顺序"></a>2.IoFilter执行顺序</h1><p>搞清楚了 </p>
+<p><img src="http://opesdt6ii.bkt.clouddn.com/17-5-5/15329899-file_1493966521689_24fe.png" alt="图5.2 过滤器调用顺序图"></p>
+<p>在事件端，我们以messageSent事件被执行的代码来详解下过程；在操作端我们的例子是session.write。</p>
+<h2 id="2-1-messageSent顺序调用过滤器链"><a href="#2-1-messageSent顺序调用过滤器链" class="headerlink" title="2.1 messageSent顺序调用过滤器链"></a>2.1 messageSent顺序调用过滤器链</h2><pre><code>当IoProcessor的remove(session)方法被调用时，该session将被添加进Processor内部的removingSessions的ConcurrentLinkedQueue等待被移除。
+</code></pre><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title">remove</span><span class="params">(S session)</span> </span>&#123;  </div><div class="line">    scheduleRemove(session);  </div><div class="line">    startupProcessor();  </div><div class="line">&#125;  </div><div class="line">  </div><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">scheduleRemove</span><span class="params">(S session)</span> </span>&#123;  </div><div class="line">    removingSessions.add(session);  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>当IoProcessor工作线程执行一个循环，调用removeSessions()方法，状态为SessionState.OPENED的session将被移除，移除的代码中就包括刷新消息队列，其中代码如下，从而引发一次过滤器链的调用。 </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">if</span> (message <span class="keyword">instanceof</span> IoBuffer) &#123;  </div><div class="line">    IoBuffer buf = (IoBuffer) message;  </div><div class="line">    <span class="keyword">if</span> (buf.hasRemaining()) &#123;  </div><div class="line">        buf.reset();  </div><div class="line">        failedRequests.add(req);  </div><div class="line">    &#125; <span class="keyword">else</span> &#123;  </div><div class="line">        IoFilterChain filterChain = session.getFilterChain();  </div><div class="line">        filterChain.fireMessageSent(req);  </div><div class="line">    &#125;  </div><div class="line">&#125; <span class="keyword">else</span> &#123;  </div><div class="line">    failedRequests.add(req);  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>最终调用的是TailFilter，他的代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">TailFilter</span> <span class="keyword">extends</span> <span class="title">IoFilterAdapter</span> </span>&#123;  </div><div class="line">  </div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">sessionCreated</span><span class="params">(NextFilter nextFilter, IoSession session)</span> <span class="keyword">throws</span> Exception </span>&#123;  </div><div class="line">            session.getHandler().sessionCreated(session);  </div><div class="line">        &#125;  </div><div class="line">  </div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">sessionOpened</span><span class="params">(NextFilter nextFilter, IoSession session)</span> <span class="keyword">throws</span> Exception </span>&#123;  </div><div class="line">            session.getHandler().sessionOpened(session);  </div><div class="line">        &#125;  </div><div class="line">  </div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">sessionClosed</span><span class="params">(NextFilter nextFilter, IoSession session)</span> <span class="keyword">throws</span> Exception </span>&#123;  </div><div class="line">            AbstractIoSession s = (AbstractIoSession) session;  </div><div class="line">            <span class="keyword">try</span> &#123;  </div><div class="line">                s.getHandler().sessionClosed(session);  </div><div class="line">            &#125; <span class="keyword">finally</span> &#123;  </div><div class="line">                <span class="keyword">try</span> &#123;  </div><div class="line">                    s.getWriteRequestQueue().dispose(session);  </div><div class="line">                &#125; <span class="keyword">finally</span> &#123;  </div><div class="line">                    <span class="keyword">try</span> &#123;  </div><div class="line">                        s.getAttributeMap().dispose(session);  </div><div class="line">                    &#125; <span class="keyword">finally</span> &#123;  </div><div class="line">                        <span class="keyword">try</span> &#123;  </div><div class="line">                            <span class="comment">// Remove all filters.  </span></div><div class="line">                            session.getFilterChain().clear();  </div><div class="line">                        &#125; <span class="keyword">finally</span> &#123;  </div><div class="line">                            <span class="keyword">if</span> (s.getConfig().isUseReadOperation()) &#123;  </div><div class="line">                                s.offerClosedReadFuture();  </div><div class="line">                            &#125;  </div><div class="line">                        &#125;  </div><div class="line">                    &#125;  </div><div class="line">                &#125;  </div><div class="line">            &#125;  </div><div class="line">        &#125;  </div><div class="line">  </div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">sessionIdle</span><span class="params">(NextFilter nextFilter, IoSession session, IdleStatus status)</span> <span class="keyword">throws</span> Exception </span>&#123;  </div><div class="line">            session.getHandler().sessionIdle(session, status);  </div><div class="line">        &#125;  </div><div class="line">  </div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">exceptionCaught</span><span class="params">(NextFilter nextFilter, IoSession session, Throwable cause)</span> <span class="keyword">throws</span> Exception </span>&#123;  </div><div class="line">            AbstractIoSession s = (AbstractIoSession) session;  </div><div class="line">            <span class="keyword">try</span> &#123;  </div><div class="line">                s.getHandler().exceptionCaught(s, cause);  </div><div class="line">            &#125; <span class="keyword">finally</span> &#123;  </div><div class="line">                <span class="keyword">if</span> (s.getConfig().isUseReadOperation()) &#123;  </div><div class="line">                    s.offerFailedReadFuture(cause);  </div><div class="line">                &#125;  </div><div class="line">            &#125;  </div><div class="line">        &#125;  </div><div class="line">  </div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">messageReceived</span><span class="params">(NextFilter nextFilter, IoSession session, Object message)</span> <span class="keyword">throws</span> Exception </span>&#123;  </div><div class="line">            session.getHandler().messageReceived(s, message);  </div><div class="line">        &#125;  </div><div class="line">  </div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">messageSent</span><span class="params">(NextFilter nextFilter, IoSession session, WriteRequest writeRequest)</span> <span class="keyword">throws</span> Exception </span>&#123;  </div><div class="line">            session.getHandler().messageSent(session, writeRequest.getMessage());  </div><div class="line">        &#125;  </div><div class="line">  </div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">filterWrite</span><span class="params">(NextFilter nextFilter, IoSession session, WriteRequest writeRequest)</span> <span class="keyword">throws</span> Exception </span>&#123;  </div><div class="line">            nextFilter.filterWrite(session, writeRequest);  </div><div class="line">        &#125;  </div><div class="line">  </div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">filterClose</span><span class="params">(NextFilter nextFilter, IoSession session)</span> <span class="keyword">throws</span> Exception </span>&#123;  </div><div class="line">            nextFilter.filterClose(session);  </div><div class="line">        &#125;  </div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<h2 id="2-2-session-write逆序调用过滤器链"><a href="#2-2-session-write逆序调用过滤器链" class="headerlink" title="2.2 session.write逆序调用过滤器链"></a>2.2 session.write逆序调用过滤器链</h2><p>在Handler中持有session的对象，调用session.write(date.toString());，session会调用具体方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">AbstractIoSession.write(Object message) &#123;  </div><div class="line">    ...  </div><div class="line">        IoFilterChain filterChain = getFilterChain();  </div><div class="line">        filterChain.fireFilterWrite(writeRequest);  </div><div class="line">    ...  </div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">DefaultIoFilterChain.fireFilterWrite(WriteRequest writeRequest) &#123;  </div><div class="line">        Entry tail = <span class="keyword">this</span>.tail;  </div><div class="line">        callPreviousFilterWrite(tail, session, writeRequest);  </div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<p>触发逆序的过滤器链，最终到HeadFilter中：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">...其他Filter  </div><div class="line">HeadFilter.filterWrite(NextFilter nextFilter, IoSession session, WriteRequest writeRequest) <span class="keyword">throws</span> Exception &#123;  </div><div class="line">        AbstractIoSession s = (AbstractIoSession) session;  </div><div class="line">        ...  </div><div class="line">            WriteRequestQueue writeRequestQueue = s.getWriteRequestQueue();  </div><div class="line">  </div><div class="line">            <span class="keyword">if</span> (!s.isWriteSuspended()) &#123;  </div><div class="line">                <span class="keyword">if</span> (writeRequestQueue.size() == <span class="number">0</span>) &#123;  </div><div class="line">                    <span class="comment">// We can write directly the message  </span></div><div class="line">                    s.getProcessor().write(s, writeRequest);  </div><div class="line">                &#125; <span class="keyword">else</span> &#123;  </div><div class="line">                    s.getWriteRequestQueue().offer(s, writeRequest);  </div><div class="line">                    s.getProcessor().flush(s);  </div><div class="line">                &#125;  </div><div class="line">            &#125; <span class="keyword">else</span> &#123;  </div><div class="line">                s.getWriteRequestQueue().offer(s, writeRequest);  </div><div class="line">            &#125;  </div><div class="line">        &#125;</div></pre></td></tr></table></figure>
+<h1 id="3-IoHandler-API"><a href="#3-IoHandler-API" class="headerlink" title="3.IoHandler API"></a>3.IoHandler API</h1><pre><code>Handler虽然是直面用户的对象，但由上述可知，他其实只是整个操作链上最后的一环，也是最简单的一环，给出IoHander的API清单
+</code></pre><ul>
+<li>sessionCreated(IoSession)：session创建时调用</li>
+<li>sessionOpened(IoSession)：session打开时调用，实际上是在sessionCreated后立即执行</li>
+<li>sessionClosed(IoSession)：session关闭时调用</li>
+<li>sessionIdle(IoSession, IdleStatus)：session空闲时调用</li>
+<li>exceptionCaught(IoSession, Throwable)：异常时调用</li>
+<li>messageReceived(IoSession, Object)：接收到新的request时调用</li>
+<li>messageSent(IoSession, Object)：发送在消息队列中未完成的消息时调用</li>
+</ul>
+<h1 id="4-IoFilter-API"><a href="#4-IoFilter-API" class="headerlink" title="4. IoFilter API"></a>4. IoFilter API</h1><p>和Handler有一部分一致：</p>
+<ul>
+<li>init() filter初始化方法，在下面4个on方法调用之前必须先被调用。</li>
+<li>destroy() 该方法被ReferenceCountingFilter引用到，如果不继承ReferenceCountingFilter，不需实现该方法。</li>
+<li>onPreAdd(IoFilterChain, String, NextFilter) 过滤器被添加之前调用。</li>
+<li>onPostAdd(IoFilterChain, String, NextFilter) 过滤器被添加之后调用。</li>
+<li>onPreRemove(IoFilterChain, String, NextFilter) 过滤器被移除之前调用。</li>
+<li>onPostRemove(IoFilterChain, String, NextFilter) 过滤器被移除之后调用。</li>
+<li>sessionCreated(NextFilter, IoSession) </li>
+<li>sessionOpened(NextFilter, IoSession)</li>
+<li>sessionClosed(NextFilter, IoSession)</li>
+<li>sessionIdle(NextFilter, IoSession, IdleStatus)</li>
+<li>exceptionCaught(NextFilter, IoSession, Throwable)</li>
+<li>messageReceived(NextFilter, IoSession, Object)</li>
+<li>messageSent(NextFilter, IoSession, WriteRequest)</li>
+<li>filterClose(NextFilter, IoSession)  session.close(）方法中调用。</li>
+<li>filterWrite(NextFilter, IoSession, WriteRequest) session.write(）方法中调用。</li>
+</ul>
+<h1 id="5-IoListener"><a href="#5-IoListener" class="headerlink" title="5. IoListener"></a>5. IoListener</h1><p>上面用了比较多的篇幅介绍了IoFilter，现在我们也该讲讲二号后台人物——IoListerner。在mina中主要有两类，一个是IoServiceListener，另一个就是IoFutureListener。</p>
+<h2 id="5-1-IoServiceListener"><a href="#5-1-IoServiceListener" class="headerlink" title="5.1 IoServiceListener"></a>5.1 IoServiceListener</h2><pre><code>IoServiceListener负责Service的各个生命周期节点事件通知。我们曾在学习笔记三中提到过IoServiceListenerSupport，此类对象是该service所有IoServiceListener对象的持有类并管理着监听器的回调入口，同时还管理着当前Service的所有session。当时没有详细的介绍，现在我们重点说说这个类在做嫁衣方面的独到之处。     IoServiceListenerSupport是在AbstractIoService的构造函数中被生成的，也就是说，恭喜，无论你是Acceptor还是Connector，你都拥有这个强大的助手了。为了支持监听器的功能，可爱的祖父AbstractIoService还贴心的为我们实现好了addListener(IoServiceListener listener)和removeListener(IoServiceListener listener)方法。     我们先看看的API吧：
+</code></pre><ul>
+<li><p>serviceActivated(IoService) 当service生效时被调用。当新的service被bind时或第一个session生成时，IoServiceListenerSupport.fireServiceActivated被调用同时调用此方法。</p>
+</li>
+<li><p>serviceIdle(IoService, IdleStatus) 当service空闲时被调用，不过此方法没有在mina中真正使用。</p>
+</li>
+<li><p>serviceDeactivated(IoService) 当service失效时被调用。当service被unbind或最后个session注销时，IoServiceListenerSupport.fireServiceDeactivated被调用同时调用此方法。</p>
+</li>
+<li><p>sessionCreated(IoSession) 当新的session生成时被调用。IoServiceListenerSupport.fireSessionCreated</p>
+</li>
+<li>sessionDestroyed(IoSession) 当session被注销时调用。IoServiceListenerSupport.fireSessionDestroyed</li>
+</ul>
+<p>如此一看，还是很简单清晰的，监听器可以在任意时刻被添加或移除。我们的使用方法也很简单：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">IoServiceListener listener = <span class="keyword">new</span> IoServiceListener() &#123;  </div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">sessionDestroyed</span><span class="params">(IoSession session)</span> <span class="keyword">throws</span> Exception </span>&#123;  </div><div class="line">    &#125;  </div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">sessionCreated</span><span class="params">(IoSession session)</span> <span class="keyword">throws</span> Exception </span>&#123;  </div><div class="line">    &#125;  </div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">serviceIdle</span><span class="params">(IoService service, IdleStatus idleStatus)</span>  </span></div><div class="line">            <span class="keyword">throws</span> Exception &#123;  </div><div class="line">    &#125;  </div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">serviceDeactivated</span><span class="params">(IoService service)</span> <span class="keyword">throws</span> Exception </span>&#123;  </div><div class="line">    &#125;  </div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">serviceActivated</span><span class="params">(IoService service)</span> <span class="keyword">throws</span> Exception </span>&#123;  </div><div class="line">    &#125;  </div><div class="line">&#125;;  </div><div class="line">acceptor.addListener(listener);  </div><div class="line">acceptor.removeListener(listener);</div></pre></td></tr></table></figure>
+<h2 id="5-1-IoFutureListener"><a href="#5-1-IoFutureListener" class="headerlink" title="5.1 IoFutureListener"></a>5.1 IoFutureListener</h2><p>还有一种Listener就是IoFutureListener，他在学习笔记四种也出现过，确实也比较简单，能在IoFuture任务完成后被调用，唯一的API：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">IoFutureListener</span>&lt;<span class="title">F</span> <span class="keyword">extends</span> <span class="title">IoFuture</span>&gt; <span class="keyword">extends</span> <span class="title">EventListener</span> </span>&#123;    </div><div class="line">    <span class="function"><span class="keyword">void</span> <span class="title">operationComplete</span><span class="params">(F future)</span></span>;    </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>因为大部分的future都被mina集成在框架里，所以future的listener支持一项特性：若任务已经执行完后添加的listener将被立刻执行。我们先看看future是怎么实现该功能的。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> IoFuture <span class="title">addListener</span><span class="params">(IoFutureListener&lt;?&gt; listener)</span> </span>&#123;  </div><div class="line">    <span class="keyword">if</span> (listener == <span class="keyword">null</span>) &#123;  </div><div class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">"listener"</span>);  </div><div class="line">    &#125;  </div><div class="line">  </div><div class="line">    <span class="keyword">boolean</span> notifyNow = <span class="keyword">false</span>;  </div><div class="line">    <span class="keyword">synchronized</span> (lock) &#123;  </div><div class="line">        <span class="keyword">if</span> (ready) &#123;  </div><div class="line">            notifyNow = <span class="keyword">true</span>;  </div><div class="line">        &#125; <span class="keyword">else</span> &#123;  </div><div class="line">            <span class="keyword">if</span> (firstListener == <span class="keyword">null</span>) &#123;  </div><div class="line">                firstListener = listener;  </div><div class="line">            &#125; <span class="keyword">else</span> &#123;  </div><div class="line">                <span class="keyword">if</span> (otherListeners == <span class="keyword">null</span>) &#123;  </div><div class="line">                    otherListeners = <span class="keyword">new</span> ArrayList&lt;IoFutureListener&lt;?&gt;&gt;(<span class="number">1</span>);  </div><div class="line">                &#125;  </div><div class="line">                otherListeners.add(listener);  </div><div class="line">            &#125;  </div><div class="line">        &#125;  </div><div class="line">    &#125;  </div><div class="line">是这里了！如果ready完成了，则马上执行  </div><div class="line">    <span class="keyword">if</span> (notifyNow) &#123;  </div><div class="line">        notifyListener(listener);  </div><div class="line">    &#125;  </div><div class="line">    <span class="keyword">return</span> <span class="keyword">this</span>;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>那不用说就知道啦，在notiffyListener中将会回调监听器的方法。</p>
+<h1 id="6-结语"><a href="#6-结语" class="headerlink" title="6. 结语"></a>6. 结语</h1><p>mina框架核心部件基本上都讲的差不多了，看看如果有需要补余的，留在下一章节。</p>
+<p>版权声明：本文为博主原创文章，未经博主允许不得转载。</p>
+
+            <blockquote>
+                <p>
+                本文地址：
+                <a href="https://smuwjs.github.io/2016/09/08/mina学习笔记五：做嫁衣的IoFilter和IoListener/" target="_blank" rel="external">https://smuwjs.github.io/2016/09/08/mina学习笔记五：做嫁衣的IoFilter和IoListener/</a>
+                </p>
+                <footer><cite><a href="https://smuwjs.github.io">@Jeeson's Blog</a></cite></footer>
+            </blockquote>
+            </div>
+            
+<nav class="post-nav">
+  
+    <div class="waves-block waves-effect prev fl">
+      <a href="/2016/09/08/mina学习笔记六：补刀/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">mina学习笔记六：补刀</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next fr">
+      <a href="/2016/09/08/mina学习笔记四：交互的核心IoSession/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">mina学习笔记四：交互的核心IoSession</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+            
+            
+<div class="duoshuo">
+	<!-- 多说评论框 start -->
+	<div class="ds-thread" data-thread-key="mina学习笔记五：做嫁衣的IoFilter和IoListener" data-title="mina学习笔记五：做嫁衣的IoFilter和IoListener" data-url="https://smuwjs.github.io/2016/09/08/mina学习笔记五：做嫁衣的IoFilter和IoListener/index.html"></div>
+	<!-- 多说评论框 end -->
+	<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+	<script type="text/javascript">
+	var duoshuoQuery = {short_name:"smuwjs"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+	<!-- 多说公共JS代码 end -->
+</div>
+
+
+
+
+
+        </div>
+    </div>
+</article>
+    </div>
+  </main>
+<div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+<script>
+var BLOG_SHARE = {
+    title: "mina学习笔记五：做嫁衣的IoFilter和IoListener",
+    pic: "/img/head.png",
+    summary: document.getElementsByName('summary')[0].content,
+    url: "https://smuwjs.github.io/2016/09/08/mina学习笔记五：做嫁衣的IoFilter和IoListener/index.html"
+};
+</script>
+<div class="global-share" id="global-share">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+<script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+
+<script src="/js/main.js"></script>
+
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<script type="text/template" id="search-tpl">
+<li class="item">
+    <a href="/{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</script>
+
+<script src="/js/search.js"></script>
+
+
+
+
+
+
+
+
+
+</body>
+</html>

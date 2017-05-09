@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>使用SoureceTree管理你的git项目 | Jeeson&#39;s Blog | Write the code. Change the world.</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  <meta name="theme-color" content="#3F51B5">
+  
+  
+  <meta name="keywords" content="Git">
+  <meta name="description" content="Update update: Windows用户在初始化Souretree工具时，需要用到Atlassian ID，新建用户时需要加载google 验证码，这一步需要VPN的支持，请注意。 找到一个版本的SourceTree工具可以不需要以上验证也能使用，下载链接：SourceTreeSetup_1.6.14.exe   补充1 ：Git学习网站 猴子都能学会的git教程 常用 Git 命令清单">
+<meta name="keywords" content="Git">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用SoureceTree管理你的git项目">
+<meta property="og:url" content="https://smuwjs.github.io/2016/04/20/git01-sourcetree/index.html">
+<meta property="og:site_name" content="Jeeson&#39;s Blog">
+<meta property="og:description" content="Update update: Windows用户在初始化Souretree工具时，需要用到Atlassian ID，新建用户时需要加载google 验证码，这一步需要VPN的支持，请注意。 找到一个版本的SourceTree工具可以不需要以上验证也能使用，下载链接：SourceTreeSetup_1.6.14.exe   补充1 ：Git学习网站 猴子都能学会的git教程 常用 Git 命令清单">
+<meta property="og:image" content="http://samzong.oss-cn-shenzhen.aliyuncs.com/2016%2F04%2Fsourcetree02.jpg">
+<meta property="og:image" content="http://samzong.oss-cn-shenzhen.aliyuncs.com/2016%2F04%2Fsouretree03.jpg">
+<meta property="og:image" content="http://samzong.oss-cn-shenzhen.aliyuncs.com/2016%2F04%2Fsourcetree05.jpg">
+<meta property="og:image" content="http://samzong.oss-cn-shenzhen.aliyuncs.com/2016%2F04%2Fsouretree06.jpg">
+<meta property="og:image" content="http://samzong.oss-cn-shenzhen.aliyuncs.com/2016%2F04%2Fsourcetree13.jpg">
+<meta property="og:image" content="http://samzong.oss-cn-shenzhen.aliyuncs.com/2016%2F04%2Fsourcetree14.jpg">
+<meta property="og:image" content="http://samzong.oss-cn-shenzhen.aliyuncs.com/2016%2F04%2Fsourcetree15.jpg">
+<meta property="og:image" content="http://samzong.oss-cn-shenzhen.aliyuncs.com/2016%2F04%2Fsourcetree12.jpg">
+<meta property="og:image" content="http://samzong.oss-cn-shenzhen.aliyuncs.com/2016%2F04%2Fsourcetree07.jpg">
+<meta property="og:image" content="http://samzong.oss-cn-shenzhen.aliyuncs.com/2016%2F04%2Fsourcetree08.jpg">
+<meta property="og:image" content="http://samzong.oss-cn-shenzhen.aliyuncs.com/2016%2F04%2Fsourcetree09.jpg">
+<meta property="og:image" content="http://samzong.oss-cn-shenzhen.aliyuncs.com/2016%2F04%2Fsourcetree10.jpg">
+<meta property="og:image" content="http://samzong.oss-cn-shenzhen.aliyuncs.com/2016%2F04%2Fsourcetree11.jpg">
+<meta property="og:updated_time" content="2017-04-21T13:36:47.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="使用SoureceTree管理你的git项目">
+<meta name="twitter:description" content="Update update: Windows用户在初始化Souretree工具时，需要用到Atlassian ID，新建用户时需要加载google 验证码，这一步需要VPN的支持，请注意。 找到一个版本的SourceTree工具可以不需要以上验证也能使用，下载链接：SourceTreeSetup_1.6.14.exe   补充1 ：Git学习网站 猴子都能学会的git教程 常用 Git 命令清单">
+<meta name="twitter:image" content="http://samzong.oss-cn-shenzhen.aliyuncs.com/2016%2F04%2Fsourcetree02.jpg">
+  
+    <link rel="alternative" href="/atom.xml" title="Jeeson&#39;s Blog" type="application/atom+xml">
+  
+  <meta name="summary" content="null">
+  <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="loading" class="active"></div>
+
+  <nav id="menu" class="hide" >
+   <div class="inner flex-row-vertical">
+  <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+      <i class="icon icon-lg icon-close"></i>
+  </a>
+  <div class="brand-wrap">
+    <div class="brand">
+      <a href="/" class="avatar"><img src="/img/head.png"></a>
+      <hgroup class="introduce">
+        <h5 class="nickname">Jeeson</h5>
+        <a href="mailto:smuwjs@163.com" title="smuwjs@163.com" class="mail">smuwjs@163.com</a>
+      </hgroup>
+    </div>
+  </div>
+  <div class="scroll-wrap flex-col">
+    <ul class="nav">
+      
+          <li class="waves-block waves-effect">
+            <a href="/"  >
+              <i class="icon icon-lg icon-home"></i>
+              博客首页
+            </a>
+          </li>
+      
+          <li class="waves-block waves-effect">
+            <a href="/archives"  >
+              <i class="icon icon-lg icon-archives"></i>
+              文章归档
+            </a>
+          </li>
+      
+          <li class="waves-block waves-effect">
+            <a href="/tags"  >
+              <i class="icon icon-lg icon-tags"></i>
+              我的标签
+            </a>
+          </li>
+      
+          <li class="waves-block waves-effect">
+            <a href="https://github.com/smuwjs" target="_blank" >
+              <i class="icon icon-lg icon-github"></i>
+              Github
+            </a>
+          </li>
+      
+          <li class="waves-block waves-effect">
+            <a href="http://www.weibo.com/ysweb" target="_blank" >
+              <i class="icon icon-lg icon-weibo"></i>
+              微博
+            </a>
+          </li>
+      
+    </ul>
+
+    <footer class="footer">
+  <p><a rel="license" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0;vertical-align:middle;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAAAPCAMAAABEF7i9AAAAllBMVEUAAAD///+rsapERER3d3eIiIjMzMzu7u4iIiKUmZO6v7rKzsoODg4RERFVVVUNDQ0NDg0PEA8zMzNLTEtbXltmZmZydnF9gn2AgICPkI+ZmZmqqqq7u7vFxsXIzMgNDQwZGRkgICAhISEkJSMnKCcuMC4xMzE5Ozk7PTtBQkFCQkJDQ0Nna2eGhoaHh4ezuLLGysbd3d1wVGpAAAAA4UlEQVR42q2T1xqCMAyFk7QsBQeKA9x7j/d/OSm22CpX0nzcpA1/T05aAOuBVkMAScQFHLnEwoCo2f1TnQIGoVMewjZEjVFN4GH1Ue1Cn2jWqwfsOOj6wDwGvotsl/c8lv7KIq1eLOsT0HMFHMIE/RZyHnlphryT9zyV+8WH5e8yQw3wnQvgAFxPTKUVi555SHR/lOfLMgVTeDlSfN+TaoUsiTyeIm+bCkHvCA2FUKG48LDtYBZBknsYP/G8NTw0gaaHyuQf4H5pecrB/FYCT2sL9zAfy1Xyjou6L8X2W7YcLyBZCRtnq/zfAAAAAElFTkSuQmCC" /></a></p>
+  <p>Jeeson&#39;s Blog &copy; 2017</p>
+  <p>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme
+  <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></p>
+  <a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-2x icon-rss-square"></i></a>
+</footer>
+
+  </div>
+</div>
+
+  </nav>
+  <main id="main">
+    <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">使用SoureceTree管理你的git项目</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input " autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-share">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header">
+  <div class="container">
+    <h1 class="author">使用SoureceTree管理你的git项目</h1>
+    <h5 class="subtitle">
+        
+            <time datetime="2016-04-20T21:31:49.000Z" itemprop="datePublished" class="page-time">
+  2016-04-20
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Git/">Git</a></li></ul>
+
+        
+    </h5>
+  </div>
+</header>
+
+    <div class="container body-wrap">
+      <article id="post-git01-sourcetree" 
+  class="article article-type-post" itemprop="blogPost">
+    <div class="post-meta flex-row">
+        
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Git/">Git</a></li></ul>
+
+    </div>
+    <div class="post-body">
+        <aside class="post-widget" id="post-widget">
+
+            
+            <div class="post-share" id="post-share">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+            
+
+            
+            <nav class="post-toc-wrap" id="post-toc">
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-6"><a class="post-toc-link" href="#Update"><span class="post-toc-text">Update</span></a></li></ol></li><li class="post-toc-item post-toc-level-5"><a class="post-toc-link" href="#补充1-：Git学习网站"><span class="post-toc-text">补充1 ：Git学习网站</span></a></li><li class="post-toc-item post-toc-level-5"><a class="post-toc-link" href="#补充2-：利用Git协同开发"><span class="post-toc-text">补充2 ：利用Git协同开发</span></a></li></ol></li></ol></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#1-关于-SourceTree"><span class="post-toc-text">1. 关于 SourceTree</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#SourceTree-是一款免费且同时支持Windows-和Mac-的git项目管理软件，本文旨在给大家介绍这款应用的基础使用，并用它来管理你的项目。"><span class="post-toc-text">SourceTree 是一款免费且同时支持Windows 和Mac 的git项目管理软件，本文旨在给大家介绍这款应用的基础使用，并用它来管理你的项目。</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#2-git帐号建立"><span class="post-toc-text">2. git帐号建立</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#1-新员工入职之后，你的公司邮箱内会收到一封来自Gitlab的邮件，如下图："><span class="post-toc-text">1. 新员工入职之后，你的公司邮箱内会收到一封来自Gitlab的邮件，如下图：</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#2-点击邮件中的-“Click-here-to-set-your-password”，设置gitlab登陆密码。"><span class="post-toc-text">2. 点击邮件中的 “Click here to set your password”，设置gitlab登陆密码。</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#3-登陆gitlab帐号，将会出现这个界面："><span class="post-toc-text">3. 登陆gitlab帐号，将会出现这个界面：</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#4-设定个人信息："><span class="post-toc-text">4. 设定个人信息：</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#5-sshKey"><span class="post-toc-text">5. sshKey</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#5-1-在Linux和Mac上生成sshkey："><span class="post-toc-text">5.1 在Linux和Mac上生成sshkey：</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#5-2-在Windows上生成sshkey："><span class="post-toc-text">5.2 在Windows上生成sshkey：</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#因为windows没有自带openssl模块，所以在Windows环境中使用第三方工具puttygen-exe生成sshkey-下载地址"><span class="post-toc-text">因为windows没有自带openssl模块，所以在Windows环境中使用第三方工具puttygen.exe生成sshkey 下载地址</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#步骤如下："><span class="post-toc-text">步骤如下：</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#当sourcetree首次启动时，会弹出加载sshkey的提示，按提示操作，找到之前保存的private-ppk文件"><span class="post-toc-text">当sourcetree首次启动时，会弹出加载sshkey的提示，按提示操作，找到之前保存的private.ppk文件</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#5-3-上传sshkey："><span class="post-toc-text">5.3 上传sshkey：</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#6-回到-dashboard-，点击项目名称进入详情："><span class="post-toc-text">6. 回到 dashboard ，点击项目名称进入详情：</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#7-使用souretree将项目从git服务器clone到本地"><span class="post-toc-text">7. 使用souretree将项目从git服务器clone到本地</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#7-1-安装souretree-软件-［略］"><span class="post-toc-text">7.1 安装souretree 软件 ［略］</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#7-2-clone项目到本地"><span class="post-toc-text">7.2 clone项目到本地</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#8-进入项目工作台："><span class="post-toc-text">8. 进入项目工作台：</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#9-关于sourcetree工具的使用，下面是一些git操作的释疑。"><span class="post-toc-text">9. 关于sourcetree工具的使用，下面是一些git操作的释疑。</span></a>
+            </nav>
+            
+        </aside>
+
+        <div class="post-main">
+
+            <div class="post-content" id="post-content" itemprop="postContent">
+            <h6 id="Update"><a href="#Update" class="headerlink" title="Update"></a>Update</h6><ul>
+<li><font color="red">update: Windows用户在初始化Souretree工具时，需要用到Atlassian ID，新建用户时需要加载google 验证码，这一步需要VPN的支持，请注意。</font></li>
+<li>找到一个版本的SourceTree工具可以不需要以上验证也能使用，下载链接：<a href="https://pan.baidu.com/s/1bJOzOq" target="_blank" rel="external">SourceTreeSetup_1.6.14.exe</a></li>
+</ul>
+<p><br></p>
+<h5 id="补充1-：Git学习网站"><a href="#补充1-：Git学习网站" class="headerlink" title="补充1 ：Git学习网站"></a>补充1 ：Git学习网站</h5><ol>
+<li><a href="http://backlogtool.com/git-guide/cn/" target="_blank" rel="external">猴子都能学会的git教程</a></li>
+<li><a href="http://www.ruanyifeng.com/blog/2015/12/git-cheat-sheet.html" target="_blank" rel="external">常用 Git 命令清单</a></li>
+<li><a href="http://www.liaoxuefeng.com/wiki/0013739516305929606dd18361248578c67b8067c8c017b000" target="_blank" rel="external">廖雪峰的git教程</a></li>
+<li><a href="http://zoomq.qiniudn.com/ZQScrapBook/ZqFLOSS/data/20081210180347/" target="_blank" rel="external">Why Git is Better than X</a></li>
+</ol>
+<h5 id="补充2-：利用Git协同开发"><a href="#补充2-：利用Git协同开发" class="headerlink" title="补充2 ：利用Git协同开发"></a>补充2 ：利用Git协同开发</h5><ol>
+<li><a href="https://ourai.ws/posts/working-with-git-in-team/" target="_blank" rel="external">团队中的Git实践</a></li>
+<li><a href="http://www.ruanyifeng.com/blog/2015/08/git-use-process.html" target="_blank" rel="external">Git 使用规范流程</a></li>
+<li><a href="http://nvie.com/files/Git-branching-model.pdf" target="_blank" rel="external">Git分支管理模型</a></li>
+<li><a href="http://marklodato.github.io/visual-git-guide/index-zh-cn.html" target="_blank" rel="external">图解Git</a></li>
+</ol>
+<hr>
+
+<h2 id="1-关于-SourceTree"><a href="#1-关于-SourceTree" class="headerlink" title="1. 关于 SourceTree"></a>1. 关于 SourceTree</h2><h4 id="SourceTree-是一款免费且同时支持Windows-和Mac-的git项目管理软件，本文旨在给大家介绍这款应用的基础使用，并用它来管理你的项目。"><a href="#SourceTree-是一款免费且同时支持Windows-和Mac-的git项目管理软件，本文旨在给大家介绍这款应用的基础使用，并用它来管理你的项目。" class="headerlink" title="SourceTree 是一款免费且同时支持Windows 和Mac 的git项目管理软件，本文旨在给大家介绍这款应用的基础使用，并用它来管理你的项目。"></a>SourceTree 是一款免费且同时支持Windows 和Mac 的git项目管理软件，本文旨在给大家介绍这款应用的基础使用，并用它来管理你的项目。</h4><blockquote>
+<p>官网： <a href="https://www.sourcetreeapp.com/" target="_blank" rel="external">https://www.sourcetreeapp.com/</a></p>
+</blockquote>
+<h2 id="2-git帐号建立"><a href="#2-git帐号建立" class="headerlink" title="2. git帐号建立"></a>2. git帐号建立</h2><h3 id="1-新员工入职之后，你的公司邮箱内会收到一封来自Gitlab的邮件，如下图："><a href="#1-新员工入职之后，你的公司邮箱内会收到一封来自Gitlab的邮件，如下图：" class="headerlink" title="1. 新员工入职之后，你的公司邮箱内会收到一封来自Gitlab的邮件，如下图："></a>1. 新员工入职之后，你的公司邮箱内会收到一封来自Gitlab的邮件，如下图：</h3><p><img src="http://samzong.oss-cn-shenzhen.aliyuncs.com/2016%2F04%2Fsourcetree02.jpg" alt="image"></p>
+<h3 id="2-点击邮件中的-“Click-here-to-set-your-password”，设置gitlab登陆密码。"><a href="#2-点击邮件中的-“Click-here-to-set-your-password”，设置gitlab登陆密码。" class="headerlink" title="2. 点击邮件中的 “Click here to set your password”，设置gitlab登陆密码。"></a>2. 点击邮件中的 “Click here to set your password”，设置gitlab登陆密码。</h3><p><img src="http://samzong.oss-cn-shenzhen.aliyuncs.com/2016%2F04%2Fsouretree03.jpg" alt="image"></p>
+<h3 id="3-登陆gitlab帐号，将会出现这个界面："><a href="#3-登陆gitlab帐号，将会出现这个界面：" class="headerlink" title="3. 登陆gitlab帐号，将会出现这个界面："></a>3. 登陆gitlab帐号，将会出现这个界面：</h3><p><img src="http://samzong.oss-cn-shenzhen.aliyuncs.com/2016%2F04%2Fsourcetree05.jpg" alt="image"></p>
+<h3 id="4-设定个人信息："><a href="#4-设定个人信息：" class="headerlink" title="4. 设定个人信息："></a>4. 设定个人信息：</h3><p><img src="http://samzong.oss-cn-shenzhen.aliyuncs.com/2016%2F04%2Fsouretree06.jpg" alt="image"></p>
+<h3 id="5-sshKey"><a href="#5-sshKey" class="headerlink" title="5. sshKey"></a>5. sshKey</h3><h4 id="5-1-在Linux和Mac上生成sshkey："><a href="#5-1-在Linux和Mac上生成sshkey：" class="headerlink" title="5.1 在Linux和Mac上生成sshkey："></a>5.1 在Linux和Mac上生成sshkey：</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">➜  ~ ssh-keygen -t rsa</div><div class="line">Generating public/private rsa key pair.</div><div class="line">Enter file in which to save the key (/Users/Alex/.ssh/id_rsa):</div><div class="line">Enter passphrase (empty for no passphrase):</div><div class="line">Enter same passphrase again:</div><div class="line">Your identification has been saved in /Users/Alex/.ssh/id_rsa.</div><div class="line">Your public key has been saved in /Users/Alex/.ssh/id_rsa.pub.</div><div class="line">The key fingerprint is:</div><div class="line">SHA256:98jE3jhBhFT5nQlZRj34a3WOk1t6XF+Dbf/hliXl4WQ Alex@Alex-Mac</div><div class="line">The key&apos;s randomart image is:</div><div class="line">+---[RSA 2048]----+</div><div class="line">|       ..oo. +=. |</div><div class="line">|        ... oo ..|</div><div class="line">|          .. o.o.|</div><div class="line">|         o  . +E+|</div><div class="line">|        S =   **=|</div><div class="line">|         = * .=BB|</div><div class="line">|          * o oOO|</div><div class="line">|           .  +o*|</div><div class="line">|              .oo|</div><div class="line">+----[SHA256]-----+</div><div class="line">➜  ~ cat ~/.ssh/id_rsa.pub</div><div class="line">ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCvuQAq65b+nLZPqqc3b3Mj9e7Pt8oWKasJFa2QH1VIEkDvxKLFGcHsT7Ur4zXwEi9YiW2tVRrBSjcMALxuBjVm2IxYV6Lk8SLuGadyYy5telWGJmHsQ3VIPRuKwpzTkLN643kjqc6JFSlnZG/XoP9SPtCOsp2ql4u0s7Auc2bZay4RaTDXbcpJVU9OA0xM8Zy4oTTNYdZ4tvGittVmn+wLrhN255J7clORF5126dmDYxV3E8ZboaDdQpdLGIWmDNcBJQvl0CLwpKUCi7EUDqDVtm4bNgwIX9fEIkTxGdaWjBW1iXBk8TGXWkgB+Qp8B1IwaJ4GHUwUhQrefWvw9XeJ Alex@Alex-Mac</div><div class="line">➜  ~</div></pre></td></tr></table></figure>
+<h4 id="5-2-在Windows上生成sshkey："><a href="#5-2-在Windows上生成sshkey：" class="headerlink" title="5.2 在Windows上生成sshkey："></a>5.2 在Windows上生成sshkey：</h4><h4 id="因为windows没有自带openssl模块，所以在Windows环境中使用第三方工具puttygen-exe生成sshkey-下载地址"><a href="#因为windows没有自带openssl模块，所以在Windows环境中使用第三方工具puttygen-exe生成sshkey-下载地址" class="headerlink" title="因为windows没有自带openssl模块，所以在Windows环境中使用第三方工具puttygen.exe生成sshkey 下载地址"></a>因为windows没有自带openssl模块，所以在Windows环境中使用第三方工具puttygen.exe生成sshkey <a href="http://the.earth.li/~sgtatham/putty/0.67/x86/puttygen.exe" target="_blank" rel="external">下载地址</a></h4><h4 id="步骤如下："><a href="#步骤如下：" class="headerlink" title="步骤如下："></a>步骤如下：</h4><p><img src="http://samzong.oss-cn-shenzhen.aliyuncs.com/2016%2F04%2Fsourcetree13.jpg" alt="image"><br><img src="http://samzong.oss-cn-shenzhen.aliyuncs.com/2016%2F04%2Fsourcetree14.jpg" alt="image"><br><img src="http://samzong.oss-cn-shenzhen.aliyuncs.com/2016%2F04%2Fsourcetree15.jpg" alt="image"></p>
+<h4 id="当sourcetree首次启动时，会弹出加载sshkey的提示，按提示操作，找到之前保存的private-ppk文件"><a href="#当sourcetree首次启动时，会弹出加载sshkey的提示，按提示操作，找到之前保存的private-ppk文件" class="headerlink" title="当sourcetree首次启动时，会弹出加载sshkey的提示，按提示操作，找到之前保存的private.ppk文件"></a>当sourcetree首次启动时，会弹出加载sshkey的提示，按提示操作，找到之前保存的private.ppk文件</h4><p><img src="http://samzong.oss-cn-shenzhen.aliyuncs.com/2016%2F04%2Fsourcetree12.jpg" alt="image"></p>
+<h4 id="5-3-上传sshkey："><a href="#5-3-上传sshkey：" class="headerlink" title="5.3 上传sshkey："></a>5.3 上传sshkey：</h4><p><img src="http://samzong.oss-cn-shenzhen.aliyuncs.com/2016%2F04%2Fsourcetree07.jpg" alt="image"></p>
+<h3 id="6-回到-dashboard-，点击项目名称进入详情："><a href="#6-回到-dashboard-，点击项目名称进入详情：" class="headerlink" title="6. 回到 dashboard ，点击项目名称进入详情："></a>6. 回到 dashboard ，点击项目名称进入详情：</h3><p><img src="http://samzong.oss-cn-shenzhen.aliyuncs.com/2016%2F04%2Fsourcetree08.jpg" alt="image"></p>
+<h3 id="7-使用souretree将项目从git服务器clone到本地"><a href="#7-使用souretree将项目从git服务器clone到本地" class="headerlink" title="7. 使用souretree将项目从git服务器clone到本地"></a>7. 使用souretree将项目从git服务器clone到本地</h3><h4 id="7-1-安装souretree-软件-［略］"><a href="#7-1-安装souretree-软件-［略］" class="headerlink" title="7.1 安装souretree 软件 ［略］"></a>7.1 安装souretree 软件 ［略］</h4><h4 id="7-2-clone项目到本地"><a href="#7-2-clone项目到本地" class="headerlink" title="7.2 clone项目到本地"></a>7.2 clone项目到本地</h4><p><img src="http://samzong.oss-cn-shenzhen.aliyuncs.com/2016%2F04%2Fsourcetree09.jpg" alt="image"><br><img src="http://samzong.oss-cn-shenzhen.aliyuncs.com/2016%2F04%2Fsourcetree10.jpg" alt="image"></p>
+<h3 id="8-进入项目工作台："><a href="#8-进入项目工作台：" class="headerlink" title="8. 进入项目工作台："></a>8. 进入项目工作台：</h3><p><img src="http://samzong.oss-cn-shenzhen.aliyuncs.com/2016%2F04%2Fsourcetree11.jpg" alt="image"></p>
+<h4 id="9-关于sourcetree工具的使用，下面是一些git操作的释疑。"><a href="#9-关于sourcetree工具的使用，下面是一些git操作的释疑。" class="headerlink" title="9. 关于sourcetree工具的使用，下面是一些git操作的释疑。"></a>9. 关于sourcetree工具的使用，下面是一些git操作的释疑。</h4><ul>
+<li>检出仓库: 将在本地创建一个git仓库的克隆版本</li>
+<li>工作流: 本地仓库由 git 维护的三棵“树”组成。第一个是 工作目录，它持有实际文件；第二个是 缓存区（Index），它像个缓存区域，临时保存改动；最后是 HEAD，指向最近一次提交后的结果。</li>
+<li>提交：可以计划改动（把它们添加到缓存区),将改动提交到了 HEAD，但是还没到提交到远端仓库。</li>
+<li>拉取：从远端仓库拉取最新版本状态，特别是在其他人员有所改动之后。</li>
+<li>推送：改动现在已经在本地仓库的 HEAD 中了。这时可以使用它将这些改动提交到远端仓库。</li>
+<li>分支：分支是用来将特性开发分离出来的。在创建仓库的时候，master 是“默认的”。创建分支将可以从主线开发上分离开来，然后在不影响主线的同时继续工作，完成后再将它们合并到主分支上。</li>
+<li>合并： 将分支功能并入主分支。</li>
+</ul>
+
+            <blockquote>
+                <p>
+                本文地址：
+                <a href="https://smuwjs.github.io/2016/04/20/git01-sourcetree/" target="_blank" rel="external">https://smuwjs.github.io/2016/04/20/git01-sourcetree/</a>
+                </p>
+                <footer><cite><a href="https://smuwjs.github.io">@Jeeson's Blog</a></cite></footer>
+            </blockquote>
+            </div>
+            
+<nav class="post-nav">
+  
+    <div class="waves-block waves-effect prev fl">
+      <a href="/2016/09/06/hello-world/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">Hello World</h4>
+      </a>
+    </div>
+  
+
+  
+</nav>
+
+
+            
+            
+<div class="duoshuo">
+	<!-- 多说评论框 start -->
+	<div class="ds-thread" data-thread-key="git01-sourcetree" data-title="使用SoureceTree管理你的git项目" data-url="https://smuwjs.github.io/2016/04/20/git01-sourcetree/index.html"></div>
+	<!-- 多说评论框 end -->
+	<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+	<script type="text/javascript">
+	var duoshuoQuery = {short_name:"smuwjs"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+	<!-- 多说公共JS代码 end -->
+</div>
+
+
+
+
+
+        </div>
+    </div>
+</article>
+    </div>
+  </main>
+<div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+<script>
+var BLOG_SHARE = {
+    title: "使用SoureceTree管理你的git项目",
+    pic: "/img/head.png",
+    summary: document.getElementsByName('summary')[0].content,
+    url: "https://smuwjs.github.io/2016/04/20/git01-sourcetree/index.html"
+};
+</script>
+<div class="global-share" id="global-share">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+<script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+
+<script src="/js/main.js"></script>
+
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<script type="text/template" id="search-tpl">
+<li class="item">
+    <a href="/{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</script>
+
+<script src="/js/search.js"></script>
+
+
+
+
+
+
+
+
+
+</body>
+</html>
