@@ -2,10 +2,7 @@
 title: 使用SoureceTree管理你的git项目
 tags: 'Git'
 categories: 'Git'
-permalink: git01-sourcetree
-id: 29
-updated: '2017-04-21 13:36:47'
-date: 2016-04-20 21:31:49
+date: 2016-09-12 11:12:58
 ---
 
 ###### Update

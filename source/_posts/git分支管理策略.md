@@ -1,5 +1,5 @@
 title: Git分支管理策略
-date: 2014-07-23 11:12:58
+date: 2016-09-10 11:12:58
 permalink: git-branching-model
 tags:
 - 版本控制
