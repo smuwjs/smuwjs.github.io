@@ -2,7 +2,7 @@
 title: 使用SoureceTree管理你的git项目
 tags: 'Git'
 categories: 'Git'
-date: 2016-09-12 11:12:58
+date: 2016-09-11 11:12:58
 ---
 
 ###### Update

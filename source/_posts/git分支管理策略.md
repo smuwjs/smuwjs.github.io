@@ -1,12 +1,10 @@
-title: Git分支管理策略
-date: 2016-09-10 11:12:58
-permalink: git-branching-model
-tags:
-- 版本控制
-- git
-  categories:
-- 编程
 ---
+title: Git分支管理策略
+tags: 'Git'
+categories: 'Git'
+date: 2016-09-10 11:12:58
+---
+
 > 转载自 [阮一峰老师的blog](http://www.ruanyifeng.com/blog/2012/07/git.html)
 
 作者： [阮一峰](http://www.ruanyifeng.com)
