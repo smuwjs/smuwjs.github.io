@@ -5,7 +5,7 @@ description: blog
 title: "Android Studio系列教程六--Gradle多渠道打包"
 categories: [DevTools]
 tags: [AndroidStudio]
-date: 2016-09-12
+date: 2016-09-12 01:01:06
 ---
 > [原文地址](http://stormzhang.com/devtools/2014/11/25/android-studio-tutorial6/)
 

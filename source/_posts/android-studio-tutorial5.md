@@ -5,7 +5,7 @@ description: blog
 title: "Android Studio系列教程五--Gradle命令详解与导入第三方包"
 categories: [DevTools]
 tags: [AndroidStudio, Gradle]
-date: 2016-09-12
+date: 2016-09-12 01:01:05
 ---
 >[原文地址](http://stormzhang.com/devtools/2014/11/25/android-studio-tutorial5/)
 

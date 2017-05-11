@@ -4,7 +4,7 @@ categories:
 - DevTools
 tags: 
 - AndroidStudio
-date: 2016-09-12
+date: 2016-09-12 01:01:02
 ---
 >[原文地址](http://stormzhang.com/devtools/2014/11/25/android-studio-tutorial2/)
 
