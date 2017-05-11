@@ -1,16 +1,15 @@
 ---
 title: Hexo插件安装
 date: 2016-09-07 22:33:55
-description: 
 categories:
 - Hexo
-  tags:
+tags:
 - Hexo
-  toc: true
-  author:
-  comments:
-  original:
-  permalink: 
+toc: true
+author:
+comments:
+original:
+permalink: 
 ---
 
 　　**自用笔记：**本文属于自用笔记，不做详解，仅供参考。在此记录自己已理解并开始遵循的前端代码规范。What How Why
@@ -520,6 +519,7 @@ var duoshuoQuery = {short_name:'<%= config.disqus_shortname %>'};
 ```
 
 >修改样式：[V说：](http://www.vsay.cn/one-more-custom-css-lets-you-say-comments-city.html)[设计达人：](http://www.shejidaren.com/use-css3-to-create-a-beautiful-comment-ui.html)[设计达人：](http://www.shejidaren.com/examples/comment-ui/)
+
 
 
 >添加方法：
