@@ -1,4 +1,5 @@
 ---
+title: 用SoureceTree管理Git项目
 tags: 'Git'
 categories: 'Git'
 date: 2016-09-11 11:12:58
