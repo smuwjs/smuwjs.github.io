@@ -1,15 +1,16 @@
+---
 title: Hexo的使用介绍
 date: 2016-09-07 21:33:01
 description: 
 categories:
 - Hexo
-tags:
+  tags:
 - Hexo
-toc: true
-author:
-comments:
-original:
-permalink: 
+  toc: true
+  author:
+  comments:
+  original:
+  permalink: 
 ---
 
 　　**自用笔记：**本文属于自用笔记，不做详解，仅供参考。在此记录自己已理解并开始遵循的前端代码规范。What How Why

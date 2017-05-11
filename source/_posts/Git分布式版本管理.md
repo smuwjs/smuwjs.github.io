@@ -1,5 +1,4 @@
 ---
-title: Git分布式版本管理
 tags: 'Git'
 categories: 'Git'
 date: 2016-09-09 11:12:58

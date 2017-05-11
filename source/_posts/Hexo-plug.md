@@ -1,15 +1,16 @@
+---
 title: Hexo插件安装
 date: 2016-09-07 22:33:55
 description: 
 categories:
 - Hexo
-tags:
+  tags:
 - Hexo
-toc: true
-author:
-comments:
-original:
-permalink: 
+  toc: true
+  author:
+  comments:
+  original:
+  permalink: 
 ---
 
 　　**自用笔记：**本文属于自用笔记，不做详解，仅供参考。在此记录自己已理解并开始遵循的前端代码规范。What How Why
@@ -333,7 +334,7 @@ themes/你的主题/layout/_partial/footer.ejs
 ## 站内搜索框
 
 >添加代码
-用ajax+json搜索
+>用ajax+json搜索
 
 
 [完美解决Hexo静态博客搜索问题](http://www.netcan666.com/2015/11/20/%E5%AE%8C%E7%BE%8E%E8%A7%A3%E5%86%B3Hexo%E9%9D%99%E6%80%81%E5%8D%9A%E5%AE%A2%E6%90%9C%E7%B4%A2%E9%97%AE%E9%A2%98/)
@@ -520,8 +521,9 @@ var duoshuoQuery = {short_name:'<%= config.disqus_shortname %>'};
 
 >修改样式：[V说：](http://www.vsay.cn/one-more-custom-css-lets-you-say-comments-city.html)[设计达人：](http://www.shejidaren.com/use-css3-to-create-a-beautiful-comment-ui.html)[设计达人：](http://www.shejidaren.com/examples/comment-ui/)
 
+
 >添加方法：
-添加方法：打开「后台」 > 「多说评论」 > 「设置」 > 「基本设置」 > 然后把样式粘贴到「自定义CSS」文本框 > 「保存」
+>添加方法：打开「后台」 > 「多说评论」 > 「设置」 > 「基本设置」 > 然后把样式粘贴到「自定义CSS」文本框 > 「保存」
 
 个性样式：
 
