@@ -7,27 +7,28 @@ branches:
     
 #env:
 #  global:
-  
+
 before_install:
 # 设置时区
-- export TZ='Asia/Shanghai'
-- npm install -g hexo
-- npm install -g hexo-cli
+  - export TZ='Asia/Shanghai'
+  - npm install -g hexo
+  - npm install -g hexo-cli
 
 before_script:
 # 设置github账户信息
   - git config --global user.name "${GIT_USER_NAME}"
   - git config --global user.email "${GIT_USER_EMAIL}"
 # github仓库操作
-- sed -i'' "s~git@${STATIC_SITE_REPO}~https://${ACCESS_TOKEN}:x-oauth-basic@${STATIC_SITE_REPO}~" _config.yml
+  - sed -i'' "s~git@${STATIC_SITE_REPO}~https://${ACCESS_TOKEN}:x-oauth-basic@${STATIC_SITE_REPO}~" _config.yml
 
 # 安装依赖组件
 install:
-- npm install
+  - npm install
+
 # 执行的命令
 script:
-- hexo clean
-- hexo generate
+  - hexo clean
+  - hexo generate
 # 执行的成功后执行 
 after_success:
-- hexo deploy
+  - hexo deploy
