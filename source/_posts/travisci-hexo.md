@@ -4,8 +4,8 @@ date: 2017-05-04 23:27:53
 categories: 
 - hexo
 tags: 
-- hexo
-- travis
+- Hexo
+- Travis CI
 comments: true
 ---
 ## 写在前面
