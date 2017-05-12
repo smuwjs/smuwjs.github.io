@@ -1,29 +1,33 @@
 language: node_js
 node_js: stable
 
-# S: Build Lifecycle
-install:
-  - npm install
-  
-#before_script:
- # - npm install -g gulp
-
-script:
-  - hexo generate
-
-after_script:
-  - cd ./public
-  - git init
-  - git config user.name "${GIT_USER_NAME}"
-  - git config user.email "${GIT_USER_EMAIL}"
-  - git add .
-  - git commit -m "Static Site Updated."
-  - git push --force --quiet "https://${ACCESS_TOKEN}@${STATIC_SITE_REPO}" master:master
-# E: Build LifeCycle
-
 branches:
   only:
     - blog-source
+    
 #env:
-# global:
- #  - GH_REF: github.com/smuwjs/smuwjs.github.io.git
+#  global:
+  
+before_install:
+# 设置时区
+- export TZ='Asia/Shanghai'
+- npm install -g hexo
+- npm install -g hexo-cli
+
+before_script:
+# 设置github账户信息
+  - git config --global user.name "${GIT_USER_NAME}"
+  - git config --global user.email "${GIT_USER_EMAIL}"
+# github仓库操作
+- sed -i'' "s~git@${STATIC_SITE_REPO}~https://${ACCESS_TOKEN}:x-oauth-basic@${STATIC_SITE_REPO}~" _config.yml
+
+# 安装依赖组件
+install:
+- npm install
+# 执行的命令
+script:
+- hexo clean
+- hexo generate
+# 执行的成功后执行 
+after_success:
+- hexo deploy
