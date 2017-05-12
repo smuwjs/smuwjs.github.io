@@ -1,34 +1,24 @@
 language: node_js
 node_js: stable
-
 branches:
   only:
-    - blog-source
-    
-#env:
-#  global:
-
+  - blog-source
 before_install:
-# 设置时区
-  - export TZ='Asia/Shanghai'
-  - npm install -g hexo
-  - npm install -g hexo-cli
-
+- export TZ='Asia/Shanghai'
+- npm install -g hexo
+- npm install -g hexo-cli
 before_script:
-# 设置github账户信息
-  - git config --global user.name "${GIT_USER_NAME}"
-  - git config --global user.email "${GIT_USER_EMAIL}"
-# github仓库操作
-  - sed -i'' "s~git@${STATIC_SITE_REPO}~https://${ACCESS_TOKEN}:x-oauth-basic@${STATIC_SITE_REPO}~" _config.yml
-
-# 安装依赖组件
+- git config --global user.name "${GIT_USER_NAME}"
+- git config --global user.email "${GIT_USER_EMAIL}"
+- sed -i'' "s~git@${STATIC_SITE_REPO}~https://${REPO_TOKEN}:x-oauth-basic@${STATIC_SITE_REPO}~" _config.yml
+  _config.yml
 install:
-  - npm install
-
-# 执行的命令
+- npm install
 script:
-  - hexo clean
-  - hexo generate
-# 执行的成功后执行 
+- hexo clean
+- hexo generate
 after_success:
-  - hexo deploy
+- hexo deploy
+env:
+  global:
+    secure: thAcSXeNAv4Rhw9HVgbG5gwxJM4jgifKpH3ktEyCNdQMzxbxWlhWXx2MbxK9QZ1C0srpFpcwxDfMQEMQBmfmqHZBb3Sjieso92mOHW4/WlIZxckXj+fiPfuXyP1s5SToTr4mXE5x4vmqi17OMHg/ZDIf7jQaPVGcXY78Jvu2Hs6i3xV1hHDu4l98uqWNjjsTPZ+ckC1zznVTSO78EvFxsCjhw3EnnZiDSAb55SEqrYpd243r05uXQVOlCSXQZ06wJ6QFl7CQkgYv8Cv82ll41d63M4j7uOUpsdq+eL83nlkna0IpaaMnRKZORnKEbP+nJ7UMoTzw9lQ62Ar6LWOXjIEfoH0FwaWlevrMP5GshjOPv2oFQQxE3rdXQftBhZhwVNMEglXe/lIBNwLnk8TNtv/7oYiQDzyzRpXpylrfmd/nMtcxNm6GX4uL5HtDVakBhJm8GPXL3dd/H+MynZJaSQ4SFRWmtzqo7q88I0lC+b0+7RFW6eAVunpATgMsCcXnE3kS7hbjYKpz4wDGQqIFcQ9NM5aHP7J5KiFNIZF7kCV7OTixRnYoqPOa3I+qr1C3MfY+ieX4+LrlE8pAEiCiIGRRnmzMlwdJvRoVT+0j34mQaPelzprjpMYFQorWfv6LAyekua3GQTgAtE9oASAp49EQQZTRlpO+uXe5S95krb4=
