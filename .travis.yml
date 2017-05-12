@@ -10,7 +10,7 @@ before_install:
 before_script:
 - git config --global user.name "${GIT_USER_NAME}"
 - git config --global user.email "${GIT_USER_EMAIL}"
-- sed -i'' "s~git@${STATIC_SITE_REPO}~https://${ACCESS_TOKEN}:x-oauth-basic@${STATIC_SITE_REPO}~" _config.yml
+- sed -i'' "s~git@github.com:SeayXu/seayxu.github.io.git~https://${REPO_TOKEN}:x-oauth-basic@${STATIC_SITE_REPO}~" _config.yml
 install:
 - npm install
 script:
@@ -18,3 +18,6 @@ script:
 - hexo generate
 after_success:
 - hexo deploy
+env:
+  global:
+    secure: xVHNJsWmKkJZ6xzUGEwj+BQzD494iU2Mi+iWrw1wWD+aVUMY/1Ft5u9mGQ+xnDRAAOjSN+MiotXFbmZYopo9C7FAoNJp2/u6RqGfDLqYUiOiVg56mPebACyE9CSVMzOTyveSqETAFD7nl5vLcddYLe36BK6YhfzSgORuMBguSNgbJul3wdsDviNyDlSlbQRAdkX9YFMX3fgCnJujxxLhAf8Fhu9fepdTPY1h7xKkHAnSkpKpdEMRMXcdv+R177i3/XZI/pNjUZMStTLritfAq5/pXfC48ussFGa/MFReHiM8n8f+YQzzgyc3N1QR8E6Wlm3udjMNP8/2il8AH6kTMacHGRCZ57Xxi3jFBkiep19G52jN0EWsBKmgDY5z1q0qU4m5Oql/UD9gSttOP9X0b85mDeYhqDnkK7dNws3jgTCjoCfsKeAjJu7ESmtLJrCesS/h7JlzRC+ZANr1MrkXpNuySdFDOAsxvHnS/Uc3t87lct+IZ/Id7vc9jKWoVWgWwIu+0ZUatOQ7xwCkPtvNTkPcQlUz2Fw+U7OyLulgasN+7PLCcs/p6J+v4R/7zQBfaEzCJ240WFAhibvsdW1wOhMc29AGe0KhaQ+DZ7HXEc8fIYuToNiBbotv0MYaqwWTdPGy+3CIxXM9bW8rlNGj0nwzlg+r+2tF73pMZOwKog4=
