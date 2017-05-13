@@ -10,15 +10,15 @@
 @h-aqua: #3e999f;
 @h-blue: #4271ae;
 @h-purple: #8959a8;
-@h-fs: 12px;
+@h-fs: 14px;
 
 .codeBlock() {
-    overflow-x: auto;
     position: relative;
-    background: @h-background;
-    padding: 15px;
+    overflow-x: auto;
+    padding: 20px;
+    font-size: @h-fs;
     line-height: @h-fs*1.6;
-    border-radius: 2px;
+    background: @h-background;
 }
 
 .line-numbers() {
@@ -220,4 +220,11 @@ pre {
         color: @h-purple
     }
 
+}
+@media screen and(max-width:760px) {
+    .post-content .highlight {
+        margin-left: -16px;
+        margin-right: -16px;
+        padding: 20px 16px;
+    }
 }

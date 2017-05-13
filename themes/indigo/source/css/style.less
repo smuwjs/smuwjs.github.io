@@ -10,31 +10,39 @@
 }
 
 ::-webkit-scrollbar {
-    width: 5px;
-    height: 5px;
+    -webkit-appearance: none;
+    width: 8px;
+    height: 8px;
 
-    &-track { background-color: transparent; }
+    &-track { background-color: inherit; }
     &-thumb {
-        background-color: @dividerColor ;
-
+        background-color: @dividerColor;
+        border: 1px solid #fff;
+        border-radius: 10px;
         &:hover {
-            background-color: @secondaryTextColor
+            background-color: darken(@dividerColor, 10%)
         }
         &:active {
-            background-color: @secondaryTextColor
+            background-color: darken(@dividerColor, 20%)
         }
     }
 }
 
+::selection {
+    background: lighten(@lightPrimaryColor, 5%);
+}
+
 html {
-    background-color: #fff;
+    background-color: @backColor;
     color: @primaryTextColor;
     font-size: @font-size;
     line-height: 1.5;
+    overflow-x: hidden;
 }
 
 body {
     -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+    -webkit-overflow-scrolling: touch;
 }
 
 html,
@@ -42,6 +50,11 @@ body {
     position: relative;
     min-height: 100%;
     height: 100%;
+}
+
+.lock {
+    overflow: hidden;
+    max-height: 100%;
 }
 
 body,
@@ -117,6 +130,13 @@ small {
     line-height: 1;
 }
 
+main {
+    display: block
+}
+template {
+    display: none
+}
+
 img {
     max-width: 100%;
     border: none;
@@ -129,7 +149,6 @@ label {
     vertical-align: middle;
 }
 
-em,
 i {
     font-style: normal;
 }
@@ -203,11 +222,12 @@ a {
     background-image: none;
     color: @primaryColor;
     text-decoration: none;
+    outline: 0;
 }
 
 a:hover {
     color: @darkPrimaryColor;
-    outline: 0;
+    text-decoration: underline;
 }
 
 hr,
@@ -252,13 +272,20 @@ hr,
 
 /* flex布局  */
 .flex-row,
+.flex-column,
 .flex-row-vertical {
     display: -webkit-box;
     display: -webkit-flex;
     display: -ms-flexbox;
     display: flex;
 }
-
+.flex-column {
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: row;
+    -ms-flex-direction: row;
+    flex-direction: row;
+}
 .flex-row-vertical {
     -webkit-box-orient: vertical;
     -webkit-box-direction: normal;
@@ -268,7 +295,8 @@ hr,
 }
 
 /* 多行布局 */
-.flex-row-wrap {
+.flex-row-wrap,
+.flex-column {
     -webkit-flex-wrap: wrap;
     -ms-flex-wrap: wrap;
     flex-wrap: wrap;
@@ -369,11 +397,15 @@ hr,
 @import '_partial/waves';
 @import '_partial/layout';
 @import '_partial/header';
+@import '_partial/highlight';
 @import '_partial/postlist';
 @import '_partial/gotop';
 @import '_partial/share';
 @import '_partial/article';
 @import '_partial/archives';
+@import '_partial/page';
 @import '_partial/tags';
-@import '_partial/highlight';
 @import '_partial/search';
+@import '_partial/reward';
+@import '_partial/lightbox';
+@import '_duoshuo/embed';

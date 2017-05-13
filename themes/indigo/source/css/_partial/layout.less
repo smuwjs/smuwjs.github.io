@@ -38,7 +38,6 @@
     }
 
     .brand-wrap {
-        background: url(../img/brand.jpg);
         background-size: 100% 100%;
     }
 
@@ -78,6 +77,7 @@
     .nav {
         margin: 0;
         padding: 12px 0;
+        height: 300px;
         min-height: ~"calc(100% - 115px)";
         list-style: none;
         line-height: @navH;
@@ -112,24 +112,7 @@
             line-height: @navH;
             font-weight: 500;
             color: @secondaryTextColor;
-        }
-
-    }
-
-    .footer {
-        position: relative;
-        width: 100%;
-        height: 115px;
-        font-size: 12px;
-        font-family: @font-code;
-        padding: 10px @menuPadding;
-        border-top: 1px solid @borderColor;
-
-        .rss {
-            position: absolute;
-            right: @menuPadding;
-            top: 17px;
-            color: #E64A19;
+            text-decoration: none;
         }
 
     }
@@ -137,22 +120,29 @@
 }
 
 #main {
-    padding-left: 240px;
+    padding-left: @menuWidth;
     min-height: 100%;
-    background: @backColor;
     .transition(.4s);
 }
 
 .body-wrap {
     padding: 30px 0 40px;
+    min-height: ~'calc(100vh - 340px)';
 }
 
 .container {
-    width: 960px;
+    width: @contentWidth;
     margin: 0 auto;
+
+    &:after {
+        content: '';
+        display: table;
+        clear: both;
+    }
 }
 
 .mask {
+    visibility: hidden;
     position: fixed;
     top: 0;
     left: 0;
@@ -161,11 +151,52 @@
     width: 100%;
     height: 100%;
     background: #000;
-    opacity: .5;
-    filter: alpha(opacity=50);
-    display: none;
+    opacity: 0;
+    filter: alpha(opacity=0);
+    pointer-events: none;
+    .transition(.3s);
+
     &.in {
-        display: block;
+        visibility: visible;
+        pointer-events: auto;
+        opacity: .3;
+    }
+}
+
+.footer {
+    background: @darkPrimaryColor;
+    p {
+        margin: 0;
+        line-height: 1.6;
+        font-size: 13px;
+        text-align: center;
+
+        span:not(:first-child):before {
+            content: '·';
+            padding: 0 .5em;
+        }
+        a {
+            border-bottom: 1px dotted darken(@lightPrimaryColor, 15%);
+            &:hover {
+                border-bottom: 1px solid #fff;
+            }
+        }
+    }
+    .top {
+        padding: 16px;
+        color: darken(@lightPrimaryColor, 10%);
+        background: @primaryColor;
+    }
+    a {
+        color: @lightPrimaryColor;
+        &:hover {
+            color: #fff;
+            text-decoration: none
+        }
+    }
+    .bottom {
+        padding: 16px;
+        color: darken(@lightPrimaryColor, 15%);
     }
 }
 
@@ -174,9 +205,6 @@ a[title="站长统计"] {
 }
 
 @media screen and (max-width:1240px) {
-    .container {
-        width: 720px;
-    }
 
     #menu-off {
         display: none;
@@ -199,10 +227,19 @@ a[title="站长统计"] {
 
 }
 
-@media screen and (max-width:760px) {
+
+@media screen and (max-width:1040px) {
     .container {
         width: 100%;
         padding: 20px 16px;
+    }
+}
+
+@media screen and (max-width:760px) {
+
+    #main {
+        width: 100%;
+        overflow-x: hidden;
     }
 
     #menu {
@@ -223,4 +260,9 @@ a[title="站长统计"] {
 
     }
 
+    ::-webkit-scrollbar {
+        display: none;
+    }
+
 }
+

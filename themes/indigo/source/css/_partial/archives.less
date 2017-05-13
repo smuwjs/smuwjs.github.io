@@ -3,27 +3,25 @@
     color: @primaryColor;
     font-size: 16px;
     font-weight: bold;
-    text-transform: uppercase;
+
+    &:first-child {
+        margin-top: 10px;
+    }
 }
 
-.archive-article {
-    position: relative;
-    padding: 25px 25px 25px 140px;
-    background: #fff;
-    border-bottom: 1px solid @borderColor;
-    box-shadow: 0 1px 2px rgba(151, 151, 151, 0.58);
+.article-card {
+    padding: 16px 20px 0;
+    .card();
 
-    .post-title,
-    .article-tag-list {
-        margin: 0;
-        display: inline;
-        vertical-align: middle;
-    }
+    .post-content {
+        word-break: break-all;
 
-    .post-title {
-        margin: 0 5px 0 0;
-        font-size: 18px;
-        line-height: 1.3;
+        .highlight,
+        > pre {
+            margin-left: -20px;
+            margin-right: -20px;
+            padding: 20px;
+        }
     }
 
     .post-time {
@@ -31,39 +29,68 @@
         font-weight: bold;
     }
 
-    .article-tag-list-item {
-        margin: 5px 5px 0 0;
-        padding: 0 6px;
-        font-size: 12px;
+    .post-footer {
+        margin: 0 -20px;
+        padding: 12px 20px 8px;
     }
 
 }
 
-.archive-article-inner {
-    display: inline;
+.archive-article {
+    .post-title {
+        font-size: 18px;
+        margin-bottom: 0;
+        padding-bottom: 16px;
+    }
 }
-
-.archive-article-date {
+.waterfall {
+    position: relative;
+    margin: 0 -10px -20px;
+    .fade;
+}
+.waterfall-item {
     position: absolute;
-    top: 25px;
-    left: 25px;
-    
+    width: 50%;
+    padding: 0 10px 20px;
 }
 
 @media screen and (max-width:760px) {
     .archive-article {
+        display: block;
         margin: 0 -16px;
-        padding: 20px 20px 20px 80px;
+        padding: 16px 16px 8px;
+        border-bottom: 1px solid @borderColor;
+        .post-footer {
+            border-top: none;
+            padding-top: 0;
+            padding-bottom: 0;
+        }
     }
 
+    .article-card {
+        border-radius: 0
+    }
+
+    .archive-separator {
+        margin-top: 16px;
+    }
+
+    .waterfall {
+        margin: 0;
+        height: auto!important;
+        opacity: 1;
+        .transform(translateY(0));
+    }
+
+    .waterfall-item {
+        position: static;
+        width: 100%;
+        padding: 0;
+    }
 }
 
 @media screen and (max-width:420px) {
     .archive-article {
-        padding: 20px;
+        padding: 16px 16px 0;
     }
-    .archive-article-date {
-        position: static;
-    }
-
 }
