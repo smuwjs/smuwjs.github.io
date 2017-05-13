@@ -1,7 +1,6 @@
 ---
-title: 我的标签
+title: tags
+date: 2017-05-13 11:14:38
 layout: tags
-noDate: true
 comments: false
-date: 2016-09-05 23:18:36
 ---
