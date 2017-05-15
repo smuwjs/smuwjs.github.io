@@ -7,7 +7,7 @@ title: Jeeson's Blog
 subtitle: Write the code. Change the world.
 description:
 author: Jeeson
-language: zh-Hans
+language: zh-CN
 timezone:
 
 # URL
@@ -24,7 +24,7 @@ tag_dir: tags
 archive_dir: archives
 category_dir: categories
 code_dir: downloads/code
-i18n_dir: :language
+i18n_dir: :lang
 skip_render:
   - README.md
 
