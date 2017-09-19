@@ -1,4 +1,12 @@
- 
+---
+title: "java io系列06之 序列化(Serializable和Externalizable)详解"
+categories: 
+- source analysis
+tags: 
+- Java IO系列
+- Java源码分析
+date: 2016-10-06
+--- 
 
 > 本章，我们对序列化进行深入的学习和探讨。学习内容，包括序列化的作用、用途、用法，以及对实现序列化的2种方式Serializable和Externalizable的深入研究。
 

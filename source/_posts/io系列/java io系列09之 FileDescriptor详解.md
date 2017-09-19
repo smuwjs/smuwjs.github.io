@@ -1,3 +1,12 @@
+---
+title: "java io系列09之 FileDescriptor详解"
+categories: 
+- source analysis
+tags: 
+- Java IO系列
+- Java源码分析
+date: 2016-10-09
+---
 
 > 本章对FileDescriptor进行介绍
 

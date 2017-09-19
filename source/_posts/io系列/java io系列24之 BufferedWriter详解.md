@@ -1,3 +1,12 @@
+---
+title: "java io系列24之 BufferedWriter详解"
+categories: 
+- source analysis
+tags: 
+- Java IO系列
+- Java源码分析
+date: 2016-10-24
+---
 
 > **目录**  
 [1. BufferedWriter 介绍](#anchor1)   

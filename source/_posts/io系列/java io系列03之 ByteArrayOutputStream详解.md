@@ -1,3 +1,12 @@
+---
+title: "java io系列03之 ByteArrayOutputStream详解"
+categories: 
+- source analysis
+tags: 
+- Java IO系列
+- Java源码分析
+date: 2016-10-03
+---
 
 > 前面学习ByteArrayInputStream，了解了“输入流”。接下来，我们学习与ByteArrayInputStream相对应的输出流，即ByteArrayOutputStream。  
 本章，我们会先对ByteArrayOutputStream进行介绍，在了解了它的源码之后，再通过示例来掌握如何使用它。

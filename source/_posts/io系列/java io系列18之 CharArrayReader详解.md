@@ -1,3 +1,12 @@
+---
+title: "java io系列18之 CharArrayReader详解"
+categories: 
+- source analysis
+tags: 
+- Java IO系列
+- Java源码分析
+date: 2016-10-18
+---
 
 > 从本章开始，我们开始对“字符流”进行学习。首先，要学习的是CharArrayReader。学习时，我们先对CharArrayReader有个大致了解，然后深入了解一下它的源码，最后通过示例来掌握它的用法。
 

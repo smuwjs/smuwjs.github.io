@@ -1,3 +1,12 @@
+---
+title: "java io系列22之 FileReader和FileWriter详解"
+categories: 
+- source analysis
+tags: 
+- Java IO系列
+- Java源码分析
+date: 2016-10-22
+---
 
 > **目录**  
 [1. FileReader和FileWriter 介绍](#anchor1)   

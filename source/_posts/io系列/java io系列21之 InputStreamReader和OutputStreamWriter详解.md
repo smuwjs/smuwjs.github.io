@@ -1,3 +1,12 @@
+---
+title: "java io系列21之 InputStreamReader和OutputStreamWriter详解"
+categories: 
+- source analysis
+tags: 
+- Java IO系列
+- Java源码分析
+date: 2016-10-21
+---
  
 > **目录**  
 [1. InputStreamReader和OutputStreamWriter 介绍](#anchor1)   

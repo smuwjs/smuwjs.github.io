@@ -1,3 +1,12 @@
+---
+title: "java io系列08之 File详解"
+categories: 
+- source analysis
+tags: 
+- Java IO系列
+- Java源码分析
+date: 2016-10-08
+---
 
 > 本文对File的API和常用方法进行介绍。
 

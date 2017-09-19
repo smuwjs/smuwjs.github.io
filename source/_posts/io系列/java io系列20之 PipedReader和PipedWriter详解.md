@@ -1,3 +1,12 @@
+---
+title: "java io系列20之 PipedReader和PipedWriter详解"
+categories: 
+- source analysis
+tags: 
+- Java IO系列
+- Java源码分析
+date: 2016-10-20
+---
 
 > 本章，我们学习PipedReader和PipedWriter。它们和“PipedInputStream和PipedOutputStream”一样，都可以用于管道通信。
 

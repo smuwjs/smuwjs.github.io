@@ -1,3 +1,12 @@
+---
+title: "java io系列12之 BufferedInputStream详解"
+categories: 
+- source analysis
+tags: 
+- Java IO系列
+- Java源码分析
+date: 2016-10-12
+---
 
 > **目录**  
 [1. BufferedInputStream 介绍](#anchor1)   

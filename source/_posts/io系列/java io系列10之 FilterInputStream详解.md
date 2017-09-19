@@ -1,3 +1,12 @@
+---
+title: "java io系列10之 FilterInputStream详解"
+categories: 
+- source analysis
+tags: 
+- Java IO系列
+- Java源码分析
+date: 2016-10-10
+---
  
 <a name="anchor1"></a>
 # FilterInputStream 介绍

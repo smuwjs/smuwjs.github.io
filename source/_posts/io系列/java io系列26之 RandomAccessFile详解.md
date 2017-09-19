@@ -1,3 +1,12 @@
+---
+title: "java io系列26之 RandomAccessFile详解"
+categories: 
+- source analysis
+tags: 
+- Java IO系列
+- Java源码分析
+date: 2016-10-26
+---
 
 > **目录**  
 > [1. RandomAccessFile](#anchor1)   

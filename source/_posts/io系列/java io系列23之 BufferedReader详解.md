@@ -1,3 +1,12 @@
+---
+title: "java io系列23之 BufferedReader详解"
+categories: 
+- source analysis
+tags: 
+- Java IO系列
+- Java源码分析
+date: 2016-10-23
+---
 
 > **目录**  
 [1. BufferedReader 介绍](#anchor1)   

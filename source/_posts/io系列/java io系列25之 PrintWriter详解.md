@@ -1,3 +1,12 @@
+---
+title: "java io系列25之 PrintWriter详解"
+categories: 
+- source analysis
+tags: 
+- Java IO系列
+- Java源码分析
+date: 2016-10-25
+---
 
 > **目录**  
 [1. PrintWriter 介绍](#anchor1)   

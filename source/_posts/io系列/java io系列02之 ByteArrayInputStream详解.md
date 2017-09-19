@@ -1,3 +1,12 @@
+---
+title: "java io系列02之 ByteArrayInputStream详解"
+categories: 
+- source analysis
+tags: 
+- Java IO系列
+- Java源码分析
+date: 2016-10-02
+---
 
 > 我们以ByteArrayInputStream，拉开对字节类型的“输入流”的学习序幕。  
 本章，我们会先对ByteArrayInputStream进行介绍，然后深入了解一下它的源码，最后通过示例来掌握它的用法。

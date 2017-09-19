@@ -1,3 +1,12 @@
+---
+title: "java io系列13之 BufferedOutputStream详解"
+categories: 
+- source analysis
+tags: 
+- Java IO系列
+- Java源码分析
+date: 2016-10-13
+---
 
 > **目录**  
 [1. BufferedOutputStream 介绍](#anchor1)   

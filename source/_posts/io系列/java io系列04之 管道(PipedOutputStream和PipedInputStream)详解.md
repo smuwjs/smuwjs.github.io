@@ -1,3 +1,12 @@
+---
+title: "java io系列04之 管道(PipedOutputStream和PipedInputStream)详解"
+categories: 
+- source analysis
+tags: 
+- Java IO系列
+- Java源码分析
+date: 2016-10-04
+---
 
 > 本章，我们对java 管道进行学习。
 

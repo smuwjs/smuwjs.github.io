@@ -1,3 +1,12 @@
+---
+title: "java io系列11之 FilterOutputStream详解"
+categories: 
+- source analysis
+tags: 
+- Java IO系列
+- Java源码分析
+date: 2016-10-11
+---
  
 <a name="anchor1"></a>
 # FilterOutputStream 介绍

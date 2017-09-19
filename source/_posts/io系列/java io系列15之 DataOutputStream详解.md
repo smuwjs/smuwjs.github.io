@@ -1,4 +1,12 @@
-
+---
+title: "java io系列15之 DataOutputStream详解"
+categories: 
+- source analysis
+tags: 
+- Java IO系列
+- Java源码分析
+date: 2016-10-15
+---
 
 > 本章介绍DataOutputStream。我们先对DataOutputStream有个大致认识，然后再深入学习它的源码，最后通过示例加深对它的了解。
 

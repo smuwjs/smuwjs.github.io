@@ -1,4 +1,12 @@
-
+---
+title: "java io系列17之 System.out.println详解"
+categories: 
+- source analysis
+tags: 
+- Java IO系列
+- Java源码分析
+date: 2016-10-17
+---
 
 我们初学java的第一个程序是"hello world"
 

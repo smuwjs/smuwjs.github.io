@@ -1,3 +1,12 @@
+---
+title: "java io系列05之 ObjectInputStream和ObjectOutputStream详解"
+categories: 
+- source analysis
+tags: 
+- Java IO系列
+- Java源码分析
+date: 2016-10-05
+---
 
 > 本章，我们学习ObjectInputStream 和 ObjectOutputStream
 
