@@ -26,27 +26,27 @@ date: 2016-09-09
 
 1.打开eclipse选择Window->Preference。
 
-![](https://imgsa.baidu.com/exp/w=480/sign=b84400bd02082838680ddd1c8898a964/730e0cf3d7ca7bcb957d6c8dbb096b63f624a80a.jpg)
+![](http://opesdt6ii.bkt.clouddn.com/17-9-19/6641968.jpg)
 
 2.选择Java->Installed JREs 或者直接搜索Installed JREs
 
-![选择Java->Installed JRES](https://imgsa.baidu.com/exp/w=480/sign=615d96b1d854564ee565e53183df9cde/c9fcc3cec3fdfc03ba4c491ad13f8794a4c2265f.jpg)
+![选择Java->Installed JRES](http://opesdt6ii.bkt.clouddn.com/17-9-19/50293672.jpg)
 
 3.此时"Installed JRES"右边是列表窗格，列出了系统中的 JRE 环境，选择你的JRE，然后点边上的 "Edit..."。
 
-![](https://imgsa.baidu.com/exp/w=480/sign=7e902feccf8065387beaa51ba7dca115/9c16fdfaaf51f3de590c13c691eef01f3b2979d2.jpg)
+![](http://opesdt6ii.bkt.clouddn.com/17-9-19/69568829.jpg)
 
 4.会出现一个窗口(Edit JRE)，选中rt.jar文件的这一项。 
 
-![](https://imgsa.baidu.com/exp/w=480/sign=b4dd6e899816fdfad86cc7e6848e8cea/960a304e251f95cac2fa0714cc177f3e67095200.jpg)
+![](http://opesdt6ii.bkt.clouddn.com/17-9-19/94728886.jpg)
 
 5.展开后，可以看到“Source Attachment:(none)”，点这一项，点右边的按钮“Source Attachment...”, 选择你的JDK目录下的 “src.zip”文件。
 
-![](https://imgsa.baidu.com/exp/w=480/sign=1d85011982d6277fe912333018391f63/08f790529822720e967777587ecb0a46f31fabd3.jpg)
+![](http://opesdt6ii.bkt.clouddn.com/17-9-19/9559503.jpg)
 
 6.在对话框中，点击External File，选择你所安装的jdk目录下的src.zip文件，一路点OK即可。
 
-![](https://imgsa.baidu.com/exp/w=480/sign=8992f37c386d55fbc5c6772e5d234f40/b7003af33a87e9509a2f6cce15385343fbf2b45c.jpg)
+![](http://opesdt6ii.bkt.clouddn.com/17-9-19/92255501.jpg)
 
 > **注：**
 > dt.jar是关于运行环境的类库,主要是swing的包 。
