@@ -9,6 +9,7 @@ tags:
 date: 2016-11-13 01:00:00
 ---
 
+
 根据修改的数据类型，可以将JUC包中的原子操作类可以分为4类。
 
 1. **基本类型**: AtomicInteger, AtomicLong, AtomicBoolean ;  

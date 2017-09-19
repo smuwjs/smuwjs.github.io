@@ -9,6 +9,7 @@ tags:
 date: 2016-11-13 05:00:00
 ---
   
+
 > AtomicIntegerFieldUpdater，AtomicLongFieldUpdater和AtomicReferenceFieldUpdater这3个修改类的成员的原子类型的原理和用法相似。本章以对基本类型的原子类进行介绍。
 
 > **目录**  

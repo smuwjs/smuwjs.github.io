@@ -9,6 +9,7 @@ tags:
 date: 2016-11-12 09:00:00
 ---
    
+
 > 本章介绍JUC包中的LinkedBlockingDeque。
 
 > **目录**  

@@ -9,6 +9,7 @@ tags:
 date: 2016-11-14 08:00:00
 ---
    
+
 > Java的JUC(java.util.concurrent)包中的锁包括"独占锁"和"共享锁"。在“Java多线程系列--“JUC锁”02之 互斥锁ReentrantLock ”中，对Java的独占锁进行了说明。本章对Java的“共享锁”进行介绍，JUC中的共享锁有CountDownLatch, CyclicBarrier, Semaphore, ReentrantReadWriteLock等；本章会以ReentrantReadWriteLock为蓝本对共享锁进行说明。
 
 > **目录**  

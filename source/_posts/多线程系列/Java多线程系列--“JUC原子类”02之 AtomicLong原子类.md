@@ -9,6 +9,7 @@ tags:
 date: 2016-11-13 02:00:00
 ---
  
+
 > AtomicInteger,AtomicLong和AtomicBoolean这3个基本类型的原子类的原理和用法相似。本章以AtomicLong对基本类型的原子类进行介绍。
 
 > **目录**  

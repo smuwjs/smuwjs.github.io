@@ -8,7 +8,8 @@ tags:
 - JUC集合
 date: 2016-11-12 08:00:00
 ---
-    
+ 
+
 > 本章介绍JUC包中的LinkedBlockingQueue。
 
 > **目录**  

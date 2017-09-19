@@ -8,6 +8,7 @@ tags:
 date: 2016-11-02
 ---
 
+
 > 本章，我们学习“常用的实现多线程的2种方式”：Thread 和 Runnable。  
 之所以说是常用的，是因为通过还可以通过java.util.concurrent包中的线程池来实现多线程。关于线程池的内容，我们以后会详细介绍；现在，先对的Thread和Runnable进行了解。
 
