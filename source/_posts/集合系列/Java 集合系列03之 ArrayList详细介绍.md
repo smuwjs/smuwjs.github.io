@@ -1,3 +1,13 @@
+---
+title: "Java 集合系列03之 ArrayList详细介绍"
+categories: 
+- source analysis
+tags: 
+- Java 集合系列
+- Java源码分析
+date: 2016-12-03
+---
+
 # ArrayList简介
 
 ```java

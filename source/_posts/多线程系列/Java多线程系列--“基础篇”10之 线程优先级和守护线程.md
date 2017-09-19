@@ -1,3 +1,12 @@
+---
+title: "Java多线程系列--“基础篇”10之 线程优先级和守护线程"
+categories: 
+- source analysis
+tags: 
+- Java多线程系列
+- Java源码分析
+date: 2016-11-10
+---
  
 > 本章，会对守护线程和线程优先级进行介绍。
 

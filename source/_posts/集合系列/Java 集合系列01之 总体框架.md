@@ -1,3 +1,13 @@
+---
+title: "Java 集合系列01之 总体框架"
+categories: 
+- source analysis
+tags: 
+- Java 集合系列
+- Java源码分析
+date: 2016-12-01
+---
+
 # 集合与数组
 
 ## 都是对象的存储：

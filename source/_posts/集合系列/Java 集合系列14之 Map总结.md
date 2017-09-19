@@ -1,3 +1,13 @@
+---
+title: "Java 集合系列14之 Map总结"
+categories: 
+- source analysis
+tags: 
+- Java 集合系列
+- Java源码分析
+date: 2016-12-14
+---
+
 # Map 总结
 
 学完了Map的全部内容，我们再回头看看Map的框架图。

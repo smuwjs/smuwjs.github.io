@@ -1,3 +1,13 @@
+---
+title: "Java 集合系列12之 TreeMap详细介绍"
+categories: 
+- source analysis
+tags: 
+- Java 集合系列
+- Java源码分析
+date: 2016-12-12
+---
+
 # TreeMap 简介
 
 TreeMap 是一个有序的key-value集合，它是通过红黑树实现的。

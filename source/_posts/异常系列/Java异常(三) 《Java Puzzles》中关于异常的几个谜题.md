@@ -1,4 +1,13 @@
- 
+---
+title: "Java异常(三) 《Java Puzzles》中关于异常的几个谜题"
+categories: 
+- source analysis
+tags: 
+- Java异常系列
+- Java源码分析
+date: 2017-03-03
+---
+  
 > 本章介绍《Java Puzzles》中关于异常的几个谜题。这一章都是以代码为例，相比上一章看起来更有意思。
 
 > **目录**  

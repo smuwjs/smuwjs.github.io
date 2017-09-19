@@ -1,4 +1,12 @@
-
+---
+title: "Java多线程系列--“基础篇”11之 生产消费者问题"
+categories: 
+- source analysis
+tags: 
+- Java多线程系列
+- Java源码分析
+date: 2016-11-11
+---
  
 > 本章，会对“生产/消费者问题”进行讨论。
 

@@ -1,3 +1,13 @@
+---
+title: "Java 集合系列04之 fail-fast总结"
+categories: 
+- source analysis
+tags: 
+- Java 集合系列
+- Java源码分析
+date: 2016-12-04
+---
+
 # 1、fail-fast简介
 
 fail-fast 机制是Java集合(Collection)中的一种错误机制。当多个线程对同一个集合的内容进行操作时，就可能会产生fail-fast事件。

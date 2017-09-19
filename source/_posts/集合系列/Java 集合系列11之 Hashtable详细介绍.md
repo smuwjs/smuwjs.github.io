@@ -1,3 +1,13 @@
+---
+title: "Java 集合系列11之 Hashtable详细介绍"
+categories: 
+- source analysis
+tags: 
+- Java 集合系列
+- Java源码分析
+date: 2016-12-11
+---
+
 # Hashtable 简介
 
 和HashMap一样，Hashtable 也是一个散列表，它存储的内容是键值对(key-value)映射。

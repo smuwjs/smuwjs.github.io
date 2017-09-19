@@ -1,3 +1,12 @@
+---
+title: "Java多线程系列--“基础篇”09之 interrupt()和线程终止方式"
+categories: 
+- source analysis
+tags: 
+- Java多线程系列
+- Java源码分析
+date: 2016-11-09
+---
 
 > 本章，会对线程的interrupt()中断和终止方式进行介绍。
 

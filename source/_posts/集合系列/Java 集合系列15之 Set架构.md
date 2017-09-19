@@ -1,3 +1,13 @@
+---
+title: "Java 集合系列15之 Set架构"
+categories: 
+- source analysis
+tags: 
+- Java 集合系列
+- Java源码分析
+date: 2016-12-15
+---
+
 # Set
 
 前面，我们已经系统的对List和Map进行了学习。接下来，我们开始可以学习Set。相信经过Map的了解之后，学习Set会容易很多。毕竟，Set的实现类都是基于Map来实现的(HashSet是通过HashMap实现的，TreeSet是通过TreeMap实现的)。

@@ -1,3 +1,12 @@
+---
+title: "Java 字符串系列02 StringBuilder详解"
+categories: 
+- source analysis
+tags: 
+- Java 字符串系列
+- Java源码分析
+date: 2017-04-02
+---
 
 > 本章介绍StringBuilder以及它的API的详细使用方法。
 

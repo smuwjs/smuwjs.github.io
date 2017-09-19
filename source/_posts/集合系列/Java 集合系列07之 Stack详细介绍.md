@@ -1,3 +1,13 @@
+---
+title: "Java 集合系列07之 Stack详细介绍"
+categories: 
+- source analysis
+tags: 
+- Java 集合系列
+- Java源码分析
+date: 2016-12-07
+---
+
 # Stack简介
 
 Stack是栈。它的特性是：先进后出(FILO, First In Last Out)。

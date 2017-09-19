@@ -1,3 +1,13 @@
+---
+title: "Java 集合系列16之 HashSet详细介绍"
+categories: 
+- source analysis
+tags: 
+- Java 集合系列
+- Java源码分析
+date: 2016-12-16
+---
+
 # HashSet 简介
 
 HashSet 是一个没有重复元素的集合。

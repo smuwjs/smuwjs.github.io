@@ -1,3 +1,13 @@
+---
+title: "Java 集合系列09之 Map架构"
+categories: 
+- source analysis
+tags: 
+- Java 集合系列
+- Java源码分析
+date: 2016-12-09
+---
+
 # Map
 
 前面，我们已经系统的对List进行了学习。接下来，我们先学习Map，然后再学习Set；因为Set的实现类都是基于Map来实现的(如，HashSet是通过HashMap实现的，TreeSet是通过TreeMap实现的)。

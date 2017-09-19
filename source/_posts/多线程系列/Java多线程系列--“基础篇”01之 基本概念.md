@@ -1,3 +1,12 @@
+---
+title: "Java多线程系列--“基础篇”01之 基本概念"
+categories: 
+- source analysis
+tags: 
+- Java多线程系列
+- Java源码分析
+date: 2016-11-01
+---
 
 > 多线程是Java中不可避免的一个重要主体。从本章开始，我们将展开对多线程的学习。接下来的内容，是对“JDK中新增JUC包”之前的Java多线程内容的讲解，涉及到的内容包括，Object类中的wait(), notify()等接口；Thread类中的接口；synchronized关键字。
 

@@ -1,3 +1,13 @@
+---
+title: "Java 集合系列13之 WeakHashMap详细介绍"
+categories: 
+- source analysis
+tags: 
+- Java 集合系列
+- Java源码分析
+date: 2016-12-13
+---
+
 # WeakHashMap简介
 
 WeakHashMap 继承于AbstractMap，实现了Map接口。和HashMap一样，WeakHashMap 也是一个散列表，它存储的内容也是键值对(key-value)映射，而且键和值都可以是null。

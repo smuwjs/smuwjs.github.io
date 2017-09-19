@@ -1,3 +1,12 @@
+---
+title: "Java多线程系列--“基础篇”03之  Thread中start()和run()的区别"
+categories: 
+- source analysis
+tags: 
+- Java多线程系列
+- Java源码分析
+date: 2016-11-03
+---
 
 > Thread类包含start()和run()方法，它们的区别是什么？本章将对此作出解答。
 

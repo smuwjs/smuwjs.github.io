@@ -1,3 +1,12 @@
+---
+title: "Java多线程系列--“基础篇”05之 线程等待与唤醒"
+categories: 
+- source analysis
+tags: 
+- Java多线程系列
+- Java源码分析
+date: 2016-11-05
+---
  
 > 本章，会对线程等待/唤醒方法进行介绍。
 

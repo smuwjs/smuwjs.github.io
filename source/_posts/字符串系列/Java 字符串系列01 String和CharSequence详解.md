@@ -1,3 +1,13 @@
+---
+title: "Java 字符串系列01 String和CharSequence详解"
+categories: 
+- source analysis
+tags: 
+- Java 字符串系列
+- Java源码分析
+date: 2017-04-01
+---
+
 > 本章主要介绍String和CharSequence的区别，以及它们的API详细使用方法。
 
 

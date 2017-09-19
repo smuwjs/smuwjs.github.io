@@ -1,3 +1,12 @@
+---
+title: "Java多线程系列--“基础篇”07之 线程休眠"
+categories: 
+- source analysis
+tags: 
+- Java多线程系列
+- Java源码分析
+date: 2016-11-07
+---
 
 > 本章，会对Thread中sleep()方法进行介绍。
 

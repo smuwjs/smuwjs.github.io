@@ -1,3 +1,13 @@
+---
+title: "Java 集合系列17之 TreeSet详细介绍"
+categories: 
+- source analysis
+tags: 
+- Java 集合系列
+- Java源码分析
+date: 2016-12-17
+---
+
 # TreeSet简介
 
 TreeSet 是一个有序的集合，它的作用是提供有序的Set集合。它继承于AbstractSet抽象类，实现了NavigableSet<E>, Cloneable, java.io.Serializable接口。

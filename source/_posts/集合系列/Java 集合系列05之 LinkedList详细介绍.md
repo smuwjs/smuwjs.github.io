@@ -1,3 +1,13 @@
+---
+title: "Java 集合系列05之 LinkedList详细介绍"
+categories: 
+- source analysis
+tags: 
+- Java 集合系列
+- Java源码分析
+date: 2016-12-05
+---
+
 # LinkedList简介
 
 * LinkedList 是一个继承于AbstractSequentialList的双向链表。它也可以被当作堆栈、队列或双端队列进行操作。

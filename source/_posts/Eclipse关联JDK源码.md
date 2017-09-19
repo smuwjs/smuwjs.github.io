@@ -1,3 +1,12 @@
+---
+title: "Eclipse关联JDK源码"
+categories: 
+- source analysis
+tags: 
+- Java源码分析
+date: 2017-09-09
+---
+
 #  Eclipse关联JDK源码
 
 >阅读JDK源码是Java程序员的基本功，也是必经之路。在使用Eclipse编写代码时，常常需要查看JDK的源码实现。第三方的依赖包源码可以用Maven辅助下载，这里主要记录下如何关联JDK源码。

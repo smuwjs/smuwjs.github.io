@@ -1,4 +1,12 @@
-
+---
+title: "Java 字符串系列03 StringBuffer详解"
+categories: 
+- source analysis
+tags: 
+- Java 字符串系列
+- Java源码分析
+date: 2017-04-03
+---
 
 > 本章介绍StringBuffer以及它的API的详细使用方法。
 

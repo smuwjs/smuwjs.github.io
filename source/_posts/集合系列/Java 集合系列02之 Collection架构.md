@@ -1,3 +1,13 @@
+---
+title: "Java 集合系列02之 Collection架构"
+categories: 
+- source analysis
+tags: 
+- Java 集合系列
+- Java源码分析
+date: 2016-12-02
+---
+
 # Collection
 
 Collection框架类的关系图：

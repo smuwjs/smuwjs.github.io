@@ -1,3 +1,13 @@
+---
+title: "Java 集合系列06之 Vector详细介绍"
+categories: 
+- source analysis
+tags: 
+- Java 集合系列
+- Java源码分析
+date: 2016-12-06
+---
+
 # Vector简介
 
 Vector 是矢量队列，它是JDK1.0版本添加的类。继承于AbstractList，实现了List, RandomAccess, Cloneable这些接口。

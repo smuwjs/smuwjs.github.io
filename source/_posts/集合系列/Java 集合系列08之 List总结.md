@@ -1,3 +1,13 @@
+---
+title: "Java 集合系列08之 List总结"
+categories: 
+- source analysis
+tags: 
+- Java 集合系列
+- Java源码分析
+date: 2016-12-08
+---
+
 # List 总结
 
 先回顾一下List的框架图

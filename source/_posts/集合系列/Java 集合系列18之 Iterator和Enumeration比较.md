@@ -1,3 +1,13 @@
+---
+title: "Java 集合系列18之 Iterator和Enumeration比较"
+categories: 
+- source analysis
+tags: 
+- Java 集合系列
+- Java源码分析
+date: 2016-12-18
+---
+
 # Iterator和Enumeration区别
 
 在Java集合中，我们通常都通过 “Iterator(迭代器)” 或 “Enumeration(枚举类)” 去遍历集合。今天，我们就一起学习一下它们之间到底有什么区别。

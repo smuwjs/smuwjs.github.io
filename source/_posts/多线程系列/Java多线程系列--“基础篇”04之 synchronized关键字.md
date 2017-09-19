@@ -1,3 +1,12 @@
+---
+title: "Java多线程系列--“基础篇”04之 synchronized关键字"
+categories: 
+- source analysis
+tags: 
+- Java多线程系列
+- Java源码分析
+date: 2016-11-04
+---
 
 > 本章，会对synchronized关键字进行介绍。
 

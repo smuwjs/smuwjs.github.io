@@ -1,3 +1,12 @@
+---
+title: "Java异常(二) 《Effective Java》中关于异常处理的几条建议"
+categories: 
+- source analysis
+tags: 
+- Java异常系列
+- Java源码分析
+date: 2017-03-02
+---
  
 > 本章是从《Effective Java》摘录整理出来的关于异常处理的几条建议。
 

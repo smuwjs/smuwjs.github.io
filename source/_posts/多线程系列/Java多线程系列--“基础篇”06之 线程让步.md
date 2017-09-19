@@ -1,3 +1,12 @@
+---
+title: "Java多线程系列--“基础篇”06之 线程让步"
+categories: 
+- source analysis
+tags: 
+- Java多线程系列
+- Java源码分析
+date: 2016-11-06
+---
 
 > 本章，会对Thread中的线程让步方法yield()进行介绍。
 

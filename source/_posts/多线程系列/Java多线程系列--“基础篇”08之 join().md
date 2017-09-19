@@ -1,3 +1,12 @@
+---
+title: "Java多线程系列--“基础篇”08之 join()"
+categories: 
+- source analysis
+tags: 
+- Java多线程系列
+- Java源码分析
+date: 2016-11-08
+---
 
 > 本章，会对Thread中join()方法进行介绍。
 
