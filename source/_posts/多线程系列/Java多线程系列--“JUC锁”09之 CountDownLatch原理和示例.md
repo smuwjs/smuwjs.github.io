@@ -1,4 +1,14 @@
- 
+---
+title: "Java多线程系列--“JUC锁”09之 CountDownLatch原理和示例"
+categories: 
+- source analysis
+tags: 
+- Java多线程系列
+- Java源码分析
+- JUC锁
+date: 2016-11-14 09:00:00
+---
+    
 > 前面对"独占锁"和"共享锁"有了个大致的了解；本章，我们对CountDownLatch进行学习。和ReadWriteLock.ReadLock一样，CountDownLatch的本质也是一个"共享锁"。
 
 > **目录**  

@@ -1,4 +1,14 @@
- 
+---
+title: "Java多线程系列--“JUC线程池”02之 线程池原理(一)"
+categories: 
+- source analysis
+tags: 
+- Java多线程系列
+- Java源码分析
+- JUC线程池
+date: 2016-11-14 02:00:00
+---
+  
 > 在上一章"Java多线程系列--“JUC线程池”01之 线程池架构"中，我们了解了线程池的架构。线程池的实现类是ThreadPoolExecutor类。本章，我们通过分析ThreadPoolExecutor类，来了解线程池的原理。
 
 

@@ -1,4 +1,14 @@
- 
+---
+title: "Java多线程系列--“JUC集合”09之 LinkedBlockingDeque"
+categories: 
+- source analysis
+tags: 
+- Java多线程系列
+- Java源码分析
+- JUC集合
+date: 2016-11-12 09:00:00
+---
+   
 > 本章介绍JUC包中的LinkedBlockingDeque。
 
 > **目录**  

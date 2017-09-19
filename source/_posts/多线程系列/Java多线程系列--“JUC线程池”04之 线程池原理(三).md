@@ -1,4 +1,14 @@
- 
+---
+title: "Java多线程系列--“JUC线程池”04之 线程池原理(三)"
+categories: 
+- source analysis
+tags: 
+- Java多线程系列
+- Java源码分析
+- JUC线程池
+date: 2016-11-14 04:00:00
+---
+    
 > 本章介绍线程池的生命周期。   
 在"Java多线程系列--“基础篇”01之 基本概念"中，我们介绍过，线程有5种状态：新建状态，就绪状态，运行状态，阻塞状态，死亡状态。线程池也有5种状态；然而，线程池不同于线程，线程池的5种状态是：**Running, SHUTDOWN, STOP, TIDYING, TERMINATED**。
 

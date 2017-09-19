@@ -1,3 +1,13 @@
+---
+title: "Java多线程系列--“JUC集合”01之 框架"
+categories: 
+- source analysis
+tags: 
+- Java多线程系列
+- Java源码分析
+- JUC集合
+date: 2016-11-12 01:00:00
+---
  
 > 之前，在"Java 集合系列目录(Category)"中，讲解了Java集合包中的各个类。  
 > 接下来，将展开对JUC包中的集合进行学习。在学习之前，先温习一下"Java集合包"。

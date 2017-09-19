@@ -1,4 +1,13 @@
- 
+---
+title: "Java多线程系列--“JUC锁”02之 互斥锁ReentrantLock"
+categories: 
+- source analysis
+tags: 
+- Java多线程系列
+- Java源码分析
+- JUC锁
+date: 2016-11-14 02:00:00
+---
 
 > 本章对ReentrantLock包进行基本介绍，这一章主要对ReentrantLock进行概括性的介绍。在后面的两章，会分别介绍ReentrantLock的两个子类(公平锁和非公平锁)的实现原理。
 

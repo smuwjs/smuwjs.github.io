@@ -1,5 +1,14 @@
- 
- 
+---
+title: "Java多线程系列--“JUC集合”10之 ConcurrentHashMap"
+categories: 
+- source analysis
+tags: 
+- Java多线程系列
+- Java源码分析
+- JUC集合
+date: 2016-11-12 10:00:00
+---
+    
 > 本章对Java.util.concurrent包中的ConcurrentHashMap类进行详细的介绍。
 
 > **目录**  

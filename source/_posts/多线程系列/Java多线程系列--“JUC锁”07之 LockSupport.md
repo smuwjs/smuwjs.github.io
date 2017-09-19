@@ -1,4 +1,14 @@
- 
+---
+title: "Java多线程系列--“JUC锁”07之 LockSupport"
+categories: 
+- source analysis
+tags: 
+- Java多线程系列
+- Java源码分析
+- JUC锁
+date: 2016-11-14 07:00:00
+---
+   
 > 本章介绍JUC(java.util.concurrent)包中的LockSupport。
 
 > **目录**  

@@ -1,4 +1,14 @@
- 
+---
+title: "Java多线程系列--“JUC锁”06之 Condition条件"
+categories: 
+- source analysis
+tags: 
+- Java多线程系列
+- Java源码分析
+- JUC锁
+date: 2016-11-14 06:00:00
+---
+   
 > 前面对JUC包中的锁的原理进行了介绍，本章会JUC中对与锁经常配合使用的Condition进行介绍。
 
 > **目录**  

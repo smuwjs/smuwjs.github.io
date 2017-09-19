@@ -1,3 +1,13 @@
+---
+title: "Java多线程系列--“JUC线程池”01之 线程池架构"
+categories: 
+- source analysis
+tags: 
+- Java多线程系列
+- Java源码分析
+- JUC线程池
+date: 2016-11-14 01:00:00
+---
  
 > 前面分别介绍了"Java多线程基础"、"JUC原子类"和"JUC锁"。本章介绍JUC的最后一部分的内容——线程池。
 

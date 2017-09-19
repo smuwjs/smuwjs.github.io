@@ -1,4 +1,14 @@
- 
+---
+title: "Java多线程系列--“JUC原子类”04之 AtomicReference原子类"
+categories: 
+- source analysis
+tags: 
+- Java多线程系列
+- Java源码分析
+- JUC原子类
+date: 2016-11-13 04:00:00
+---
+   
 > 本章对AtomicReference引用类型的原子类进行介绍。
 
 > **目录**  

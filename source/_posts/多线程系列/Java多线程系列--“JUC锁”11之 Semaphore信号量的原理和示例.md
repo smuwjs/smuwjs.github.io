@@ -1,4 +1,14 @@
- 
+---
+title: "Java多线程系列--“JUC锁”11之 Semaphore信号量的原理和示例"
+categories: 
+- source analysis
+tags: 
+- Java多线程系列
+- Java源码分析
+- JUC锁
+date: 2016-11-14 11:00:00
+---
+      
 > 本章，我们对JUC包中的信号量Semaphore进行学习。
 
 > **目录**  

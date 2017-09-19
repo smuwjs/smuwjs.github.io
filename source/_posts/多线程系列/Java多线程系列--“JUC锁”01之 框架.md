@@ -1,5 +1,14 @@
- 
-
+---
+title: "Java多线程系列--“JUC锁”01之 框架"
+categories: 
+- source analysis
+tags: 
+- Java多线程系列
+- Java源码分析
+- JUC锁
+date: 2016-11-14 01:00:00
+---
+    
 > 本章，我们介绍锁的架构；后面的章节将会对它们逐个进行分析介绍。
 
  

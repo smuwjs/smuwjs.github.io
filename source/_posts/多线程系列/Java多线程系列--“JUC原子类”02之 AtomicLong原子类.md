@@ -1,4 +1,13 @@
-
+---
+title: "Java多线程系列--“JUC原子类”02之 AtomicLong原子类"
+categories: 
+- source analysis
+tags: 
+- Java多线程系列
+- Java源码分析
+- JUC原子类
+date: 2016-11-13 02:00:00
+---
  
 > AtomicInteger,AtomicLong和AtomicBoolean这3个基本类型的原子类的原理和用法相似。本章以AtomicLong对基本类型的原子类进行介绍。
 

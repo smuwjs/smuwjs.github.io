@@ -1,4 +1,14 @@
- 
+---
+title: "Java多线程系列--“JUC线程池”05之 线程池原理(四)"
+categories: 
+- source analysis
+tags: 
+- Java多线程系列
+- Java源码分析
+- JUC线程池
+date: 2016-11-14 05:00:00
+---
+     
 > 本章介绍线程池的拒绝策略。
 
 > **目录**  

@@ -1,3 +1,13 @@
+---
+title: "Java多线程系列--“JUC集合”03之 CopyOnWriteArraySet"
+categories: 
+- source analysis
+tags: 
+- Java多线程系列
+- Java源码分析
+- JUC集合
+date: 2016-11-12 03:00:00
+---
  
 > 本章是JUC系列中的CopyOnWriteArraySet篇。接下来，会先对CopyOnWriteArraySet进行基本介绍，然后再说明它的原理，接着通过代码去分析，最后通过示例更进一步的了解CopyOnWriteArraySet。
 

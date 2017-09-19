@@ -1,4 +1,14 @@
- 
+---
+title: "Java多线程系列--“JUC线程池”06之 Callable和Future"
+categories: 
+- source analysis
+tags: 
+- Java多线程系列
+- Java源码分析
+- JUC线程池
+date: 2016-11-14 06:00:00
+---
+    
 > 本章介绍线程池中的Callable和Future。
 
 > **目录**  

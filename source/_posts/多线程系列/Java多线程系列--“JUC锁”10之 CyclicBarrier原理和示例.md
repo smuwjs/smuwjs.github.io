@@ -1,4 +1,14 @@
- 
+---
+title: "Java多线程系列--“JUC锁”10之 CyclicBarrier原理和示例"
+categories: 
+- source analysis
+tags: 
+- Java多线程系列
+- Java源码分析
+- JUC锁
+date: 2016-11-14 10:00:00
+---
+     
 > 本章介绍JUC包中的CyclicBarrier锁。
 
 > **目录**  
