@@ -3,6 +3,7 @@ title: "浅谈Android Architecture Components"
 categories: 
 - architecture
 tags: 
+- Android
 - Android Architecture
 date: 2017-07-28 01:01:01
 ---
