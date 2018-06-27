@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>Java多线程系列--“JUC锁”09之 CountDownLatch原理和示例 | Jeeson&#39;s Blog | Write the code. Change the world.</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="Java源码分析,Java多线程系列,JUC锁">
+    <meta name="description" content="前面对”独占锁”和”共享锁”有了个大致的了解；本章，我们对CountDownLatch进行学习。和ReadWriteLock.ReadLock一样，CountDownLatch的本质也是一个”共享锁”。   目录1. CountDownLatch简介2. CountDownLatch数据结构3. CountDownLatch源码分析(基于JDK1.7.0_40)4. CountDownLatch">
+<meta name="keywords" content="Java源码分析,Java多线程系列,JUC锁">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java多线程系列--“JUC锁”09之 CountDownLatch原理和示例">
+<meta property="og:url" content="https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”09之 CountDownLatch原理和示例/index.html">
+<meta property="og:site_name" content="Jeeson&#39;s Blog">
+<meta property="og:description" content="前面对”独占锁”和”共享锁”有了个大致的了解；本章，我们对CountDownLatch进行学习。和ReadWriteLock.ReadLock一样，CountDownLatch的本质也是一个”共享锁”。   目录1. CountDownLatch简介2. CountDownLatch数据结构3. CountDownLatch源码分析(基于JDK1.7.0_40)4. CountDownLatch">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://wangkuiwu.github.io/media/pic/java/threads/juc-lock09-01.jpg">
+<meta property="og:updated_time" content="2018-06-27T09:39:57.945Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java多线程系列--“JUC锁”09之 CountDownLatch原理和示例">
+<meta name="twitter:description" content="前面对”独占锁”和”共享锁”有了个大致的了解；本章，我们对CountDownLatch进行学习。和ReadWriteLock.ReadLock一样，CountDownLatch的本质也是一个”共享锁”。   目录1. CountDownLatch简介2. CountDownLatch数据结构3. CountDownLatch源码分析(基于JDK1.7.0_40)4. CountDownLatch">
+<meta name="twitter:image" content="http://wangkuiwu.github.io/media/pic/java/threads/juc-lock09-01.jpg">
+    
+        <link rel="alternate" type="application/atom+xml" title="Jeeson&#39;s Blog" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/head.png">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Jeeson</h5>
+          <a href="mailto:smuwjs@163.com" title="smuwjs@163.com" class="mail">smuwjs@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/smuwjs" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Java多线程系列--“JUC锁”09之 CountDownLatch原理和示例</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Java多线程系列--“JUC锁”09之 CountDownLatch原理和示例</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2016-11-14T01:00:00.000Z" itemprop="datePublished" class="page-time">
+  2016-11-14
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#1-CountDownLatch简介"><span class="post-toc-number">1.</span> <span class="post-toc-text">1. CountDownLatch简介</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#2-CountDownLatch数据结构"><span class="post-toc-number">2.</span> <span class="post-toc-text">2. CountDownLatch数据结构</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#3-CountDownLatch源码分析-基于JDK1-7-0-40"><span class="post-toc-number">3.</span> <span class="post-toc-text">3. CountDownLatch源码分析(基于JDK1.7.0_40)</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#3-1-CountDownLatch-int-count"><span class="post-toc-number">3.1.</span> <span class="post-toc-text">3.1 CountDownLatch(int count)</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#3-2-await"><span class="post-toc-number">3.2.</span> <span class="post-toc-text">3.2 await()</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#3-3-countDown"><span class="post-toc-number">3.3.</span> <span class="post-toc-text">3.3 countDown()</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#4-CountDownLatch的使用示例"><span class="post-toc-number">4.</span> <span class="post-toc-text">4. CountDownLatch的使用示例</span></a></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”09之 CountDownLatch原理和示例"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Java多线程系列--“JUC锁”09之 CountDownLatch原理和示例</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2016-11-14 09:00:00" datetime="2016-11-14T01:00:00.000Z"  itemprop="datePublished">2016-11-14</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <blockquote>
+<p>前面对”独占锁”和”共享锁”有了个大致的了解；本章，我们对CountDownLatch进行学习。和ReadWriteLock.ReadLock一样，CountDownLatch的本质也是一个”共享锁”。</p>
+</blockquote>
+<blockquote>
+<p><strong>目录</strong><br><a href="#anchor1">1. CountDownLatch简介</a><br><a href="#anchor2">2. CountDownLatch数据结构</a><br><a href="#anchor3">3. CountDownLatch源码分析(基于JDK1.7.0_40)</a><br><a href="#anchor4">4. CountDownLatch的使用示例</a>  </p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="1-CountDownLatch简介"><a href="#1-CountDownLatch简介" class="headerlink" title="1. CountDownLatch简介"></a>1. CountDownLatch简介</h1><p>CountDownLatch是一个同步辅助类，在完成一组正在其他线程中执行的操作之前，它允许一个或多个线程一直等待。</p>
+<p>CountDownLatch和CyclicBarrier的区别<br>(01) CountDownLatch的作用是允许1或N个线程等待其他线程完成执行；而CyclicBarrier则是允许N个线程相互等待。<br>(02) CountDownLatch的计数器无法被重置；CyclicBarrier的计数器可以被重置后使用，因此它被称为是循环的barrier。<br>关于CyclicBarrier的原理，后面一章再来学习。</p>
+<p><strong>CountDownLatch函数列表</strong></p>
+<pre><code>CountDownLatch(int count)
+构造一个用给定计数初始化的 CountDownLatch。
+
+// 使当前线程在锁存器倒计数至零之前一直等待，除非线程被中断。
+void await()
+// 使当前线程在锁存器倒计数至零之前一直等待，除非线程被中断或超出了指定的等待时间。
+boolean await(long timeout, TimeUnit unit)
+// 递减锁存器的计数，如果计数到达零，则释放所有等待的线程。
+void countDown()
+// 返回当前计数。
+long getCount()
+// 返回标识此锁存器及其状态的字符串。
+String toString()
+</code></pre><p><a name="anchor2"></a></p>
+<h1 id="2-CountDownLatch数据结构"><a href="#2-CountDownLatch数据结构" class="headerlink" title="2. CountDownLatch数据结构"></a>2. CountDownLatch数据结构</h1><p>CountDownLatch的UML类图如下：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://wangkuiwu.github.io/media/pic/java/threads/juc-lock09-01.jpg" alt="img" title="">
+                </div>
+                <div class="image-caption">img</div>
+            </figure>
+<p>CountDownLatch的数据结构很简单，它是通过”共享锁”实现的。它包含了sync对象，sync是Sync类型。Sync是实例类，它继承于AQS。</p>
+<p><a name="anchor3"></a></p>
+<h1 id="3-CountDownLatch源码分析-基于JDK1-7-0-40"><a href="#3-CountDownLatch源码分析-基于JDK1-7-0-40" class="headerlink" title="3. CountDownLatch源码分析(基于JDK1.7.0_40)"></a>3. CountDownLatch源码分析(基于JDK1.7.0_40)</h1><p>CountDownLatch是通过“共享锁”实现的。下面，我们分析CountDownLatch中3个核心函数: CountDownLatch(int count), await(), countDown()。</p>
+<h2 id="3-1-CountDownLatch-int-count"><a href="#3-1-CountDownLatch-int-count" class="headerlink" title="3.1 CountDownLatch(int count)"></a>3.1 CountDownLatch(int count)</h2><pre><code>public CountDownLatch(int count) {
+    if (count &lt; 0) throw new IllegalArgumentException(&quot;count &lt; 0&quot;);
+    this.sync = new Sync(count);
+}
+</code></pre><p>说明：该函数是创建一个Sync对象，而Sync是继承于AQS类。Sync构造函数如下：</p>
+<pre><code>Sync(int count) {
+    setState(count);
+}
+</code></pre><p>setState()在AQS中实现，源码如下：</p>
+<pre><code>protected final void setState(long newState) {
+    state = newState;
+}
+</code></pre><p>说明：在AQS中，state是一个private volatile long类型的对象。对于CountDownLatch而言，state表示的”锁计数器“。CountDownLatch中的getCount()最终是调用AQS中的getState()，返回的state对象，即”锁计数器“。</p>
+<h2 id="3-2-await"><a href="#3-2-await" class="headerlink" title="3.2 await()"></a>3.2 await()</h2><pre><code>public void await() throws InterruptedException {
+    sync.acquireSharedInterruptibly(1);
+}
+</code></pre><p>说明：该函数实际上是调用的AQS的acquireSharedInterruptibly(1);</p>
+<p>AQS中的acquireSharedInterruptibly()的源码如下：</p>
+<pre><code>public final void acquireSharedInterruptibly(long arg)
+        throws InterruptedException {
+    if (Thread.interrupted())
+        throw new InterruptedException();
+    if (tryAcquireShared(arg) &lt; 0)
+        doAcquireSharedInterruptibly(arg);
+}
+</code></pre><p>说明：acquireSharedInterruptibly()的作用是获取共享锁。<br>如果当前线程是中断状态，则抛出异常InterruptedException。否则，调用tryAcquireShared(arg)尝试获取共享锁；尝试成功则返回，否则就调用doAcquireSharedInterruptibly()。doAcquireSharedInterruptibly()会使当前线程一直等待，直到当前线程获取到共享锁(或被中断)才返回。</p>
+<p>tryAcquireShared()在CountDownLatch.java中被重写，它的源码如下：</p>
+<pre><code>protected int tryAcquireShared(int acquires) {
+    return (getState() == 0) ? 1 : -1;
+}
+</code></pre><p>说明：tryAcquireShared()的作用是尝试获取共享锁。<br>如果”锁计数器=0”，即锁是可获取状态，则返回1；否则，锁是不可获取状态，则返回-1。</p>
+<pre><code>private void doAcquireSharedInterruptibly(long arg)
+    throws InterruptedException {
+    // 创建&quot;当前线程&quot;的Node节点，且Node中记录的锁是&quot;共享锁&quot;类型；并将该节点添加到CLH队列末尾。
+    final Node node = addWaiter(Node.SHARED);
+    boolean failed = true;
+    try {
+        for (;;) {
+            // 获取上一个节点。
+            // 如果上一节点是CLH队列的表头，则&quot;尝试获取共享锁&quot;。
+            final Node p = node.predecessor();
+            if (p == head) {
+                long r = tryAcquireShared(arg);
+                if (r &gt;= 0) {
+                    setHeadAndPropagate(node, r);
+                    p.next = null; // help GC
+                    failed = false;
+                    return;
+                }
+            }
+            // (上一节点不是CLH队列的表头) 当前线程一直等待，直到获取到共享锁。
+            // 如果线程在等待过程中被中断过，则再次中断该线程(还原之前的中断状态)。
+            if (shouldParkAfterFailedAcquire(p, node) &amp;&amp;
+                parkAndCheckInterrupt())
+                throw new InterruptedException();
+        }
+    } finally {
+        if (failed)
+            cancelAcquire(node);
+    }
+}
+</code></pre><p>说明：<br>(01) addWaiter(Node.SHARED)的作用是，创建”当前线程“的Node节点，且Node中记录的锁的类型是”共享锁“(Node.SHARED)；并将该节点添加到CLH队列末尾。关于Node和CLH在”Java多线程系列–“JUC锁”03之 公平锁(一)”已经详细介绍过，这里就不再重复说明了。<br>(02) node.predecessor()的作用是，获取上一个节点。如果上一节点是CLH队列的表头，则”尝试获取共享锁“。<br>(03) shouldParkAfterFailedAcquire()的作用和它的名称一样，如果在尝试获取锁失败之后，线程应该等待，则返回true；否则，返回false。<br>(04) 当shouldParkAfterFailedAcquire()返回ture时，则调用parkAndCheckInterrupt()，当前线程会进入等待状态，直到获取到共享锁才继续运行。<br>doAcquireSharedInterruptibly()中的shouldParkAfterFailedAcquire(), parkAndCheckInterrupt等函数在”Java多线程系列–“JUC锁”03之 公平锁(一)”中介绍过，这里也就不再详细说明了。</p>
+<h2 id="3-3-countDown"><a href="#3-3-countDown" class="headerlink" title="3.3 countDown()"></a>3.3 countDown()</h2><pre><code>public void countDown() {
+    sync.releaseShared(1);
+}
+</code></pre><p>说明：该函数实际上调用releaseShared(1)释放共享锁。</p>
+<p>releaseShared()在AQS中实现，源码如下：</p>
+<pre><code>public final boolean releaseShared(int arg) {
+    if (tryReleaseShared(arg)) {
+        doReleaseShared();
+        return true;
+    }
+    return false;
+}
+</code></pre><p>说明：releaseShared()的目的是让当前线程释放它所持有的共享锁。<br>它首先会通过tryReleaseShared()去尝试释放共享锁。尝试成功，则直接返回；尝试失败，则通过doReleaseShared()去释放共享锁。</p>
+<p>tryReleaseShared()在CountDownLatch.java中被重写，源码如下：</p>
+<pre><code>protected boolean tryReleaseShared(int releases) {
+    // Decrement count; signal when transition to zero
+    for (;;) {
+        // 获取“锁计数器”的状态
+        int c = getState();
+        if (c == 0)
+            return false;
+        // “锁计数器”-1
+        int nextc = c-1;
+        // 通过CAS函数进行赋值。
+        if (compareAndSetState(c, nextc))
+            return nextc == 0;
+    }
+}
+</code></pre><p>说明：tryReleaseShared()的作用是释放共享锁，将“锁计数器”的值-1。</p>
+<p>总结：CountDownLatch是通过“共享锁”实现的。在创建CountDownLatch中时，会传递一个int类型参数count，该参数是“锁计数器”的初始状态，表示该“共享锁”最多能被count给线程同时获取。当某线程调用该CountDownLatch对象的await()方法时，该线程会等待“共享锁”可用时，才能获取“共享锁”进而继续运行。而“共享锁”可用的条件，就是“锁计数器”的值为0！而“锁计数器”的初始值为count，每当一个线程调用该CountDownLatch对象的countDown()方法时，才将“锁计数器”-1；通过这种方式，必须有count个线程调用countDown()之后，“锁计数器”才为0，而前面提到的等待线程才能继续运行！</p>
+<p>以上，就是CountDownLatch的实现原理。</p>
+<p><a name="anchor4"></a></p>
+<h1 id="4-CountDownLatch的使用示例"><a href="#4-CountDownLatch的使用示例" class="headerlink" title="4. CountDownLatch的使用示例"></a>4. CountDownLatch的使用示例</h1><p>下面通过CountDownLatch实现：”主线程”等待”5个子线程”全部都完成”指定的工作(休眠1000ms)”之后，再继续运行。</p>
+<pre><code>import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.CyclicBarrier;
+
+public class CountDownLatchTest1 {
+
+    private static int LATCH_SIZE = 5;
+    private static CountDownLatch doneSignal;
+    public static void main(String[] args) {
+
+        try {
+            doneSignal = new CountDownLatch(LATCH_SIZE);
+
+            // 新建5个任务
+            for(int i=0; i&lt;LATCH_SIZE; i++)
+                new InnerThread().start();
+
+            System.out.println(&quot;main await begin.&quot;);
+            // &quot;主线程&quot;等待线程池中5个任务的完成
+            doneSignal.await();
+
+            System.out.println(&quot;main await finished.&quot;);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    static class InnerThread extends Thread{
+        public void run() {
+            try {
+                Thread.sleep(1000);
+                System.out.println(Thread.currentThread().getName() + &quot; sleep 1000ms.&quot;);
+                // 将CountDownLatch的数值减1
+                doneSignal.countDown();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+}
+</code></pre><p>运行结果：</p>
+<pre><code>main await begin.
+Thread-0 sleep 1000ms.
+Thread-2 sleep 1000ms.
+Thread-1 sleep 1000ms.
+Thread-4 sleep 1000ms.
+Thread-3 sleep 1000ms.
+main await finished.
+</code></pre><p>结果说明：主线程通过doneSignal.await()等待其它线程将doneSignal递减至0。其它的5个InnerThread线程，每一个都通过doneSignal.countDown()将doneSignal的值减1；当doneSignal为0时，main被唤醒后继续执行。</p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2018-06-27T09:39:57.945Z" itemprop="dateUpdated">2018-06-27 17:39:57</time>
+</span><br>
+
+
+        
+        本文固定链接：<a href="/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”09之 CountDownLatch原理和示例/" target="_blank" rel="external">https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”09之 CountDownLatch原理和示例/</a>
+        
+    </div>
+    <footer>
+        <a href="https://smuwjs.github.io">
+            <img src="/img/head.png" alt="Jeeson">
+            Jeeson
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JUC锁/">JUC锁</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java多线程系列/">Java多线程系列</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java源码分析/">Java源码分析</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”09之 CountDownLatch原理和示例/&title=《Java多线程系列--“JUC锁”09之 CountDownLatch原理和示例》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”09之 CountDownLatch原理和示例/&title=《Java多线程系列--“JUC锁”09之 CountDownLatch原理和示例》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”09之 CountDownLatch原理和示例/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Java多线程系列--“JUC锁”09之 CountDownLatch原理和示例》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”09之 CountDownLatch原理和示例/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”09之 CountDownLatch原理和示例/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”10之 CyclicBarrier原理和示例/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">Java多线程系列--“JUC锁”10之 CyclicBarrier原理和示例</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”08之 共享锁和ReentrantReadWriteLock/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Java多线程系列--“JUC锁”08之 共享锁和ReentrantReadWriteLock</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”09之 CountDownLatch原理和示例" data-title="Java多线程系列--“JUC锁”09之 CountDownLatch原理和示例" data-url="https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”09之 CountDownLatch原理和示例/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'smuwjs', theme: 'none'};
+lazyScripts.push('//unpkg.com/hexo-theme-material-indigo@latest/js/embed.min.js');
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循<a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>Jeeson &copy; 2015 - 2018</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”09之 CountDownLatch原理和示例/&title=《Java多线程系列--“JUC锁”09之 CountDownLatch原理和示例》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”09之 CountDownLatch原理和示例/&title=《Java多线程系列--“JUC锁”09之 CountDownLatch原理和示例》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”09之 CountDownLatch原理和示例/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Java多线程系列--“JUC锁”09之 CountDownLatch原理和示例》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”09之 CountDownLatch原理和示例/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”09之 CountDownLatch原理和示例/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”09之 CountDownLatch原理和示例/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

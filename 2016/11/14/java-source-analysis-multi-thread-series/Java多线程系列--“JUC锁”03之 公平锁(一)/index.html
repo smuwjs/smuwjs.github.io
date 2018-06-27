@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>Java多线程系列--“JUC锁”03之 公平锁(一) | Jeeson&#39;s Blog | Write the code. Change the world.</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="Java源码分析,Java多线程系列,JUC锁">
+    <meta name="description" content="本章对“公平锁”的获取锁机制进行介绍(本文的公平锁指的是互斥锁的公平锁)。“公平锁”的释放锁的机制在后面一章再做介绍，锁的使用示例请参考“Java多线程系列–“JUC锁”02之 互斥锁ReentrantLock”。   目录第1部分 基本概念第2部分 ReentrantLock数据结构第3部分 参考代码第4部分 获取公平锁(基于JDK1.7.0_40)&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbs">
+<meta name="keywords" content="Java源码分析,Java多线程系列,JUC锁">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java多线程系列--“JUC锁”03之 公平锁(一)">
+<meta property="og:url" content="https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”03之 公平锁(一)/index.html">
+<meta property="og:site_name" content="Jeeson&#39;s Blog">
+<meta property="og:description" content="本章对“公平锁”的获取锁机制进行介绍(本文的公平锁指的是互斥锁的公平锁)。“公平锁”的释放锁的机制在后面一章再做介绍，锁的使用示例请参考“Java多线程系列–“JUC锁”02之 互斥锁ReentrantLock”。   目录第1部分 基本概念第2部分 ReentrantLock数据结构第3部分 参考代码第4部分 获取公平锁(基于JDK1.7.0_40)&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbs">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://wangkuiwu.github.io/media/pic/java/threads/juc-lock03-01.jpg">
+<meta property="og:updated_time" content="2018-06-27T09:39:57.945Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java多线程系列--“JUC锁”03之 公平锁(一)">
+<meta name="twitter:description" content="本章对“公平锁”的获取锁机制进行介绍(本文的公平锁指的是互斥锁的公平锁)。“公平锁”的释放锁的机制在后面一章再做介绍，锁的使用示例请参考“Java多线程系列–“JUC锁”02之 互斥锁ReentrantLock”。   目录第1部分 基本概念第2部分 ReentrantLock数据结构第3部分 参考代码第4部分 获取公平锁(基于JDK1.7.0_40)&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbs">
+<meta name="twitter:image" content="http://wangkuiwu.github.io/media/pic/java/threads/juc-lock03-01.jpg">
+    
+        <link rel="alternate" type="application/atom+xml" title="Jeeson&#39;s Blog" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/head.png">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Jeeson</h5>
+          <a href="mailto:smuwjs@163.com" title="smuwjs@163.com" class="mail">smuwjs@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/smuwjs" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Java多线程系列--“JUC锁”03之 公平锁(一)</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Java多线程系列--“JUC锁”03之 公平锁(一)</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2016-11-13T19:00:00.000Z" itemprop="datePublished" class="page-time">
+  2016-11-14
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#第1部分-基本概念"><span class="post-toc-number">1.</span> <span class="post-toc-text">第1部分 基本概念</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#第2部分-ReentrantLock数据结构"><span class="post-toc-number">2.</span> <span class="post-toc-text">第2部分 ReentrantLock数据结构</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#第3部分-参考代码"><span class="post-toc-number">3.</span> <span class="post-toc-text">第3部分 参考代码</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#第4部分-获取公平锁-基于JDK1-7-0-40"><span class="post-toc-number">3.1.</span> <span class="post-toc-text">第4部分 获取公平锁(基于JDK1.7.0_40)</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#1-lock"><span class="post-toc-number">3.2.</span> <span class="post-toc-text">1. lock()</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#2-acquire"><span class="post-toc-number">3.3.</span> <span class="post-toc-text">2. acquire()</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#第4-1部分-tryAcquire"><span class="post-toc-number">4.</span> <span class="post-toc-text">第4.1部分 tryAcquire()</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#1-tryAcquire"><span class="post-toc-number">4.1.</span> <span class="post-toc-text">1. tryAcquire()</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#2-hasQueuedPredecessors"><span class="post-toc-number">4.2.</span> <span class="post-toc-text">2. hasQueuedPredecessors()</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#3-Node的源码"><span class="post-toc-number">4.3.</span> <span class="post-toc-text">3. Node的源码</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#4-compareAndSetState"><span class="post-toc-number">4.4.</span> <span class="post-toc-text">4. compareAndSetState()</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#5-setExclusiveOwnerThread"><span class="post-toc-number">4.5.</span> <span class="post-toc-text">5. setExclusiveOwnerThread()</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#6-getState-setState"><span class="post-toc-number">4.6.</span> <span class="post-toc-text">6. getState(), setState()</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#第4-2部分-addWaiter-Node-EXCLUSIVE"><span class="post-toc-number">5.</span> <span class="post-toc-text">第4.2部分 addWaiter(Node.EXCLUSIVE)</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#1-addWaiter"><span class="post-toc-number">5.1.</span> <span class="post-toc-text">1.addWaiter()</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#2-compareAndSetTail"><span class="post-toc-number">5.2.</span> <span class="post-toc-text">2. compareAndSetTail()</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#3-enq"><span class="post-toc-number">5.3.</span> <span class="post-toc-text">3. enq()</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#第4-3部分-acquireQueued"><span class="post-toc-number">6.</span> <span class="post-toc-text">第4.3部分 acquireQueued()</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#1-acquireQueued"><span class="post-toc-number">6.1.</span> <span class="post-toc-text">1. acquireQueued()</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#2-shouldParkAfterFailedAcquire"><span class="post-toc-number">6.2.</span> <span class="post-toc-text">2. shouldParkAfterFailedAcquire()</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#3-parkAndCheckInterrupt"><span class="post-toc-number">6.3.</span> <span class="post-toc-text">3. parkAndCheckInterrupt())</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#4-再次tryAcquire"><span class="post-toc-number">6.4.</span> <span class="post-toc-text">4. 再次tryAcquire()</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#第4-4部分-selfInterrupt"><span class="post-toc-number">7.</span> <span class="post-toc-text">第4.4部分 selfInterrupt()</span></a></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”03之 公平锁(一)"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Java多线程系列--“JUC锁”03之 公平锁(一)</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2016-11-14 03:00:00" datetime="2016-11-13T19:00:00.000Z"  itemprop="datePublished">2016-11-14</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <blockquote>
+<p>本章对“公平锁”的获取锁机制进行介绍(本文的公平锁指的是互斥锁的公平锁)。<br>“公平锁”的释放锁的机制在后面一章再做介绍，锁的使用示例请参考“Java多线程系列–“JUC锁”02之 互斥锁ReentrantLock”。</p>
+</blockquote>
+<blockquote>
+<p><strong>目录</strong><br><a href="#anchor1">第1部分 基本概念</a><br><a href="#anchor2">第2部分 ReentrantLock数据结构</a><br><a href="#anchor3">第3部分 参考代码</a><br><a href="#anchor4">第4部分 获取公平锁(基于JDK1.7.0_40)</a><br>&nbsp;&nbsp;&nbsp;&nbsp; <a href="#anchor4_1">第4.1部分 tryAcquire()</a><br>&nbsp;&nbsp;&nbsp;&nbsp; <a href="#anchor4_2">第4.2部分 addWaiter(Node.EXCLUSIVE)</a><br>&nbsp;&nbsp;&nbsp;&nbsp; <a href="#anchor4_3">第4.3部分 acquireQueued()</a><br>&nbsp;&nbsp;&nbsp;&nbsp; <a href="#anchor4_4">第4.4部分 selfInterrupt()</a>  </p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="第1部分-基本概念"><a href="#第1部分-基本概念" class="headerlink" title="第1部分 基本概念"></a>第1部分 基本概念</h1><p>本章，我们会讲解“线程获取公平锁”的原理；在讲解之前，需要了解几个基本概念。后面的内容，都是基于这些概念的；这些概念可能比较枯燥，但从这些概念中，能窥见“java锁”的一些架构，这对我们了解锁是有帮助的。</p>
+<p><strong>1. AQS – 指AbstractQueuedSynchronizer类。</strong><br>&nbsp;&nbsp;&nbsp;&nbsp; AQS是java中管理“锁”的抽象类，锁的许多公共方法都是在这个类中实现。AQS是独占锁(例如，ReentrantLock)和共享锁(例如，Semaphore)的公共父类。</p>
+<p><strong>2. AQS锁的类别 – 分为“独占锁”和“共享锁”两种。</strong><br>&nbsp;&nbsp;&nbsp;&nbsp; (01) 独占锁 – 锁在一个时间点只能被一个线程锁占有。根据锁的获取机制，它又划分为“公平锁”和“非公平锁”。公平锁，是按照通过CLH等待线程按照先来先得的规则，公平的获取锁；而非公平锁，则当线程要获取锁时，它会无视CLH等待队列而直接获取锁。独占锁的典型实例子是ReentrantLock，此外，ReentrantReadWriteLock.WriteLock也是独占锁。<br>&nbsp;&nbsp;&nbsp;&nbsp; (02) 共享锁 – 能被多个线程同时拥有，能被共享的锁。JUC包中的ReentrantReadWriteLock.ReadLock，CyclicBarrier， CountDownLatch和Semaphore都是共享锁。这些锁的用途和原理，在以后的章节再详细介绍。</p>
+<p><strong>3. CLH队列 – Craig, Landin, and Hagersten lock queue</strong><br>&nbsp;&nbsp;&nbsp;&nbsp; CLH队列是AQS中“等待锁”的线程队列。在多线程中，为了保护竞争资源不被多个线程同时操作而起来错误，我们常常需要通过锁来保护这些资源。在独占锁中，竞争资源在一个时间点只能被一个线程锁访问；而其它线程则需要等待。CLH就是管理这些“等待锁”的线程的队列。<br>&nbsp;&nbsp;&nbsp;&nbsp; CLH是一个非阻塞的 FIFO 队列。也就是说往里面插入或移除一个节点的时候，在并发条件下不会阻塞，而是通过自旋锁和 CAS 保证节点插入和移除的原子性。</p>
+<p><strong>4. CAS函数 – Compare And Swap</strong><br>&nbsp;&nbsp;&nbsp;&nbsp; CAS函数，是比较并交换函数，它是原子操作函数；即，通过CAS操作的数据都是以原子方式进行的。例如，compareAndSetHead(), compareAndSetTail(), compareAndSetNext()等函数。它们共同的特点是，这些函数所执行的动作是以原子的方式进行的。</p>
+<p>本章是围绕“公平锁”如何获取锁而层次展开。“公平锁”涉及到的知识点比较多，但总的来说，不是特别难；如果读者能读懂AQS和ReentrantLock.java这两个类的大致意思，理解锁的原理和机制也就不成问题了。本章只是作者本人对锁的一点点理解，希望这部分知识能帮助您了解“公平锁”的获取过程，认识“锁”的框架。</p>
+<p><a name="anchor2"></a></p>
+<h1 id="第2部分-ReentrantLock数据结构"><a href="#第2部分-ReentrantLock数据结构" class="headerlink" title="第2部分 ReentrantLock数据结构"></a>第2部分 ReentrantLock数据结构</h1><p>ReentrantLock的UML类图</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://wangkuiwu.github.io/media/pic/java/threads/juc-lock03-01.jpg" alt="img" title="">
+                </div>
+                <div class="image-caption">img</div>
+            </figure>
+<p>从图中可以看出：<br>(01) ReentrantLock实现了Lock接口。<br>(02) ReentrantLock与sync是组合关系。ReentrantLock中，包含了Sync对象；而且，Sync是AQS的子类；更重要的是，Sync有两个子类FairSync(公平锁)和NonFairSync(非公平锁)。ReentrantLock是一个独占锁，至于它到底是公平锁还是非公平锁，就取决于sync对象是”FairSync的实例”还是”NonFairSync的实例”。</p>
+<p><a name="anchor3"></a></p>
+<h1 id="第3部分-参考代码"><a href="#第3部分-参考代码" class="headerlink" title="第3部分 参考代码"></a>第3部分 参考代码</h1><p><strong>ReentranLock.java</strong></p>
+<p><strong>AQS(AbstractQueuedSynchronizer.java)</strong></p>
+<p>由于源码太多，这里就不粘贴出源码了，感兴趣的读者可以自行查看。</p>
+<p><a name="anchor4"></a></p>
+<h2 id="第4部分-获取公平锁-基于JDK1-7-0-40"><a href="#第4部分-获取公平锁-基于JDK1-7-0-40" class="headerlink" title="第4部分 获取公平锁(基于JDK1.7.0_40)"></a>第4部分 获取公平锁(基于JDK1.7.0_40)</h2><p>通过前面“Java多线程系列–“JUC锁”02之 互斥锁ReentrantLock”的“示例1”，我们知道，获取锁是通过lock()函数。下面，我们以lock()对获取公平锁的过程进行展开。</p>
+<h2 id="1-lock"><a href="#1-lock" class="headerlink" title="1. lock()"></a>1. lock()</h2><p>lock()在ReentrantLock.java的FairSync类中实现，它的源码如下：</p>
+<pre><code>final void lock() {
+    acquire(1);
+}
+</code></pre><p>说明：“当前线程”实际上是通过acquire(1)获取锁的。<br>这里说明一下“1”的含义，它是设置“锁的状态”的参数。对于“独占锁”而言，锁处于可获取状态时，它的状态值是0；锁被线程初次获取到了，它的状态值就变成了1。<br>由于ReentrantLock(公平锁/非公平锁)是可重入锁，所以“独占锁”可以被单个线程多此获取，每获取1次就将锁的状态+1。也就是说，初次获取锁时，通过acquire(1)将锁的状态值设为1；再次获取锁时，将锁的状态值设为2；依次类推…这就是为什么获取锁时，传入的参数是1的原因了。<br>可重入就是指锁可以被单个线程多次获取。</p>
+<h2 id="2-acquire"><a href="#2-acquire" class="headerlink" title="2. acquire()"></a>2. acquire()</h2><p>acquire()在AQS中实现的，它的源码如下：</p>
+<pre><code>public final void acquire(int arg) {
+    if (!tryAcquire(arg) &amp;&amp;
+        acquireQueued(addWaiter(Node.EXCLUSIVE), arg))
+        selfInterrupt();
+}
+</code></pre><p>(01) “当前线程”首先通过tryAcquire()尝试获取锁。获取成功的话，直接返回；尝试失败的话，进入到等待队列排序等待(前面还有可能有需要线程在等待该锁)。<br>(02) “当前线程”尝试失败的情况下，先通过addWaiter(Node.EXCLUSIVE)来将“当前线程”加入到”CLH队列(非阻塞的FIFO队列)”末尾。CLH队列就是线程等待队列。<br>(03) 再执行完addWaiter(Node.EXCLUSIVE)之后，会调用acquireQueued()来获取锁。由于此时ReentrantLock是公平锁，它会根据公平性原则来获取锁。<br>(04) “当前线程”在执行acquireQueued()时，会进入到CLH队列中休眠等待，直到获取锁了才返回！如果“当前线程”在休眠等待过程中被中断过，acquireQueued会返回true，此时”当前线程”会调用selfInterrupt()来自己给自己产生一个中断。至于为什么要自己给自己产生一个中断，后面再介绍。</p>
+<p>上面是对acquire()的概括性说明。下面，我们将该函数分为4部分来逐步解析。</p>
+<blockquote>
+<p>一. tryAcquire()<br>二. addWaiter()<br>三. acquireQueued()<br>四. selfInterrupt()</p>
+</blockquote>
+<p><a name="anchor4_1"></a></p>
+<h1 id="第4-1部分-tryAcquire"><a href="#第4-1部分-tryAcquire" class="headerlink" title="第4.1部分 tryAcquire()"></a>第4.1部分 tryAcquire()</h1><h2 id="1-tryAcquire"><a href="#1-tryAcquire" class="headerlink" title="1. tryAcquire()"></a>1. tryAcquire()</h2><p>公平锁的tryAcquire()在ReentrantLock.java的FairSync类中实现，源码如下：</p>
+<pre><code>protected final boolean tryAcquire(int acquires) {
+    // 获取“当前线程”
+    final Thread current = Thread.currentThread();
+    // 获取“独占锁”的状态
+    int c = getState();
+    // c=0意味着“锁没有被任何线程锁拥有”，
+    if (c == 0) {
+        // 若“锁没有被任何线程锁拥有”，
+        // 则判断“当前线程”是不是CLH队列中的第一个线程线程，
+        // 若是的话，则获取该锁，设置锁的状态，并切设置锁的拥有者为“当前线程”。
+        if (!hasQueuedPredecessors() &amp;&amp;
+            compareAndSetState(0, acquires)) {
+            setExclusiveOwnerThread(current);
+            return true;
+        }
+    }
+    else if (current == getExclusiveOwnerThread()) {
+        // 如果“独占锁”的拥有者已经为“当前线程”，
+        // 则将更新锁的状态。
+        int nextc = c + acquires;
+        if (nextc &lt; 0)
+            throw new Error(&quot;Maximum lock count exceeded&quot;);
+        setState(nextc);
+        return true;
+    }
+    return false;
+}
+</code></pre><p>说明：根据代码，我们可以分析出，tryAcquire()的作用就是尝试去获取锁。注意，这里只是尝试！<br>尝试成功的话，返回true；尝试失败的话，返回false，后续再通过其它办法来获取该锁。后面我们会说明，在尝试失败的情况下，是如何一步步获取锁的。</p>
+<h2 id="2-hasQueuedPredecessors"><a href="#2-hasQueuedPredecessors" class="headerlink" title="2. hasQueuedPredecessors()"></a>2. hasQueuedPredecessors()</h2><p>hasQueuedPredecessors()在AQS中实现，源码如下：</p>
+<pre><code>public final boolean hasQueuedPredecessors() {
+    Node t = tail; 
+    Node h = head;
+    Node s;
+    return h != t &amp;&amp;
+        ((s = h.next) == null || s.thread != Thread.currentThread());
+}
+</code></pre><p>说明： 通过代码，能分析出，hasQueuedPredecessors() 是通过判断”当前线程”是不是在CLH队列的队首，来返回AQS中是不是有比“当前线程”等待更久的线程。下面对head、tail和Node进行说明。</p>
+<h2 id="3-Node的源码"><a href="#3-Node的源码" class="headerlink" title="3. Node的源码"></a>3. Node的源码</h2><p>Node就是CLH队列的节点。Node在AQS中实现，它的数据结构如下：</p>
+<pre><code>private transient volatile Node head;    // CLH队列的队首
+private transient volatile Node tail;    // CLH队列的队尾
+
+// CLH队列的节点
+static final class Node {
+    static final Node SHARED = new Node();
+    static final Node EXCLUSIVE = null;
+
+    // 线程已被取消，对应的waitStatus的值
+    static final int CANCELLED =  1;
+    // “当前线程的后继线程需要被unpark(唤醒)”，对应的waitStatus的值。
+    // 一般发生情况是：当前线程的后继线程处于阻塞状态，而当前线程被release或cancel掉，因此需要唤醒当前线程的后继线程。
+    static final int SIGNAL    = -1;
+    // 线程(处在Condition休眠状态)在等待Condition唤醒，对应的waitStatus的值
+    static final int CONDITION = -2;
+    // (共享锁)其它线程获取到“共享锁”，对应的waitStatus的值
+    static final int PROPAGATE = -3;
+
+    // waitStatus为“CANCELLED, SIGNAL, CONDITION, PROPAGATE”时分别表示不同状态，
+    // 若waitStatus=0，则意味着当前线程不属于上面的任何一种状态。
+    volatile int waitStatus;
+
+    // 前一节点
+    volatile Node prev;
+
+    // 后一节点
+    volatile Node next;
+
+    // 节点所对应的线程
+    volatile Thread thread;
+
+    // nextWaiter是“区别当前CLH队列是 ‘独占锁’队列 还是 ‘共享锁’队列 的标记”
+    // 若nextWaiter=SHARED，则CLH队列是“独占锁”队列；
+    // 若nextWaiter=EXCLUSIVE，(即nextWaiter=null)，则CLH队列是“共享锁”队列。
+    Node nextWaiter;
+
+    // “共享锁”则返回true，“独占锁”则返回false。
+    final boolean isShared() {
+        return nextWaiter == SHARED;
+    }
+
+    // 返回前一节点
+    final Node predecessor() throws NullPointerException {
+        Node p = prev;
+        if (p == null)
+            throw new NullPointerException();
+        else
+            return p;
+    }
+
+    Node() {    // Used to establish initial head or SHARED marker
+    }
+
+    // 构造函数。thread是节点所对应的线程，mode是用来表示thread的锁是“独占锁”还是“共享锁”。
+    Node(Thread thread, Node mode) {     // Used by addWaiter
+        this.nextWaiter = mode;
+        this.thread = thread;
+    }
+
+    // 构造函数。thread是节点所对应的线程，waitStatus是线程的等待状态。
+    Node(Thread thread, int waitStatus) { // Used by Condition
+        this.waitStatus = waitStatus;
+        this.thread = thread;
+    }
+}
+</code></pre><p>说明：<br>Node是CLH队列的节点，代表“等待锁的线程队列”。<br>(01) 每个Node都会一个线程对应。<br>(02) 每个Node会通过prev和next分别指向上一个节点和下一个节点，这分别代表上一个等待线程和下一个等待线程。<br>(03) Node通过waitStatus保存线程的等待状态。<br>(04) Node通过nextWaiter来区分线程是“独占锁”线程还是“共享锁”线程。如果是“独占锁”线程，则nextWaiter的值为EXCLUSIVE；如果是“共享锁”线程，则nextWaiter的值是SHARED。</p>
+<h2 id="4-compareAndSetState"><a href="#4-compareAndSetState" class="headerlink" title="4. compareAndSetState()"></a>4. compareAndSetState()</h2><p>compareAndSetState()在AQS中实现。它的源码如下：</p>
+<pre><code>protected final boolean compareAndSetState(int expect, int update) {
+    return unsafe.compareAndSwapInt(this, stateOffset, expect, update);
+}
+</code></pre><p>说明： compareAndSwapInt() 是sun.misc.Unsafe类中的一个本地方法。对此，我们需要了解的是 compareAndSetState(expect, update) 是以原子的方式操作当前线程；若当前线程的状态为expect，则设置它的状态为update。</p>
+<h2 id="5-setExclusiveOwnerThread"><a href="#5-setExclusiveOwnerThread" class="headerlink" title="5. setExclusiveOwnerThread()"></a>5. setExclusiveOwnerThread()</h2><p>setExclusiveOwnerThread()在AbstractOwnableSynchronizer.java中实现，它的源码如下：</p>
+<pre><code>// exclusiveOwnerThread是当前拥有“独占锁”的线程
+private transient Thread exclusiveOwnerThread;
+protected final void setExclusiveOwnerThread(Thread t) {
+    exclusiveOwnerThread = t;
+}
+</code></pre><p>说明：setExclusiveOwnerThread()的作用就是，设置线程t为当前拥有“独占锁”的线程。</p>
+<h2 id="6-getState-setState"><a href="#6-getState-setState" class="headerlink" title="6. getState(), setState()"></a>6. getState(), setState()</h2><p>getState()和setState()都在AQS中实现，源码如下：</p>
+<pre><code>// 锁的状态
+private volatile int state;
+// 设置锁的状态
+protected final void setState(int newState) {
+    state = newState;
+}
+// 获取锁的状态
+protected final int getState() {
+    return state;
+}
+</code></pre><p>说明：state表示锁的状态，对于“独占锁”而已，state=0表示锁是可获取状态(即，锁没有被任何线程锁持有)。由于java中的独占锁是可重入的，state的值可以&gt;1。</p>
+<p><strong>小结：tryAcquire()的作用就是让“当前线程”尝试获取锁。获取成功返回true，失败则返回false。</strong></p>
+<p><a name="anchor4_2"></a></p>
+<h1 id="第4-2部分-addWaiter-Node-EXCLUSIVE"><a href="#第4-2部分-addWaiter-Node-EXCLUSIVE" class="headerlink" title="第4.2部分 addWaiter(Node.EXCLUSIVE)"></a>第4.2部分 addWaiter(Node.EXCLUSIVE)</h1><p>addWaiter(Node.EXCLUSIVE)的作用是，创建“当前线程”的Node节点，且Node中记录“当前线程”对应的锁是“独占锁”类型，并且将该节点添加到CLH队列的末尾。</p>
+<h2 id="1-addWaiter"><a href="#1-addWaiter" class="headerlink" title="1.addWaiter()"></a>1.addWaiter()</h2><p>addWaiter()在AQS中实现，源码如下：</p>
+<pre><code>private Node addWaiter(Node mode) {
+    // 新建一个Node节点，节点对应的线程是“当前线程”，“当前线程”的锁的模型是mode。
+    Node node = new Node(Thread.currentThread(), mode);
+    Node pred = tail;
+    // 若CLH队列不为空，则将“当前线程”添加到CLH队列末尾
+    if (pred != null) {
+        node.prev = pred;
+        if (compareAndSetTail(pred, node)) {
+            pred.next = node;
+            return node;
+        }
+    }
+    // 若CLH队列为空，则调用enq()新建CLH队列，然后再将“当前线程”添加到CLH队列中。
+    enq(node);
+    return node;
+}
+</code></pre><p>说明：对于“公平锁”而言，addWaiter(Node.EXCLUSIVE)会首先创建一个Node节点，节点的类型是“独占锁”(Node.EXCLUSIVE)类型。然后，再将该节点添加到CLH队列的末尾。</p>
+<h2 id="2-compareAndSetTail"><a href="#2-compareAndSetTail" class="headerlink" title="2. compareAndSetTail()"></a>2. compareAndSetTail()</h2><p>compareAndSetTail()在AQS中实现，源码如下：</p>
+<pre><code>private final boolean compareAndSetTail(Node expect, Node update) {
+    return unsafe.compareAndSwapObject(this, tailOffset, expect, update);
+}
+</code></pre><p>说明：compareAndSetTail也属于CAS函数，也是通过“本地方法”实现的。compareAndSetTail(expect, update)会以原子的方式进行操作，它的作用是判断CLH队列的队尾是不是为expect，是的话，就将队尾设为update。</p>
+<h2 id="3-enq"><a href="#3-enq" class="headerlink" title="3. enq()"></a>3. enq()</h2><p>enq()在AQS中实现，源码如下：</p>
+<pre><code>private Node enq(final Node node) {
+    for (;;) {
+        Node t = tail;
+        if (t == null) { // Must initialize
+            if (compareAndSetHead(new Node()))
+                tail = head;
+        } else {
+            node.prev = t;
+            if (compareAndSetTail(t, node)) {
+                t.next = node;
+                return t;
+            }
+        }
+    }
+}
+</code></pre><p>说明： enq()的作用很简单。如果CLH队列为空，则新建一个CLH表头；然后将node添加到CLH末尾。否则，直接将node添加到CLH末尾。</p>
+<p><strong>小结：addWaiter()的作用，就是将当前线程添加到CLH队列中。这就意味着将当前线程添加到等待获取“锁”的等待线程队列中了。</strong></p>
+<p><a name="anchor4_3"></a></p>
+<h1 id="第4-3部分-acquireQueued"><a href="#第4-3部分-acquireQueued" class="headerlink" title="第4.3部分 acquireQueued()"></a>第4.3部分 acquireQueued()</h1><p>前面，我们已经将当前线程添加到CLH队列中了。而acquireQueued()的作用就是逐步的去执行CLH队列的线程，如果当前线程获取到了锁，则返回；否则，当前线程进行休眠，直到唤醒并重新获取锁了才返回。下面，我们看看acquireQueued()的具体流程。</p>
+<h2 id="1-acquireQueued"><a href="#1-acquireQueued" class="headerlink" title="1. acquireQueued()"></a>1. acquireQueued()</h2><p>acquireQueued()在AQS中实现，源码如下：</p>
+<pre><code>final boolean acquireQueued(final Node node, int arg) {
+    boolean failed = true;
+    try {
+        // interrupted表示在CLH队列的调度中，
+        // “当前线程”在休眠时，有没有被中断过。
+        boolean interrupted = false;
+        for (;;) {
+            // 获取上一个节点。
+            // node是“当前线程”对应的节点，这里就意味着“获取上一个等待锁的线程”。
+            final Node p = node.predecessor();
+            if (p == head &amp;&amp; tryAcquire(arg)) {
+                setHead(node);
+                p.next = null; // help GC
+                failed = false;
+                return interrupted;
+            }
+            if (shouldParkAfterFailedAcquire(p, node) &amp;&amp;
+                parkAndCheckInterrupt())
+                interrupted = true;
+        }
+    } finally {
+        if (failed)
+            cancelAcquire(node);
+    }
+}
+</code></pre><p>说明：acquireQueued()的目的是从队列中获取锁。</p>
+<h2 id="2-shouldParkAfterFailedAcquire"><a href="#2-shouldParkAfterFailedAcquire" class="headerlink" title="2. shouldParkAfterFailedAcquire()"></a>2. shouldParkAfterFailedAcquire()</h2><p>shouldParkAfterFailedAcquire()在AQS中实现，源码如下：</p>
+<pre><code>// 返回“当前线程是否应该阻塞”
+private static boolean shouldParkAfterFailedAcquire(Node pred, Node node) {
+    // 前继节点的状态
+    int ws = pred.waitStatus;
+    // 如果前继节点是SIGNAL状态，则意味这当前线程需要被unpark唤醒。此时，返回true。
+    if (ws == Node.SIGNAL)
+        return true;
+    // 如果前继节点是“取消”状态，则设置 “当前节点”的 “当前前继节点”  为  “‘原前继节点’的前继节点”。
+    if (ws &gt; 0) {
+        do {
+            node.prev = pred = pred.prev;
+        } while (pred.waitStatus &gt; 0);
+        pred.next = node;
+    } else {
+        // 如果前继节点为“0”或者“共享锁”状态，则设置前继节点为SIGNAL状态。
+        compareAndSetWaitStatus(pred, ws, Node.SIGNAL);
+    }
+    return false;
+}
+</code></pre><p>说明：<br>(01) 关于waitStatus请参考下表(中扩号内为waitStatus的值)，更多关于waitStatus的内容，可以参考前面的Node类的介绍。</p>
+<pre><code>CANCELLED[1]  -- 当前线程已被取消
+SIGNAL[-1]    -- “当前线程的后继线程需要被unpark(唤醒)”。一般发生情况是：当前线程的后继线程处于阻塞状态，而当前线程被release或cancel掉，因此需要唤醒当前线程的后继线程。
+CONDITION[-2] -- 当前线程(处在Condition休眠状态)在等待Condition唤醒
+PROPAGATE[-3] -- (共享锁)其它线程获取到“共享锁”
+[0]           -- 当前线程不属于上面的任何一种状态。
+</code></pre><p>(02) shouldParkAfterFailedAcquire()通过以下规则，判断“当前线程”是否需要被阻塞。</p>
+<blockquote>
+<p>规则1：如果前继节点状态为SIGNAL，表明当前节点需要被unpark(唤醒)，此时则返回true。<br>规则2：如果前继节点状态为CANCELLED(ws&gt;0)，说明前继节点已经被取消，则通过先前回溯找到一个有效(非CANCELLED状态)的节点，并返回false。<br>规则3：如果前继节点状态为非SIGNAL、非CANCELLED，则设置前继的状态为SIGNAL，并返回false。</p>
+</blockquote>
+<p>如果“规则1”发生，即“前继节点是SIGNAL”状态，则意味着“当前线程”需要被阻塞。接下来会调用parkAndCheckInterrupt()阻塞当前线程，直到当前先被唤醒才从parkAndCheckInterrupt()中返回。</p>
+<h2 id="3-parkAndCheckInterrupt"><a href="#3-parkAndCheckInterrupt" class="headerlink" title="3. parkAndCheckInterrupt())"></a>3. parkAndCheckInterrupt())</h2><p>parkAndCheckInterrupt()在AQS中实现，源码如下：</p>
+<pre><code>private final boolean parkAndCheckInterrupt() {
+    // 通过LockSupport的park()阻塞“当前线程”。
+    LockSupport.park(this);
+    // 返回线程的中断状态。
+    return Thread.interrupted();
+}
+</code></pre><p>说明：parkAndCheckInterrupt()的作用是阻塞当前线程，并且返回“线程被唤醒之后”的中断状态。<br>它会先通过LockSupport.park()阻塞“当前线程”，然后通过Thread.interrupted()返回线程的中断状态。</p>
+<p>这里介绍一下线程被阻塞之后如何唤醒。一般有2种情况：<br><strong>第1种情况</strong>：unpark()唤醒。“前继节点对应的线程”使用完锁之后，通过unpark()方式唤醒当前线程。<br><strong>第2种情况</strong>：中断唤醒。其它线程通过interrupt()中断当前线程。</p>
+<p>补充：LockSupport()中的park(),unpark()的作用 和 Object中的wait(),notify()作用类似，是阻塞/唤醒。<br>它们的用法不同，park(),unpark()是轻量级的，而wait(),notify()是必须先通过Synchronized获取同步锁。<br>关于LockSupport，我们会在之后的章节再专门进行介绍！</p>
+<h2 id="4-再次tryAcquire"><a href="#4-再次tryAcquire" class="headerlink" title="4. 再次tryAcquire()"></a>4. 再次tryAcquire()</h2><p>了解了shouldParkAfterFailedAcquire()和parkAndCheckInterrupt()函数之后。我们接着分析acquireQueued()的for循环部分。</p>
+<pre><code>final Node p = node.predecessor();
+if (p == head &amp;&amp; tryAcquire(arg)) {
+    setHead(node);
+    p.next = null; // help GC
+    failed = false;
+    return interrupted;
+}
+</code></pre><p>说明：<br>(01) 通过node.predecessor()获取前继节点。predecessor()就是返回node的前继节点，若对此有疑惑可以查看下面关于Node类的介绍。<br>(02) p == head &amp;&amp; tryAcquire(arg)<br>&nbsp;&nbsp;&nbsp;&nbsp; 首先，判断“前继节点”是不是CHL表头。如果是的话，则通过tryAcquire()尝试获取锁。<br>&nbsp;&nbsp;&nbsp;&nbsp; 其实，这样做的目的是为了“让当前线程获取锁”，但是为什么需要先判断p==head呢？理解这个对理解“公平锁”的机制很重要，因为这么做的原因就是为了保证公平性！<br>&nbsp;&nbsp;&nbsp;&nbsp; (a) 前面，我们在shouldParkAfterFailedAcquire()我们判断“当前线程”是否需要阻塞；<br>&nbsp;&nbsp;&nbsp;&nbsp; (b) 接着，“当前线程”阻塞的话，会调用parkAndCheckInterrupt()来阻塞线程。当线程被解除阻塞的时候，我们会返回线程的中断状态。而线程被解决阻塞，可能是由于“线程被中断”，也可能是由于“其它线程调用了该线程的unpark()函数”。<br>&nbsp;&nbsp;&nbsp;&nbsp; (c) 再回到p==head这里。如果当前线程是因为其它线程调用了unpark()函数而被唤醒，那么唤醒它的线程，应该是它的前继节点所对应的线程(关于这一点，后面在“释放锁”的过程中会看到)。 OK，是前继节点调用unpark()唤醒了当前线程！<br>&nbsp;&nbsp;&nbsp;&nbsp; 此时，再来理解p==head就很简单了：当前继节点是CLH队列的头节点，并且它释放锁之后；就轮到当前节点获取锁了。然后，当前节点通过tryAcquire()获取锁；获取成功的话，通过setHead(node)设置当前节点为头节点，并返回。</p>
+<p>总之，如果“前继节点调用unpark()唤醒了当前线程”并且“前继节点是CLH表头”，此时就是满足p==head，也就是符合公平性原则的。否则，如果当前线程是因为“线程被中断”而唤醒，那么显然就不是公平了。这就是为什么说p==head就是保证公平性！</p>
+<p>小结：acquireQueued()的作用就是“当前线程”会根据公平性原则进行阻塞等待，直到获取锁为止；并且返回当前线程在等待过程中有没有并中断过。</p>
+<p><a name="anchor4_4"></a></p>
+<h1 id="第4-4部分-selfInterrupt"><a href="#第4-4部分-selfInterrupt" class="headerlink" title="第4.4部分 selfInterrupt()"></a>第4.4部分 selfInterrupt()</h1><p>selfInterrupt()是AQS中实现，源码如下：</p>
+<pre><code>private static void selfInterrupt() {
+    Thread.currentThread().interrupt();
+}
+</code></pre><p>说明：selfInterrupt()的代码很简单，就是“当前线程”自己产生一个中断。但是，为什么需要这么做呢？<br>这必须结合acquireQueued()进行分析。如果在acquireQueued()中，当前线程被中断过，则执行selfInterrupt()；否则不会执行。</p>
+<p>在acquireQueued()中，即使是线程在阻塞状态被中断唤醒而获取到cpu执行权利；但是，如果该线程的前面还有其它等待锁的线程，根据公平性原则，该线程依然无法获取到锁。它会再次阻塞！ 该线程再次阻塞，直到该线程被它的前面等待锁的线程锁唤醒；线程才会获取锁，然后“真正执行起来”！<br>也就是说，在该线程“成功获取锁并真正执行起来”之前，它的中断会被忽略并且中断标记会被清除！ 因为在parkAndCheckInterrupt()中，我们线程的中断状态时调用了Thread.interrupted()。该函数不同于Thread的isInterrupted()函数，isInterrupted()仅仅返回中断状态，而interrupted()在返回当前中断状态之后，还会清除中断状态。 正因为之前的中断状态被清除了，所以这里需要调用selfInterrupt()重新产生一个中断！</p>
+<p>小结：selfInterrupt()的作用就是当前线程自己产生一个中断。</p>
+<p><strong>总结</strong></p>
+<p>再回过头看看acquire()函数，它最终的目的是获取锁！</p>
+<pre><code>public final void acquire(int arg) {
+    if (!tryAcquire(arg) &amp;&amp;
+        acquireQueued(addWaiter(Node.EXCLUSIVE), arg))
+        selfInterrupt();
+}
+</code></pre><p>(01) 先是通过tryAcquire()尝试获取锁。获取成功的话，直接返回；尝试失败的话，再通过acquireQueued()获取锁。<br>(02) 尝试失败的情况下，会先通过addWaiter()来将“当前线程”加入到”CLH队列”末尾；然后调用acquireQueued()，在CLH队列中排序等待获取锁，在此过程中，线程处于休眠状态。直到获取锁了才返回。 如果在休眠等待过程中被中断过，则调用selfInterrupt()来自己产生一个中断。</p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2018-06-27T09:39:57.945Z" itemprop="dateUpdated">2018-06-27 17:39:57</time>
+</span><br>
+
+
+        
+        本文固定链接：<a href="/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”03之 公平锁(一)/" target="_blank" rel="external">https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”03之 公平锁(一)/</a>
+        
+    </div>
+    <footer>
+        <a href="https://smuwjs.github.io">
+            <img src="/img/head.png" alt="Jeeson">
+            Jeeson
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JUC锁/">JUC锁</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java多线程系列/">Java多线程系列</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java源码分析/">Java源码分析</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”03之 公平锁(一)/&title=《Java多线程系列--“JUC锁”03之 公平锁(一)》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”03之 公平锁(一)/&title=《Java多线程系列--“JUC锁”03之 公平锁(一)》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”03之 公平锁(一)/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Java多线程系列--“JUC锁”03之 公平锁(一)》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”03之 公平锁(一)/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”03之 公平锁(一)/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC线程池”03之 线程池原理(二)/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">Java多线程系列--“JUC线程池”03之 线程池原理(二)</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC线程池”02之 线程池原理(一)/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Java多线程系列--“JUC线程池”02之 线程池原理(一)</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”03之 公平锁(一)" data-title="Java多线程系列--“JUC锁”03之 公平锁(一)" data-url="https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”03之 公平锁(一)/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'smuwjs', theme: 'none'};
+lazyScripts.push('//unpkg.com/hexo-theme-material-indigo@latest/js/embed.min.js');
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循<a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>Jeeson &copy; 2015 - 2018</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”03之 公平锁(一)/&title=《Java多线程系列--“JUC锁”03之 公平锁(一)》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”03之 公平锁(一)/&title=《Java多线程系列--“JUC锁”03之 公平锁(一)》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”03之 公平锁(一)/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Java多线程系列--“JUC锁”03之 公平锁(一)》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”03之 公平锁(一)/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”03之 公平锁(一)/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”03之 公平锁(一)/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>设计模式06之 命令模式 | Jeeson&#39;s Blog | Write the code. Change the world.</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="Java,Java设计模式">
+    <meta name="description" content="命令模式定义命令模式将请求封装成对象，以便使用不同的请求，队列或者日志来参数化其他对象。命令模式也支持可撤销的操作。 现实世界中任何一个稍微复杂的子系统都应当有一套命令，比如餐馆的运行机制：顾客A来到餐馆点一碗面（发出请求） -&amp;gt; 柜台服务员记录下来（创建命令） -&amp;gt; 服务员把小票扔给厨房 -&amp;gt; 厨师C很快做好了一碗面（请求被执行）顾客不知道将由谁来做这碗面，柜台服务员也不知道，">
+<meta name="keywords" content="Java,Java设计模式">
+<meta property="og:type" content="article">
+<meta property="og:title" content="设计模式06之 命令模式">
+<meta property="og:url" content="https://smuwjs.github.io/2017/01/06/java-source-analysis-design-pattern-series/设计模式06之 命令模式/index.html">
+<meta property="og:site_name" content="Jeeson&#39;s Blog">
+<meta property="og:description" content="命令模式定义命令模式将请求封装成对象，以便使用不同的请求，队列或者日志来参数化其他对象。命令模式也支持可撤销的操作。 现实世界中任何一个稍微复杂的子系统都应当有一套命令，比如餐馆的运行机制：顾客A来到餐馆点一碗面（发出请求） -&amp;gt; 柜台服务员记录下来（创建命令） -&amp;gt; 服务员把小票扔给厨房 -&amp;gt; 厨师C很快做好了一碗面（请求被执行）顾客不知道将由谁来做这碗面，柜台服务员也不知道，">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://oov0wb0gl.bkt.clouddn.com/2017-06-06-14965868809639.jpg">
+<meta property="og:updated_time" content="2018-06-27T09:39:57.937Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="设计模式06之 命令模式">
+<meta name="twitter:description" content="命令模式定义命令模式将请求封装成对象，以便使用不同的请求，队列或者日志来参数化其他对象。命令模式也支持可撤销的操作。 现实世界中任何一个稍微复杂的子系统都应当有一套命令，比如餐馆的运行机制：顾客A来到餐馆点一碗面（发出请求） -&amp;gt; 柜台服务员记录下来（创建命令） -&amp;gt; 服务员把小票扔给厨房 -&amp;gt; 厨师C很快做好了一碗面（请求被执行）顾客不知道将由谁来做这碗面，柜台服务员也不知道，">
+<meta name="twitter:image" content="http://oov0wb0gl.bkt.clouddn.com/2017-06-06-14965868809639.jpg">
+    
+        <link rel="alternate" type="application/atom+xml" title="Jeeson&#39;s Blog" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/head.png">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Jeeson</h5>
+          <a href="mailto:smuwjs@163.com" title="smuwjs@163.com" class="mail">smuwjs@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/smuwjs" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">设计模式06之 命令模式</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">设计模式06之 命令模式</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2017-01-05T16:00:00.000Z" itemprop="datePublished" class="page-time">
+  2017-01-06
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Java设计模式/">Java设计模式</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#命令模式"><span class="post-toc-number">1.</span> <span class="post-toc-text">命令模式</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#定义命令模式"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">定义命令模式</span></a></li></ol></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-java-source-analysis-design-pattern-series/设计模式06之 命令模式"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">设计模式06之 命令模式</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2017-01-06 00:00:00" datetime="2017-01-05T16:00:00.000Z"  itemprop="datePublished">2017-01-06</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Java设计模式/">Java设计模式</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h1 id="命令模式"><a href="#命令模式" class="headerlink" title="命令模式"></a>命令模式</h1><h2 id="定义命令模式"><a href="#定义命令模式" class="headerlink" title="定义命令模式"></a>定义命令模式</h2><p>将请求封装成对象，以便使用不同的请求，队列或者日志来参数化其他对象。命令模式也支持可撤销的操作。</p>
+<p>现实世界中任何一个稍微复杂的子系统都应当有一套命令，比如餐馆的运行机制：<br>顾客A来到餐馆点一碗面（发出请求） -&gt; 柜台服务员记录下来（创建命令） -&gt; 服务员把小票扔给厨房 -&gt; 厨师C很快做好了一碗面（请求被执行）<br>顾客不知道将由谁来做这碗面，柜台服务员也不知道，厨师不知道是谁点了这碗面，只知道做完面就可以休息了</p>
+<p>是不是与命令模式很相像？</p>
+<p>不妨用代码来实现上面的机制</p>
+<p>首先，我们需要一个命令接口，毕竟命令才是命令模式的核心，没有命令，一切都是空想</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> CommandPattern;</span><br><span class="line"> </span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 定义Command接口</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Command</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">execute</span><span class="params">()</span></span>; <span class="comment">//只需要定义一个统一的执行方法</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>有了命令还需要执行者，否则只有将军没有小兵，餐馆的执行者当然是厨师：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">package CommandPattern;</span><br><span class="line"> </span><br><span class="line">/**</span><br><span class="line"> * 定义Chef基类</span><br><span class="line"> */</span><br><span class="line">public abstract class Chef &#123;</span><br><span class="line">    //在此定义厨师的公共属性</span><br><span class="line">     </span><br><span class="line">    /**</span><br><span class="line">     * 定义烹饪方法</span><br><span class="line">     */</span><br><span class="line">    public abstract void cook();</span><br><span class="line">    //在此定义其它有用的方法</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>我们还需要实现具体的厨师，术业有专攻：<br>做面的厨师：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">package CommandPattern;</span><br><span class="line"> </span><br><span class="line">/**</span><br><span class="line"> * 定义专业做面的厨师</span><br><span class="line"> */</span><br><span class="line">public class NoodlesChef extends Chef&#123;</span><br><span class="line"> </span><br><span class="line">    @Override</span><br><span class="line">    public void cook() &#123;</span><br><span class="line">        System.out.println(&quot;做好了一碗美味的拉面&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>做饼的厨师：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">package CommandPattern;</span><br><span class="line"> </span><br><span class="line">/**</span><br><span class="line"> * 定义专业做饼的厨师</span><br><span class="line"> */</span><br><span class="line">public class PieChef extends Chef&#123;</span><br><span class="line"> </span><br><span class="line">    @Override</span><br><span class="line">    public void cook() &#123;</span><br><span class="line">        System.out.println(&quot;做好了一块香喷喷的大饼&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>有了小兵，有了将军，我们还需要一套完整的命令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">package CommandPattern;</span><br><span class="line"> </span><br><span class="line">/**</span><br><span class="line"> * 实现具体NoodlesCommand</span><br><span class="line"> */</span><br><span class="line">public class NoodlesCommand implements Command&#123;</span><br><span class="line">    private NoodlesChef chef;//专业做面的厨师</span><br><span class="line">     </span><br><span class="line">    public NoodlesCommand()&#123;</span><br><span class="line">        chef = new NoodlesChef();</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    @Override</span><br><span class="line">    public void execute() &#123;</span><br><span class="line">        chef.cook();</span><br><span class="line">        //调用其它需要的方法</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">package CommandPattern;</span><br><span class="line"> </span><br><span class="line">/**</span><br><span class="line"> * 实现具体PieCommand</span><br><span class="line"> */</span><br><span class="line">public class PieCommand implements Command&#123;</span><br><span class="line">    private PieChef chef;//专业做饼的厨师</span><br><span class="line">     </span><br><span class="line">    public PieCommand()&#123;</span><br><span class="line">        chef = new PieChef();</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    @Override</span><br><span class="line">    public void execute() &#123;</span><br><span class="line">        chef.cook();</span><br><span class="line">        //调用其它需要的方法</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>准备工作做好了，餐馆可以开张了<br>三.效果示例<br>需要一个Test类：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">package CommandPattern;</span><br><span class="line"> </span><br><span class="line">/**</span><br><span class="line"> * 实现测试类</span><br><span class="line"> */</span><br><span class="line">public class Test &#123;</span><br><span class="line">     </span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        System.out.println(&quot;Command Pattern餐馆开张。。&quot;);</span><br><span class="line">        System.out.println(&quot;第一位客户X先生&quot;);</span><br><span class="line">        System.out.println(&quot;X先生：你好，我需要一碗面，我饿极了&quot;);</span><br><span class="line">        NoodlesCommand nCmd = new NoodlesCommand();</span><br><span class="line">        System.out.println(&quot;柜台服务员：好的，我已经记下了，马上就好&quot;);</span><br><span class="line">        System.out.println(&quot;柜台服务员：厨房~~,接单&quot;);</span><br><span class="line">        nCmd.execute();</span><br><span class="line">        System.out.println(&quot;X先生：真快啊！&quot;);</span><br><span class="line">         </span><br><span class="line">        System.out.println();</span><br><span class="line">         </span><br><span class="line">        System.out.println(&quot;第二位客户XX先生&quot;);</span><br><span class="line">        System.out.println(&quot;XX先生：你好，我需要一块饼，20分钟后来取&quot;);</span><br><span class="line">        PieCommand pCmd = new PieCommand();</span><br><span class="line">        System.out.println(&quot;柜台服务员：好的，我已经记下了&quot;);</span><br><span class="line">        System.out.println(&quot;15分钟后&quot;);</span><br><span class="line">        System.out.println(&quot;柜台服务员：厨房~~,接单&quot;);</span><br><span class="line">        pCmd.execute();</span><br><span class="line">        System.out.println(&quot;XX先生：真准时啊！&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>结果示例：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://oov0wb0gl.bkt.clouddn.com/2017-06-06-14965868809639.jpg" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2018-06-27T09:39:57.937Z" itemprop="dateUpdated">2018-06-27 17:39:57</time>
+</span><br>
+
+
+        
+        本文固定链接：<a href="/2017/01/06/java-source-analysis-design-pattern-series/设计模式06之 命令模式/" target="_blank" rel="external">https://smuwjs.github.io/2017/01/06/java-source-analysis-design-pattern-series/设计模式06之 命令模式/</a>
+        
+    </div>
+    <footer>
+        <a href="https://smuwjs.github.io">
+            <img src="/img/head.png" alt="Jeeson">
+            Jeeson
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/">Java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java设计模式/">Java设计模式</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2017/01/06/java-source-analysis-design-pattern-series/设计模式06之 命令模式/&title=《设计模式06之 命令模式》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2017/01/06/java-source-analysis-design-pattern-series/设计模式06之 命令模式/&title=《设计模式06之 命令模式》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2017/01/06/java-source-analysis-design-pattern-series/设计模式06之 命令模式/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《设计模式06之 命令模式》 — Jeeson's Blog&url=https://smuwjs.github.io/2017/01/06/java-source-analysis-design-pattern-series/设计模式06之 命令模式/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2017/01/06/java-source-analysis-design-pattern-series/设计模式06之 命令模式/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2017/01/07/java-source-analysis-design-pattern-series/设计模式07之 适配器模式/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">设计模式07之 适配器模式</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2017/01/05/java-source-analysis-design-pattern-series/设计模式05之 单例模式/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">设计模式05之 单例模式</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="java-source-analysis-design-pattern-series/设计模式06之 命令模式" data-title="设计模式06之 命令模式" data-url="https://smuwjs.github.io/2017/01/06/java-source-analysis-design-pattern-series/设计模式06之 命令模式/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'smuwjs', theme: 'none'};
+lazyScripts.push('//unpkg.com/hexo-theme-material-indigo@latest/js/embed.min.js');
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循<a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>Jeeson &copy; 2015 - 2018</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2017/01/06/java-source-analysis-design-pattern-series/设计模式06之 命令模式/&title=《设计模式06之 命令模式》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2017/01/06/java-source-analysis-design-pattern-series/设计模式06之 命令模式/&title=《设计模式06之 命令模式》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2017/01/06/java-source-analysis-design-pattern-series/设计模式06之 命令模式/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《设计模式06之 命令模式》 — Jeeson's Blog&url=https://smuwjs.github.io/2017/01/06/java-source-analysis-design-pattern-series/设计模式06之 命令模式/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2017/01/06/java-source-analysis-design-pattern-series/设计模式06之 命令模式/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://smuwjs.github.io/2017/01/06/java-source-analysis-design-pattern-series/设计模式06之 命令模式/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>java io系列15之 DataOutputStream详解 | Jeeson&#39;s Blog | Write the code. Change the world.</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="Java源码分析,Java IO系列">
+    <meta name="description" content="本章介绍DataOutputStream。我们先对DataOutputStream有个大致认识，然后再深入学习它的源码，最后通过示例加深对它的了解。   目录1. DataOutputStream 介绍2. DataOutputStream 源码分析(基于jdk1.7.40)3. 示例代码      1. DataOutputStream 介绍DataOutputStream 是数据输出流。它继">
+<meta name="keywords" content="Java源码分析,Java IO系列">
+<meta property="og:type" content="article">
+<meta property="og:title" content="java io系列15之 DataOutputStream详解">
+<meta property="og:url" content="https://smuwjs.github.io/2016/10/15/java-source-analysis-io-series/java io系列15之 DataOutputStream详解/index.html">
+<meta property="og:site_name" content="Jeeson&#39;s Blog">
+<meta property="og:description" content="本章介绍DataOutputStream。我们先对DataOutputStream有个大致认识，然后再深入学习它的源码，最后通过示例加深对它的了解。   目录1. DataOutputStream 介绍2. DataOutputStream 源码分析(基于jdk1.7.40)3. 示例代码      1. DataOutputStream 介绍DataOutputStream 是数据输出流。它继">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-06-27T09:39:57.941Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="java io系列15之 DataOutputStream详解">
+<meta name="twitter:description" content="本章介绍DataOutputStream。我们先对DataOutputStream有个大致认识，然后再深入学习它的源码，最后通过示例加深对它的了解。   目录1. DataOutputStream 介绍2. DataOutputStream 源码分析(基于jdk1.7.40)3. 示例代码      1. DataOutputStream 介绍DataOutputStream 是数据输出流。它继">
+    
+        <link rel="alternate" type="application/atom+xml" title="Jeeson&#39;s Blog" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/head.png">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Jeeson</h5>
+          <a href="mailto:smuwjs@163.com" title="smuwjs@163.com" class="mail">smuwjs@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/smuwjs" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">java io系列15之 DataOutputStream详解</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">java io系列15之 DataOutputStream详解</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2016-10-14T16:00:00.000Z" itemprop="datePublished" class="page-time">
+  2016-10-15
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#1-DataOutputStream-介绍"><span class="post-toc-number">1.</span> <span class="post-toc-text">1. DataOutputStream 介绍</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#2-DataOutputStream-源码分析-基于jdk1-7-40"><span class="post-toc-number">2.</span> <span class="post-toc-text">2. DataOutputStream 源码分析(基于jdk1.7.40)</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#3-示例代码"><span class="post-toc-number">3.</span> <span class="post-toc-text">3. 示例代码</span></a></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-java-source-analysis-io-series/java io系列15之 DataOutputStream详解"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">java io系列15之 DataOutputStream详解</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2016-10-15 00:00:00" datetime="2016-10-14T16:00:00.000Z"  itemprop="datePublished">2016-10-15</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <blockquote>
+<p>本章介绍DataOutputStream。我们先对DataOutputStream有个大致认识，然后再深入学习它的源码，最后通过示例加深对它的了解。</p>
+</blockquote>
+<blockquote>
+<p><strong>目录</strong><br><a href="#anchor1">1. DataOutputStream 介绍</a><br><a href="#anchor2">2. DataOutputStream 源码分析(基于jdk1.7.40)</a><br><a href="#anchor3">3. 示例代码</a>   </p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="1-DataOutputStream-介绍"><a href="#1-DataOutputStream-介绍" class="headerlink" title="1. DataOutputStream 介绍"></a>1. DataOutputStream 介绍</h1><p>DataOutputStream 是数据输出流。它继承于FilterOutputStream。</p>
+<p>DataOutputStream 是用来装饰其它输出流，将DataOutputStream和DataInputStream输入流配合使用，“允许应用程序以与机器无关方式从底层输入流中读写基本 Java 数据类型”。</p>
+<p><a name="anchor2"></a></p>
+<h1 id="2-DataOutputStream-源码分析-基于jdk1-7-40"><a href="#2-DataOutputStream-源码分析-基于jdk1-7-40" class="headerlink" title="2. DataOutputStream 源码分析(基于jdk1.7.40)"></a>2. DataOutputStream 源码分析(基于jdk1.7.40)</h1><pre><code>package java.io;
+
+public class DataOutputStream extends FilterOutputStream implements DataOutput {
+    // “数据输出流”的字节数
+    protected int written;
+
+    // “数据输出流”对应的字节数组
+    private byte[] bytearr = null;
+
+    // 构造函数
+    public DataOutputStream(OutputStream out) {
+        super(out);
+    }
+
+    // 增加“输出值”
+    private void incCount(int value) {
+        int temp = written + value;
+        if (temp &lt; 0) {
+            temp = Integer.MAX_VALUE;
+        }
+        written = temp;
+    }
+
+    // 将int类型的值写入到“数据输出流”中
+    public synchronized void write(int b) throws IOException {
+        out.write(b);
+        incCount(1);
+    }
+
+    // 将字节数组b从off开始的len个字节，都写入到“数据输出流”中
+    public synchronized void write(byte b[], int off, int len)
+        throws IOException
+    {
+        out.write(b, off, len);
+        incCount(len);
+    }
+
+    // 清空缓冲，即将缓冲中的数据都写入到输出流中
+    public void flush() throws IOException {
+        out.flush();
+    }
+
+    // 将boolean类型的值写入到“数据输出流”中
+    public final void writeBoolean(boolean v) throws IOException {
+        out.write(v ? 1 : 0);
+        incCount(1);
+    }
+
+    // 将byte类型的值写入到“数据输出流”中
+    public final void writeByte(int v) throws IOException {
+        out.write(v);
+        incCount(1);
+    }
+
+    // 将short类型的值写入到“数据输出流”中
+    // 注意：short占2个字节
+    public final void writeShort(int v) throws IOException {
+        // 写入 short高8位 对应的字节
+        out.write((v &gt;&gt;&gt; 8) &amp; 0xFF);
+        // 写入 short低8位 对应的字节
+        out.write((v &gt;&gt;&gt; 0) &amp; 0xFF);
+        incCount(2);
+    }
+
+    // 将char类型的值写入到“数据输出流”中
+    // 注意：char占2个字节
+    public final void writeChar(int v) throws IOException {
+        // 写入 char高8位 对应的字节
+        out.write((v &gt;&gt;&gt; 8) &amp; 0xFF);
+        // 写入 char低8位 对应的字节
+        out.write((v &gt;&gt;&gt; 0) &amp; 0xFF);
+        incCount(2);
+    }
+
+    // 将int类型的值写入到“数据输出流”中
+    // 注意：int占4个字节
+    public final void writeInt(int v) throws IOException {
+        out.write((v &gt;&gt;&gt; 24) &amp; 0xFF);
+        out.write((v &gt;&gt;&gt; 16) &amp; 0xFF);
+        out.write((v &gt;&gt;&gt;  8) &amp; 0xFF);
+        out.write((v &gt;&gt;&gt;  0) &amp; 0xFF);
+        incCount(4);
+    }
+
+    private byte writeBuffer[] = new byte[8];
+
+    // 将long类型的值写入到“数据输出流”中
+    // 注意：long占8个字节
+    public final void writeLong(long v) throws IOException {
+        writeBuffer[0] = (byte)(v &gt;&gt;&gt; 56);
+        writeBuffer[1] = (byte)(v &gt;&gt;&gt; 48);
+        writeBuffer[2] = (byte)(v &gt;&gt;&gt; 40);
+        writeBuffer[3] = (byte)(v &gt;&gt;&gt; 32);
+        writeBuffer[4] = (byte)(v &gt;&gt;&gt; 24);
+        writeBuffer[5] = (byte)(v &gt;&gt;&gt; 16);
+        writeBuffer[6] = (byte)(v &gt;&gt;&gt;  8);
+        writeBuffer[7] = (byte)(v &gt;&gt;&gt;  0);
+        out.write(writeBuffer, 0, 8);
+        incCount(8);
+    }
+
+    // 将float类型的值写入到“数据输出流”中
+    public final void writeFloat(float v) throws IOException {
+        writeInt(Float.floatToIntBits(v));
+    }
+
+    // 将double类型的值写入到“数据输出流”中
+    public final void writeDouble(double v) throws IOException {
+        writeLong(Double.doubleToLongBits(v));
+    }
+
+    // 将String类型的值写入到“数据输出流”中
+    // 实际写入时，是将String对应的每个字符转换成byte数据后写入输出流中。
+    public final void writeBytes(String s) throws IOException {
+        int len = s.length();
+        for (int i = 0 ; i &lt; len ; i++) {
+            out.write((byte)s.charAt(i));
+        }
+        incCount(len);
+    }
+
+    // 将String类型的值写入到“数据输出流”中
+    // 实际写入时，是将String对应的每个字符转换成char数据后写入输出流中。
+    public final void writeChars(String s) throws IOException {
+        int len = s.length();
+        for (int i = 0 ; i &lt; len ; i++) {
+            int v = s.charAt(i);
+            out.write((v &gt;&gt;&gt; 8) &amp; 0xFF);
+            out.write((v &gt;&gt;&gt; 0) &amp; 0xFF);
+        }
+        incCount(len * 2);
+    }
+
+    // 将UTF-8类型的值写入到“数据输出流”中
+    public final void writeUTF(String str) throws IOException {
+        writeUTF(str, this);
+    }
+
+    // 将String数据以UTF-8类型的形式写入到“输出流out”中
+    static int writeUTF(String str, DataOutput out) throws IOException {
+        //获取String的长度
+        int strlen = str.length();
+        int utflen = 0;
+        int c, count = 0;
+
+        // 由于UTF-8是1～4个字节不等；
+        // 这里，根据UTF-8首字节的范围，判断UTF-8是几个字节的。
+        for (int i = 0; i &lt; strlen; i++) {
+            c = str.charAt(i);
+            if ((c &gt;= 0x0001) &amp;&amp; (c &lt;= 0x007F)) {
+                utflen++;
+            } else if (c &gt; 0x07FF) {
+                utflen += 3;
+            } else {
+                utflen += 2;
+            }
+        }
+
+        if (utflen &gt; 65535)
+            throw new UTFDataFormatException(
+                &quot;encoded string too long: &quot; + utflen + &quot; bytes&quot;);
+
+        // 新建“字节数组bytearr”
+        byte[] bytearr = null;
+        if (out instanceof DataOutputStream) {
+            DataOutputStream dos = (DataOutputStream)out;
+            if(dos.bytearr == null || (dos.bytearr.length &lt; (utflen+2)))
+                dos.bytearr = new byte[(utflen*2) + 2];
+            bytearr = dos.bytearr;
+        } else {
+            bytearr = new byte[utflen+2];
+        }
+
+        // “字节数组”的前2个字节保存的是“UTF-8数据的长度”
+        bytearr[count++] = (byte) ((utflen &gt;&gt;&gt; 8) &amp; 0xFF);
+        bytearr[count++] = (byte) ((utflen &gt;&gt;&gt; 0) &amp; 0xFF);
+
+        // 对UTF-8中的单字节数据进行预处理
+        int i=0;
+        for (i=0; i&lt;strlen; i++) {
+           c = str.charAt(i);
+           if (!((c &gt;= 0x0001) &amp;&amp; (c &lt;= 0x007F))) break;
+           bytearr[count++] = (byte) c;
+        }
+
+        // 对预处理后的数据，接着进行处理
+        for (;i &lt; strlen; i++){
+            c = str.charAt(i);
+            // UTF-8数据是1个字节的情况
+            if ((c &gt;= 0x0001) &amp;&amp; (c &lt;= 0x007F)) {
+                bytearr[count++] = (byte) c;
+
+            } else if (c &gt; 0x07FF) {
+                // UTF-8数据是3个字节的情况
+                bytearr[count++] = (byte) (0xE0 | ((c &gt;&gt; 12) &amp; 0x0F));
+                bytearr[count++] = (byte) (0x80 | ((c &gt;&gt;  6) &amp; 0x3F));
+                bytearr[count++] = (byte) (0x80 | ((c &gt;&gt;  0) &amp; 0x3F));
+            } else {
+                // UTF-8数据是2个字节的情况
+                bytearr[count++] = (byte) (0xC0 | ((c &gt;&gt;  6) &amp; 0x1F));
+                bytearr[count++] = (byte) (0x80 | ((c &gt;&gt;  0) &amp; 0x3F));
+            }
+        }
+        // 将字节数组写入到“数据输出流”中
+        out.write(bytearr, 0, utflen+2);
+        return utflen + 2;
+    }
+
+    public final int size() {
+        return written;
+    }
+}
+</code></pre><p><a name="anchor3"></a></p>
+<h1 id="3-示例代码"><a href="#3-示例代码" class="headerlink" title="3. 示例代码"></a>3. 示例代码</h1><p>关于DataOutStream中API的详细用法，参考示例代码(DataInputStreamTest.java)：</p>
+<pre><code>import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.InputStream;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.FileNotFoundException;
+import java.lang.SecurityException;
+
+/**
+ * DataInputStream 和 DataOutputStream测试程序
+ *
+ * @author skywang
+ */
+public class DataInputStreamTest {
+
+    private static final int LEN = 5;
+
+    public static void main(String[] args) {
+        // 测试DataOutputStream，将数据写入到输出流中。
+        testDataOutputStream() ;
+        // 测试DataInputStream，从上面的输出流结果中读取数据。
+        testDataInputStream() ;
+    }
+
+    /**
+     * DataOutputStream的API测试函数
+     */
+    private static void testDataOutputStream() {
+
+        try {
+            File file = new File(&quot;file.txt&quot;);
+            DataOutputStream out =
+                  new DataOutputStream(
+                      new FileOutputStream(file));
+
+            out.writeBoolean(true);
+            out.writeByte((byte)0x41);
+            out.writeChar((char)0x4243);
+            out.writeShort((short)0x4445);
+            out.writeInt(0x12345678);
+            out.writeLong(0x0FEDCBA987654321L);
+
+            out.writeUTF(&quot;abcdefghijklmnopqrstuvwxyz严12&quot;);
+
+            out.close();
+       } catch (FileNotFoundException e) {
+           e.printStackTrace();
+       } catch (SecurityException e) {
+           e.printStackTrace();
+       } catch (IOException e) {
+           e.printStackTrace();
+       }
+    }
+    /**
+     * DataInputStream的API测试函数
+     */
+    private static void testDataInputStream() {
+
+        try {
+            File file = new File(&quot;file.txt&quot;);
+            DataInputStream in =
+                  new DataInputStream(
+                      new FileInputStream(file));
+
+            System.out.printf(&quot;byteToHexString(0x8F):0x%s\n&quot;, byteToHexString((byte)0x8F));
+            System.out.printf(&quot;charToHexString(0x8FCF):0x%s\n&quot;, charToHexString((char)0x8FCF));
+
+            System.out.printf(&quot;readBoolean():%s\n&quot;, in.readBoolean());
+            System.out.printf(&quot;readByte():0x%s\n&quot;, byteToHexString(in.readByte()));
+            System.out.printf(&quot;readChar():0x%s\n&quot;, charToHexString(in.readChar()));
+            System.out.printf(&quot;readShort():0x%s\n&quot;, shortToHexString(in.readShort()));
+            System.out.printf(&quot;readInt():0x%s\n&quot;, Integer.toHexString(in.readInt()));
+            System.out.printf(&quot;readLong():0x%s\n&quot;, Long.toHexString(in.readLong()));
+            System.out.printf(&quot;readUTF():%s\n&quot;, in.readUTF());
+
+            in.close();
+       } catch (FileNotFoundException e) {
+           e.printStackTrace();
+       } catch (SecurityException e) {
+           e.printStackTrace();
+       } catch (IOException e) {
+           e.printStackTrace();
+       }
+    }
+
+    // 打印byte对应的16进制的字符串
+    private static String byteToHexString(byte val) {
+        return Integer.toHexString(val &amp; 0xff);
+    }
+
+    // 打印char对应的16进制的字符串
+    private static String charToHexString(char val) {
+        return Integer.toHexString(val);
+    }
+
+    // 打印short对应的16进制的字符串
+    private static String shortToHexString(short val) {
+        return Integer.toHexString(val &amp; 0xffff);
+    }
+}
+</code></pre><p>运行结果：</p>
+<pre><code>byteToHexString(0x8F):0x8f
+charToHexString(0x8FCF):0x8fcf
+readBoolean():true
+readByte():0x41
+readChar():0x4243
+readShort():0x4445
+readInt():0x12345678
+readLong():0xfedcba987654321
+readUTF():abcdefghijklmnopqrstuvwxyz严12
+</code></pre>
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2018-06-27T09:39:57.941Z" itemprop="dateUpdated">2018-06-27 17:39:57</time>
+</span><br>
+
+
+        
+        本文固定链接：<a href="/2016/10/15/java-source-analysis-io-series/java io系列15之 DataOutputStream详解/" target="_blank" rel="external">https://smuwjs.github.io/2016/10/15/java-source-analysis-io-series/java io系列15之 DataOutputStream详解/</a>
+        
+    </div>
+    <footer>
+        <a href="https://smuwjs.github.io">
+            <img src="/img/head.png" alt="Jeeson">
+            Jeeson
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java-IO系列/">Java IO系列</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java源码分析/">Java源码分析</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/10/15/java-source-analysis-io-series/java io系列15之 DataOutputStream详解/&title=《java io系列15之 DataOutputStream详解》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/10/15/java-source-analysis-io-series/java io系列15之 DataOutputStream详解/&title=《java io系列15之 DataOutputStream详解》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/10/15/java-source-analysis-io-series/java io系列15之 DataOutputStream详解/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《java io系列15之 DataOutputStream详解》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/10/15/java-source-analysis-io-series/java io系列15之 DataOutputStream详解/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/10/15/java-source-analysis-io-series/java io系列15之 DataOutputStream详解/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2016/10/16/java-source-analysis-io-series/java io系列16之 PrintStream详解/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">java io系列16之 PrintStream详解</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2016/10/14/java-source-analysis-io-series/java io系列14之 DataInputStream详解/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">java io系列14之 DataInputStream详解</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="java-source-analysis-io-series/java io系列15之 DataOutputStream详解" data-title="java io系列15之 DataOutputStream详解" data-url="https://smuwjs.github.io/2016/10/15/java-source-analysis-io-series/java io系列15之 DataOutputStream详解/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'smuwjs', theme: 'none'};
+lazyScripts.push('//unpkg.com/hexo-theme-material-indigo@latest/js/embed.min.js');
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循<a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>Jeeson &copy; 2015 - 2018</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/10/15/java-source-analysis-io-series/java io系列15之 DataOutputStream详解/&title=《java io系列15之 DataOutputStream详解》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/10/15/java-source-analysis-io-series/java io系列15之 DataOutputStream详解/&title=《java io系列15之 DataOutputStream详解》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/10/15/java-source-analysis-io-series/java io系列15之 DataOutputStream详解/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《java io系列15之 DataOutputStream详解》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/10/15/java-source-analysis-io-series/java io系列15之 DataOutputStream详解/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/10/15/java-source-analysis-io-series/java io系列15之 DataOutputStream详解/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://smuwjs.github.io/2016/10/15/java-source-analysis-io-series/java io系列15之 DataOutputStream详解/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

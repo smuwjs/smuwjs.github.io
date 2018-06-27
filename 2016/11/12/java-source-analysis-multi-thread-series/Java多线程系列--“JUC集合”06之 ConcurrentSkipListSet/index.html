@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>Java多线程系列--“JUC集合”06之 ConcurrentSkipListSet | Jeeson&#39;s Blog | Write the code. Change the world.</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="Java源码分析,Java多线程系列,JUC集合">
+    <meta name="description" content="本章对Java.util.concurrent包中的ConcurrentSkipListSet类进行详细的介绍。   目录1. ConcurrentSkipListSet介绍2. ConcurrentSkipListSet原理和数据结构3. ConcurrentSkipListSet函数列表4. ConcurrentSkipListSet源码(JDK1.7.0_40版本)5. Concurren">
+<meta name="keywords" content="Java源码分析,Java多线程系列,JUC集合">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java多线程系列--“JUC集合”06之 ConcurrentSkipListSet">
+<meta property="og:url" content="https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”06之 ConcurrentSkipListSet/index.html">
+<meta property="og:site_name" content="Jeeson&#39;s Blog">
+<meta property="og:description" content="本章对Java.util.concurrent包中的ConcurrentSkipListSet类进行详细的介绍。   目录1. ConcurrentSkipListSet介绍2. ConcurrentSkipListSet原理和数据结构3. ConcurrentSkipListSet函数列表4. ConcurrentSkipListSet源码(JDK1.7.0_40版本)5. Concurren">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://wangkuiwu.github.io/media/pic/java/threads/juc-col06-01.jpg">
+<meta property="og:updated_time" content="2018-06-27T09:39:57.949Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java多线程系列--“JUC集合”06之 ConcurrentSkipListSet">
+<meta name="twitter:description" content="本章对Java.util.concurrent包中的ConcurrentSkipListSet类进行详细的介绍。   目录1. ConcurrentSkipListSet介绍2. ConcurrentSkipListSet原理和数据结构3. ConcurrentSkipListSet函数列表4. ConcurrentSkipListSet源码(JDK1.7.0_40版本)5. Concurren">
+<meta name="twitter:image" content="http://wangkuiwu.github.io/media/pic/java/threads/juc-col06-01.jpg">
+    
+        <link rel="alternate" type="application/atom+xml" title="Jeeson&#39;s Blog" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/head.png">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Jeeson</h5>
+          <a href="mailto:smuwjs@163.com" title="smuwjs@163.com" class="mail">smuwjs@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/smuwjs" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Java多线程系列--“JUC集合”06之 ConcurrentSkipListSet</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Java多线程系列--“JUC集合”06之 ConcurrentSkipListSet</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2016-11-11T22:00:00.000Z" itemprop="datePublished" class="page-time">
+  2016-11-12
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#1-ConcurrentSkipListSet介绍"><span class="post-toc-number">1.</span> <span class="post-toc-text">1. ConcurrentSkipListSet介绍</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#2-ConcurrentSkipListSet原理和数据结构"><span class="post-toc-number">2.</span> <span class="post-toc-text">2. ConcurrentSkipListSet原理和数据结构</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#3-ConcurrentSkipListSet函数列表"><span class="post-toc-number">3.</span> <span class="post-toc-text">3. ConcurrentSkipListSet函数列表</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#4-ConcurrentSkipListSet源码-JDK1-7-0-40版本"><span class="post-toc-number">4.</span> <span class="post-toc-text">4. ConcurrentSkipListSet源码(JDK1.7.0_40版本)</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#5-ConcurrentSkipListSet示例"><span class="post-toc-number">5.</span> <span class="post-toc-text">5. ConcurrentSkipListSet示例</span></a></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”06之 ConcurrentSkipListSet"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Java多线程系列--“JUC集合”06之 ConcurrentSkipListSet</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2016-11-12 06:00:00" datetime="2016-11-11T22:00:00.000Z"  itemprop="datePublished">2016-11-12</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <blockquote>
+<p>本章对Java.util.concurrent包中的ConcurrentSkipListSet类进行详细的介绍。</p>
+</blockquote>
+<blockquote>
+<p><strong>目录</strong><br><a href="#anchor1">1. ConcurrentSkipListSet介绍</a><br><a href="#anchor2">2. ConcurrentSkipListSet原理和数据结构</a><br><a href="#anchor3">3. ConcurrentSkipListSet函数列表</a><br><a href="#anchor4">4. ConcurrentSkipListSet源码(JDK1.7.0_40版本)</a><br><a href="#anchor5">5. ConcurrentSkipListSet示例</a>  </p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="1-ConcurrentSkipListSet介绍"><a href="#1-ConcurrentSkipListSet介绍" class="headerlink" title="1. ConcurrentSkipListSet介绍"></a>1. ConcurrentSkipListSet介绍</h1><p>ConcurrentSkipListSet是线程安全的有序的集合，适用于高并发的场景。</p>
+<p>ConcurrentSkipListSet和TreeSet，它们虽然都是有序的集合。但是，<br>第一，它们的线程安全机制不同，TreeSet是非线程安全的，而ConcurrentSkipListSet是线程安全的。<br>第二，ConcurrentSkipListSet是通过ConcurrentSkipListMap实现的，而TreeSet是通过TreeMap实现的。</p>
+<p><a name="anchor2"></a></p>
+<h1 id="2-ConcurrentSkipListSet原理和数据结构"><a href="#2-ConcurrentSkipListSet原理和数据结构" class="headerlink" title="2. ConcurrentSkipListSet原理和数据结构"></a>2. ConcurrentSkipListSet原理和数据结构</h1><p>ConcurrentSkipListSet的数据结构，如下图所示：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://wangkuiwu.github.io/media/pic/java/threads/juc-col06-01.jpg" alt="img" title="">
+                </div>
+                <div class="image-caption">img</div>
+            </figure>
+<p>说明：<br>(01) ConcurrentSkipListSet继承于AbstractSet。因此，它本质上是一个集合。<br>(02) ConcurrentSkipListSet实现了NavigableSet接口。因此，ConcurrentSkipListSet是一个有序的集合。<br>(03) ConcurrentSkipListSet是通过ConcurrentSkipListMap实现的。它包含一个ConcurrentNavigableMap对象m，而m对象实际上是ConcurrentNavigableMap的实现类ConcurrentSkipListMap的实例。ConcurrentSkipListMap中的元素是key-value键值对；而ConcurrentSkipListSet是集合，它只用到了ConcurrentSkipListMap中的key！</p>
+<p><a name="anchor3"></a></p>
+<h1 id="3-ConcurrentSkipListSet函数列表"><a href="#3-ConcurrentSkipListSet函数列表" class="headerlink" title="3. ConcurrentSkipListSet函数列表"></a>3. ConcurrentSkipListSet函数列表</h1><pre><code>// 构造一个新的空 set，该 set 按照元素的自然顺序对其进行排序。
+ConcurrentSkipListSet()
+// 构造一个包含指定 collection 中元素的新 set，这个新 set 按照元素的自然顺序对其进行排序。
+ConcurrentSkipListSet(Collection&lt;? extends E&gt; c)
+// 构造一个新的空 set，该 set 按照指定的比较器对其元素进行排序。
+ConcurrentSkipListSet(Comparator&lt;? super E&gt; comparator)
+// 构造一个新 set，该 set 所包含的元素与指定的有序 set 包含的元素相同，使用的顺序也相同。
+ConcurrentSkipListSet(SortedSet&lt;E&gt; s)
+
+// 如果此 set 中不包含指定元素，则添加指定元素。
+boolean add(E e)
+// 返回此 set 中大于等于给定元素的最小元素；如果不存在这样的元素，则返回 null。
+E ceiling(E e)
+// 从此 set 中移除所有元素。
+void clear()
+// 返回此 ConcurrentSkipListSet 实例的浅表副本。
+ConcurrentSkipListSet&lt;E&gt; clone()
+// 返回对此 set 中的元素进行排序的比较器；如果此 set 使用其元素的自然顺序，则返回 null。
+Comparator&lt;? super E&gt; comparator()
+// 如果此 set 包含指定的元素，则返回 true。
+boolean contains(Object o)
+// 返回在此 set 的元素上以降序进行迭代的迭代器。
+Iterator&lt;E&gt; descendingIterator()
+// 返回此 set 中所包含元素的逆序视图。
+NavigableSet&lt;E&gt; descendingSet()
+// 比较指定对象与此 set 的相等性。
+boolean equals(Object o)
+// 返回此 set 中当前第一个（最低）元素。
+E first()
+// 返回此 set 中小于等于给定元素的最大元素；如果不存在这样的元素，则返回 null。
+E floor(E e)
+// 返回此 set 的部分视图，其元素严格小于 toElement。
+NavigableSet&lt;E&gt; headSet(E toElement)
+// 返回此 set 的部分视图，其元素小于（或等于，如果 inclusive 为 true）toElement。
+NavigableSet&lt;E&gt; headSet(E toElement, boolean inclusive)
+// 返回此 set 中严格大于给定元素的最小元素；如果不存在这样的元素，则返回 null。
+E higher(E e)
+// 如果此 set 不包含任何元素，则返回 true。
+boolean isEmpty()
+// 返回在此 set 的元素上以升序进行迭代的迭代器。
+Iterator&lt;E&gt; iterator()
+// 返回此 set 中当前最后一个（最高）元素。
+E last()
+// 返回此 set 中严格小于给定元素的最大元素；如果不存在这样的元素，则返回 null。
+E lower(E e)
+// 获取并移除第一个（最低）元素；如果此 set 为空，则返回 null。
+E pollFirst()
+// 获取并移除最后一个（最高）元素；如果此 set 为空，则返回 null。
+E pollLast()
+// 如果此 set 中存在指定的元素，则将其移除。
+boolean remove(Object o)
+// 从此 set 中移除包含在指定 collection 中的所有元素。
+boolean removeAll(Collection&lt;?&gt; c)
+// 返回此 set 中的元素数目。
+int size()
+// 返回此 set 的部分视图，其元素范围从 fromElement 到 toElement。
+NavigableSet&lt;E&gt; subSet(E fromElement, boolean fromInclusive, E toElement, boolean toInclusive)
+// 返回此 set 的部分视图，其元素从 fromElement（包括）到 toElement（不包括）。
+NavigableSet&lt;E&gt; subSet(E fromElement, E toElement)
+// 返回此 set 的部分视图，其元素大于等于 fromElement。
+NavigableSet&lt;E&gt; tailSet(E fromElement)
+// 返回此 set 的部分视图，其元素大于（或等于，如果 inclusive 为 true）fromElement。
+NavigableSet&lt;E&gt; tailSet(E fromElement, boolean inclusive)
+</code></pre><p><a name="anchor4"></a></p>
+<h1 id="4-ConcurrentSkipListSet源码-JDK1-7-0-40版本"><a href="#4-ConcurrentSkipListSet源码-JDK1-7-0-40版本" class="headerlink" title="4. ConcurrentSkipListSet源码(JDK1.7.0_40版本)"></a>4. ConcurrentSkipListSet源码(JDK1.7.0_40版本)</h1><p>ConcurrentSkipListSet.java的完整源码如下：</p>
+<pre><code>public class ConcurrentSkipListSet&lt;E&gt;
+    extends AbstractSet&lt;E&gt;
+    implements NavigableSet&lt;E&gt;, Cloneable, java.io.Serializable {
+
+    private static final long serialVersionUID = -2479143111061671589L;
+
+    /**
+     * The underlying map. Uses Boolean.TRUE as value for each
+     * element.  This field is declared final for the sake of thread
+     * safety, which entails some ugliness in clone()
+     */
+    private final ConcurrentNavigableMap&lt;E,Object&gt; m;
+
+    /**
+     * Constructs a new, empty set that orders its elements according to
+     * their {@linkplain Comparable natural ordering}.
+     */
+    public ConcurrentSkipListSet() {
+        m = new ConcurrentSkipListMap&lt;E,Object&gt;();
+    }
+
+    /**
+     * Constructs a new, empty set that orders its elements according to
+     * the specified comparator.
+     *
+     * @param comparator the comparator that will be used to order this set.
+     *        If &lt;tt&gt;null&lt;/tt&gt;, the {@linkplain Comparable natural
+     *        ordering} of the elements will be used.
+     */
+    public ConcurrentSkipListSet(Comparator&lt;? super E&gt; comparator) {
+        m = new ConcurrentSkipListMap&lt;E,Object&gt;(comparator);
+    }
+
+    /**
+     * Constructs a new set containing the elements in the specified
+     * collection, that orders its elements according to their
+     * {@linkplain Comparable natural ordering}.
+     *
+     * @param c The elements that will comprise the new set
+     * @throws ClassCastException if the elements in &lt;tt&gt;c&lt;/tt&gt; are
+     *         not {@link Comparable}, or are not mutually comparable
+     * @throws NullPointerException if the specified collection or any
+     *         of its elements are null
+     */
+    public ConcurrentSkipListSet(Collection&lt;? extends E&gt; c) {
+        m = new ConcurrentSkipListMap&lt;E,Object&gt;();
+        addAll(c);
+    }
+
+    /**
+     * Constructs a new set containing the same elements and using the
+     * same ordering as the specified sorted set.
+     *
+     * @param s sorted set whose elements will comprise the new set
+     * @throws NullPointerException if the specified sorted set or any
+     *         of its elements are null
+     */
+    public ConcurrentSkipListSet(SortedSet&lt;E&gt; s) {
+        m = new ConcurrentSkipListMap&lt;E,Object&gt;(s.comparator());
+        addAll(s);
+    }
+
+    /**
+     * For use by submaps
+     */
+    ConcurrentSkipListSet(ConcurrentNavigableMap&lt;E,Object&gt; m) {
+        this.m = m;
+    }
+
+    /**
+     * Returns a shallow copy of this &lt;tt&gt;ConcurrentSkipListSet&lt;/tt&gt;
+     * instance. (The elements themselves are not cloned.)
+     *
+     * @return a shallow copy of this set
+     */
+    public ConcurrentSkipListSet&lt;E&gt; clone() {
+        ConcurrentSkipListSet&lt;E&gt; clone = null;
+        try {
+            clone = (ConcurrentSkipListSet&lt;E&gt;) super.clone();
+            clone.setMap(new ConcurrentSkipListMap(m));
+        } catch (CloneNotSupportedException e) {
+            throw new InternalError();
+        }
+
+        return clone;
+    }
+
+    /* ---------------- Set operations -------------- */
+
+    /**
+     * Returns the number of elements in this set.  If this set
+     * contains more than &lt;tt&gt;Integer.MAX_VALUE&lt;/tt&gt; elements, it
+     * returns &lt;tt&gt;Integer.MAX_VALUE&lt;/tt&gt;.
+     *
+     * &lt;p&gt;Beware that, unlike in most collections, this method is
+     * &lt;em&gt;NOT&lt;/em&gt; a constant-time operation. Because of the
+     * asynchronous nature of these sets, determining the current
+     * number of elements requires traversing them all to count them.
+     * Additionally, it is possible for the size to change during
+     * execution of this method, in which case the returned result
+     * will be inaccurate. Thus, this method is typically not very
+     * useful in concurrent applications.
+     *
+     * @return the number of elements in this set
+     */
+    public int size() {
+        return m.size();
+    }
+
+    /**
+     * Returns &lt;tt&gt;true&lt;/tt&gt; if this set contains no elements.
+     * @return &lt;tt&gt;true&lt;/tt&gt; if this set contains no elements
+     */
+    public boolean isEmpty() {
+        return m.isEmpty();
+    }
+
+    /**
+     * Returns &lt;tt&gt;true&lt;/tt&gt; if this set contains the specified element.
+     * More formally, returns &lt;tt&gt;true&lt;/tt&gt; if and only if this set
+     * contains an element &lt;tt&gt;e&lt;/tt&gt; such that &lt;tt&gt;o.equals(e)&lt;/tt&gt;.
+     *
+     * @param o object to be checked for containment in this set
+     * @return &lt;tt&gt;true&lt;/tt&gt; if this set contains the specified element
+     * @throws ClassCastException if the specified element cannot be
+     *         compared with the elements currently in this set
+     * @throws NullPointerException if the specified element is null
+     */
+    public boolean contains(Object o) {
+        return m.containsKey(o);
+    }
+
+    /**
+     * Adds the specified element to this set if it is not already present.
+     * More formally, adds the specified element &lt;tt&gt;e&lt;/tt&gt; to this set if
+     * the set contains no element &lt;tt&gt;e2&lt;/tt&gt; such that &lt;tt&gt;e.equals(e2)&lt;/tt&gt;.
+     * If this set already contains the element, the call leaves the set
+     * unchanged and returns &lt;tt&gt;false&lt;/tt&gt;.
+     *
+     * @param e element to be added to this set
+     * @return &lt;tt&gt;true&lt;/tt&gt; if this set did not already contain the
+     *         specified element
+     * @throws ClassCastException if &lt;tt&gt;e&lt;/tt&gt; cannot be compared
+     *         with the elements currently in this set
+     * @throws NullPointerException if the specified element is null
+     */
+    public boolean add(E e) {
+        return m.putIfAbsent(e, Boolean.TRUE) == null;
+    }
+
+    /**
+     * Removes the specified element from this set if it is present.
+     * More formally, removes an element &lt;tt&gt;e&lt;/tt&gt; such that
+     * &lt;tt&gt;o.equals(e)&lt;/tt&gt;, if this set contains such an element.
+     * Returns &lt;tt&gt;true&lt;/tt&gt; if this set contained the element (or
+     * equivalently, if this set changed as a result of the call).
+     * (This set will not contain the element once the call returns.)
+     *
+     * @param o object to be removed from this set, if present
+     * @return &lt;tt&gt;true&lt;/tt&gt; if this set contained the specified element
+     * @throws ClassCastException if &lt;tt&gt;o&lt;/tt&gt; cannot be compared
+     *         with the elements currently in this set
+     * @throws NullPointerException if the specified element is null
+     */
+    public boolean remove(Object o) {
+        return m.remove(o, Boolean.TRUE);
+    }
+
+    /**
+     * Removes all of the elements from this set.
+     */
+    public void clear() {
+        m.clear();
+    }
+
+    /**
+     * Returns an iterator over the elements in this set in ascending order.
+     *
+     * @return an iterator over the elements in this set in ascending order
+     */
+    public Iterator&lt;E&gt; iterator() {
+        return m.navigableKeySet().iterator();
+    }
+
+    /**
+     * Returns an iterator over the elements in this set in descending order.
+     *
+     * @return an iterator over the elements in this set in descending order
+     */
+    public Iterator&lt;E&gt; descendingIterator() {
+        return m.descendingKeySet().iterator();
+    }
+
+
+    /* ---------------- AbstractSet Overrides -------------- */
+
+    /**
+     * Compares the specified object with this set for equality.  Returns
+     * &lt;tt&gt;true&lt;/tt&gt; if the specified object is also a set, the two sets
+     * have the same size, and every member of the specified set is
+     * contained in this set (or equivalently, every member of this set is
+     * contained in the specified set).  This definition ensures that the
+     * equals method works properly across different implementations of the
+     * set interface.
+     *
+     * @param o the object to be compared for equality with this set
+     * @return &lt;tt&gt;true&lt;/tt&gt; if the specified object is equal to this set
+     */
+    public boolean equals(Object o) {
+        // Override AbstractSet version to avoid calling size()
+        if (o == this)
+            return true;
+        if (!(o instanceof Set))
+            return false;
+        Collection&lt;?&gt; c = (Collection&lt;?&gt;) o;
+        try {
+            return containsAll(c) &amp;&amp; c.containsAll(this);
+        } catch (ClassCastException unused)   {
+            return false;
+        } catch (NullPointerException unused) {
+            return false;
+        }
+    }
+
+    /**
+     * Removes from this set all of its elements that are contained in
+     * the specified collection.  If the specified collection is also
+     * a set, this operation effectively modifies this set so that its
+     * value is the &lt;i&gt;asymmetric set difference&lt;/i&gt; of the two sets.
+     *
+     * @param  c collection containing elements to be removed from this set
+     * @return &lt;tt&gt;true&lt;/tt&gt; if this set changed as a result of the call
+     * @throws ClassCastException if the types of one or more elements in this
+     *         set are incompatible with the specified collection
+     * @throws NullPointerException if the specified collection or any
+     *         of its elements are null
+     */
+    public boolean removeAll(Collection&lt;?&gt; c) {
+        // Override AbstractSet version to avoid unnecessary call to size()
+        boolean modified = false;
+        for (Iterator&lt;?&gt; i = c.iterator(); i.hasNext(); )
+            if (remove(i.next()))
+                modified = true;
+        return modified;
+    }
+
+    /* ---------------- Relational operations -------------- */
+
+    /**
+     * @throws ClassCastException {@inheritDoc}
+     * @throws NullPointerException if the specified element is null
+     */
+    public E lower(E e) {
+        return m.lowerKey(e);
+    }
+
+    /**
+     * @throws ClassCastException {@inheritDoc}
+     * @throws NullPointerException if the specified element is null
+     */
+    public E floor(E e) {
+        return m.floorKey(e);
+    }
+
+    /**
+     * @throws ClassCastException {@inheritDoc}
+     * @throws NullPointerException if the specified element is null
+     */
+    public E ceiling(E e) {
+        return m.ceilingKey(e);
+    }
+
+    /**
+     * @throws ClassCastException {@inheritDoc}
+     * @throws NullPointerException if the specified element is null
+     */
+    public E higher(E e) {
+        return m.higherKey(e);
+    }
+
+    public E pollFirst() {
+        Map.Entry&lt;E,Object&gt; e = m.pollFirstEntry();
+        return (e == null) ? null : e.getKey();
+    }
+
+    public E pollLast() {
+        Map.Entry&lt;E,Object&gt; e = m.pollLastEntry();
+        return (e == null) ? null : e.getKey();
+    }
+
+
+    /* ---------------- SortedSet operations -------------- */
+
+
+    public Comparator&lt;? super E&gt; comparator() {
+        return m.comparator();
+    }
+
+    /**
+     * @throws NoSuchElementException {@inheritDoc}
+     */
+    public E first() {
+        return m.firstKey();
+    }
+
+    /**
+     * @throws NoSuchElementException {@inheritDoc}
+     */
+    public E last() {
+        return m.lastKey();
+    }
+
+    /**
+     * @throws ClassCastException {@inheritDoc}
+     * @throws NullPointerException if {@code fromElement} or
+     *         {@code toElement} is null
+     * @throws IllegalArgumentException {@inheritDoc}
+     */
+    public NavigableSet&lt;E&gt; subSet(E fromElement,
+                                  boolean fromInclusive,
+                                  E toElement,
+                                  boolean toInclusive) {
+        return new ConcurrentSkipListSet&lt;E&gt;
+            (m.subMap(fromElement, fromInclusive,
+                      toElement,   toInclusive));
+    }
+
+    /**
+     * @throws ClassCastException {@inheritDoc}
+     * @throws NullPointerException if {@code toElement} is null
+     * @throws IllegalArgumentException {@inheritDoc}
+     */
+    public NavigableSet&lt;E&gt; headSet(E toElement, boolean inclusive) {
+        return new ConcurrentSkipListSet&lt;E&gt;(m.headMap(toElement, inclusive));
+    }
+
+    /**
+     * @throws ClassCastException {@inheritDoc}
+     * @throws NullPointerException if {@code fromElement} is null
+     * @throws IllegalArgumentException {@inheritDoc}
+     */
+    public NavigableSet&lt;E&gt; tailSet(E fromElement, boolean inclusive) {
+        return new ConcurrentSkipListSet&lt;E&gt;(m.tailMap(fromElement, inclusive));
+    }
+
+    /**
+     * @throws ClassCastException {@inheritDoc}
+     * @throws NullPointerException if {@code fromElement} or
+     *         {@code toElement} is null
+     * @throws IllegalArgumentException {@inheritDoc}
+     */
+    public NavigableSet&lt;E&gt; subSet(E fromElement, E toElement) {
+        return subSet(fromElement, true, toElement, false);
+    }
+
+    /**
+     * @throws ClassCastException {@inheritDoc}
+     * @throws NullPointerException if {@code toElement} is null
+     * @throws IllegalArgumentException {@inheritDoc}
+     */
+    public NavigableSet&lt;E&gt; headSet(E toElement) {
+        return headSet(toElement, false);
+    }
+
+    /**
+     * @throws ClassCastException {@inheritDoc}
+     * @throws NullPointerException if {@code fromElement} is null
+     * @throws IllegalArgumentException {@inheritDoc}
+     */
+    public NavigableSet&lt;E&gt; tailSet(E fromElement) {
+        return tailSet(fromElement, true);
+    }
+
+    /**
+     * Returns a reverse order view of the elements contained in this set.
+     * The descending set is backed by this set, so changes to the set are
+     * reflected in the descending set, and vice-versa.
+     *
+     * &lt;p&gt;The returned set has an ordering equivalent to
+     * &lt;tt&gt;{@link Collections#reverseOrder(Comparator) Collections.reverseOrder}(comparator())&lt;/tt&gt;.
+     * The expression {@code s.descendingSet().descendingSet()} returns a
+     * view of {@code s} essentially equivalent to {@code s}.
+     *
+     * @return a reverse order view of this set
+     */
+    public NavigableSet&lt;E&gt; descendingSet() {
+        return new ConcurrentSkipListSet(m.descendingMap());
+    }
+
+    // Support for resetting map in clone
+    private void setMap(ConcurrentNavigableMap&lt;E,Object&gt; map) {
+        UNSAFE.putObjectVolatile(this, mapOffset, map);
+    }
+
+    private static final sun.misc.Unsafe UNSAFE;
+    private static final long mapOffset;
+    static {
+        try {
+            UNSAFE = sun.misc.Unsafe.getUnsafe();
+            Class k = ConcurrentSkipListSet.class;
+            mapOffset = UNSAFE.objectFieldOffset
+                (k.getDeclaredField(&quot;m&quot;));
+        } catch (Exception e) {
+            throw new Error(e);
+        }
+    }
+}
+</code></pre><p>ConcurrentSkipListSet是通过ConcurrentSkipListMap实现的，它的接口基本上都是通过调用ConcurrentSkipListMap接口来实现的。这里就不再对它的源码进行分析了。</p>
+<p><a name="anchor5"></a></p>
+<h1 id="5-ConcurrentSkipListSet示例"><a href="#5-ConcurrentSkipListSet示例" class="headerlink" title="5. ConcurrentSkipListSet示例"></a>5. ConcurrentSkipListSet示例</h1><pre><code>import java.util.*;
+import java.util.concurrent.*;
+
+/*
+ *   ConcurrentSkipListSet是“线程安全”的集合，而TreeSet是非线程安全的。
+ *
+ *   下面是“多个线程同时操作并且遍历集合set”的示例
+ *   (01) 当set是ConcurrentSkipListSet对象时，程序能正常运行。
+ *   (02) 当set是TreeSet对象时，程序会产生ConcurrentModificationException异常。
+ *
+ * @author skywang
+ */
+public class ConcurrentSkipListSetDemo1 {
+
+    // TODO: set是TreeSet对象时，程序会出错。
+    //private static Set&lt;String&gt; set = new TreeSet&lt;String&gt;();
+    private static Set&lt;String&gt; set = new ConcurrentSkipListSet&lt;String&gt;();
+    public static void main(String[] args) {
+
+        // 同时启动两个线程对set进行操作！
+        new MyThread(&quot;a&quot;).start();
+        new MyThread(&quot;b&quot;).start();
+    }
+
+    private static void printAll() {
+        String value = null;
+        Iterator iter = set.iterator();
+        while(iter.hasNext()) {
+            value = (String)iter.next();
+            System.out.print(value+&quot;, &quot;);
+        }
+        System.out.println();
+    }
+
+    private static class MyThread extends Thread {
+        MyThread(String name) {
+            super(name);
+        }
+        @Override
+        public void run() {
+                int i = 0;
+            while (i++ &lt; 10) {
+                // “线程名” + &quot;序号&quot;
+                String val = Thread.currentThread().getName() + (i%6);
+                set.add(val);
+                // 通过“Iterator”遍历set。
+                printAll();
+            }
+        }
+    }
+}
+</code></pre><p>(某一次)运行结果：</p>
+<pre><code>a1, b1, 
+a1, a1, a2, b1, 
+b1, a1, a2, a3, b1,
+
+a1, a2, a3, a1, a4, b1, b2, 
+a2, a1, a2, a3, a4, a5, b1, b2, 
+a3, a0, a4, a5, a1, b1, a2, b2, 
+a3, a0, a4, a1, a5, a2, b1, a3, b2, a4, b3, 
+a5, a0, b1, a1, b2, a2, b3, 
+a3, a0, a4, a1, a5, a2, b1, a3, b2, a4, b3, a5, b4, 
+b1, a0, b2, a1, b3, a2, b4, 
+a3, a0, a4, a1, a5, a2, b1, a3, b2, a4, b3, a5, b4, b1, b5, 
+b2, a0, a1, a2, a3, a4, a5, b3, b1, b4, b2, b5, 
+b3, a0, b4, a1, b5, 
+a2, a0, a3, a1, a4, a2, a5, a3, b0, a4, b1, a5, b2, b0, b3, b1, b4, b2, b5, b3, 
+b4, a0, b5, 
+a1, a2, a3, a4, a5, b0, b1, b2, b3, b4, b5, 
+a0, a1, a2, a3, a4, a5, b0, b1, b2, b3, b4, b5, 
+a0, a1, a2, a3, a4, a5, b0, b1, b2, b3, b4, b5, 
+a0, a1, a2, a3, a4, a5, b0, b1, b2, b3, b4, b5, 
+</code></pre><p>结果说明：<br>示例程序中，启动两个线程(线程a和线程b)分别对ConcurrentSkipListSet进行操作。以线程a而言，它会先获取“线程名”+“序号”，然后将该字符串添加到ConcurrentSkipListSet集合中；接着，遍历并输出集合中的全部元素。 线程b的操作和线程a一样，只不过线程b的名字和线程a的名字不同。<br>当set是ConcurrentSkipListSet对象时，程序能正常运行。如果将set改为TreeSet时，程序会产生ConcurrentModificationException异常。</p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2018-06-27T09:39:57.949Z" itemprop="dateUpdated">2018-06-27 17:39:57</time>
+</span><br>
+
+
+        
+        本文固定链接：<a href="/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”06之 ConcurrentSkipListSet/" target="_blank" rel="external">https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”06之 ConcurrentSkipListSet/</a>
+        
+    </div>
+    <footer>
+        <a href="https://smuwjs.github.io">
+            <img src="/img/head.png" alt="Jeeson">
+            Jeeson
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JUC集合/">JUC集合</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java多线程系列/">Java多线程系列</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java源码分析/">Java源码分析</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”06之 ConcurrentSkipListSet/&title=《Java多线程系列--“JUC集合”06之 ConcurrentSkipListSet》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”06之 ConcurrentSkipListSet/&title=《Java多线程系列--“JUC集合”06之 ConcurrentSkipListSet》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”06之 ConcurrentSkipListSet/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Java多线程系列--“JUC集合”06之 ConcurrentSkipListSet》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”06之 ConcurrentSkipListSet/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”06之 ConcurrentSkipListSet/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”07之 ArrayBlockingQueue/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">Java多线程系列--“JUC集合”07之 ArrayBlockingQueue</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”05之 ConcurrentSkipListMap/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Java多线程系列--“JUC集合”05之 ConcurrentSkipListMap</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”06之 ConcurrentSkipListSet" data-title="Java多线程系列--“JUC集合”06之 ConcurrentSkipListSet" data-url="https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”06之 ConcurrentSkipListSet/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'smuwjs', theme: 'none'};
+lazyScripts.push('//unpkg.com/hexo-theme-material-indigo@latest/js/embed.min.js');
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循<a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>Jeeson &copy; 2015 - 2018</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”06之 ConcurrentSkipListSet/&title=《Java多线程系列--“JUC集合”06之 ConcurrentSkipListSet》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”06之 ConcurrentSkipListSet/&title=《Java多线程系列--“JUC集合”06之 ConcurrentSkipListSet》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”06之 ConcurrentSkipListSet/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Java多线程系列--“JUC集合”06之 ConcurrentSkipListSet》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”06之 ConcurrentSkipListSet/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”06之 ConcurrentSkipListSet/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”06之 ConcurrentSkipListSet/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

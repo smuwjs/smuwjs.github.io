@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>mina学习笔记二：从官方例子开始 | Jeeson&#39;s Blog | Write the code. Change the world.</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="Java,MINA">
+    <meta name="description" content="原文：http://blog.csdn.net/yoara/article/details/37324821     本节内容只介绍mina总体架构，同时给出官方的几个实用TCP、UDP的经典服务端客户端例子。 mina体系结构mina位于用户程序和网络处理之间，将用户从复杂的网络处理中解耦，那我们就可以更加关注业务领域。">
+<meta name="keywords" content="Java,MINA">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mina学习笔记二：从官方例子开始">
+<meta property="og:url" content="https://smuwjs.github.io/2016/09/08/mina-study-node2/index.html">
+<meta property="og:site_name" content="Jeeson&#39;s Blog">
+<meta property="og:description" content="原文：http://blog.csdn.net/yoara/article/details/37324821     本节内容只介绍mina总体架构，同时给出官方的几个实用TCP、UDP的经典服务端客户端例子。 mina体系结构mina位于用户程序和网络处理之间，将用户从复杂的网络处理中解耦，那我们就可以更加关注业务领域。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://opesdt6ii.bkt.clouddn.com/17-5-5/73185035-file_1493951689595_62d1.png">
+<meta property="og:image" content="http://opesdt6ii.bkt.clouddn.com/17-5-5/1757032-file_1493951826742_1606b.png?imageView/2/w/450">
+<meta property="og:image" content="http://opesdt6ii.bkt.clouddn.com/17-5-5/13929582-file_1493951496846_fb87.png">
+<meta property="og:image" content="http://opesdt6ii.bkt.clouddn.com/17-5-5/95294309-file_1493953292315_102b1.png">
+<meta property="og:updated_time" content="2018-06-27T09:39:57.957Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="mina学习笔记二：从官方例子开始">
+<meta name="twitter:description" content="原文：http://blog.csdn.net/yoara/article/details/37324821     本节内容只介绍mina总体架构，同时给出官方的几个实用TCP、UDP的经典服务端客户端例子。 mina体系结构mina位于用户程序和网络处理之间，将用户从复杂的网络处理中解耦，那我们就可以更加关注业务领域。">
+<meta name="twitter:image" content="http://opesdt6ii.bkt.clouddn.com/17-5-5/73185035-file_1493951689595_62d1.png">
+    
+        <link rel="alternate" type="application/atom+xml" title="Jeeson&#39;s Blog" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/head.png">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Jeeson</h5>
+          <a href="mailto:smuwjs@163.com" title="smuwjs@163.com" class="mail">smuwjs@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/smuwjs" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">mina学习笔记二：从官方例子开始</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">mina学习笔记二：从官方例子开始</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2016-09-08T12:12:14.000Z" itemprop="datePublished" class="page-time">
+  2016-09-08
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/mina/">mina</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#mina体系结构"><span class="post-toc-number">1.</span> <span class="post-toc-text">mina体系结构</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#服务端结构"><span class="post-toc-number">2.</span> <span class="post-toc-text">服务端结构</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#客户端结构"><span class="post-toc-number">3.</span> <span class="post-toc-text">客户端结构</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#TCP连接的例子"><span class="post-toc-number">4.</span> <span class="post-toc-text">TCP连接的例子</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#UDP连接的例子"><span class="post-toc-number">5.</span> <span class="post-toc-text">UDP连接的例子</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#结语"><span class="post-toc-number">6.</span> <span class="post-toc-text">结语</span></a></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-mina-study-node2"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">mina学习笔记二：从官方例子开始</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2016-09-08 20:12:14" datetime="2016-09-08T12:12:14.000Z"  itemprop="datePublished">2016-09-08</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/mina/">mina</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p><a href="http://blog.csdn.net/yoara/article/details/37324821" target="_blank" rel="noopener">原文：http://blog.csdn.net/yoara/article/details/37324821    </a></p>
+<p>本节内容只介绍mina总体架构，同时给出官方的几个实用TCP、UDP的经典服务端客户端例子。</p>
+<h1 id="mina体系结构"><a href="#mina体系结构" class="headerlink" title="mina体系结构"></a>mina体系结构</h1><p>mina位于用户程序和网络处理之间，将用户从复杂的网络处理中解耦，那我们就可以更加关注业务领域。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://opesdt6ii.bkt.clouddn.com/17-5-5/73185035-file_1493951689595_62d1.png" alt="图2.1 mina鸟瞰图" title="">
+                </div>
+                <div class="image-caption">图2.1 mina鸟瞰图</div>
+            </figure>
+<p>让我们再深入进去，mina框架内部的各个组件是怎么协调工作的呢？ <figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://opesdt6ii.bkt.clouddn.com/17-5-5/1757032-file_1493951826742_1606b.png?imageView/2/w/450" alt="mina组件结构图" title="">
+                </div>
+                <div class="image-caption">mina组件结构图</div>
+            </figure></p>
+<p>显然，mina框架被分成了主要的3个组件部分：</p>
+<ul>
+<li>I/O Service，具体提供服务的组件。</li>
+<li>I/O Filter Chain，过滤器链，用于支持各种切面服务。</li>
+<li>I/O Handler，用于处理用户的业务逻辑。</li>
+</ul>
+<p>相对应的，为了创建一个基于mina的应用程序，我们需要：</p>
+<ul>
+<li>创建I/O Service ：可选择mina提供的Services如（*Acceptor）或实现自己的Service。</li>
+<li>创建I/O Filter ：同样可以选择mina提供的各类filter，也可以实现自己的编解码过滤器等。</li>
+<li>实现I/O Handler，实现Handler接口，处理各种消息。</li>
+</ul>
+<h1 id="服务端结构"><a href="#服务端结构" class="headerlink" title="服务端结构"></a>服务端结构</h1><p>服务端的作用就是开启监听端口，等待请求的到来、处理他们、以及将发送对请求的响应。同时，服务端会为每个连接创建session，在session周期内提供各种精度的服务，比如连接创建时(sessionCreated(IoSession session))、连接等待时(sessionIdle(IoSession session, IdleStatus status))、连接销毁时(sessionClosed(IoSession session))等。mina的api为TCP/UDP提供的一致性Server端操作。 <figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://opesdt6ii.bkt.clouddn.com/17-5-5/13929582-file_1493951496846_fb87.png" alt="Server结构图" title="">
+                </div>
+                <div class="image-caption">Server结构图</div>
+            </figure></p>
+<ul>
+<li>IOAcceptor 监听来自网络的请求。</li>
+<li>当新的连接建立时，一个新的session会被创建，该session用作对同一IP/端口组合的客户端提供服务。</li>
+<li>数据包需经过一系列的过滤器，这些过滤器可用来修改数据包的内容（如转换对象、添加或修改信息等），其中将原始字节流转换成POJO对象是非常有用的。当然这需要解编码器提供支持。</li>
+<li>最后这些数据包或转化后的对象将交由IOHandler处理，我们将实现IOHandler用于处理具体的业务逻辑。</li>
+</ul>
+<h1 id="客户端结构"><a href="#客户端结构" class="headerlink" title="客户端结构"></a>客户端结构</h1><p>客户端需要连接服务端，发送请求并处理响应。实际上客户端的结构和服务端极其相似。 </p>
+<p><img src="http://opesdt6ii.bkt.clouddn.com/17-5-5/95294309-file_1493953292315_102b1.png" alt="图2.4 客户端结构"></p>
+<ul>
+<li>客户端首先需要创建IOConnector对象，绑定服务端的IP和端口。</li>
+<li>一旦连接成功，一个于本次连接绑定的session对象将被创建。</li>
+<li>客户端发送给服务端的请求都需要经过一系列的fliter。</li>
+<li>同样，响应消息的接受也会经过一系列的filter再到IOHandler被处理。</li>
+</ul>
+<p>所以整体上，mina提供良好的一致性调用和封装结构。在使用mina创建基于网络的程序应用时，投入的学习成本比较低。</p>
+<h1 id="TCP连接的例子"><a href="#TCP连接的例子" class="headerlink" title="TCP连接的例子"></a>TCP连接的例子</h1><p>依赖的Jar包：</p>
+<ul>
+<li>MINA 2.x Core</li>
+<li>JDK 1.5 或以上</li>
+<li><p>SLF4J 1.3.0 或以上</p>
+<ul>
+<li>Log4J 1.2： slf4j-api.jar, slf4j-log4j12.jar, Log4j 1.2.x</li>
+<li>Log4J 1.3： slf4j-api.jar, slf4j-log4j13.jar, Log4j 1.3.x（注意，请确认log4j的版本）</li>
+</ul>
+<p>TCP Server端代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MinaTimeTest</span> </span>&#123;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> PORT = <span class="number">9123</span>;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">		<span class="comment">//首先，我们为服务端创建IoAcceptor，NioSocketAcceptor是基于NIO的服务端监听器</span></span><br><span class="line">		IoAcceptor acceptor = <span class="keyword">new</span> NioSocketAcceptor();</span><br><span class="line">		<span class="comment">//接着，如结构图示，在Acceptor和IoHandler之间将设置一系列的Fliter</span></span><br><span class="line">		<span class="comment">//包括记录过滤器和编解码过滤器。其中TextLineCodecFactory是mina自带的文本解编码器</span></span><br><span class="line">		acceptor.getFilterChain().addLast(<span class="string">"logger"</span>, <span class="keyword">new</span> LoggingFilter());</span><br><span class="line">		acceptor.getFilterChain().addLast(<span class="string">"codec"</span>,</span><br><span class="line">				<span class="keyword">new</span> ProtocolCodecFilter(<span class="keyword">new</span> TextLineCodecFactory(Charset.forName(<span class="string">"UTF-8"</span>))));</span><br><span class="line">		<span class="comment">//配置事务处理Handler，将请求转由TimeServerHandler处理。</span></span><br><span class="line">		acceptor.setHandler(<span class="keyword">new</span> TimeServerHandler());</span><br><span class="line">		<span class="comment">//配置Buffer的缓冲区大小</span></span><br><span class="line">		acceptor.getSessionConfig().setReadBufferSize(<span class="number">2048</span>);</span><br><span class="line">		<span class="comment">//设置等待时间，每隔IdleTime将调用一次handler.sessionIdle()方法</span></span><br><span class="line">		acceptor.getSessionConfig().setIdleTime(IdleStatus.BOTH_IDLE, <span class="number">10</span>);</span><br><span class="line">		<span class="comment">//绑定端口</span></span><br><span class="line">		acceptor.bind(<span class="keyword">new</span> InetSocketAddress(PORT));</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">TimeServerHandler</span> <span class="keyword">extends</span> <span class="title">IoHandlerAdapter</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">		<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">exceptionCaught</span><span class="params">(IoSession session, Throwable cause)</span></span></span><br><span class="line"><span class="function">				<span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">			cause.printStackTrace();</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">messageReceived</span><span class="params">(IoSession session, Object message)</span></span></span><br><span class="line"><span class="function">				<span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">			String str = message.toString();</span><br><span class="line">			<span class="keyword">if</span> (str.trim().equalsIgnoreCase(<span class="string">"quit"</span>)) &#123;</span><br><span class="line">				session.close(<span class="keyword">false</span>);</span><br><span class="line">				<span class="keyword">return</span>;</span><br><span class="line">			&#125;</span><br><span class="line">			Date date = <span class="keyword">new</span> Date();</span><br><span class="line">			session.write(date.toString());</span><br><span class="line">			System.out.println(<span class="string">"Message written..."</span>);</span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">		<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">sessionIdle</span><span class="params">(IoSession session, IdleStatus status)</span></span></span><br><span class="line"><span class="function">				<span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">			System.out.println(<span class="string">"IDLE "</span> + session.getIdleCount(status));</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>TCP Client端代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TimeClient</span> </span>&#123;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String HOSTNAME = <span class="string">"127.0.0.1"</span>;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> PORT = <span class="number">9123</span>;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> CONNECT_TIMEOUT = <span class="number">30</span> * <span class="number">1000L</span>; <span class="comment">// 30 seconds</span></span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Throwable </span>&#123;</span><br><span class="line">		<span class="comment">//创建Connector连接器</span></span><br><span class="line">		NioSocketConnector connector = <span class="keyword">new</span> NioSocketConnector();</span><br><span class="line">		<span class="comment">//设置连接超时时间</span></span><br><span class="line">		connector.setConnectTimeoutMillis(CONNECT_TIMEOUT);</span><br><span class="line">		</span><br><span class="line">		connector.getFilterChain().addLast(<span class="string">"codec"</span>,</span><br><span class="line">				<span class="keyword">new</span> ProtocolCodecFilter(<span class="keyword">new</span> TextLineCodecFactory()));</span><br><span class="line">		connector.getFilterChain().addLast(<span class="string">"logger"</span>, <span class="keyword">new</span> LoggingFilter());</span><br><span class="line">		<span class="comment">//非常简单的处理Handler，向服务器发送一个数字</span></span><br><span class="line">		connector.setHandler(<span class="keyword">new</span> ClientSessionHandler(<span class="number">1</span>));</span><br><span class="line">		IoSession session = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">try</span> &#123;</span><br><span class="line">			<span class="comment">//连接远程主机，设置IP和端口</span></span><br><span class="line">			ConnectFuture future = connector.connect(<span class="keyword">new</span> InetSocketAddress(</span><br><span class="line">					HOSTNAME, PORT));</span><br><span class="line">			<span class="comment">//等待连接建立</span></span><br><span class="line">			future.awaitUninterruptibly();</span><br><span class="line">			<span class="comment">//连接建立后返回会话session</span></span><br><span class="line">			session = future.getSession();</span><br><span class="line">		&#125; <span class="keyword">catch</span> (RuntimeIoException e) &#123;</span><br><span class="line">			System.err.println(<span class="string">"Failed to connect."</span>);</span><br><span class="line">			e.printStackTrace();</span><br><span class="line">			Thread.sleep(<span class="number">5000</span>);</span><br><span class="line">		&#125; <span class="keyword">finally</span>&#123;</span><br><span class="line">			<span class="keyword">if</span>(session!=<span class="keyword">null</span>)&#123;</span><br><span class="line">				<span class="comment">//等待本次连接通话结束，不可中断式的阻塞等待</span></span><br><span class="line">				session.getCloseFuture().awaitUninterruptibly();</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">//关闭连接</span></span><br><span class="line">		connector.dispose();</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">ClientSessionHandler</span> <span class="keyword">extends</span> <span class="title">IoHandlerAdapter</span> </span>&#123;</span><br><span class="line">	    <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">int</span> value;</span><br><span class="line">	    <span class="function"><span class="keyword">public</span> <span class="title">ClientSessionHandler</span><span class="params">(<span class="keyword">int</span> value)</span> </span>&#123;</span><br><span class="line">	        <span class="keyword">this</span>.value = value;</span><br><span class="line">	    &#125;</span><br><span class="line">	    <span class="meta">@Override</span></span><br><span class="line">	    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">sessionOpened</span><span class="params">(IoSession session)</span> </span>&#123;</span><br><span class="line">	    	session.write(value);</span><br><span class="line">	    &#125;</span><br><span class="line"></span><br><span class="line">	    <span class="meta">@Override</span></span><br><span class="line">	    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">messageReceived</span><span class="params">(IoSession session, Object message)</span> </span>&#123;</span><br><span class="line">	        System.out.println(message);</span><br><span class="line">	        session.close(<span class="keyword">true</span>);</span><br><span class="line">	    &#125;</span><br><span class="line"></span><br><span class="line">	    <span class="meta">@Override</span></span><br><span class="line">	    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">exceptionCaught</span><span class="params">(IoSession session, Throwable cause)</span> </span>&#123;</span><br><span class="line">	        session.close(<span class="keyword">true</span>);</span><br><span class="line">	    &#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h1 id="UDP连接的例子"><a href="#UDP连接的例子" class="headerlink" title="UDP连接的例子"></a>UDP连接的例子</h1><p>UDP服务端：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UdpServer</span> </span>&#123;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">static</span> <span class="keyword">int</span> PORT = <span class="number">9234</span>;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">		<span class="comment">//创建UDPAcceptor</span></span><br><span class="line">		NioDatagramAcceptor acceptor = <span class="keyword">new</span> NioDatagramAcceptor(<span class="keyword">null</span>);</span><br><span class="line">		<span class="comment">//这次不设置字符解编码器filter，消息直接用Buffer字节流传递</span></span><br><span class="line">		acceptor.getFilterChain().addLast(<span class="string">"logger"</span>, <span class="keyword">new</span> LoggingFilter());</span><br><span class="line">		acceptor.setHandler(<span class="keyword">new</span> UDPHandler());</span><br><span class="line">		acceptor.getSessionConfig().setIdleTime(IdleStatus.BOTH_IDLE, <span class="number">10</span>);</span><br><span class="line">		acceptor.getSessionConfig().setReuseAddress(<span class="keyword">true</span>);<span class="comment">//&lt;span style="font-family: Arial, Helvetica, sans-serif;"&gt;NioDatagramAcceptor 设置为null，才能重复使用端口&lt;/span&gt;</span></span><br><span class="line">		acceptor.bind(<span class="keyword">new</span> InetSocketAddress(PORT));</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">UDPHandler</span> <span class="keyword">extends</span> <span class="title">IoHandlerAdapter</span></span>&#123;</span><br><span class="line">		<span class="meta">@Override</span></span><br><span class="line">		<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">messageReceived</span><span class="params">(IoSession session, Object message)</span></span></span><br><span class="line"><span class="function">				<span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">			IoBuffer buffer = (IoBuffer)message;</span><br><span class="line">			System.out.println(buffer.getLong());</span><br><span class="line">			session.close(<span class="keyword">false</span>);</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="meta">@Override</span></span><br><span class="line">		<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">sessionIdle</span><span class="params">(IoSession session, IdleStatus status)</span></span></span><br><span class="line"><span class="function">				<span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">			System.out.println(<span class="string">"IDLE "</span> + session.getIdleCount(status));</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>UDP客户端：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UdpClient</span> </span>&#123;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">static</span> IoSession session = <span class="keyword">null</span>;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">		NioDatagramConnector connect = <span class="keyword">new</span> NioDatagramConnector();</span><br><span class="line">		connect.setHandler(<span class="keyword">new</span> UDPClientHandler());</span><br><span class="line">		<span class="keyword">try</span>&#123;</span><br><span class="line">			ConnectFuture future = connect.connect(<span class="keyword">new</span> InetSocketAddress(<span class="string">"127.0.0.1"</span>,<span class="number">9234</span>));</span><br><span class="line">			future.awaitUninterruptibly();</span><br><span class="line">			session = future.getSession();</span><br><span class="line">			<span class="comment">//增加连接建立完成后的监听器。</span></span><br><span class="line">			<span class="comment">//若在建立完成后才添加监听器，监听器将马上执行</span></span><br><span class="line">			future.addListener(<span class="keyword">new</span> IoFutureListener&lt;ConnectFuture&gt;()&#123;</span><br><span class="line">	            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">operationComplete</span><span class="params">(ConnectFuture future)</span> </span>&#123;</span><br><span class="line">	                <span class="keyword">if</span>( future.isConnected() )&#123;</span><br><span class="line">	                    <span class="keyword">try</span> &#123;</span><br><span class="line">	                        sendData();</span><br><span class="line">	                    &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">	                        e.printStackTrace();</span><br><span class="line">	                    &#125;</span><br><span class="line">	                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">	                    System.out.println((<span class="string">"Not connected...exiting"</span>));</span><br><span class="line">	                &#125;</span><br><span class="line">	            &#125;</span><br><span class="line">	        &#125;);</span><br><span class="line">		&#125;<span class="keyword">catch</span>(Exception e)&#123;</span><br><span class="line">			</span><br><span class="line">		&#125;<span class="keyword">finally</span>&#123;</span><br><span class="line">			<span class="keyword">if</span>(session!=<span class="keyword">null</span>)&#123;</span><br><span class="line">        	    session.getCloseFuture().awaitUninterruptibly();</span><br><span class="line">        	&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		connect.dispose();</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">sendData</span><span class="params">()</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">        <span class="keyword">long</span> free = Runtime.getRuntime().freeMemory();</span><br><span class="line">        IoBuffer buffer = IoBuffer.allocate(<span class="number">8</span>);</span><br><span class="line">        buffer.putLong(free);</span><br><span class="line">        buffer.flip();</span><br><span class="line">        session.write(buffer);</span><br><span class="line">        <span class="comment">//因为是UDP，客户端需主动关闭连接</span></span><br><span class="line">        session.close(<span class="keyword">false</span>);</span><br><span class="line">    &#125;</span><br><span class="line">	<span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">UDPClientHandler</span> <span class="keyword">extends</span> <span class="title">IoHandlerAdapter</span></span>&#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h1><p>这一节介绍了mina的组件结构和框架体系，用几个案例简单介绍了下mina的使用方法。在日常的开发中，其实已经足够了。</p>
+<p>版权声明：本文为博主原创文章，未经博主允许不得转载。</p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2018-06-27T09:39:57.957Z" itemprop="dateUpdated">2018-06-27 17:39:57</time>
+</span><br>
+
+
+        
+        本文固定链接：<a href="/2016/09/08/mina-study-node2/" target="_blank" rel="external">https://smuwjs.github.io/2016/09/08/mina-study-node2/</a>
+        
+    </div>
+    <footer>
+        <a href="https://smuwjs.github.io">
+            <img src="/img/head.png" alt="Jeeson">
+            Jeeson
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/">Java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/MINA/">MINA</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/09/08/mina-study-node2/&title=《mina学习笔记二：从官方例子开始》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/09/08/mina-study-node2/&title=《mina学习笔记二：从官方例子开始》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/09/08/mina-study-node2/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《mina学习笔记二：从官方例子开始》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/09/08/mina-study-node2/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/09/08/mina-study-node2/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2016/09/08/mina-study-node3/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">mina学习笔记三：一切的源头IoService</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2016/09/08/mina-study-node1/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">mina学习笔记一：mina上路</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="mina-study-node2" data-title="mina学习笔记二：从官方例子开始" data-url="https://smuwjs.github.io/2016/09/08/mina-study-node2/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'smuwjs', theme: 'none'};
+lazyScripts.push('//unpkg.com/hexo-theme-material-indigo@latest/js/embed.min.js');
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循<a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>Jeeson &copy; 2015 - 2018</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/09/08/mina-study-node2/&title=《mina学习笔记二：从官方例子开始》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/09/08/mina-study-node2/&title=《mina学习笔记二：从官方例子开始》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/09/08/mina-study-node2/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《mina学习笔记二：从官方例子开始》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/09/08/mina-study-node2/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/09/08/mina-study-node2/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://smuwjs.github.io/2016/09/08/mina-study-node2/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

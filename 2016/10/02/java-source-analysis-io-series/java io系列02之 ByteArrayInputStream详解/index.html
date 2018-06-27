@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>java io系列02之 ByteArrayInputStream详解 | Jeeson&#39;s Blog | Write the code. Change the world.</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="Java源码分析,Java IO系列">
+    <meta name="description" content="我们以ByteArrayInputStream，拉开对字节类型的“输入流”的学习序幕。本章，我们会先对ByteArrayInputStream进行介绍，然后深入了解一下它的源码，最后通过示例来掌握它的用法。   目录1. ByteArrayInputStream 介绍2. InputStream和ByteArrayInputStream源码分析3. 示例代码      1. ByteArrayI">
+<meta name="keywords" content="Java源码分析,Java IO系列">
+<meta property="og:type" content="article">
+<meta property="og:title" content="java io系列02之 ByteArrayInputStream详解">
+<meta property="og:url" content="https://smuwjs.github.io/2016/10/02/java-source-analysis-io-series/java io系列02之 ByteArrayInputStream详解/index.html">
+<meta property="og:site_name" content="Jeeson&#39;s Blog">
+<meta property="og:description" content="我们以ByteArrayInputStream，拉开对字节类型的“输入流”的学习序幕。本章，我们会先对ByteArrayInputStream进行介绍，然后深入了解一下它的源码，最后通过示例来掌握它的用法。   目录1. ByteArrayInputStream 介绍2. InputStream和ByteArrayInputStream源码分析3. 示例代码      1. ByteArrayI">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-06-27T09:39:57.941Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="java io系列02之 ByteArrayInputStream详解">
+<meta name="twitter:description" content="我们以ByteArrayInputStream，拉开对字节类型的“输入流”的学习序幕。本章，我们会先对ByteArrayInputStream进行介绍，然后深入了解一下它的源码，最后通过示例来掌握它的用法。   目录1. ByteArrayInputStream 介绍2. InputStream和ByteArrayInputStream源码分析3. 示例代码      1. ByteArrayI">
+    
+        <link rel="alternate" type="application/atom+xml" title="Jeeson&#39;s Blog" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/head.png">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Jeeson</h5>
+          <a href="mailto:smuwjs@163.com" title="smuwjs@163.com" class="mail">smuwjs@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/smuwjs" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">java io系列02之 ByteArrayInputStream详解</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">java io系列02之 ByteArrayInputStream详解</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2016-10-01T16:00:00.000Z" itemprop="datePublished" class="page-time">
+  2016-10-02
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#1-ByteArrayInputStream-介绍"><span class="post-toc-number">1.</span> <span class="post-toc-text">1. ByteArrayInputStream 介绍</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#2-InputStream和ByteArrayInputStream源码分析"><span class="post-toc-number">2.</span> <span class="post-toc-text">2. InputStream和ByteArrayInputStream源码分析</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#3-示例代码"><span class="post-toc-number">3.</span> <span class="post-toc-text">3. 示例代码</span></a></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-java-source-analysis-io-series/java io系列02之 ByteArrayInputStream详解"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">java io系列02之 ByteArrayInputStream详解</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2016-10-02 00:00:00" datetime="2016-10-01T16:00:00.000Z"  itemprop="datePublished">2016-10-02</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <blockquote>
+<p>我们以ByteArrayInputStream，拉开对字节类型的“输入流”的学习序幕。<br>本章，我们会先对ByteArrayInputStream进行介绍，然后深入了解一下它的源码，最后通过示例来掌握它的用法。</p>
+</blockquote>
+<blockquote>
+<p><strong>目录</strong><br><a href="#anchor1">1. ByteArrayInputStream 介绍</a><br><a href="#anchor2">2. InputStream和ByteArrayInputStream源码分析</a><br><a href="#anchor3">3. 示例代码</a>   </p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="1-ByteArrayInputStream-介绍"><a href="#1-ByteArrayInputStream-介绍" class="headerlink" title="1. ByteArrayInputStream 介绍"></a>1. ByteArrayInputStream 介绍</h1><p>ByteArrayInputStream 是字节数组输入流。它继承于InputStream。</p>
+<p>它包含一个内部缓冲区，该缓冲区包含从流中读取的字节；通俗点说，它的内部缓冲区就是一个字节数组，而ByteArrayInputStream本质就是通过字节数组来实现的。<br>我们都知道，InputStream通过read()向外提供接口，供它们来读取字节数据；而ByteArrayInputStream 的内部额外的定义了一个计数器，它被用来跟踪 read() 方法要读取的下一个字节。</p>
+<p>InputStream 函数列表</p>
+<pre><code>// 构造函数
+InputStream()
+
+             int     available()
+             void    close()
+             void    mark(int readlimit)
+             boolean markSupported()
+             int     read(byte[] buffer)
+abstract     int     read()
+             int     read(byte[] buffer, int offset, int length)
+synchronized void    reset()
+             long    skip(long byteCount)
+</code></pre><p>ByteArrayInputStream 函数列表</p>
+<pre><code>// 构造函数
+ByteArrayInputStream(byte[] buf)
+ByteArrayInputStream(byte[] buf, int offset, int length)
+
+synchronized int         available()
+             void        close()
+synchronized void        mark(int readlimit)
+             boolean     markSupported()
+synchronized int         read()
+synchronized int         read(byte[] buffer, int offset, int length)
+synchronized void        reset()
+synchronized long        skip(long byteCount)
+</code></pre><p><a name="anchor2"></a></p>
+<h1 id="2-InputStream和ByteArrayInputStream源码分析"><a href="#2-InputStream和ByteArrayInputStream源码分析" class="headerlink" title="2. InputStream和ByteArrayInputStream源码分析"></a>2. InputStream和ByteArrayInputStream源码分析</h1><p>InputStream是ByteArrayInputStream的父类，我们先看看InputStream的源码，然后再学ByteArrayInputStream的源码。</p>
+<p><strong>1. InputStream.java源码分析(基于jdk1.7.40)</strong></p>
+<pre><code>package java.io;
+
+public abstract class InputStream implements Closeable {
+
+    // 能skip的大小
+    private static final int MAX_SKIP_BUFFER_SIZE = 2048;
+
+    // 从输入流中读取数据的下一个字节。
+    public abstract int read() throws IOException;
+
+    // 将数据从输入流读入 byte 数组。
+    public int read(byte b[]) throws IOException {
+        return read(b, 0, b.length);
+    }
+
+    // 将最多 len 个数据字节从此输入流读入 byte 数组。
+    public int read(byte b[], int off, int len) throws IOException {
+        if (b == null) {
+            throw new NullPointerException();
+        } else if (off &lt; 0 || len &lt; 0 || len &gt; b.length - off) {
+            throw new IndexOutOfBoundsException();
+        } else if (len == 0) {
+            return 0;
+        }
+
+        int c = read();
+        if (c == -1) {
+            return -1;
+        }
+        b[off] = (byte)c;
+
+        int i = 1;
+        try {
+            for (; i &lt; len ; i++) {
+                c = read();
+                if (c == -1) {
+                    break;
+                }
+                b[off + i] = (byte)c;
+            }
+        } catch (IOException ee) {
+        }
+        return i;
+    }
+
+    // 跳过输入流中的n个字节
+    public long skip(long n) throws IOException {
+
+        long remaining = n;
+        int nr;
+
+        if (n &lt;= 0) {
+            return 0;
+        }
+
+        int size = (int)Math.min(MAX_SKIP_BUFFER_SIZE, remaining);
+        byte[] skipBuffer = new byte[size];
+        while (remaining &gt; 0) {
+            nr = read(skipBuffer, 0, (int)Math.min(size, remaining));
+            if (nr &lt; 0) {
+                break;
+            }
+            remaining -= nr;
+        }
+
+        return n - remaining;
+    }
+
+    public int available() throws IOException {
+        return 0;
+    }
+
+    public void close() throws IOException {}
+
+    public synchronized void mark(int readlimit) {}
+
+    public synchronized void reset() throws IOException {
+        throw new IOException(&quot;mark/reset not supported&quot;);
+    }
+
+    public boolean markSupported() {
+        return false;
+    }
+}
+</code></pre><p><strong>2. ByteArrayInputStream.java源码分析(基于jdk1.7.40)</strong></p>
+<pre><code>package java.io;
+
+public class ByteArrayInputStream extends InputStream {
+
+    // 保存字节输入流数据的字节数组
+    protected byte buf[];
+
+    // 下一个会被读取的字节的索引
+    protected int pos;
+
+    // 标记的索引
+    protected int mark = 0;
+
+    // 字节流的长度
+    protected int count;
+
+    // 构造函数：创建一个内容为buf的字节流
+    public ByteArrayInputStream(byte buf[]) {
+        // 初始化“字节流对应的字节数组为buf”
+        this.buf = buf;
+        // 初始化“下一个要被读取的字节索引号为0”
+        this.pos = 0;
+        // 初始化“字节流的长度为buf的长度”
+        this.count = buf.length;
+    }
+
+    // 构造函数：创建一个内容为buf的字节流，并且是从offset开始读取数据，读取的长度为length
+    public ByteArrayInputStream(byte buf[], int offset, int length) {
+        // 初始化“字节流对应的字节数组为buf”
+        this.buf = buf;
+        // 初始化“下一个要被读取的字节索引号为offset”
+        this.pos = offset;
+        // 初始化“字节流的长度”
+        this.count = Math.min(offset + length, buf.length);
+        // 初始化“标记的字节流读取位置”
+        this.mark = offset;
+    }
+
+    // 读取下一个字节
+    public synchronized int read() {
+        return (pos &lt; count) ? (buf[pos++] &amp; 0xff) : -1;
+    }
+
+    // 将“字节流的数据写入到字节数组b中”
+    // off是“字节数组b的偏移地址”，表示从数组b的off开始写入数据
+    // len是“写入的字节长度”
+    public synchronized int read(byte b[], int off, int len) {
+        if (b == null) {
+            throw new NullPointerException();
+        } else if (off &lt; 0 || len &lt; 0 || len &gt; b.length - off) {
+            throw new IndexOutOfBoundsException();
+        }
+
+        if (pos &gt;= count) {
+            return -1;
+        }
+
+        int avail = count - pos;
+        if (len &gt; avail) {
+            len = avail;
+        }
+        if (len &lt;= 0) {
+            return 0;
+        }
+        System.arraycopy(buf, pos, b, off, len);
+        pos += len;
+        return len;
+    }
+
+    // 跳过“字节流”中的n个字节。
+    public synchronized long skip(long n) {
+        long k = count - pos;
+        if (n &lt; k) {
+            k = n &lt; 0 ? 0 : n;
+        }
+
+        pos += k;
+        return k;
+    }
+
+    // “能否读取字节流的下一个字节”
+    public synchronized int available() {
+        return count - pos;
+    }
+
+    // 是否支持“标签”
+    public boolean markSupported() {
+        return true;
+    }
+
+    // 保存当前位置。readAheadLimit在此处没有任何实际意义
+    public void mark(int readAheadLimit) {
+        mark = pos;
+    }
+
+    // 重置“字节流的读取索引”为“mark所标记的位置”
+    public synchronized void reset() {
+        pos = mark;
+    }
+
+    public void close() throws IOException {
+    }
+}
+</code></pre><p>说明：<br>ByteArrayInputStream实际上是通过“字节数组”去保存数据。<br>(01) 通过ByteArrayInputStream(byte buf[]) 或 ByteArrayInputStream(byte buf[], int offset, int length) ，我们可以根据buf数组来创建字节流对象。<br>(02) read()的作用是从字节流中“读取下一个字节”。<br>(03) read(byte[] buffer, int offset, int length)的作用是从字节流读取字节数据，并写入到字节数组buffer中。offset是将字节写入到buffer的起始位置，length是写入的字节的长度。<br>(04) markSupported()是判断字节流是否支持“标记功能”。它一直返回true。<br>(05) mark(int readlimit)的作用是记录标记位置。记录标记位置之后，某一时刻调用reset()则将“字节流下一个被读取的位置”重置到“mark(int readlimit)所标记的位置”；也就是说，reset()之后再读取字节流时，是从mark(int readlimit)所标记的位置开始读取。</p>
+<p><a name="anchor3"></a></p>
+<h1 id="3-示例代码"><a href="#3-示例代码" class="headerlink" title="3. 示例代码"></a>3. 示例代码</h1><p>关于ByteArrayInputStream中API的详细用法，参考示例代码(ByteArrayInputStreamTest.java)：</p>
+<pre><code>import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+
+/**
+ * ByteArrayInputStream 测试程序
+ *
+ * @author skywang
+ */
+public class ByteArrayInputStreamTest {
+
+    private static final int LEN = 5;
+    // 对应英文字母“abcddefghijklmnopqrsttuvwxyz”
+    private static final byte[] ArrayLetters = {
+        0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67, 0x68, 0x69, 0x6A, 0x6B, 0x6C, 0x6D, 0x6E, 0x6F,
+        0x70, 0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77, 0x78, 0x79, 0x7A
+    };
+
+    public static void main(String[] args) {
+        String tmp = new String(ArrayLetters);
+        System.out.println(&quot;ArrayLetters=&quot;+tmp);
+
+        tesByteArrayInputStream() ;
+    }
+
+    /**
+     * ByteArrayInputStream的API测试函数
+     */
+    private static void tesByteArrayInputStream() {
+        // 创建ByteArrayInputStream字节流，内容是ArrayLetters数组
+        ByteArrayInputStream bais = new ByteArrayInputStream(ArrayLetters);
+
+        // 从字节流中读取5个字节
+        for (int i=0; i&lt;LEN; i++) {
+            // 若能继续读取下一个字节，则读取下一个字节
+            if (bais.available() &gt;= 0) {
+                // 读取“字节流的下一个字节”
+                int tmp = bais.read();
+                System.out.printf(&quot;%d : 0x%s\n&quot;, i, Integer.toHexString(tmp));
+            }
+        }
+
+        // 若“该字节流”不支持标记功能，则直接退出
+        if (!bais.markSupported()) {
+            System.out.println(&quot;make not supported!&quot;);
+            return ;
+        }
+
+        // 标记“字节流中下一个被读取的位置”。即--标记“0x66”，因为因为前面已经读取了5个字节，所以下一个被读取的位置是第6个字节”
+        // (01), ByteArrayInputStream类的mark(0)函数中的“参数0”是没有实际意义的。
+        // (02), mark()与reset()是配套的，reset()会将“字节流中下一个被读取的位置”重置为“mark()中所保存的位置”
+        bais.mark(0);
+
+        // 跳过5个字节。跳过5个字节后，字节流中下一个被读取的值应该是“0x6B”。
+        bais.skip(5);
+
+        // 从字节流中读取5个数据。即读取“0x6B, 0x6C, 0x6D, 0x6E, 0x6F”
+        byte[] buf = new byte[LEN];
+        bais.read(buf, 0, LEN);
+        // 将buf转换为String字符串。“0x6B, 0x6C, 0x6D, 0x6E, 0x6F”对应字符是“klmno”
+        String str1 = new String(buf);
+        System.out.printf(&quot;str1=%s\n&quot;, str1);
+
+        // 重置“字节流”：即，将“字节流中下一个被读取的位置”重置到“mark()所标记的位置”，即0x66。
+        bais.reset();
+        // 从“重置后的字节流”中读取5个字节到buf中。即读取“0x66, 0x67, 0x68, 0x69, 0x6A”
+        bais.read(buf, 0, LEN);
+        // 将buf转换为String字符串。“0x66, 0x67, 0x68, 0x69, 0x6A”对应字符是“fghij”
+        String str2 = new String(buf);
+        System.out.printf(&quot;str2=%s\n&quot;, str2);
+    }
+}
+</code></pre><p>运行结果：</p>
+<pre><code>ArrayLetters=abcdefghijklmnopqrstuvwxyz
+0 : 0x61
+1 : 0x62
+2 : 0x63
+3 : 0x64
+4 : 0x65
+str1=klmno
+str2=fghij
+</code></pre><p>结果说明：</p>
+<p>(01) ArrayLetters 是字节数组。0x61对应的ASCII码值是a，0x62对应的ASCII码值是b，依次类推…<br>(02) ByteArrayInputStream bais = new ByteArrayInputStream(ArrayLetters); 这句话是创建“字节流bais”，它的内容就是ArrayLetters。<br>(03) for (int i=0; i&lt;LEN; i++) ; 这个for循环的作用就是从字节流中读取5个字节。每次调用bais.read()就从字节流中读取一个字节。<br>(04) bais.mark(0); 这句话就是“设置字节流的标记”，此时标记的位置对应的值是0x66。<br>(05) bais.skip(5); 这句话是跳过5个字节。跳过5个字节后，对应的字节流中下一个被读取的字节的值是0x6B。<br>(06) bais.read(buf, 0, LEN); 这句话是“从字节流中读取LEN个数据写入到buf中，0表示从buf的第0个位置开始写入”。<br>(07) bais.reset(); 这句话是将“字节流中下一个被读取的位置”重置到“mark()所标记的位置”，即0x66。  </p>
+<p>学完了ByteArrayInputStream输入流。下面，我们学习与之对应的输出流ByteArrayOutputStream。</p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2018-06-27T09:39:57.941Z" itemprop="dateUpdated">2018-06-27 17:39:57</time>
+</span><br>
+
+
+        
+        本文固定链接：<a href="/2016/10/02/java-source-analysis-io-series/java io系列02之 ByteArrayInputStream详解/" target="_blank" rel="external">https://smuwjs.github.io/2016/10/02/java-source-analysis-io-series/java io系列02之 ByteArrayInputStream详解/</a>
+        
+    </div>
+    <footer>
+        <a href="https://smuwjs.github.io">
+            <img src="/img/head.png" alt="Jeeson">
+            Jeeson
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java-IO系列/">Java IO系列</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java源码分析/">Java源码分析</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/10/02/java-source-analysis-io-series/java io系列02之 ByteArrayInputStream详解/&title=《java io系列02之 ByteArrayInputStream详解》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/10/02/java-source-analysis-io-series/java io系列02之 ByteArrayInputStream详解/&title=《java io系列02之 ByteArrayInputStream详解》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/10/02/java-source-analysis-io-series/java io系列02之 ByteArrayInputStream详解/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《java io系列02之 ByteArrayInputStream详解》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/10/02/java-source-analysis-io-series/java io系列02之 ByteArrayInputStream详解/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/10/02/java-source-analysis-io-series/java io系列02之 ByteArrayInputStream详解/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2016/10/03/java-source-analysis-io-series/java io系列03之 ByteArrayOutputStream详解/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">java io系列03之 ByteArrayOutputStream详解</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2016/10/01/java-source-analysis-io-series/java io系列01之 IO框架/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">java io系列01之 IO框架</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="java-source-analysis-io-series/java io系列02之 ByteArrayInputStream详解" data-title="java io系列02之 ByteArrayInputStream详解" data-url="https://smuwjs.github.io/2016/10/02/java-source-analysis-io-series/java io系列02之 ByteArrayInputStream详解/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'smuwjs', theme: 'none'};
+lazyScripts.push('//unpkg.com/hexo-theme-material-indigo@latest/js/embed.min.js');
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循<a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>Jeeson &copy; 2015 - 2018</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/10/02/java-source-analysis-io-series/java io系列02之 ByteArrayInputStream详解/&title=《java io系列02之 ByteArrayInputStream详解》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/10/02/java-source-analysis-io-series/java io系列02之 ByteArrayInputStream详解/&title=《java io系列02之 ByteArrayInputStream详解》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/10/02/java-source-analysis-io-series/java io系列02之 ByteArrayInputStream详解/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《java io系列02之 ByteArrayInputStream详解》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/10/02/java-source-analysis-io-series/java io系列02之 ByteArrayInputStream详解/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/10/02/java-source-analysis-io-series/java io系列02之 ByteArrayInputStream详解/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://smuwjs.github.io/2016/10/02/java-source-analysis-io-series/java io系列02之 ByteArrayInputStream详解/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

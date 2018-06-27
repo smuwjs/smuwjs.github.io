@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>Java 集合系列08之 List总结 | Jeeson&#39;s Blog | Write the code. Change the world.</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="Java源码分析,Java 集合系列">
+    <meta name="description" content="List 总结先回顾一下List的框架图                                                                                                             List 是一个接口，它继承于Collection的接口。它代表着有序的队列。  AbstractList 是一个抽象类，它继承于Abstra">
+<meta name="keywords" content="Java源码分析,Java 集合系列">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java 集合系列08之 List总结">
+<meta property="og:url" content="https://smuwjs.github.io/2016/12/08/java-source-analysis-set-series/Java 集合系列08之 List总结/index.html">
+<meta property="og:site_name" content="Jeeson&#39;s Blog">
+<meta property="og:description" content="List 总结先回顾一下List的框架图                                                                                                             List 是一个接口，它继承于Collection的接口。它代表着有序的队列。  AbstractList 是一个抽象类，它继承于Abstra">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://oov0wb0gl.bkt.clouddn.com/2017-06-06-14955300758588.jpg">
+<meta property="og:updated_time" content="2018-06-27T09:39:57.953Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java 集合系列08之 List总结">
+<meta name="twitter:description" content="List 总结先回顾一下List的框架图                                                                                                             List 是一个接口，它继承于Collection的接口。它代表着有序的队列。  AbstractList 是一个抽象类，它继承于Abstra">
+<meta name="twitter:image" content="http://oov0wb0gl.bkt.clouddn.com/2017-06-06-14955300758588.jpg">
+    
+        <link rel="alternate" type="application/atom+xml" title="Jeeson&#39;s Blog" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/head.png">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Jeeson</h5>
+          <a href="mailto:smuwjs@163.com" title="smuwjs@163.com" class="mail">smuwjs@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/smuwjs" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Java 集合系列08之 List总结</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Java 集合系列08之 List总结</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2016-12-07T16:00:00.000Z" itemprop="datePublished" class="page-time">
+  2016-12-08
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#List-总结"><span class="post-toc-number">1.</span> <span class="post-toc-text">List 总结</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#List使用场景"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">List使用场景</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#LinkedList和ArrayList性能差异分析"><span class="post-toc-number">2.</span> <span class="post-toc-text">LinkedList和ArrayList性能差异分析</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#为什么LinkedList中插入元素很快，而ArrayList中插入元素很慢！"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">为什么LinkedList中插入元素很快，而ArrayList中插入元素很慢！</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#为什么LinkedList中随机访问很慢，而ArrayList中随机访问很快"><span class="post-toc-number">2.1.1.</span> <span class="post-toc-text">为什么LinkedList中随机访问很慢，而ArrayList中随机访问很快</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#Vector和ArrayList比较"><span class="post-toc-number">3.</span> <span class="post-toc-text">Vector和ArrayList比较</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#相同之处"><span class="post-toc-number">3.1.</span> <span class="post-toc-text">相同之处</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#它们都是List"><span class="post-toc-number">3.1.1.</span> <span class="post-toc-text">它们都是List</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#它们都实现了RandomAccess和Cloneable接口"><span class="post-toc-number">3.1.2.</span> <span class="post-toc-text">它们都实现了RandomAccess和Cloneable接口</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#它们都是通过数组实现的，本质上都是动态数组"><span class="post-toc-number">3.1.3.</span> <span class="post-toc-text">它们都是通过数组实现的，本质上都是动态数组</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#它们的默认数组容量是10"><span class="post-toc-number">3.1.4.</span> <span class="post-toc-text">它们的默认数组容量是10</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#它们都支持Iterator和listIterator遍历"><span class="post-toc-number">3.1.5.</span> <span class="post-toc-text">它们都支持Iterator和listIterator遍历</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#不同之处"><span class="post-toc-number">3.2.</span> <span class="post-toc-text">不同之处</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#线程安全性不一样"><span class="post-toc-number">3.2.1.</span> <span class="post-toc-text">线程安全性不一样</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#对序列化支持不同"><span class="post-toc-number">3.2.2.</span> <span class="post-toc-text">对序列化支持不同</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#构造函数个数不同"><span class="post-toc-number">3.2.3.</span> <span class="post-toc-text">构造函数个数不同</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#4、容量增加方式不同"><span class="post-toc-number">3.2.4.</span> <span class="post-toc-text">4、容量增加方式不同</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#5、对Enumeration的支持不同。Vector支持通过Enumeration去遍历，而List不支持"><span class="post-toc-number">3.2.5.</span> <span class="post-toc-text">5、对Enumeration的支持不同。Vector支持通过Enumeration去遍历，而List不支持</span></a></li></ol></li></ol></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-java-source-analysis-set-series/Java 集合系列08之 List总结"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Java 集合系列08之 List总结</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2016-12-08 00:00:00" datetime="2016-12-07T16:00:00.000Z"  itemprop="datePublished">2016-12-08</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h1 id="List-总结"><a href="#List-总结" class="headerlink" title="List 总结"></a>List 总结</h1><p>先回顾一下List的框架图</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://oov0wb0gl.bkt.clouddn.com/2017-06-06-14955300758588.jpg" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<ol>
+<li><p>List 是一个接口，它继承于Collection的接口。它代表着有序的队列。</p>
+</li>
+<li><p>AbstractList 是一个抽象类，它继承于AbstractCollection。AbstractList实现List接口中除size()、get(int location)之外的函数。</p>
+</li>
+<li><p>AbstractSequentialList 是一个抽象类，它继承于AbstractList。AbstractSequentialList 实现了“链表中，根据index索引值操作链表的全部函数”。</p>
+</li>
+<li><p>ArrayList, LinkedList, Vector, Stack是List的4个实现类。</p>
+<pre><code>1. ArrayList 是一个数组队列，相当于动态数组。它由数组实现，随机访问效率高，随机插入、随机删除效率低。
+2. LinkedList 是一个双向链表。它也可以被当作堆栈、队列或双端队列进行操作。LinkedList随机访问效率低，但随机插入、随机删除效率高。
+3. Vector 是矢量队列，和ArrayList一样，它也是一个动态数组，由数组实现。但是ArrayList是非线程安全的，而Vector是线程安全的。
+4. Stack 是栈，它继承于Vector。它的特性是：先进后出(FILO, First In Last Out)。
+</code></pre></li>
+</ol>
+<h2 id="List使用场景"><a href="#List使用场景" class="headerlink" title="List使用场景"></a>List使用场景</h2><p>学东西的最终目的是为了能够理解、使用它。下面先概括的说明一下各个List的使用场景，后面再分析原因。</p>
+<p>如果涉及到“栈”、“队列”、“链表”等操作，应该考虑用List，具体的选择哪个List，根据下面的标准来取舍。</p>
+<ol>
+<li>对于需要快速插入，删除元素，应该使用LinkedList。</li>
+<li>对于需要快速随机访问元素，应该使用ArrayList。</li>
+<li>对于“单线程环境” 或者 “多线程环境，但List仅仅只会被单个线程操作”，此时应该使用非同步的类(如ArrayList)。</li>
+<li>对于“多线程环境，且List可能同时被多个线程操作”，此时，应该使用同步的类(如Vector)。</li>
+</ol>
+<p>通过下面的测试程序，我们来验证上面的(01)和(02)结论。参考代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.*;</span><br><span class="line"><span class="keyword">import</span> java.lang.Class;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * @desc 对比ArrayList和LinkedList的插入、随机读取效率、删除的效率</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ListCompareTest</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> COUNT = <span class="number">100000</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> LinkedList linkedList = <span class="keyword">new</span> LinkedList();</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> ArrayList arrayList = <span class="keyword">new</span> ArrayList();</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Vector vector = <span class="keyword">new</span> Vector();</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Stack stack = <span class="keyword">new</span> Stack();</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 换行符</span></span><br><span class="line">        System.out.println();</span><br><span class="line">        <span class="comment">// 插入</span></span><br><span class="line">        insertByPosition(stack) ;</span><br><span class="line">        insertByPosition(vector) ;</span><br><span class="line">        insertByPosition(linkedList) ;</span><br><span class="line">        insertByPosition(arrayList) ;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 换行符</span></span><br><span class="line">        System.out.println();</span><br><span class="line">        <span class="comment">// 随机读取</span></span><br><span class="line">        readByPosition(stack);</span><br><span class="line">        readByPosition(vector);</span><br><span class="line">        readByPosition(linkedList);</span><br><span class="line">        readByPosition(arrayList);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 换行符</span></span><br><span class="line">        System.out.println();</span><br><span class="line">        <span class="comment">// 删除 </span></span><br><span class="line">        deleteByPosition(stack);</span><br><span class="line">        deleteByPosition(vector);</span><br><span class="line">        deleteByPosition(linkedList);</span><br><span class="line">        deleteByPosition(arrayList);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取list的名称</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> String <span class="title">getListName</span><span class="params">(List list)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (list <span class="keyword">instanceof</span> LinkedList) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="string">"LinkedList"</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (list <span class="keyword">instanceof</span> ArrayList) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="string">"ArrayList"</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (list <span class="keyword">instanceof</span> Stack) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="string">"Stack"</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (list <span class="keyword">instanceof</span> Vector) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="string">"Vector"</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="string">"List"</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 向list的指定位置插入COUNT个元素，并统计时间</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">insertByPosition</span><span class="params">(List list)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">long</span> startTime = System.currentTimeMillis();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 向list的位置0插入COUNT个数</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>; i&lt;COUNT; i++)</span><br><span class="line">            list.add(<span class="number">0</span>, i);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">long</span> endTime = System.currentTimeMillis();</span><br><span class="line">        <span class="keyword">long</span> interval = endTime - startTime;</span><br><span class="line">        System.out.println(getListName(list) + <span class="string">" : insert "</span>+COUNT+<span class="string">" elements into the 1st position use time："</span> + interval+<span class="string">" ms"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 从list的指定位置删除COUNT个元素，并统计时间</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">deleteByPosition</span><span class="params">(List list)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">long</span> startTime = System.currentTimeMillis();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 删除list第一个位置元素</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>; i&lt;COUNT; i++)</span><br><span class="line">            list.remove(<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">long</span> endTime = System.currentTimeMillis();</span><br><span class="line">        <span class="keyword">long</span> interval = endTime - startTime;</span><br><span class="line">        System.out.println(getListName(list) + <span class="string">" : delete "</span>+COUNT+<span class="string">" elements from the 1st position use time："</span> + interval+<span class="string">" ms"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 根据position，不断从list中读取元素，并统计时间</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">readByPosition</span><span class="params">(List list)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">long</span> startTime = System.currentTimeMillis();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 读取list元素</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>; i&lt;COUNT; i++)</span><br><span class="line">            list.get(i);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">long</span> endTime = System.currentTimeMillis();</span><br><span class="line">        <span class="keyword">long</span> interval = endTime - startTime;</span><br><span class="line">        System.out.println(getListName(list) + <span class="string">" : read "</span>+COUNT+<span class="string">" elements by position use time："</span> + interval+<span class="string">" ms"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>运行结果如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">Stack : insert <span class="number">100000</span> elements into the <span class="number">1</span>st position use time：<span class="number">1640</span> ms</span><br><span class="line">Vector : insert <span class="number">100000</span> elements into the <span class="number">1</span>st position use time：<span class="number">1607</span> ms</span><br><span class="line">LinkedList : insert <span class="number">100000</span> elements into the <span class="number">1</span>st position use time：<span class="number">29</span> ms</span><br><span class="line">ArrayList : insert <span class="number">100000</span> elements into the <span class="number">1</span>st position use time：<span class="number">1617</span> ms</span><br><span class="line"></span><br><span class="line">Stack : read <span class="number">100000</span> elements by position use time：<span class="number">9</span> ms</span><br><span class="line">Vector : read <span class="number">100000</span> elements by position use time：<span class="number">6</span> ms</span><br><span class="line">LinkedList : read <span class="number">100000</span> elements by position use time：<span class="number">10809</span> ms</span><br><span class="line">ArrayList : read <span class="number">100000</span> elements by position use time：<span class="number">5</span> ms</span><br><span class="line"></span><br><span class="line">Stack : delete <span class="number">100000</span> elements from the <span class="number">1</span>st position use time：<span class="number">1916</span> ms</span><br><span class="line">Vector : delete <span class="number">100000</span> elements from the <span class="number">1</span>st position use time：<span class="number">1910</span> ms</span><br><span class="line">LinkedList : delete <span class="number">100000</span> elements from the <span class="number">1</span>st position use time：<span class="number">15</span> ms</span><br><span class="line">ArrayList : delete <span class="number">100000</span> elements from the <span class="number">1</span>st position use time：<span class="number">1909</span> ms</span><br></pre></td></tr></table></figure>
+<p>从中，我们可以发现：<br>插入10万个元素，LinkedList所花时间最短：29ms。<br>删除10万个元素，LinkedList所花时间最短：15ms。<br>遍历10万个元素，LinkedList所花时间最长：10809 ms；而ArrayList、Stack和Vector则相差不多，都只用了几秒。</p>
+<h1 id="LinkedList和ArrayList性能差异分析"><a href="#LinkedList和ArrayList性能差异分析" class="headerlink" title="LinkedList和ArrayList性能差异分析"></a>LinkedList和ArrayList性能差异分析</h1><h2 id="为什么LinkedList中插入元素很快，而ArrayList中插入元素很慢！"><a href="#为什么LinkedList中插入元素很快，而ArrayList中插入元素很慢！" class="headerlink" title="为什么LinkedList中插入元素很快，而ArrayList中插入元素很慢！"></a>为什么LinkedList中插入元素很快，而ArrayList中插入元素很慢！</h2><p><code>LinkedList.java</code>中向指定位置插入元素的代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 在index前添加节点，且节点的值为element</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">add</span><span class="params">(<span class="keyword">int</span> index, E element)</span> </span>&#123;</span><br><span class="line">    addBefore(element, (index==size ? header : entry(index)));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 获取双向链表中指定位置的节点</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> Entry&lt;E&gt; <span class="title">entry</span><span class="params">(<span class="keyword">int</span> index)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (index &lt; <span class="number">0</span> || index &gt;= size)</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> IndexOutOfBoundsException(<span class="string">"Index: "</span>+index+</span><br><span class="line">                                            <span class="string">", Size: "</span>+size);</span><br><span class="line">    Entry&lt;E&gt; e = header;</span><br><span class="line">    <span class="comment">// 获取index处的节点。</span></span><br><span class="line">    <span class="comment">// 若index &lt; 双向链表长度的1/2,则从前向后查找;</span></span><br><span class="line">    <span class="comment">// 否则，从后向前查找。</span></span><br><span class="line">    <span class="keyword">if</span> (index &lt; (size &gt;&gt; <span class="number">1</span>)) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt;= index; i++)</span><br><span class="line">            e = e.next;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = size; i &gt; index; i--)</span><br><span class="line">            e = e.previous;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> e;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 将节点(节点数据是e)添加到entry节点之前。</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> Entry&lt;E&gt; <span class="title">addBefore</span><span class="params">(E e, Entry&lt;E&gt; entry)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 新建节点newEntry，将newEntry插入到节点e之前；并且设置newEntry的数据是e</span></span><br><span class="line">    Entry&lt;E&gt; newEntry = <span class="keyword">new</span> Entry&lt;E&gt;(e, entry, entry.previous);</span><br><span class="line">    <span class="comment">// 插入newEntry到链表中</span></span><br><span class="line">    newEntry.previous.next = newEntry;</span><br><span class="line">    newEntry.next.previous = newEntry;</span><br><span class="line">    size++;</span><br><span class="line">    modCount++;</span><br><span class="line">    <span class="keyword">return</span> newEntry;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>从中，我们可以看出：通过<code>add(int index, E element)</code>向LinkedList插入元素时。先是在双向链表中找到要插入节点的位置index；找到之后，再插入一个新节点。</p>
+<p>双向链表查找index位置的节点时，有一个加速动作：若index &lt; 双向链表长度的1/2，则从前向后查找; 否则，从后向前查找。</p>
+<p>接着，我们看看ArrayList.java中向指定位置插入元素的代码。如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 将e添加到ArrayList的指定位置</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">add</span><span class="params">(<span class="keyword">int</span> index, E element)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (index &gt; size || index &lt; <span class="number">0</span>)</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> IndexOutOfBoundsException(</span><br><span class="line">        <span class="string">"Index: "</span>+index+<span class="string">", Size: "</span>+size);</span><br><span class="line"></span><br><span class="line">    ensureCapacity(size+<span class="number">1</span>);  <span class="comment">// Increments modCount!!</span></span><br><span class="line">    System.arraycopy(elementData, index, elementData, index + <span class="number">1</span>,</span><br><span class="line">         size - index);</span><br><span class="line">    elementData[index] = element;</span><br><span class="line">    size++;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>耗时的操作是 :</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">System.arraycopy(elementData, index, elementData, index + <span class="number">1</span>, size - index);</span><br></pre></td></tr></table></figure>
+<p>Sun JDK包的java/lang/System.java中的arraycopy()声明如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">native</span> <span class="keyword">void</span> <span class="title">arraycopy</span><span class="params">(Object src, <span class="keyword">int</span> srcPos, Object dest, <span class="keyword">int</span> destPos, <span class="keyword">int</span> length)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>arraycopy()是个JNI函数，它是在JVM中实现的。sunJDK中看不到源码，不过可以在OpenJDK包中看到的源码。网上有对arraycopy()的分析说明，请参考：System.arraycopy源码分析 。</p>
+<p>实际上，我们只需要了解： </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">System.arraycopy(elementData, index, elementData, index + <span class="number">1</span>, size - index);</span><br></pre></td></tr></table></figure>
+<p>会移动index之后所有元素即可。这就意味着，<code>ArrayList的add(int index, E element)</code>函数，会引起index之后所有元素的改变！</p>
+<p>通过上面的分析，我们就能理解为什么LinkedList中插入元素很快，而ArrayList中插入元素很慢。</p>
+<p>“删除元素”与“插入元素”的原理类似，这里就不再过多说明。</p>
+<h3 id="为什么LinkedList中随机访问很慢，而ArrayList中随机访问很快"><a href="#为什么LinkedList中随机访问很慢，而ArrayList中随机访问很快" class="headerlink" title="为什么LinkedList中随机访问很慢，而ArrayList中随机访问很快"></a>为什么LinkedList中随机访问很慢，而ArrayList中随机访问很快</h3><p>先看看LinkedList随机访问的代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 返回LinkedList指定位置的元素</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> E <span class="title">get</span><span class="params">(<span class="keyword">int</span> index)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> entry(index).element;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 获取双向链表中指定位置的节点</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> Entry&lt;E&gt; <span class="title">entry</span><span class="params">(<span class="keyword">int</span> index)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (index &lt; <span class="number">0</span> || index &gt;= size)</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> IndexOutOfBoundsException(<span class="string">"Index: "</span>+index+</span><br><span class="line">                                            <span class="string">", Size: "</span>+size);</span><br><span class="line">    Entry&lt;E&gt; e = header;</span><br><span class="line">    <span class="comment">// 获取index处的节点。</span></span><br><span class="line">    <span class="comment">// 若index &lt; 双向链表长度的1/2,则从前先后查找;</span></span><br><span class="line">    <span class="comment">// 否则，从后向前查找。</span></span><br><span class="line">    <span class="keyword">if</span> (index &lt; (size &gt;&gt; <span class="number">1</span>)) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt;= index; i++)</span><br><span class="line">            e = e.next;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = size; i &gt; index; i--)</span><br><span class="line">            e = e.previous;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> e;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>从中，我们可以看出：通过get(int index)获取LinkedList第index个元素时。先是在双向链表中找到要index位置的元素；找到之后再返回。<br>双向链表查找index位置的节点时，有一个加速动作：若index &lt; 双向链表长度的1/2，则从前向后查找; 否则，从后向前查找。</p>
+<p>下面看看ArrayList随机访问的代码 </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 获取index位置的元素值</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> E <span class="title">get</span><span class="params">(<span class="keyword">int</span> index)</span> </span>&#123;</span><br><span class="line">    RangeCheck(index);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> (E) elementData[index];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">RangeCheck</span><span class="params">(<span class="keyword">int</span> index)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (index &gt;= size)</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> IndexOutOfBoundsException(</span><br><span class="line">        <span class="string">"Index: "</span>+index+<span class="string">", Size: "</span>+size);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>从中，我们可以看出：通过get(int index)获取ArrayList第index个元素时。直接返回数组中index位置的元素，而不需要像LinkedList一样进行查找。</p>
+<h1 id="Vector和ArrayList比较"><a href="#Vector和ArrayList比较" class="headerlink" title="Vector和ArrayList比较"></a>Vector和ArrayList比较</h1><h2 id="相同之处"><a href="#相同之处" class="headerlink" title="相同之处"></a>相同之处</h2><h3 id="它们都是List"><a href="#它们都是List" class="headerlink" title="它们都是List"></a>它们都是List</h3><p>它们都继承于AbstractList，并且实现List接口。<br>ArrayList和Vector的类定义如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ArrayList的定义</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ArrayList</span>&lt;<span class="title">E</span>&gt; <span class="keyword">extends</span> <span class="title">AbstractList</span>&lt;<span class="title">E</span>&gt;</span></span><br><span class="line"><span class="class">        <span class="keyword">implements</span> <span class="title">List</span>&lt;<span class="title">E</span>&gt;, <span class="title">RandomAccess</span>, <span class="title">Cloneable</span>, <span class="title">java</span>.<span class="title">io</span>.<span class="title">Serializable</span></span></span><br><span class="line"><span class="class"></span></span><br><span class="line"><span class="class">// <span class="title">Vector</span>的定义</span></span><br><span class="line"><span class="class"><span class="title">public</span> <span class="title">class</span> <span class="title">Vector</span>&lt;<span class="title">E</span>&gt; <span class="keyword">extends</span> <span class="title">AbstractList</span>&lt;<span class="title">E</span>&gt;</span></span><br><span class="line"><span class="class">    <span class="keyword">implements</span> <span class="title">List</span>&lt;<span class="title">E</span>&gt;, <span class="title">RandomAccess</span>, <span class="title">Cloneable</span>, <span class="title">java</span>.<span class="title">io</span>.<span class="title">Serializable</span> </span>&#123;&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="它们都实现了RandomAccess和Cloneable接口"><a href="#它们都实现了RandomAccess和Cloneable接口" class="headerlink" title="它们都实现了RandomAccess和Cloneable接口"></a>它们都实现了RandomAccess和Cloneable接口</h3><p>   实现RandomAccess接口，意味着它们都支持快速随机访问；<br>   实现Cloneable接口，意味着它们能克隆自己。</p>
+<h3 id="它们都是通过数组实现的，本质上都是动态数组"><a href="#它们都是通过数组实现的，本质上都是动态数组" class="headerlink" title="它们都是通过数组实现的，本质上都是动态数组"></a>它们都是通过数组实现的，本质上都是动态数组</h3><p>ArrayList.java中定义数组elementData用于保存元素</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 保存ArrayList中数据的数组</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">transient</span> Object[] elementData;</span><br><span class="line">Vector.java中也定义了数组elementData用于保存元素</span><br><span class="line"></span><br><span class="line"><span class="comment">// 保存Vector中数据的数组</span></span><br><span class="line"><span class="keyword">protected</span> Object[] elementData;</span><br></pre></td></tr></table></figure>
+<h3 id="它们的默认数组容量是10"><a href="#它们的默认数组容量是10" class="headerlink" title="它们的默认数组容量是10"></a>它们的默认数组容量是10</h3><p>若创建ArrayList或Vector时，没指定容量大小；则使用默认容量大小10。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ArrayList构造函数。默认容量是10。</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">ArrayList</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>(<span class="number">10</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Vector构造函数。默认容量是10。</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">Vector</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>(<span class="number">10</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="它们都支持Iterator和listIterator遍历"><a href="#它们都支持Iterator和listIterator遍历" class="headerlink" title="它们都支持Iterator和listIterator遍历"></a>它们都支持Iterator和listIterator遍历</h3><p>它们都继承于AbstractList，而AbstractList中分别实现了 “iterator()接口返回Iterator迭代器” 和 “listIterator()返回ListIterator迭代器”。</p>
+<h2 id="不同之处"><a href="#不同之处" class="headerlink" title="不同之处"></a>不同之处</h2><h3 id="线程安全性不一样"><a href="#线程安全性不一样" class="headerlink" title="线程安全性不一样"></a>线程安全性不一样</h3><p>ArrayList是非线程安全；<br>而Vector是线程安全的，它的函数都是synchronized的，即都是支持同步的。<br>ArrayList适用于单线程，Vector适用于多线程。</p>
+<h3 id="对序列化支持不同"><a href="#对序列化支持不同" class="headerlink" title="对序列化支持不同"></a>对序列化支持不同</h3><p>ArrayList支持序列化，而Vector不支持；即ArrayList有实现java.io.Serializable接口，而Vector没有实现该接口。</p>
+<h3 id="构造函数个数不同"><a href="#构造函数个数不同" class="headerlink" title="构造函数个数不同"></a>构造函数个数不同</h3><p>ArrayList有3个构造函数，而Vector有4个构造函数。Vector除了包括和ArrayList类似的3个构造函数之外，另外的一个构造函数可以指定容量增加系数。</p>
+<p>ArrayList的构造函数如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 默认构造函数</span></span><br><span class="line">ArrayList()</span><br><span class="line"></span><br><span class="line"><span class="comment">// capacity是ArrayList的默认容量大小。当由于增加数据导致容量不足时，容量会添加上一次容量大小的一半。</span></span><br><span class="line">ArrayList(<span class="keyword">int</span> capacity)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 创建一个包含collection的ArrayList</span></span><br><span class="line">ArrayList(Collection&lt;? extends E&gt; collection)</span><br></pre></td></tr></table></figure>
+<p>Vector的构造函数如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 默认构造函数</span></span><br><span class="line">Vector()</span><br><span class="line"></span><br><span class="line"><span class="comment">// capacity是Vector的默认容量大小。当由于增加数据导致容量增加时，每次容量会增加一倍。</span></span><br><span class="line">Vector(<span class="keyword">int</span> capacity)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 创建一个包含collection的Vector</span></span><br><span class="line">Vector(Collection&lt;? extends E&gt; collection)</span><br><span class="line"></span><br><span class="line"><span class="comment">// capacity是Vector的默认容量大小，capacityIncrement是每次Vector容量增加时的增量值。</span></span><br><span class="line">Vector(<span class="keyword">int</span> capacity, <span class="keyword">int</span> capacityIncrement)</span><br></pre></td></tr></table></figure>
+<h3 id="4、容量增加方式不同"><a href="#4、容量增加方式不同" class="headerlink" title="4、容量增加方式不同"></a>4、容量增加方式不同</h3><p>逐个添加元素时，若ArrayList容量不足时，“新的容量”=“(原始容量x3)/2 + 1”。</p>
+<p>而Vector的容量增长与“增长系数有关”，若指定了“增长系数”，且“增长系数有效(即，大于0)”；那么，每次容量不足时，“新的容量”=“原始容量+增长系数”。若增长系数无效(即，小于/等于0)，则“新的容量”=“原始容量 x 2”。</p>
+<p>ArrayList中容量增长的主要函数如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">ensureCapacity</span><span class="params">(<span class="keyword">int</span> minCapacity)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 将“修改统计数”+1</span></span><br><span class="line">    modCount++;</span><br><span class="line">    <span class="keyword">int</span> oldCapacity = elementData.length;</span><br><span class="line">    <span class="comment">// 若当前容量不足以容纳当前的元素个数，设置 新的容量=“(原始容量x3)/2 + 1”</span></span><br><span class="line">    <span class="keyword">if</span> (minCapacity &gt; oldCapacity) &#123;</span><br><span class="line">        Object oldData[] = elementData;</span><br><span class="line">        <span class="keyword">int</span> newCapacity = (oldCapacity * <span class="number">3</span>)/<span class="number">2</span> + <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">if</span> (newCapacity &lt; minCapacity)</span><br><span class="line">            newCapacity = minCapacity;</span><br><span class="line">        elementData = Arrays.copyOf(elementData, newCapacity);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Vector中容量增长的主要函数如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">ensureCapacityHelper</span><span class="params">(<span class="keyword">int</span> minCapacity)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> oldCapacity = elementData.length;</span><br><span class="line">    <span class="comment">// 当Vector的容量不足以容纳当前的全部元素，增加容量大小。</span></span><br><span class="line">    <span class="comment">// 若 容量增量系数&gt;0(即capacityIncrement&gt;0)，则将容量增大当capacityIncrement</span></span><br><span class="line">    <span class="comment">// 否则，将容量增大一倍。</span></span><br><span class="line">    <span class="keyword">if</span> (minCapacity &gt; oldCapacity) &#123;</span><br><span class="line">        Object[] oldData = elementData;</span><br><span class="line">        <span class="keyword">int</span> newCapacity = (capacityIncrement &gt; <span class="number">0</span>) ?</span><br><span class="line">            (oldCapacity + capacityIncrement) : (oldCapacity * <span class="number">2</span>);</span><br><span class="line">        <span class="keyword">if</span> (newCapacity &lt; minCapacity) &#123;</span><br><span class="line">            newCapacity = minCapacity;</span><br><span class="line">        &#125;</span><br><span class="line">        elementData = Arrays.copyOf(elementData, newCapacity);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="5、对Enumeration的支持不同。Vector支持通过Enumeration去遍历，而List不支持"><a href="#5、对Enumeration的支持不同。Vector支持通过Enumeration去遍历，而List不支持" class="headerlink" title="5、对Enumeration的支持不同。Vector支持通过Enumeration去遍历，而List不支持"></a>5、对Enumeration的支持不同。Vector支持通过Enumeration去遍历，而List不支持</h3><p>Vector中实现Enumeration的代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> Enumeration&lt;E&gt; <span class="title">elements</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 通过匿名类实现Enumeration</span></span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> Enumeration&lt;E&gt;() &#123;</span><br><span class="line">        <span class="keyword">int</span> count = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 是否存在下一个元素</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">hasMoreElements</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> count &lt; elementCount;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 获取下一个元素</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> E <span class="title">nextElement</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">synchronized</span> (Vector.<span class="keyword">this</span>) &#123;</span><br><span class="line">                <span class="keyword">if</span> (count &lt; elementCount) &#123;</span><br><span class="line">                    <span class="keyword">return</span> (E)elementData[count++];</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> NoSuchElementException(<span class="string">"Vector Enumeration"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2018-06-27T09:39:57.953Z" itemprop="dateUpdated">2018-06-27 17:39:57</time>
+</span><br>
+
+
+        
+        本文固定链接：<a href="/2016/12/08/java-source-analysis-set-series/Java 集合系列08之 List总结/" target="_blank" rel="external">https://smuwjs.github.io/2016/12/08/java-source-analysis-set-series/Java 集合系列08之 List总结/</a>
+        
+    </div>
+    <footer>
+        <a href="https://smuwjs.github.io">
+            <img src="/img/head.png" alt="Jeeson">
+            Jeeson
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java-集合系列/">Java 集合系列</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java源码分析/">Java源码分析</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/12/08/java-source-analysis-set-series/Java 集合系列08之 List总结/&title=《Java 集合系列08之 List总结》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/12/08/java-source-analysis-set-series/Java 集合系列08之 List总结/&title=《Java 集合系列08之 List总结》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/12/08/java-source-analysis-set-series/Java 集合系列08之 List总结/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Java 集合系列08之 List总结》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/12/08/java-source-analysis-set-series/Java 集合系列08之 List总结/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/12/08/java-source-analysis-set-series/Java 集合系列08之 List总结/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2016/12/09/java-source-analysis-set-series/Java 集合系列09之 Map架构/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">Java 集合系列09之 Map架构</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2016/12/07/java-source-analysis-set-series/Java 集合系列07之 Stack详细介绍/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Java 集合系列07之 Stack详细介绍</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="java-source-analysis-set-series/Java 集合系列08之 List总结" data-title="Java 集合系列08之 List总结" data-url="https://smuwjs.github.io/2016/12/08/java-source-analysis-set-series/Java 集合系列08之 List总结/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'smuwjs', theme: 'none'};
+lazyScripts.push('//unpkg.com/hexo-theme-material-indigo@latest/js/embed.min.js');
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循<a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>Jeeson &copy; 2015 - 2018</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/12/08/java-source-analysis-set-series/Java 集合系列08之 List总结/&title=《Java 集合系列08之 List总结》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/12/08/java-source-analysis-set-series/Java 集合系列08之 List总结/&title=《Java 集合系列08之 List总结》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/12/08/java-source-analysis-set-series/Java 集合系列08之 List总结/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Java 集合系列08之 List总结》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/12/08/java-source-analysis-set-series/Java 集合系列08之 List总结/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/12/08/java-source-analysis-set-series/Java 集合系列08之 List总结/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://smuwjs.github.io/2016/12/08/java-source-analysis-set-series/Java 集合系列08之 List总结/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

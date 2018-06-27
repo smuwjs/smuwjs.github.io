@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>java io系列13之 BufferedOutputStream详解 | Jeeson&#39;s Blog | Write the code. Change the world.</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="Java源码分析,Java IO系列">
+    <meta name="description" content="目录1. BufferedOutputStream 介绍2. BufferedOutputStream 源码分析(基于jdk1.7.40) 3. 示例代码      1. BufferedOutputStream 介绍BufferedOutputStream 是缓冲输出流。它继承于FilterOutputStream。 BufferedOutputStream 的作用是为另一个输出流提供“缓冲功">
+<meta name="keywords" content="Java源码分析,Java IO系列">
+<meta property="og:type" content="article">
+<meta property="og:title" content="java io系列13之 BufferedOutputStream详解">
+<meta property="og:url" content="https://smuwjs.github.io/2016/10/13/java-source-analysis-io-series/java io系列13之 BufferedOutputStream详解/index.html">
+<meta property="og:site_name" content="Jeeson&#39;s Blog">
+<meta property="og:description" content="目录1. BufferedOutputStream 介绍2. BufferedOutputStream 源码分析(基于jdk1.7.40) 3. 示例代码      1. BufferedOutputStream 介绍BufferedOutputStream 是缓冲输出流。它继承于FilterOutputStream。 BufferedOutputStream 的作用是为另一个输出流提供“缓冲功">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-06-27T09:39:57.941Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="java io系列13之 BufferedOutputStream详解">
+<meta name="twitter:description" content="目录1. BufferedOutputStream 介绍2. BufferedOutputStream 源码分析(基于jdk1.7.40) 3. 示例代码      1. BufferedOutputStream 介绍BufferedOutputStream 是缓冲输出流。它继承于FilterOutputStream。 BufferedOutputStream 的作用是为另一个输出流提供“缓冲功">
+    
+        <link rel="alternate" type="application/atom+xml" title="Jeeson&#39;s Blog" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/head.png">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Jeeson</h5>
+          <a href="mailto:smuwjs@163.com" title="smuwjs@163.com" class="mail">smuwjs@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/smuwjs" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">java io系列13之 BufferedOutputStream详解</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">java io系列13之 BufferedOutputStream详解</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2016-10-12T16:00:00.000Z" itemprop="datePublished" class="page-time">
+  2016-10-13
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#1-BufferedOutputStream-介绍"><span class="post-toc-number">1.</span> <span class="post-toc-text">1. BufferedOutputStream 介绍</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#2-BufferedOutputStream-源码分析-基于jdk1-7-40"><span class="post-toc-number">2.</span> <span class="post-toc-text">2. BufferedOutputStream 源码分析(基于jdk1.7.40)</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#3-示例代码"><span class="post-toc-number">3.</span> <span class="post-toc-text">3. 示例代码</span></a></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-java-source-analysis-io-series/java io系列13之 BufferedOutputStream详解"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">java io系列13之 BufferedOutputStream详解</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2016-10-13 00:00:00" datetime="2016-10-12T16:00:00.000Z"  itemprop="datePublished">2016-10-13</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <blockquote>
+<p><strong>目录</strong><br><a href="#anchor1">1. BufferedOutputStream 介绍</a><br><a href="#anchor2">2. BufferedOutputStream 源码分析(基于jdk1.7.40) </a><br><a href="#anchor3">3. 示例代码</a>   </p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="1-BufferedOutputStream-介绍"><a href="#1-BufferedOutputStream-介绍" class="headerlink" title="1. BufferedOutputStream 介绍"></a>1. BufferedOutputStream 介绍</h1><p>BufferedOutputStream 是缓冲输出流。它继承于FilterOutputStream。</p>
+<p>BufferedOutputStream 的作用是为另一个输出流提供“缓冲功能”。</p>
+<p><strong>BufferedOutputStream 函数列表</strong></p>
+<pre><code>BufferedOutputStream(OutputStream out)
+BufferedOutputStream(OutputStream out, int size)
+
+synchronized void     close()
+synchronized void     flush()
+synchronized void     write(byte[] buffer, int offset, int length)
+synchronized void     write(int oneByte)
+</code></pre><p><a name="anchor2"></a></p>
+<h1 id="2-BufferedOutputStream-源码分析-基于jdk1-7-40"><a href="#2-BufferedOutputStream-源码分析-基于jdk1-7-40" class="headerlink" title="2. BufferedOutputStream 源码分析(基于jdk1.7.40)"></a>2. BufferedOutputStream 源码分析(基于jdk1.7.40)</h1><pre><code>package java.io;
+
+public class BufferedOutputStream extends FilterOutputStream {
+    // 保存“缓冲输出流”数据的字节数组
+    protected byte buf[];
+
+    // 缓冲中数据的大小
+    protected int count;
+
+    // 构造函数：新建字节数组大小为8192的“缓冲输出流”
+    public BufferedOutputStream(OutputStream out) {
+        this(out, 8192);
+    }
+
+    // 构造函数：新建字节数组大小为size的“缓冲输出流”
+    public BufferedOutputStream(OutputStream out, int size) {
+        super(out);
+        if (size &lt;= 0) {
+            throw new IllegalArgumentException(&quot;Buffer size &lt;= 0&quot;);
+        }
+        buf = new byte[size];
+    }
+
+    // 将缓冲数据都写入到输出流中
+    private void flushBuffer() throws IOException {
+        if (count &gt; 0) {
+            out.write(buf, 0, count);
+            count = 0;
+        }
+    }
+
+    // 将“数据b(转换成字节类型)”写入到输出流中
+    public synchronized void write(int b) throws IOException {
+        // 若缓冲已满，则先将缓冲数据写入到输出流中。
+        if (count &gt;= buf.length) {
+            flushBuffer();
+        }
+        // 将“数据b”写入到缓冲中
+        buf[count++] = (byte)b;
+    }
+
+    public synchronized void write(byte b[], int off, int len) throws IOException {
+        // 若“写入长度”大于“缓冲区大小”，则先将缓冲中的数据写入到输出流，然后直接将数组b写入到输出流中
+        if (len &gt;= buf.length) {
+            flushBuffer();
+            out.write(b, off, len);
+            return;
+        }
+        // 若“剩余的缓冲空间 不足以 存储即将写入的数据”，则先将缓冲中的数据写入到输出流中
+        if (len &gt; buf.length - count) {
+            flushBuffer();
+        }
+        System.arraycopy(b, off, buf, count, len);
+        count += len;
+    }
+
+    // 将“缓冲数据”写入到输出流中
+    public synchronized void flush() throws IOException {
+        flushBuffer();
+        out.flush();
+    }
+}
+</code></pre><p>说明： BufferedOutputStream的源码非常简单，这里就BufferedOutputStream的思想进行简单说明：BufferedOutputStream通过字节数组来缓冲数据，当缓冲区满或者用户调用flush()函数时，它就会将缓冲区的数据写入到输出流中。</p>
+<p><a name="anchor3"></a></p>
+<h1 id="3-示例代码"><a href="#3-示例代码" class="headerlink" title="3. 示例代码"></a>3. 示例代码</h1><p>关于BufferedOutputStream中API的详细用法，参考示例代码(BufferedOutputStreamTest.java)：</p>
+<pre><code>import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.OutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.FileNotFoundException;
+import java.lang.SecurityException;
+import java.util.Scanner;
+
+/**
+ * BufferedOutputStream 测试程序
+ *
+ * @author skywang
+ */
+public class BufferedOutputStreamTest {
+
+    private static final int LEN = 5;
+    // 对应英文字母“abcddefghijklmnopqrsttuvwxyz”
+    private static final byte[] ArrayLetters = {
+        0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67, 0x68, 0x69, 0x6A, 0x6B, 0x6C, 0x6D, 0x6E, 0x6F,
+        0x70, 0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77, 0x78, 0x79, 0x7A
+    };
+
+    public static void main(String[] args) {
+        testBufferedOutputStream() ;
+    }
+
+    /**
+     * BufferedOutputStream的API测试函数
+     */
+    private static void testBufferedOutputStream() {
+
+        // 创建“文件输出流”对应的BufferedOutputStream
+        // 它对应缓冲区的大小是16，即缓冲区的数据&gt;=16时，会自动将缓冲区的内容写入到输出流。
+        try {
+            File file = new File(&quot;out.txt&quot;);
+            OutputStream out =
+                  new BufferedOutputStream(
+                      new FileOutputStream(file), 16);
+
+            // 将ArrayLetters数组的前10个字节写入到输出流中
+            out.write(ArrayLetters, 0, 10);
+            // 将“换行符\n”写入到输出流中
+            out.write(&apos;\n&apos;);
+
+            // TODO!
+            //out.flush();
+
+            readUserInput() ;
+
+            out.close();
+       } catch (FileNotFoundException e) {
+           e.printStackTrace();
+       } catch (SecurityException e) {
+           e.printStackTrace();
+       } catch (IOException e) {
+           e.printStackTrace();
+       }
+    }
+
+    /**
+     * 读取用户输入
+     */
+    private static void readUserInput() {
+        System.out.println(&quot;please input a text:&quot;);
+        Scanner reader=new Scanner(System.in);
+        // 等待一个输入
+        String str = reader.next();
+        System.out.printf(&quot;the input is : %s\n&quot;, str);
+    }
+}
+</code></pre><p><strong>运行结果</strong></p>
+<p>生成文件“out.txt”，文件的内容是“abcdefghij”。</p>
+<p><strong>分步测试</strong>：<br>分别按照下面3种步骤测试程序,来查看缓冲区大小以及flush()的作用。</p>
+<p><strong>第1种</strong>：原始程序</p>
+<p>(01) 运行程序。在程序等待用户输入时，查看“out.txt”的文本内容；发现：内容为空。<br>(02) 运行程序。在用户输入之后，查看“out.txt”的文本内容；发现：内容为“abcdefghij”。<br>从中，我们发现(01)和(02)的结果不同；之所以(01)中的out.txt内容为空，是因为out.txt对应的缓冲区大小是16字节，而我们只写入了11个字节，所以，它不会执行清空缓冲操作(即，将缓冲数据写入到输出流中)。<br>而(02)对应out.txt的内容是“abcdefghij”，是因为执行了out.close()，它会关闭输出流；在关闭输出流之前，会将缓冲区的数据写入到输出流中。</p>
+<p>注意：重新测试时，要先删除out.txt。</p>
+<p><strong>第2种</strong>：在readUserInput()前添加如下语句</p>
+<pre><code>out.flush();
+</code></pre><p>这句话的作用，是将“缓冲区的内容”写入到输出流中。<br>(01) 运行程序。在程序等待用户输入时，查看“out.txt”的文本内容；发现：内容为“abcdefghij”。<br>(02) 运行程序。在用户输入之后，查看“out.txt”的文本内容；发现：内容为“abcdefghij”。<br>从中，我们发现(01)和(02)结果一样，对应out.txt的内容都是“abcdefghij”。这是因为执行了flush()操作，它的作用是将缓冲区的数据写入到输出流中。  </p>
+<p>注意：重新测试时，要先删除out.txt！</p>
+<p><strong>第3种</strong>：在第1种的基础上，将</p>
+<pre><code>out.write(ArrayLetters, 0, 10);
+</code></pre><p>修改为</p>
+<pre><code>out.write(ArrayLetters, 0, 20);
+</code></pre><p>(01) 运行程序。在程序等待用户输入时，查看“out.txt”的文本内容；发现：内容为“abcdefghijklmnopqrst”(不含回车)。<br>(02) 运行程序。在用户输入之后，查看“out.txt”的文本内容；发现：内容为“abcdefghijklmnopqrst”(含回车)。<br>从中，我们发现(01)运行结果是“abcdefghijklmnopqrst”(不含回车)。这是因为，缓冲区的大小是16，而我们通过out.write(ArrayLetters, 0, 20)写入了20个字节，超过了缓冲区的大小；这时，会直接将全部的输入都写入都输出流中，而不经过缓冲区。<br>(03)运行结果是“abcdefghijklmnopqrst”(含回车)，这是因为执行out.close()时，将回车符号’\n’写入了输出流中。</p>
+<p>注意：重新测试时，要先删除out.txt！</p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2018-06-27T09:39:57.941Z" itemprop="dateUpdated">2018-06-27 17:39:57</time>
+</span><br>
+
+
+        
+        本文固定链接：<a href="/2016/10/13/java-source-analysis-io-series/java io系列13之 BufferedOutputStream详解/" target="_blank" rel="external">https://smuwjs.github.io/2016/10/13/java-source-analysis-io-series/java io系列13之 BufferedOutputStream详解/</a>
+        
+    </div>
+    <footer>
+        <a href="https://smuwjs.github.io">
+            <img src="/img/head.png" alt="Jeeson">
+            Jeeson
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java-IO系列/">Java IO系列</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java源码分析/">Java源码分析</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/10/13/java-source-analysis-io-series/java io系列13之 BufferedOutputStream详解/&title=《java io系列13之 BufferedOutputStream详解》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/10/13/java-source-analysis-io-series/java io系列13之 BufferedOutputStream详解/&title=《java io系列13之 BufferedOutputStream详解》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/10/13/java-source-analysis-io-series/java io系列13之 BufferedOutputStream详解/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《java io系列13之 BufferedOutputStream详解》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/10/13/java-source-analysis-io-series/java io系列13之 BufferedOutputStream详解/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/10/13/java-source-analysis-io-series/java io系列13之 BufferedOutputStream详解/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2016/10/14/java-source-analysis-io-series/java io系列14之 DataInputStream详解/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">java io系列14之 DataInputStream详解</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2016/10/12/java-source-analysis-io-series/java io系列12之 BufferedInputStream详解/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">java io系列12之 BufferedInputStream详解</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="java-source-analysis-io-series/java io系列13之 BufferedOutputStream详解" data-title="java io系列13之 BufferedOutputStream详解" data-url="https://smuwjs.github.io/2016/10/13/java-source-analysis-io-series/java io系列13之 BufferedOutputStream详解/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'smuwjs', theme: 'none'};
+lazyScripts.push('//unpkg.com/hexo-theme-material-indigo@latest/js/embed.min.js');
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循<a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>Jeeson &copy; 2015 - 2018</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/10/13/java-source-analysis-io-series/java io系列13之 BufferedOutputStream详解/&title=《java io系列13之 BufferedOutputStream详解》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/10/13/java-source-analysis-io-series/java io系列13之 BufferedOutputStream详解/&title=《java io系列13之 BufferedOutputStream详解》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/10/13/java-source-analysis-io-series/java io系列13之 BufferedOutputStream详解/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《java io系列13之 BufferedOutputStream详解》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/10/13/java-source-analysis-io-series/java io系列13之 BufferedOutputStream详解/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/10/13/java-source-analysis-io-series/java io系列13之 BufferedOutputStream详解/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://smuwjs.github.io/2016/10/13/java-source-analysis-io-series/java io系列13之 BufferedOutputStream详解/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

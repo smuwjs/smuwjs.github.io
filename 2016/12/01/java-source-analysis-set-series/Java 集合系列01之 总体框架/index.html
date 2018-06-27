@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>Java 集合系列01之 总体框架 | Jeeson&#39;s Blog | Write the code. Change the world.</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="Java源码分析,Java 集合系列">
+    <meta name="description" content="集合与数组都是对象的存储： 数组（基本数据类型  &amp;amp; 引用数据类型）   集合（引用数据类型）  引用数据类型数组的元素是对象引用，初值为空，必须实例化；而基本类型数组元素都有默认初值。 数组存储数据的弊端： 一旦创建，其长度不可变。 真实的数组存放的对象的个数是不可知。  为什么集合不能存储基本数据类型？集合中存放的可都是对象的引用，实际内容都在堆上面或者方法区里面，但是基本数据类型是在">
+<meta name="keywords" content="Java源码分析,Java 集合系列">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java 集合系列01之 总体框架">
+<meta property="og:url" content="https://smuwjs.github.io/2016/12/01/java-source-analysis-set-series/Java 集合系列01之 总体框架/index.html">
+<meta property="og:site_name" content="Jeeson&#39;s Blog">
+<meta property="og:description" content="集合与数组都是对象的存储： 数组（基本数据类型  &amp;amp; 引用数据类型）   集合（引用数据类型）  引用数据类型数组的元素是对象引用，初值为空，必须实例化；而基本类型数组元素都有默认初值。 数组存储数据的弊端： 一旦创建，其长度不可变。 真实的数组存放的对象的个数是不可知。  为什么集合不能存储基本数据类型？集合中存放的可都是对象的引用，实际内容都在堆上面或者方法区里面，但是基本数据类型是在">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://oov0wb0gl.bkt.clouddn.com/2017-06-06-14954338994489.jpg">
+<meta property="og:updated_time" content="2018-06-27T09:39:57.949Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java 集合系列01之 总体框架">
+<meta name="twitter:description" content="集合与数组都是对象的存储： 数组（基本数据类型  &amp;amp; 引用数据类型）   集合（引用数据类型）  引用数据类型数组的元素是对象引用，初值为空，必须实例化；而基本类型数组元素都有默认初值。 数组存储数据的弊端： 一旦创建，其长度不可变。 真实的数组存放的对象的个数是不可知。  为什么集合不能存储基本数据类型？集合中存放的可都是对象的引用，实际内容都在堆上面或者方法区里面，但是基本数据类型是在">
+<meta name="twitter:image" content="http://oov0wb0gl.bkt.clouddn.com/2017-06-06-14954338994489.jpg">
+    
+        <link rel="alternate" type="application/atom+xml" title="Jeeson&#39;s Blog" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/head.png">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Jeeson</h5>
+          <a href="mailto:smuwjs@163.com" title="smuwjs@163.com" class="mail">smuwjs@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/smuwjs" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Java 集合系列01之 总体框架</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Java 集合系列01之 总体框架</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2016-11-30T16:00:00.000Z" itemprop="datePublished" class="page-time">
+  2016-12-01
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#集合与数组"><span class="post-toc-number">1.</span> <span class="post-toc-text">集合与数组</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#都是对象的存储："><span class="post-toc-number">1.1.</span> <span class="post-toc-text">都是对象的存储：</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#数组存储数据的弊端："><span class="post-toc-number">1.2.</span> <span class="post-toc-text">数组存储数据的弊端：</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#为什么集合不能存储基本数据类型？"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">为什么集合不能存储基本数据类型？</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#总体框架"><span class="post-toc-number">2.</span> <span class="post-toc-text">总体框架</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Collection是一个接口，是高度抽象出来的集合，它包含了集合的基本操作和属性。"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">Collection是一个接口，是高度抽象出来的集合，它包含了集合的基本操作和属性。</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Map是一个映射接口，即key-value键值对。Map中的每一个元素包含“一个key”和“key对应的value”。"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">Map是一个映射接口，即key-value键值对。Map中的每一个元素包含“一个key”和“key对应的value”。</span></a></li></ol></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-java-source-analysis-set-series/Java 集合系列01之 总体框架"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Java 集合系列01之 总体框架</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2016-12-01 00:00:00" datetime="2016-11-30T16:00:00.000Z"  itemprop="datePublished">2016-12-01</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h1 id="集合与数组"><a href="#集合与数组" class="headerlink" title="集合与数组"></a>集合与数组</h1><h2 id="都是对象的存储："><a href="#都是对象的存储：" class="headerlink" title="都是对象的存储："></a>都是对象的存储：</h2><ol>
+<li>数组（基本数据类型  &amp; 引用数据类型）  </li>
+<li>集合（引用数据类型）</li>
+</ol>
+<p>引用数据类型数组的元素是对象引用，初值为空，必须实例化；而基本类型数组元素都有默认初值。</p>
+<h2 id="数组存储数据的弊端："><a href="#数组存储数据的弊端：" class="headerlink" title="数组存储数据的弊端："></a>数组存储数据的弊端：</h2><ol>
+<li>一旦创建，其长度不可变。</li>
+<li>真实的数组存放的对象的个数是不可知。</li>
+</ol>
+<h2 id="为什么集合不能存储基本数据类型？"><a href="#为什么集合不能存储基本数据类型？" class="headerlink" title="为什么集合不能存储基本数据类型？"></a>为什么集合不能存储基本数据类型？</h2><p>集合中存放的可都是对象的引用，实际内容都在堆上面或者方法区里面，但是基本数据类型是在栈上分配空间的。随时就被收回的。但是通过自动包装类就可以把基本类型转为对象类型，存放引用就解决了这个问题。</p>
+<h1 id="总体框架"><a href="#总体框架" class="headerlink" title="总体框架"></a>总体框架</h1><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://oov0wb0gl.bkt.clouddn.com/2017-06-06-14954338994489.jpg" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>看上面的框架图，先抓住它的主干，即Collection和Map。</p>
+<h2 id="Collection是一个接口，是高度抽象出来的集合，它包含了集合的基本操作和属性。"><a href="#Collection是一个接口，是高度抽象出来的集合，它包含了集合的基本操作和属性。" class="headerlink" title="Collection是一个接口，是高度抽象出来的集合，它包含了集合的基本操作和属性。"></a>Collection是一个接口，是高度抽象出来的集合，它包含了集合的基本操作和属性。</h2><p>Collection包含了List和Set两大分支。</p>
+<ol>
+<li><p>List是一个有序的队列，每一个元素都有它的索引。第一个元素的索引值是0。<br> List的实现类有LinkedList, ArrayList, Vector, Stack。</p>
+</li>
+<li><p>Set是一个不允许有重复元素的集合。<br> Set的实现类有HastSet和TreeSet。HashSet依赖于HashMap，它实际上是通过HashMap实现的；TreeSet依赖于TreeMap，它实际上是通过TreeMap实现的。</p>
+</li>
+</ol>
+<h2 id="Map是一个映射接口，即key-value键值对。Map中的每一个元素包含“一个key”和“key对应的value”。"><a href="#Map是一个映射接口，即key-value键值对。Map中的每一个元素包含“一个key”和“key对应的value”。" class="headerlink" title="Map是一个映射接口，即key-value键值对。Map中的每一个元素包含“一个key”和“key对应的value”。"></a>Map是一个映射接口，即key-value键值对。Map中的每一个元素包含“一个key”和“key对应的value”。</h2><p>AbstractMap是个抽象类，它实现了Map接口中的大部分API。而HashMap，TreeMap，WeakHashMap都是继承于AbstractMap。</p>
+<p>Hashtable虽然继承于Dictionary，但它实现了Map接口。</p>
+<p>接下来，再看Iterator。它是遍历集合的工具，即我们通常通过Iterator迭代器来遍历集合。我们说Collection依赖于Iterator，是因为Collection的实现类都要实现iterator()函数，返回一个Iterator对象。</p>
+<p>ListIterator是专门为遍历List而存在的。</p>
+<p>再看Enumeration，它是JDK 1.0引入的抽象类。作用和Iterator一样，也是遍历集合；但是Enumeration的功能要比Iterator少。在上面的框图中，Enumeration只能在Hashtable, Vector, Stack中使用。</p>
+<p>最后，看Arrays和Collections。它们是操作数组、集合的两个工具类。</p>
+<p>有了上面的整体框架之后，我们接下来对每个类分别进行分析。</p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2018-06-27T09:39:57.949Z" itemprop="dateUpdated">2018-06-27 17:39:57</time>
+</span><br>
+
+
+        
+        本文固定链接：<a href="/2016/12/01/java-source-analysis-set-series/Java 集合系列01之 总体框架/" target="_blank" rel="external">https://smuwjs.github.io/2016/12/01/java-source-analysis-set-series/Java 集合系列01之 总体框架/</a>
+        
+    </div>
+    <footer>
+        <a href="https://smuwjs.github.io">
+            <img src="/img/head.png" alt="Jeeson">
+            Jeeson
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java-集合系列/">Java 集合系列</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java源码分析/">Java源码分析</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/12/01/java-source-analysis-set-series/Java 集合系列01之 总体框架/&title=《Java 集合系列01之 总体框架》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/12/01/java-source-analysis-set-series/Java 集合系列01之 总体框架/&title=《Java 集合系列01之 总体框架》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/12/01/java-source-analysis-set-series/Java 集合系列01之 总体框架/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Java 集合系列01之 总体框架》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/12/01/java-source-analysis-set-series/Java 集合系列01之 总体框架/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/12/01/java-source-analysis-set-series/Java 集合系列01之 总体框架/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2016/12/02/java-source-analysis-set-series/Java 集合系列02之 Collection架构/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">Java 集合系列02之 Collection架构</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”11之 Semaphore信号量的原理和示例/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Java多线程系列--“JUC锁”11之 Semaphore信号量的原理和示例</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="java-source-analysis-set-series/Java 集合系列01之 总体框架" data-title="Java 集合系列01之 总体框架" data-url="https://smuwjs.github.io/2016/12/01/java-source-analysis-set-series/Java 集合系列01之 总体框架/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'smuwjs', theme: 'none'};
+lazyScripts.push('//unpkg.com/hexo-theme-material-indigo@latest/js/embed.min.js');
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循<a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>Jeeson &copy; 2015 - 2018</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/12/01/java-source-analysis-set-series/Java 集合系列01之 总体框架/&title=《Java 集合系列01之 总体框架》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/12/01/java-source-analysis-set-series/Java 集合系列01之 总体框架/&title=《Java 集合系列01之 总体框架》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/12/01/java-source-analysis-set-series/Java 集合系列01之 总体框架/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Java 集合系列01之 总体框架》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/12/01/java-source-analysis-set-series/Java 集合系列01之 总体框架/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/12/01/java-source-analysis-set-series/Java 集合系列01之 总体框架/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://smuwjs.github.io/2016/12/01/java-source-analysis-set-series/Java 集合系列01之 总体框架/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

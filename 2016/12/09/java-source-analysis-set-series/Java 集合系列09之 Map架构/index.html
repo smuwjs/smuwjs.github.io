@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>Java 集合系列09之 Map架构 | Jeeson&#39;s Blog | Write the code. Change the world.</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="Java源码分析,Java 集合系列">
+    <meta name="description" content="Map前面，我们已经系统的对List进行了学习。接下来，我们先学习Map，然后再学习Set；因为Set的实现类都是基于Map来实现的(如，HashSet是通过HashMap实现的，TreeSet是通过TreeMap实现的)。 首先，我们看看Map架构。">
+<meta name="keywords" content="Java源码分析,Java 集合系列">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java 集合系列09之 Map架构">
+<meta property="og:url" content="https://smuwjs.github.io/2016/12/09/java-source-analysis-set-series/Java 集合系列09之 Map架构/index.html">
+<meta property="og:site_name" content="Jeeson&#39;s Blog">
+<meta property="og:description" content="Map前面，我们已经系统的对List进行了学习。接下来，我们先学习Map，然后再学习Set；因为Set的实现类都是基于Map来实现的(如，HashSet是通过HashMap实现的，TreeSet是通过TreeMap实现的)。 首先，我们看看Map架构。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://oov0wb0gl.bkt.clouddn.com/2017-06-06-14955409400343.jpg">
+<meta property="og:updated_time" content="2018-06-27T09:39:57.953Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java 集合系列09之 Map架构">
+<meta name="twitter:description" content="Map前面，我们已经系统的对List进行了学习。接下来，我们先学习Map，然后再学习Set；因为Set的实现类都是基于Map来实现的(如，HashSet是通过HashMap实现的，TreeSet是通过TreeMap实现的)。 首先，我们看看Map架构。">
+<meta name="twitter:image" content="http://oov0wb0gl.bkt.clouddn.com/2017-06-06-14955409400343.jpg">
+    
+        <link rel="alternate" type="application/atom+xml" title="Jeeson&#39;s Blog" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/head.png">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Jeeson</h5>
+          <a href="mailto:smuwjs@163.com" title="smuwjs@163.com" class="mail">smuwjs@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/smuwjs" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Java 集合系列09之 Map架构</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Java 集合系列09之 Map架构</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2016-12-08T16:00:00.000Z" itemprop="datePublished" class="page-time">
+  2016-12-09
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#Map"><span class="post-toc-number">1.</span> <span class="post-toc-text">Map</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#1、Map"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">1、Map</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Map的API"><span class="post-toc-number">1.1.1.</span> <span class="post-toc-text">Map的API</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#2、Map-Entry"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">2、Map.Entry</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Map-Entry的定义："><span class="post-toc-number">1.2.1.</span> <span class="post-toc-text">Map.Entry的定义：</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Map-Entry的API"><span class="post-toc-number">1.2.2.</span> <span class="post-toc-text">Map.Entry的API</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#3、AbstractMap"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">3、AbstractMap</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#AbstractMap的定义："><span class="post-toc-number">1.3.1.</span> <span class="post-toc-text">AbstractMap的定义：</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#AbstractMap的API"><span class="post-toc-number">1.3.2.</span> <span class="post-toc-text">AbstractMap的API</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#4、SortedMap"><span class="post-toc-number">1.4.</span> <span class="post-toc-text">4、SortedMap</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#SortedMap的定义："><span class="post-toc-number">1.4.1.</span> <span class="post-toc-text">SortedMap的定义：</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#SortedMap的API"><span class="post-toc-number">1.4.2.</span> <span class="post-toc-text">SortedMap的API</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#5、NavigableMap"><span class="post-toc-number">1.5.</span> <span class="post-toc-text">5、NavigableMap</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#NavigableMap的定义："><span class="post-toc-number">1.5.1.</span> <span class="post-toc-text">NavigableMap的定义：</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#NavigableMap的API"><span class="post-toc-number">1.5.2.</span> <span class="post-toc-text">NavigableMap的API</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#6、Dictionary"><span class="post-toc-number">1.6.</span> <span class="post-toc-text">6、Dictionary</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Dictionary的定义如下："><span class="post-toc-number">1.6.1.</span> <span class="post-toc-text">Dictionary的定义如下：</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Dictionary的API"><span class="post-toc-number">1.6.2.</span> <span class="post-toc-text">Dictionary的API</span></a></li></ol></li></ol></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-java-source-analysis-set-series/Java 集合系列09之 Map架构"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Java 集合系列09之 Map架构</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2016-12-09 00:00:00" datetime="2016-12-08T16:00:00.000Z"  itemprop="datePublished">2016-12-09</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h1 id="Map"><a href="#Map" class="headerlink" title="Map"></a>Map</h1><p>前面，我们已经系统的对List进行了学习。接下来，我们先学习Map，然后再学习Set；因为Set的实现类都是基于Map来实现的(如，HashSet是通过HashMap实现的，TreeSet是通过TreeMap实现的)。</p>
+<p>首先，我们看看Map架构。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://oov0wb0gl.bkt.clouddn.com/2017-06-06-14955409400343.jpg" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>如上图：</p>
+<ol>
+<li>Map 是映射接口，Map中存储的内容是键值对(key-value)。</li>
+<li>AbstractMap 是继承于Map的抽象类，它实现了Map中的大部分API。其它Map的实现类可以通过继承AbstractMap来减少重复编码。</li>
+<li>SortedMap 是继承于Map的接口。SortedMap中的内容是排序的键值对，排序的方法是通过比较器(Comparator)。</li>
+<li>NavigableMap 是继承于SortedMap的接口。相比于SortedMap，NavigableMap有一系列的导航方法；如”获取大于/等于某对象的键值对”、“获取小于/等于某对象的键值对”等等。 </li>
+<li>TreeMap 继承于AbstractMap，且实现了NavigableMap接口；因此，TreeMap中的内容是“有序的键值对”！</li>
+<li>HashMap 继承于AbstractMap，但没实现NavigableMap接口；因此，HashMap的内容是“键值对，但不保证次序”！</li>
+<li>Hashtable 虽然不是继承于AbstractMap，但它继承于Dictionary(Dictionary也是键值对的接口)，而且也实现Map接口；因此，Hashtable的内容也是“键值对，也不保证次序”。但和HashMap相比，Hashtable是线程安全的，而且它支持通过Enumeration去遍历。</li>
+<li>WeakHashMap 继承于AbstractMap。它和HashMap的键类型不同，WeakHashMap的键是“弱键”。</li>
+</ol>
+<h2 id="1、Map"><a href="#1、Map" class="headerlink" title="1、Map"></a>1、Map</h2><p>Map的定义如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Map</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt; </span>&#123; &#125;</span><br></pre></td></tr></table></figure>
+<p>Map 是一个键值对(key-value)映射接口。Map映射中不能包含重复的键；每个键最多只能映射到一个值。</p>
+<p>Map 接口提供三种 collection 视图，允许以键集、值集或键-值映射关系集的形式查看某个映射的内容。</p>
+<p>Map 映射顺序。有些实现类，可以明确保证其顺序，如 TreeMap；另一些映射实现则不保证顺序，如 HashMap 类。</p>
+<p>Map 的实现类应该提供2个“标准的”构造方法：第一个，void（无参数）构造方法，用于创建空映射；第二个，带有单个 Map 类型参数的构造方法，用于创建一个与其参数具有相同键-值映射关系的新映射。实际上，后一个构造方法允许用户复制任意映射，生成所需类的一个等价映射。尽管无法强制执行此建议（因为接口不能包含构造方法），但是 JDK 中所有通用的映射实现都遵从它。</p>
+<h3 id="Map的API"><a href="#Map的API" class="headerlink" title="Map的API"></a>Map的API</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">void</span>                 <span class="title">clear</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">boolean</span>              <span class="title">containsKey</span><span class="params">(Object key)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">boolean</span>              <span class="title">containsValue</span><span class="params">(Object value)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> Set&lt;Entry&lt;K, V&gt;&gt;     <span class="title">entrySet</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">boolean</span>              <span class="title">equals</span><span class="params">(Object object)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> V                    <span class="title">get</span><span class="params">(Object key)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">int</span>                  <span class="title">hashCode</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">boolean</span>              <span class="title">isEmpty</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> Set&lt;K&gt;               <span class="title">keySet</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> V                    <span class="title">put</span><span class="params">(K key, V value)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">void</span>                 <span class="title">putAll</span><span class="params">(Map&lt;? extends K, ? extends V&gt; map)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> V                    <span class="title">remove</span><span class="params">(Object key)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">int</span>                  <span class="title">size</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> Collection&lt;V&gt;        <span class="title">values</span><span class="params">()</span></span></span><br></pre></td></tr></table></figure>
+<p>说明：</p>
+<ol>
+<li><p>Map提供接口分别用于返回 键集、值集或键-值映射关系集。 </p>
+<pre><code>1. entrySet()用于返回键-值集的Set集合
+2. keySet()用于返回键集的Set集合
+3. values()用户返回值集的Collection集合
+4. 因为Map中不能包含重复的键；每个键最多只能映射到一个值。所以，键-值集、键集都是Set，值集时Collection。
+</code></pre></li>
+<li><p>Map提供了“键-值对”、“根据键获取值”、“删除键”、“获取容量大小”等方法。</p>
+</li>
+</ol>
+<h2 id="2、Map-Entry"><a href="#2、Map-Entry" class="headerlink" title="2、Map.Entry"></a>2、Map.Entry</h2><h3 id="Map-Entry的定义："><a href="#Map-Entry的定义：" class="headerlink" title="Map.Entry的定义："></a>Map.Entry的定义：</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">interface</span> <span class="title">Entry</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt; </span>&#123; &#125;</span><br></pre></td></tr></table></figure>
+<p>Map.Entry是Map中内部的一个接口，Map.Entry是键值对，Map通过 entrySet() 获取Map.Entry的键值对集合，从而通过该集合实现对键值对的操作。</p>
+<h3 id="Map-Entry的API"><a href="#Map-Entry的API" class="headerlink" title="Map.Entry的API"></a>Map.Entry的API</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">boolean</span>       <span class="title">equals</span><span class="params">(Object object)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> K             <span class="title">getKey</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> V             <span class="title">getValue</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">int</span>           <span class="title">hashCode</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> V             <span class="title">setValue</span><span class="params">(V object)</span></span></span><br></pre></td></tr></table></figure>
+<h2 id="3、AbstractMap"><a href="#3、AbstractMap" class="headerlink" title="3、AbstractMap"></a>3、AbstractMap</h2><h3 id="AbstractMap的定义："><a href="#AbstractMap的定义：" class="headerlink" title="AbstractMap的定义："></a>AbstractMap的定义：</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">AbstractMap</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt; <span class="keyword">implements</span> <span class="title">Map</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt; </span>&#123;&#125;</span><br></pre></td></tr></table></figure>
+<p>AbstractMap类提供 Map 接口的骨干实现，以最大限度地减少实现此接口所需的工作。</p>
+<p>要实现不可修改的映射，编程人员只需扩展此类并提供 entrySet 方法的实现即可，该方法将返回映射的映射关系 set 视图。通常，返回的 set 将依次在 AbstractSet 上实现。此 set 不支持 add() 或 remove() 方法，其迭代器也不支持 remove() 方法。</p>
+<p>要实现可修改的映射，编程人员必须另外重写此类的 put 方法（否则将抛出 UnsupportedOperationException），entrySet().iterator() 返回的迭代器也必须另外实现其 remove 方法。</p>
+<h3 id="AbstractMap的API"><a href="#AbstractMap的API" class="headerlink" title="AbstractMap的API"></a>AbstractMap的API</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">abstract</span> Set&lt;Entry&lt;K, V&gt;&gt;     entrySet()</span><br><span class="line">         <span class="function"><span class="keyword">void</span>                 <span class="title">clear</span><span class="params">()</span></span></span><br><span class="line"><span class="function">         <span class="keyword">boolean</span>              <span class="title">containsKey</span><span class="params">(Object key)</span></span></span><br><span class="line"><span class="function">         <span class="keyword">boolean</span>              <span class="title">containsValue</span><span class="params">(Object value)</span></span></span><br><span class="line"><span class="function">         <span class="keyword">boolean</span>              <span class="title">equals</span><span class="params">(Object object)</span></span></span><br><span class="line"><span class="function">         V                    <span class="title">get</span><span class="params">(Object key)</span></span></span><br><span class="line"><span class="function">         <span class="keyword">int</span>                  <span class="title">hashCode</span><span class="params">()</span></span></span><br><span class="line"><span class="function">         <span class="keyword">boolean</span>              <span class="title">isEmpty</span><span class="params">()</span></span></span><br><span class="line"><span class="function">         Set&lt;K&gt;               <span class="title">keySet</span><span class="params">()</span></span></span><br><span class="line"><span class="function">         V                    <span class="title">put</span><span class="params">(K key, V value)</span></span></span><br><span class="line"><span class="function">         <span class="keyword">void</span>                 <span class="title">putAll</span><span class="params">(Map&lt;? extends K, ? extends V&gt; map)</span></span></span><br><span class="line"><span class="function">         V                    <span class="title">remove</span><span class="params">(Object key)</span></span></span><br><span class="line"><span class="function">         <span class="keyword">int</span>                  <span class="title">size</span><span class="params">()</span></span></span><br><span class="line"><span class="function">         String               <span class="title">toString</span><span class="params">()</span></span></span><br><span class="line"><span class="function">         Collection&lt;V&gt;        <span class="title">values</span><span class="params">()</span></span></span><br><span class="line"><span class="function">         Object               <span class="title">clone</span><span class="params">()</span></span></span><br></pre></td></tr></table></figure>
+<h2 id="4、SortedMap"><a href="#4、SortedMap" class="headerlink" title="4、SortedMap"></a>4、SortedMap</h2><h3 id="SortedMap的定义："><a href="#SortedMap的定义：" class="headerlink" title="SortedMap的定义："></a>SortedMap的定义：</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">SortedMap</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt; <span class="keyword">extends</span> <span class="title">Map</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt; </span>&#123; &#125;</span><br></pre></td></tr></table></figure>
+<p>SortedMap是一个继承于Map接口的接口。它是一个有序的SortedMap键值映射。<br>SortedMap 的排序方式有两种：自然排序 或者 用户指定比较器。 插入有序 SortedMap 的所有元素都必须实现 Comparable 接口（或者被指定的比较器所接受）。</p>
+<p>另外，所有SortedMap 实现类都应该提供 4 个“标准”构造方法：</p>
+<ol>
+<li>void（无参数）构造方法，它创建一个空的有序映射，按照键的自然顺序进行排序。</li>
+<li>带有一个 Comparator 类型参数的构造方法，它创建一个空的有序映射，根据指定的比较器进行排序。</li>
+<li>带有一个 Map 类型参数的构造方法，它创建一个新的有序映射，其键-值映射关系与参数相同，按照键的自然顺序进行排序。</li>
+<li>带有一个 SortedMap 类型参数的构造方法，它创建一个新的有序映射，其键-值映射关系和排序方法与输入的有序映射相同。无法保证强制实施此建议，因为接口不能包含构造方法。</li>
+</ol>
+<h3 id="SortedMap的API"><a href="#SortedMap的API" class="headerlink" title="SortedMap的API"></a>SortedMap的API</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 继承于Map的API</span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">void</span>                 <span class="title">clear</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">boolean</span>              <span class="title">containsKey</span><span class="params">(Object key)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">boolean</span>              <span class="title">containsValue</span><span class="params">(Object value)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> Set&lt;Entry&lt;K, V&gt;&gt;     <span class="title">entrySet</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">boolean</span>              <span class="title">equals</span><span class="params">(Object object)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> V                    <span class="title">get</span><span class="params">(Object key)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">int</span>                  <span class="title">hashCode</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">boolean</span>              <span class="title">isEmpty</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> Set&lt;K&gt;               <span class="title">keySet</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> V                    <span class="title">put</span><span class="params">(K key, V value)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">void</span>                 <span class="title">putAll</span><span class="params">(Map&lt;? extends K, ? extends V&gt; map)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> V                    <span class="title">remove</span><span class="params">(Object key)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">int</span>                  <span class="title">size</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> Collection&lt;V&gt;        <span class="title">values</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="comment">// SortedMap新增的API </span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> Comparator&lt;? <span class="keyword">super</span> K&gt;     <span class="title">comparator</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> K                         <span class="title">firstKey</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> SortedMap&lt;K, V&gt;           <span class="title">headMap</span><span class="params">(K endKey)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> K                         <span class="title">lastKey</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> SortedMap&lt;K, V&gt;           <span class="title">subMap</span><span class="params">(K startKey, K endKey)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> SortedMap&lt;K, V&gt;           <span class="title">tailMap</span><span class="params">(K startKey)</span></span></span><br></pre></td></tr></table></figure>
+<h2 id="5、NavigableMap"><a href="#5、NavigableMap" class="headerlink" title="5、NavigableMap"></a>5、NavigableMap</h2><h3 id="NavigableMap的定义："><a href="#NavigableMap的定义：" class="headerlink" title="NavigableMap的定义："></a>NavigableMap的定义：</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">NavigableMap</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt; <span class="keyword">extends</span> <span class="title">SortedMap</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt; </span>&#123; &#125;</span><br></pre></td></tr></table></figure>
+<p>NavigableMap是继承于SortedMap的接口。它是一个可导航的键-值对集合，具有了为给定搜索目标报告最接近匹配项的导航方法。<br>NavigableMap分别提供了获取“键”、“键-值对”、“键集”、“键-值对集”的相关方法。</p>
+<h3 id="NavigableMap的API"><a href="#NavigableMap的API" class="headerlink" title="NavigableMap的API"></a>NavigableMap的API</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">abstract</span> Entry&lt;K, V&gt;             <span class="title">ceilingEntry</span><span class="params">(K key)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> Entry&lt;K, V&gt;             <span class="title">firstEntry</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> Entry&lt;K, V&gt;             <span class="title">floorEntry</span><span class="params">(K key)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> Entry&lt;K, V&gt;             <span class="title">higherEntry</span><span class="params">(K key)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> Entry&lt;K, V&gt;             <span class="title">lastEntry</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> Entry&lt;K, V&gt;             <span class="title">lowerEntry</span><span class="params">(K key)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> Entry&lt;K, V&gt;             <span class="title">pollFirstEntry</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> Entry&lt;K, V&gt;             <span class="title">pollLastEntry</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> K                       <span class="title">ceilingKey</span><span class="params">(K key)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> K                       <span class="title">floorKey</span><span class="params">(K key)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> K                       <span class="title">higherKey</span><span class="params">(K key)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> K                       <span class="title">lowerKey</span><span class="params">(K key)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> NavigableSet&lt;K&gt;         <span class="title">descendingKeySet</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> NavigableSet&lt;K&gt;         <span class="title">navigableKeySet</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> NavigableMap&lt;K, V&gt;      <span class="title">descendingMap</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> NavigableMap&lt;K, V&gt;      <span class="title">headMap</span><span class="params">(K toKey, <span class="keyword">boolean</span> inclusive)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> SortedMap&lt;K, V&gt;         <span class="title">headMap</span><span class="params">(K toKey)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> SortedMap&lt;K, V&gt;         <span class="title">subMap</span><span class="params">(K fromKey, K toKey)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> NavigableMap&lt;K, V&gt;      <span class="title">subMap</span><span class="params">(K fromKey, <span class="keyword">boolean</span> fromInclusive, K toKey, <span class="keyword">boolean</span> toInclusive)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> SortedMap&lt;K, V&gt;         <span class="title">tailMap</span><span class="params">(K fromKey)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> NavigableMap&lt;K, V&gt;      <span class="title">tailMap</span><span class="params">(K fromKey, <span class="keyword">boolean</span> inclusive)</span></span></span><br></pre></td></tr></table></figure>
+<p>说明：</p>
+<p>NavigableMap除了继承SortedMap的特性外，它的提供的功能可以分为4类：</p>
+<ol>
+<li><p>提供操作键-值对的方法。</p>
+<ol>
+<li>lowerEntry、floorEntry、ceilingEntry 和 higherEntry 方法，它们分别返回与小于、小于等于、大于等于、大于给定键的键关联的 Map.Entry 对象。</li>
+<li>firstEntry、pollFirstEntry、lastEntry 和 pollLastEntry 方法，它们返回和/或移除最小和最大的映射关系（如果存在），否则返回 null。</li>
+</ol>
+</li>
+<li><p>提供操作键的方法。这个和第1类比较类似<br>  lowerKey、floorKey、ceilingKey 和 higherKey 方法，它们分别返回与小于、小于等于、大于等于、大于给定键的键。</p>
+</li>
+<li><p>获取键集。<br> navigableKeySet、descendingKeySet分别获取正序/反序的键集。</p>
+</li>
+<li><p>获取键-值对的子集。</p>
+</li>
+</ol>
+<h2 id="6、Dictionary"><a href="#6、Dictionary" class="headerlink" title="6、Dictionary"></a>6、Dictionary</h2><h3 id="Dictionary的定义如下："><a href="#Dictionary的定义如下：" class="headerlink" title="Dictionary的定义如下："></a>Dictionary的定义如下：</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">Dictionary</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt; </span>&#123;&#125;</span><br></pre></td></tr></table></figure>
+<p>NavigableMap是JDK 1.0定义的键值对的接口，它也包括了操作键值对的基本函数。</p>
+<h3 id="Dictionary的API"><a href="#Dictionary的API" class="headerlink" title="Dictionary的API"></a>Dictionary的API</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">abstract</span> Enumeration&lt;V&gt;     <span class="title">elements</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> V                  <span class="title">get</span><span class="params">(Object key)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">boolean</span>            <span class="title">isEmpty</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> Enumeration&lt;K&gt;     <span class="title">keys</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> V                  <span class="title">put</span><span class="params">(K key, V value)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> V                  <span class="title">remove</span><span class="params">(Object key)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">int</span>                <span class="title">size</span><span class="params">()</span></span></span><br></pre></td></tr></table></figure>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2018-06-27T09:39:57.953Z" itemprop="dateUpdated">2018-06-27 17:39:57</time>
+</span><br>
+
+
+        
+        本文固定链接：<a href="/2016/12/09/java-source-analysis-set-series/Java 集合系列09之 Map架构/" target="_blank" rel="external">https://smuwjs.github.io/2016/12/09/java-source-analysis-set-series/Java 集合系列09之 Map架构/</a>
+        
+    </div>
+    <footer>
+        <a href="https://smuwjs.github.io">
+            <img src="/img/head.png" alt="Jeeson">
+            Jeeson
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java-集合系列/">Java 集合系列</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java源码分析/">Java源码分析</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/12/09/java-source-analysis-set-series/Java 集合系列09之 Map架构/&title=《Java 集合系列09之 Map架构》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/12/09/java-source-analysis-set-series/Java 集合系列09之 Map架构/&title=《Java 集合系列09之 Map架构》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/12/09/java-source-analysis-set-series/Java 集合系列09之 Map架构/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Java 集合系列09之 Map架构》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/12/09/java-source-analysis-set-series/Java 集合系列09之 Map架构/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/12/09/java-source-analysis-set-series/Java 集合系列09之 Map架构/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2016/12/10/java-source-analysis-set-series/Java 集合系列10之 HashMap详细介绍/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">Java 集合系列10之 HashMap详细介绍</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2016/12/08/java-source-analysis-set-series/Java 集合系列08之 List总结/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Java 集合系列08之 List总结</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="java-source-analysis-set-series/Java 集合系列09之 Map架构" data-title="Java 集合系列09之 Map架构" data-url="https://smuwjs.github.io/2016/12/09/java-source-analysis-set-series/Java 集合系列09之 Map架构/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'smuwjs', theme: 'none'};
+lazyScripts.push('//unpkg.com/hexo-theme-material-indigo@latest/js/embed.min.js');
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循<a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>Jeeson &copy; 2015 - 2018</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/12/09/java-source-analysis-set-series/Java 集合系列09之 Map架构/&title=《Java 集合系列09之 Map架构》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/12/09/java-source-analysis-set-series/Java 集合系列09之 Map架构/&title=《Java 集合系列09之 Map架构》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/12/09/java-source-analysis-set-series/Java 集合系列09之 Map架构/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Java 集合系列09之 Map架构》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/12/09/java-source-analysis-set-series/Java 集合系列09之 Map架构/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/12/09/java-source-analysis-set-series/Java 集合系列09之 Map架构/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://smuwjs.github.io/2016/12/09/java-source-analysis-set-series/Java 集合系列09之 Map架构/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>Java 时间相关内容04 DateFormat | Jeeson&#39;s Blog | Write the code. Change the world.</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="Java源码分析,Java 时间相关内容">
+    <meta name="description" content="本章主要介绍DateFormat。   目录1. DateFormat 介绍2. DateFormat 实例      1. DateFormat 介绍DateFormat 的作用是 格式化并解析“日期/时间”。实际上，它是Date的格式化工具，它能帮助我们格式化Date，进而将Date转换成我们想要的String字符串供我们使用 不过DateFormat的格式化Date的功能有限，没有Simp">
+<meta name="keywords" content="Java源码分析,Java 时间相关内容">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java 时间相关内容04 DateFormat">
+<meta property="og:url" content="https://smuwjs.github.io/2017/02/04/java-source-analysis-time-series/Java 时间相关内容04 DateFormat/index.html">
+<meta property="og:site_name" content="Jeeson&#39;s Blog">
+<meta property="og:description" content="本章主要介绍DateFormat。   目录1. DateFormat 介绍2. DateFormat 实例      1. DateFormat 介绍DateFormat 的作用是 格式化并解析“日期/时间”。实际上，它是Date的格式化工具，它能帮助我们格式化Date，进而将Date转换成我们想要的String字符串供我们使用 不过DateFormat的格式化Date的功能有限，没有Simp">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-06-27T09:39:57.953Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java 时间相关内容04 DateFormat">
+<meta name="twitter:description" content="本章主要介绍DateFormat。   目录1. DateFormat 介绍2. DateFormat 实例      1. DateFormat 介绍DateFormat 的作用是 格式化并解析“日期/时间”。实际上，它是Date的格式化工具，它能帮助我们格式化Date，进而将Date转换成我们想要的String字符串供我们使用 不过DateFormat的格式化Date的功能有限，没有Simp">
+    
+        <link rel="alternate" type="application/atom+xml" title="Jeeson&#39;s Blog" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/head.png">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Jeeson</h5>
+          <a href="mailto:smuwjs@163.com" title="smuwjs@163.com" class="mail">smuwjs@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/smuwjs" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Java 时间相关内容04 DateFormat</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Java 时间相关内容04 DateFormat</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2017-02-03T16:00:00.000Z" itemprop="datePublished" class="page-time">
+  2017-02-04
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#1-DateFormat-介绍"><span class="post-toc-number">1.</span> <span class="post-toc-text">1. DateFormat 介绍</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#2-DateFormat-实例"><span class="post-toc-number">2.</span> <span class="post-toc-text">2. DateFormat 实例</span></a></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-java-source-analysis-time-series/Java 时间相关内容04 DateFormat"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Java 时间相关内容04 DateFormat</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2017-02-04 00:00:00" datetime="2017-02-03T16:00:00.000Z"  itemprop="datePublished">2017-02-04</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <blockquote>
+<p>本章主要介绍DateFormat。</p>
+</blockquote>
+<blockquote>
+<p><strong>目录</strong><br><a href="#anchor1">1. DateFormat 介绍</a><br><a href="#anchor2">2. DateFormat 实例</a>   </p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="1-DateFormat-介绍"><a href="#1-DateFormat-介绍" class="headerlink" title="1. DateFormat 介绍"></a>1. DateFormat 介绍</h1><p>DateFormat 的作用是 格式化并解析“日期/时间”。实际上，它是Date的格式化工具，它能帮助我们格式化Date，进而将Date转换成我们想要的String字符串供我们使用</p>
+<p>不过DateFormat的格式化Date的功能有限，没有SimpleDateFormat强大；但DateFormat是SimpleDateFormat的父类。所以，我们先对DateFormat有个整体了解，然后再学习SimpleDateFormat。</p>
+<p>DateFormat 的作用是格式化Date。它支持格式化风格包括 FULL、LONG、MEDIUM 和 SHORT 共4种：<br><strong>(01) DateFormat.SHORT</strong><br>&nbsp;&nbsp;&nbsp;&nbsp; 完全为数字，如 12.13.52 或 3:30pm<br><strong>(02) DateFormat.MEDIUM</strong><br>&nbsp;&nbsp;&nbsp;&nbsp; 较长，如 Jan 12, 1952<br><strong>(03) DateFormat.LONG</strong><br>&nbsp;&nbsp;&nbsp;&nbsp; 更长，如 January 12, 1952 或 3:30:32pm<br><strong>(04) DateFormat.FULL</strong><br>&nbsp;&nbsp;&nbsp;&nbsp; 是完全指定，如 Tuesday、April 12、1952 AD 或 3:30:42pm PST。</p>
+<p>DateFormat 的定义如下</p>
+<pre><code>public abstract class NumberFormat extends Format {}
+</code></pre><p>DateFormat 的函数接口</p>
+<pre><code>// 默认构造函数
+DateFormat()
+
+// 非构造函数
+Object                   clone()
+boolean                  equals(Object object)
+abstract StringBuffer    format(Date date, StringBuffer buffer, FieldPosition field)
+final StringBuffer       format(Object object, StringBuffer buffer, FieldPosition field)
+final String             format(Date date)
+static Locale[]          getAvailableLocales()
+Calendar                 getCalendar()
+final static DateFormat     getInstance()
+final static DateFormat     getDateInstance()
+final static DateFormat     getDateInstance(int style)
+final static DateFormat     getDateInstance(int style, Locale locale)
+final static DateFormat     getTimeInstance()
+final static DateFormat     getTimeInstance(int style)
+final static DateFormat     getTimeInstance(int style, Locale locale)
+final static DateFormat     getDateTimeInstance()
+final static DateFormat     getDateTimeInstance(int dateStyle, int timeStyle)
+final static DateFormat     getDateTimeInstance(int dateStyle, int timeStyle, Locale locale)
+NumberFormat     getNumberFormat()
+TimeZone         getTimeZone()
+int              hashCode()
+boolean          isLenient()
+Date             parse(String string)
+abstract Date    parse(String string, ParsePosition position)
+Object           parseObject(String string, ParsePosition position)
+void             setCalendar(Calendar cal)
+void             setLenient(boolean value)
+void             setNumberFormat(NumberFormat format)
+void             setTimeZone(TimeZone timezone)
+</code></pre><p>注意：DateFormat是一个抽象类。</p>
+<p>当我们通过DateFormat的 getInstance(), getDateInstance()和getDateTimeInstance() 获取DateFormat实例时；实际上是返回的SimpleDateFormat对象。<br>下面的函数实际上都是返回的SimpleDateFormat对象。</p>
+<pre><code>final static DateFormat getInstance()
+final static DateFormat getTimeInstance()
+final static DateFormat getTimeInstance(int style)
+final static DateFormat getTimeInstance(int style, Locale locale)
+final static DateFormat getDateInstance()
+final static DateFormat getDateInstance(int style)
+final static DateFormat getDateInstance(int style, Locale locale)
+final static DateFormat getDateTimeInstance()
+final static DateFormat getDateTimeInstance(int dateStyle, int timeStyle)
+final static DateFormat getDateTimeInstance(int dateStyle, int timeStyle, Locale locale)
+</code></pre><p>这些函数在SimpleDateFormat.java中的定义如下：</p>
+<pre><code>public static final int FULL = 0;
+public static final int LONG = 1;
+public static final int MEDIUM = 2;
+public static final int SHORT = 3;
+public static final int DEFAULT = MEDIUM;
+
+public final static DateFormat getInstance() {
+    return getDateTimeInstance(SHORT, SHORT);
+}
+
+public final static DateFormat getTimeInstance()
+{
+    return get(DEFAULT, 0, 1, Locale.getDefault());
+}
+
+public final static DateFormat getTimeInstance(int style)
+{
+    return get(style, 0, 1, Locale.getDefault());
+}
+
+public final static DateFormat getTimeInstance(int style,
+                                             Locale aLocale)
+{
+    return get(style, 0, 1, aLocale);
+}
+
+public final static DateFormat getDateInstance()
+{
+    return get(0, DEFAULT, 2, Locale.getDefault());
+}
+
+public final static DateFormat getDateInstance(int style)
+{
+    return get(0, style, 2, Locale.getDefault());
+}
+
+public final static DateFormat getDateInstance(int style,
+                                             Locale aLocale)
+{
+    return get(0, style, 2, aLocale);
+}
+
+public final static DateFormat getDateTimeInstance()
+{
+    return get(DEFAULT, DEFAULT, 3, Locale.getDefault());
+}
+
+public final static DateFormat getDateTimeInstance(int dateStyle,
+                                                   int timeStyle)
+{
+    return get(timeStyle, dateStyle, 3, Locale.getDefault());
+}
+
+public final static DateFormat
+    getDateTimeInstance(int dateStyle, int timeStyle, Locale aLocale)
+{
+    return get(timeStyle, dateStyle, 3, aLocale);
+}
+
+/**
+ * 获取DateFormat实例，实际上是返回SimpleDateFormat对象。
+ * 
+ * timeStyle -- 值可以为“FULL”或“LONG”或“MEDIUM”或“SHORT”
+ * dateStyle -- 值可以为“FULL”或“LONG”或“MEDIUM”或“SHORT”
+ * flags     -- 值可以为“1”或“2”或“3”。
+ *       1 表示获取“时间样式”
+ *       2 表示获取“日期样式”
+ *       3 表示获取“时间和日期样式”
+ * loc       -- locale对象，表示“区域”
+ */
+private static DateFormat get(int timeStyle, int dateStyle,
+                              int flags, Locale loc) {
+    if ((flags &amp; 1) != 0) {
+        if (timeStyle &lt; 0 || timeStyle &gt; 3) {
+            throw new IllegalArgumentException(&quot;Illegal time style &quot; + timeStyle);
+        }
+    } else {
+        timeStyle = -1;
+    }
+    if ((flags &amp; 2) != 0) {
+        if (dateStyle &lt; 0 || dateStyle &gt; 3) {
+            throw new IllegalArgumentException(&quot;Illegal date style &quot; + dateStyle);
+        }
+    } else {
+        dateStyle = -1;
+    }
+    try {
+        // Check whether a provider can provide an implementation that&apos;s closer 
+        // to the requested locale than what the Java runtime itself can provide.
+        LocaleServiceProviderPool pool =
+            LocaleServiceProviderPool.getPool(DateFormatProvider.class);
+        if (pool.hasProviders()) {
+            DateFormat providersInstance = pool.getLocalizedObject(
+                                                DateFormatGetter.INSTANCE,
+                                                loc, 
+                                                timeStyle,
+                                                dateStyle,
+                                                flags);
+            if (providersInstance != null) {
+                return providersInstance;
+            }
+        }
+
+        return new SimpleDateFormat(timeStyle, dateStyle, loc);
+    } catch (MissingResourceException e) {
+        return new SimpleDateFormat(&quot;M/d/yy h:mm a&quot;);
+    }
+}
+</code></pre><p>通过上面的代码，我们能够进一步的认识到：DateFormat的作用是格式化Date；帮助我们将Date转换成我们需要的String字符串。DateFormat提供的功能非常有限，它只能支持FULL、LONG、MEDIUM 和 SHORT 这4种格式。而且，我们获取DateFormat实例时，实际上是返回的SimpleDateFormat对象。</p>
+<p><a name="anchor2"></a></p>
+<h1 id="2-DateFormat-实例"><a href="#2-DateFormat-实例" class="headerlink" title="2. DateFormat 实例"></a>2. DateFormat 实例</h1><p>下面，我们通过实例学习使用DateFormat的常用API。</p>
+<p>源码如下(DateFormatTest.java): </p>
+<pre><code>import java.util.Date;
+import java.util.Locale;
+import java.text.DateFormat;
+import java.text.FieldPosition;
+
+/**
+ * DateFormat 的API测试程序
+ *
+ * @author skywang
+ * @email kuiwu-wang@163.com
+ */
+public class DateFormatTest {
+
+    public static void main(String[] args) {
+
+        // 只显示“时间”：调用getTimeInstance()函数
+        testGetTimeInstance() ;
+
+        // 只显示“日期”：调用getDateInstance()函数
+        testGetDateInstance() ;
+
+        // 显示“日期”+“时间”：调用getDateTimeInstance()函数
+        testGetDateTimeInstance() ;
+
+        // 测试format()函数
+        testFormat();
+    }
+
+    /**
+     * 测试DateFormat的getTimeInstance()函数
+     * 它共有3种重载形式：
+     * (01) getTimeInstance()
+     * (02) getTimeInstance(int style)
+     * (03) getTimeInstance(int style, Locale locale)
+     *
+     * @author skywang
+     */
+    private static void testGetTimeInstance() {
+        Date date = new Date(); 
+
+        //Locale locale = new Locale(&quot;fr&quot;, &quot;FR&quot;);
+        Locale locale = new Locale(&quot;zh&quot;, &quot;CN&quot;); 
+
+        // 等价于 DateFormat.getTimeInstance( DateFormat.MEDIUM); 
+        DateFormat short0  = DateFormat.getTimeInstance( ); 
+
+        // 参数是：“时间的显示样式”
+        DateFormat short1  = DateFormat.getTimeInstance( DateFormat.SHORT); 
+        DateFormat medium1 = DateFormat.getTimeInstance( DateFormat.MEDIUM); 
+        DateFormat long1   = DateFormat.getTimeInstance( DateFormat.LONG); 
+        DateFormat full1   = DateFormat.getTimeInstance( DateFormat.FULL); 
+
+        // 参数是：“时间的显示样式” 和 “地区”
+        DateFormat short2  = DateFormat.getTimeInstance( DateFormat.SHORT, locale); 
+        DateFormat medium2 = DateFormat.getTimeInstance( DateFormat.MEDIUM, locale); 
+        DateFormat long2   = DateFormat.getTimeInstance( DateFormat.LONG, locale); 
+        DateFormat full2   = DateFormat.getTimeInstance( DateFormat.FULL, locale); 
+
+        System.out.println(&quot;\n----getTimeInstance ----\n&quot;
+                + &quot;(1.0) Empty Param   : &quot; + short0.format(date) +&quot;\n&quot;
+                + &quot;(2.1) One Param(s)  : &quot; + short1.format(date) +&quot;\n&quot;
+                + &quot;(2.2) One Param(m)  : &quot; + medium1.format(date) +&quot;\n&quot;
+                + &quot;(2.3) One Param(l)  : &quot; + long1.format(date) +&quot;\n&quot;
+                + &quot;(2.4) One Param(f)  : &quot; + full1.format(date) +&quot;\n&quot;
+                + &quot;(3.1) One Param(s,l): &quot; + short2.format(date) +&quot;\n&quot;
+                + &quot;(3.2) One Param(m,l): &quot; + medium2.format(date) +&quot;\n&quot;
+                + &quot;(3.3) One Param(l,l): &quot; + long2.format(date) +&quot;\n&quot;
+                + &quot;(3.4) One Param(f,l): &quot; + full2.format(date) +&quot;\n&quot;
+                ); 
+    }
+
+    /**
+     * 测试DateFormat的getDateTimeInstance()函数
+     * 它共有3种重载形式：
+     * (01) getDateInstance()
+     * (02) getDateInstance(int style)
+     * (03) getDateInstance(int style, Locale locale)
+     */
+    public static void testGetDateTimeInstance() {
+        Date date = new Date(); 
+
+        Locale locale = new Locale(&quot;zh&quot;, &quot;CN&quot;); 
+
+        // 等价于 DateFormat.getDateTimeInstance( DateFormat.MEDIUM); 
+        DateFormat short0  = DateFormat.getDateTimeInstance( ); 
+
+        DateFormat short1  = DateFormat.getDateTimeInstance( DateFormat.SHORT, DateFormat.SHORT); 
+        DateFormat medium1 = DateFormat.getDateTimeInstance( DateFormat.MEDIUM, DateFormat.MEDIUM); 
+        DateFormat long1   = DateFormat.getDateTimeInstance( DateFormat.LONG, DateFormat.LONG); 
+        DateFormat full1   = DateFormat.getDateTimeInstance( DateFormat.FULL, DateFormat.FULL); 
+
+        DateFormat short2  = DateFormat.getDateTimeInstance( DateFormat.SHORT, DateFormat.SHORT, locale); 
+        DateFormat medium2 = DateFormat.getDateTimeInstance( DateFormat.MEDIUM, DateFormat.MEDIUM, locale); 
+        DateFormat long2   = DateFormat.getDateTimeInstance( DateFormat.LONG, DateFormat.LONG, locale); 
+        DateFormat full2   = DateFormat.getDateTimeInstance( DateFormat.FULL, DateFormat.FULL, locale); 
+
+        System.out.println(&quot;\n----getDateTimeInstance ----\n&quot;
+                + &quot;(1.0) Empty Param   : &quot; + short0.format(date) +&quot;\n&quot;
+                + &quot;(2.1) One Param(s)  : &quot; + short1.format(date) +&quot;\n&quot;
+                + &quot;(2.2) One Param(m)  : &quot; + medium1.format(date) +&quot;\n&quot;
+                + &quot;(2.3) One Param(l)  : &quot; + long1.format(date) +&quot;\n&quot;
+                + &quot;(2.4) One Param(f)  : &quot; + full1.format(date) +&quot;\n&quot;
+                + &quot;(3.1) One Param(s,l): &quot; + short2.format(date) +&quot;\n&quot;
+                + &quot;(3.2) One Param(m,l): &quot; + medium2.format(date) +&quot;\n&quot;
+                + &quot;(3.3) One Param(l,l): &quot; + long2.format(date) +&quot;\n&quot;
+                + &quot;(3.4) One Param(f,l): &quot; + full2.format(date) +&quot;\n&quot;
+                ); 
+    }
+
+    /**
+     * 测试DateFormat的getDateInstance()函数
+     * 它共有3种重载形式：
+     * (01) getDateTimeInstance()
+     * (02) getDateTimeInstance(int dateStyle, int timeStyle)
+     * (03) getDateTimeInstance(int dateStyle, int timeStyle, Locale locale)
+     */
+    public static void testGetDateInstance() {
+        Date date = new Date(); 
+
+        //Locale locale = new Locale(&quot;en&quot;, &quot;US&quot;); 
+        Locale locale = new Locale(&quot;zh&quot;, &quot;CN&quot;); 
+
+        // 等价于 DateFormat.getDateInstance( DateFormat.MEDIUM); 
+        DateFormat short0  = DateFormat.getDateInstance( ); 
+
+        DateFormat short1  = DateFormat.getDateInstance( DateFormat.SHORT); 
+        DateFormat medium1 = DateFormat.getDateInstance( DateFormat.MEDIUM); 
+        DateFormat long1   = DateFormat.getDateInstance( DateFormat.LONG); 
+        DateFormat full1   = DateFormat.getDateInstance( DateFormat.FULL); 
+
+        DateFormat short2  = DateFormat.getDateInstance( DateFormat.SHORT, locale); 
+        DateFormat medium2 = DateFormat.getDateInstance( DateFormat.MEDIUM, locale); 
+        DateFormat long2   = DateFormat.getDateInstance( DateFormat.LONG, locale); 
+        DateFormat full2   = DateFormat.getDateInstance( DateFormat.FULL, locale); 
+
+        System.out.println(&quot;\n----getDateInstance ----\n&quot;
+                + &quot;(1.0) Empty Param   : &quot; + short0.format(date) +&quot;\n&quot;
+                + &quot;(2.1) One Param(s)  : &quot; + short1.format(date) +&quot;\n&quot;
+                + &quot;(2.2) One Param(m)  : &quot; + medium1.format(date) +&quot;\n&quot;
+                + &quot;(2.3) One Param(l)  : &quot; + long1.format(date) +&quot;\n&quot;
+                + &quot;(2.4) One Param(f)  : &quot; + full1.format(date) +&quot;\n&quot;
+                + &quot;(3.1) One Param(s,l): &quot; + short2.format(date) +&quot;\n&quot;
+                + &quot;(3.2) One Param(m,l): &quot; + medium2.format(date) +&quot;\n&quot;
+                + &quot;(3.3) One Param(l,l): &quot; + long2.format(date) +&quot;\n&quot;
+                + &quot;(3.4) One Param(f,l): &quot; + full2.format(date) +&quot;\n&quot;
+                ); 
+
+    }
+
+
+    /**
+     * 测试DateFormat的format()函数
+     */
+    public static void testFormat() {
+        Date date = new Date(); 
+        StringBuffer sb = new StringBuffer();
+        FieldPosition field = new FieldPosition(DateFormat.YEAR_FIELD);
+        DateFormat format = DateFormat.getDateTimeInstance();
+
+        sb =  format.format(date, sb, field);
+        System.out.println(&quot;\ntestFormat&quot;); 
+        System.out.printf(&quot;sb=%s\n&quot;, sb);
+    }
+}
+</code></pre><p>运行结果：</p>
+<pre><code>----getTimeInstance ----
+(1.0) Empty Param   : 4:54:22 PM
+(2.1) One Param(s)  : 4:54 PM
+(2.2) One Param(m)  : 4:54:22 PM
+(2.3) One Param(l)  : 4:54:22 PM CST
+(2.4) One Param(f)  : 4:54:22 PM CST
+(3.1) One Param(s,l): 下午4:54
+(3.2) One Param(m,l): 16:54:22
+(3.3) One Param(l,l): 下午04时54分22秒
+(3.4) One Param(f,l): 下午04时54分22秒 CST
+
+
+----getDateInstance ----
+(1.0) Empty Param   : Jan 23, 2014
+(2.1) One Param(s)  : 1/23/14
+(2.2) One Param(m)  : Jan 23, 2014
+(2.3) One Param(l)  : January 23, 2014
+(2.4) One Param(f)  : Thursday, January 23, 2014
+(3.1) One Param(s,l): 14-1-23
+(3.2) One Param(m,l): 2014-1-23
+(3.3) One Param(l,l): 2014年1月23日
+(3.4) One Param(f,l): 2014年1月23日 星期四
+
+
+----getDateTimeInstance ----
+(1.0) Empty Param   : Jan 23, 2014 4:54:23 PM
+(2.1) One Param(s)  : 1/23/14 4:54 PM
+(2.2) One Param(m)  : Jan 23, 2014 4:54:23 PM
+(2.3) One Param(l)  : January 23, 2014 4:54:23 PM CST
+(2.4) One Param(f)  : Thursday, January 23, 2014 4:54:23 PM CST
+(3.1) One Param(s,l): 14-1-23 下午4:54
+(3.2) One Param(m,l): 2014-1-23 16:54:23
+(3.3) One Param(l,l): 2014年1月23日 下午04时54分23秒
+(3.4) One Param(f,l): 2014年1月23日 星期四 下午04时54分23秒 CST
+
+
+testFormat
+sb=Jan 23, 2014 4:54:23 PM
+</code></pre><p>OK。至此，对DateFormat的学习到此为止。接下来，我们开始学习SimpleDateFormat，它才是格式化Date需要重点了解的。</p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2018-06-27T09:39:57.953Z" itemprop="dateUpdated">2018-06-27 17:39:57</time>
+</span><br>
+
+
+        
+        本文固定链接：<a href="/2017/02/04/java-source-analysis-time-series/Java 时间相关内容04 DateFormat/" target="_blank" rel="external">https://smuwjs.github.io/2017/02/04/java-source-analysis-time-series/Java 时间相关内容04 DateFormat/</a>
+        
+    </div>
+    <footer>
+        <a href="https://smuwjs.github.io">
+            <img src="/img/head.png" alt="Jeeson">
+            Jeeson
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java-时间相关内容/">Java 时间相关内容</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java源码分析/">Java源码分析</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2017/02/04/java-source-analysis-time-series/Java 时间相关内容04 DateFormat/&title=《Java 时间相关内容04 DateFormat》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2017/02/04/java-source-analysis-time-series/Java 时间相关内容04 DateFormat/&title=《Java 时间相关内容04 DateFormat》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2017/02/04/java-source-analysis-time-series/Java 时间相关内容04 DateFormat/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Java 时间相关内容04 DateFormat》 — Jeeson's Blog&url=https://smuwjs.github.io/2017/02/04/java-source-analysis-time-series/Java 时间相关内容04 DateFormat/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2017/02/04/java-source-analysis-time-series/Java 时间相关内容04 DateFormat/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2017/02/05/java-source-analysis-time-series/Java 时间相关内容05 SimpleDateFormat/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">Java 时间相关内容05 SimpleDateFormat</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2017/02/03/java-source-analysis-time-series/Java 时间相关内容03 Date/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Java 时间相关内容03 Date</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="java-source-analysis-time-series/Java 时间相关内容04 DateFormat" data-title="Java 时间相关内容04 DateFormat" data-url="https://smuwjs.github.io/2017/02/04/java-source-analysis-time-series/Java 时间相关内容04 DateFormat/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'smuwjs', theme: 'none'};
+lazyScripts.push('//unpkg.com/hexo-theme-material-indigo@latest/js/embed.min.js');
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循<a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>Jeeson &copy; 2015 - 2018</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2017/02/04/java-source-analysis-time-series/Java 时间相关内容04 DateFormat/&title=《Java 时间相关内容04 DateFormat》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2017/02/04/java-source-analysis-time-series/Java 时间相关内容04 DateFormat/&title=《Java 时间相关内容04 DateFormat》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2017/02/04/java-source-analysis-time-series/Java 时间相关内容04 DateFormat/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Java 时间相关内容04 DateFormat》 — Jeeson's Blog&url=https://smuwjs.github.io/2017/02/04/java-source-analysis-time-series/Java 时间相关内容04 DateFormat/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2017/02/04/java-source-analysis-time-series/Java 时间相关内容04 DateFormat/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://smuwjs.github.io/2017/02/04/java-source-analysis-time-series/Java 时间相关内容04 DateFormat/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

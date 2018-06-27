@@ -1,0 +1,1416 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>java io系列06之 序列化(Serializable和Externalizable)详解 | Jeeson&#39;s Blog | Write the code. Change the world.</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="Java源码分析,Java IO系列">
+    <meta name="description" content="本章，我们对序列化进行深入的学习和探讨。学习内容，包括序列化的作用、用途、用法，以及对实现序列化的2种方式Serializable和Externalizable的深入研究。   目录1. 序列化是的作用和用途2. 演示程序13. 演示程序24. 演示程序35. 演示程序46. 演示程序57. Externalizable和完全定制序列化过程      1. 序列化是的作用和用途序列化，就是为了保">
+<meta name="keywords" content="Java源码分析,Java IO系列">
+<meta property="og:type" content="article">
+<meta property="og:title" content="java io系列06之 序列化(Serializable和Externalizable)详解">
+<meta property="og:url" content="https://smuwjs.github.io/2016/10/06/java-source-analysis-io-series/java io系列06之 序列化(Serializable和Externalizable)详解/index.html">
+<meta property="og:site_name" content="Jeeson&#39;s Blog">
+<meta property="og:description" content="本章，我们对序列化进行深入的学习和探讨。学习内容，包括序列化的作用、用途、用法，以及对实现序列化的2种方式Serializable和Externalizable的深入研究。   目录1. 序列化是的作用和用途2. 演示程序13. 演示程序24. 演示程序35. 演示程序46. 演示程序57. Externalizable和完全定制序列化过程      1. 序列化是的作用和用途序列化，就是为了保">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-06-27T09:39:57.941Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="java io系列06之 序列化(Serializable和Externalizable)详解">
+<meta name="twitter:description" content="本章，我们对序列化进行深入的学习和探讨。学习内容，包括序列化的作用、用途、用法，以及对实现序列化的2种方式Serializable和Externalizable的深入研究。   目录1. 序列化是的作用和用途2. 演示程序13. 演示程序24. 演示程序35. 演示程序46. 演示程序57. Externalizable和完全定制序列化过程      1. 序列化是的作用和用途序列化，就是为了保">
+    
+        <link rel="alternate" type="application/atom+xml" title="Jeeson&#39;s Blog" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/head.png">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Jeeson</h5>
+          <a href="mailto:smuwjs@163.com" title="smuwjs@163.com" class="mail">smuwjs@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/smuwjs" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">java io系列06之 序列化(Serializable和Externalizable)详解</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">java io系列06之 序列化(Serializable和Externalizable)详解</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2016-10-05T16:00:00.000Z" itemprop="datePublished" class="page-time">
+  2016-10-06
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#1-序列化是的作用和用途"><span class="post-toc-number">1.</span> <span class="post-toc-text">1. 序列化是的作用和用途</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#2-演示程序1"><span class="post-toc-number">2.</span> <span class="post-toc-text">2. 演示程序1</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#3-演示程序2"><span class="post-toc-number">3.</span> <span class="post-toc-text">3. 演示程序2</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#4-演示程序3"><span class="post-toc-number">4.</span> <span class="post-toc-text">4. 演示程序3</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#5-演示程序4"><span class="post-toc-number">5.</span> <span class="post-toc-text">5. 演示程序4</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#6-演示程序5"><span class="post-toc-number">6.</span> <span class="post-toc-text">6. 演示程序5</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#7-Externalizable和完全定制序列化过程"><span class="post-toc-number">7.</span> <span class="post-toc-text">7. Externalizable和完全定制序列化过程</span></a></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-java-source-analysis-io-series/java io系列06之 序列化(Serializable和Externalizable)详解"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">java io系列06之 序列化(Serializable和Externalizable)详解</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2016-10-06 00:00:00" datetime="2016-10-05T16:00:00.000Z"  itemprop="datePublished">2016-10-06</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <blockquote>
+<p>本章，我们对序列化进行深入的学习和探讨。学习内容，包括序列化的作用、用途、用法，以及对实现序列化的2种方式Serializable和Externalizable的深入研究。</p>
+</blockquote>
+<blockquote>
+<p><strong>目录</strong><br><a href="#anchor1">1. 序列化是的作用和用途</a><br><a href="#anchor2">2. 演示程序1</a><br><a href="#anchor3">3. 演示程序2</a><br><a href="#anchor4">4. 演示程序3</a><br><a href="#anchor5">5. 演示程序4</a><br><a href="#anchor6">6. 演示程序5</a><br><a href="#anchor7">7. Externalizable和完全定制序列化过程</a>   </p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="1-序列化是的作用和用途"><a href="#1-序列化是的作用和用途" class="headerlink" title="1. 序列化是的作用和用途"></a>1. 序列化是的作用和用途</h1><p>序列化，就是为了保存对象的状态；而与之对应的反序列化，则可以把保存的对象状态再读出来。<br>简言之：序列化/反序列化，是Java提供一种专门用于的保存/恢复对象状态的机制。</p>
+<p>一般在以下几种情况下，我们可能会用到序列化：<br>a）当你想把的内存中的对象状态保存到一个文件中或者数据库中时候；<br>b）当你想用套接字在网络上传送对象的时候；<br>c）当你想通过RMI传输对象的时候。</p>
+<p><a name="anchor2"></a></p>
+<h1 id="2-演示程序1"><a href="#2-演示程序1" class="headerlink" title="2. 演示程序1"></a>2. 演示程序1</h1><p>下面，我们先通过一则简单示例来查看序列化的用法。</p>
+<p>源码如下(SerialTest1.java)： </p>
+<pre><code>/**
+ * 序列化的演示测试程序
+ *
+ * @author skywang
+ */
+
+import java.io.FileInputStream;   
+import java.io.FileOutputStream;   
+import java.io.ObjectInputStream;   
+import java.io.ObjectOutputStream;   
+import java.io.Serializable;   
+
+public class SerialTest1 {
+    private static final String TMP_FILE = &quot;.serialtest1.txt&quot;;
+
+    public static void main(String[] args) {   
+        // 将“对象”通过序列化保存
+        testWrite();
+        // 将序列化的“对象”读出来
+        testRead();
+    }
+
+
+    /**
+     * 将Box对象通过序列化，保存到文件中
+     */
+    private static void testWrite() {   
+        try {
+            // 获取文件TMP_FILE对应的对象输出流。
+            // ObjectOutputStream中，只能写入“基本数据”或“支持序列化的对象”
+            ObjectOutputStream out = new ObjectOutputStream(
+                    new FileOutputStream(TMP_FILE));
+            // 创建Box对象，Box实现了Serializable序列化接口
+            Box box = new Box(&quot;desk&quot;, 80, 48);
+            // 将box对象写入到对象输出流out中，即相当于将对象保存到文件TMP_FILE中
+            out.writeObject(box);
+            // 打印“Box对象”
+            System.out.println(&quot;testWrite box: &quot; + box);
+
+            out.close();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    /**
+     * 从文件中读取出“序列化的Box对象”
+     */
+    private static void testRead() {
+        try {
+            // 获取文件TMP_FILE对应的对象输入流。
+            ObjectInputStream in = new ObjectInputStream(
+                    new FileInputStream(TMP_FILE));
+            // 从对象输入流中，读取先前保存的box对象。
+            Box box = (Box) in.readObject();
+            // 打印“Box对象”
+            System.out.println(&quot;testRead  box: &quot; + box);
+            in.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+
+/**
+ * Box类“支持序列化”。因为Box实现了Serializable接口。
+ *
+ * 实际上，一个类只需要实现Serializable即可实现序列化，而不需要实现任何函数。
+ */
+class Box implements Serializable {
+    private int width;   
+    private int height; 
+    private String name;   
+
+    public Box(String name, int width, int height) {
+        this.name = name;
+        this.width = width;
+        this.height = height;
+    }
+
+    @Override
+    public String toString() {
+        return &quot;[&quot;+name+&quot;: (&quot;+width+&quot;, &quot;+height+&quot;) ]&quot;;
+    }
+}
+</code></pre><p>运行结果：</p>
+<pre><code>testWrite box: [desk: (80, 48) ]
+testRead box: [desk: (80, 48) ]
+</code></pre><p>源码说明：</p>
+<p>(01) 程序的作用很简单，就是演示：先将Box对象，通过对象输出流保存到文件中；之后，再通过对象输入流，将文件中保存的Box对象读取出来。</p>
+<p>(02) Box类说明。Box是我们自定义的演示类，它被用于序列化的读写。Box实现了Serialable接口，因此它支持序列化操作；即，Box支持通过ObjectOutputStream去写入到输出流中，并且支持通过ObjectInputStream从输入流中读取出来。</p>
+<p>(03) testWrite()函数说明。testWrite()的作用就是，新建一个Box对象，然后将该Box对象写入到文件中。<br>&nbsp;&nbsp;&nbsp;&nbsp; 首先，新建文件TMP_FILE的文件输出流对象(即FileOutputStream对象)，再创建该文件输出流的对象输出流(即ObjectOutputStream对象)。<br>&nbsp;&nbsp;&nbsp;&nbsp; a) 关于FileInputStream和FileOutputStream的内容，可以参考“java io系列07之 FileInputStream和FileOutputStream”。<br>&nbsp;&nbsp;&nbsp;&nbsp; b) 关于ObjectInputStream和ObjectOutputStream的的更多知识，可以参考“java io系列05之 ObjectInputStream 和 ObjectOutputStream”<br>&nbsp;&nbsp;&nbsp;&nbsp; 然后，新建Box对象。<br>&nbsp;&nbsp;&nbsp;&nbsp; 最后，通过out.writeObject(box) 将box写入到对象输出流中。实际上，相当于将box写入到文件TMP_FILE中。  </p>
+<p>(04) testRead()函数说明。testRead()的作用就是，从文件中读出Box对象。<br>&nbsp;&nbsp;&nbsp;&nbsp; 首先，新建文件TMP_FILE的文件输入流对象(即FileInputStream对象)，再创建该文件输入流的对象输入流(即ObjectInputStream对象)。<br>&nbsp;&nbsp;&nbsp;&nbsp; 然后，通过in.readObject() 从对象输入流中读取出Box对象。实际上，相当于从文件TMP_FILE中读取Box对象。</p>
+<p>通过上面的示例，我们知道：我们可以自定义类，让它支持序列化(即实现Serializable接口)，从而能支持对象的保存/恢复。<br>若要支持序列化，除了“自定义实现Serializable接口的类”之外；java的“基本类型”和“java自带的实现了Serializable接口的类”，都支持序列化。我们通过下面的示例去查看一下。</p>
+<p><a name="anchor3"></a></p>
+<h1 id="3-演示程序2"><a href="#3-演示程序2" class="headerlink" title="3. 演示程序2"></a>3. 演示程序2</h1><p>源码如下(SerialTest2.java)：</p>
+<pre><code>/**
+ * “基本类型” 和 “java自带的实现Serializable接口的类” 对序列化的支持
+ *
+ * @author skywang
+ */
+
+import java.io.FileInputStream;   
+import java.io.FileOutputStream;   
+import java.io.ObjectInputStream;   
+import java.io.ObjectOutputStream;   
+import java.io.Serializable;   
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Iterator;
+
+public class SerialTest2 {
+    private static final String TMP_FILE = &quot;.serialabletest2.txt&quot;;
+
+    public static void main(String[] args) {   
+        testWrite();
+        testRead();
+    }
+
+    /**
+     * ObjectOutputStream 测试函数
+     */
+    private static void testWrite() {   
+        try {
+            ObjectOutputStream out = new ObjectOutputStream(
+                    new FileOutputStream(TMP_FILE));
+            out.writeBoolean(true);    // 写入Boolean值
+            out.writeByte((byte)65);// 写入Byte值
+            out.writeChar(&apos;a&apos;);     // 写入Char值
+            out.writeInt(20131015); // 写入Int值
+            out.writeFloat(3.14F);  // 写入Float值
+            out.writeDouble(1.414D);// 写入Double值
+            // 写入HashMap对象
+            HashMap map = new HashMap();
+            map.put(&quot;one&quot;, &quot;red&quot;);
+            map.put(&quot;two&quot;, &quot;green&quot;);
+            map.put(&quot;three&quot;, &quot;blue&quot;);
+            out.writeObject(map);
+
+            out.close();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    /**
+     * ObjectInputStream 测试函数
+     */
+    private static void testRead() {
+        try {
+            ObjectInputStream in = new ObjectInputStream(
+                    new FileInputStream(TMP_FILE));
+            System.out.printf(&quot;boolean:%b\n&quot; , in.readBoolean());
+            System.out.printf(&quot;byte:%d\n&quot; , (in.readByte()&amp;0xff));
+            System.out.printf(&quot;char:%c\n&quot; , in.readChar());
+            System.out.printf(&quot;int:%d\n&quot; , in.readInt());
+            System.out.printf(&quot;float:%f\n&quot; , in.readFloat());
+            System.out.printf(&quot;double:%f\n&quot; , in.readDouble());
+            // 读取HashMap对象
+            HashMap map = (HashMap) in.readObject();
+            Iterator iter = map.entrySet().iterator();
+            while (iter.hasNext()) {
+                Map.Entry entry = (Map.Entry)iter.next();
+                System.out.printf(&quot;%-6s -- %s\n&quot; , entry.getKey(), entry.getValue());
+            }
+
+            in.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+</code></pre><p>运行结果：</p>
+<pre><code>boolean:true
+byte:65
+char:a
+int:20131015
+float:3.140000
+double:1.414000
+two    -- green
+one    -- red
+three  -- blue
+</code></pre><p>源码说明：</p>
+<p>(01) 程序的作用很简单，就是演示：先将“基本类型数据”和“HashMap对象”，通过对象输出流保存到文件中；之后，再通过对象输入流，将这些保存的数据读取出来。</p>
+<p>(02) testWrite()函数说明。testWrite()的作用就是，先将“基本类型数据”和“HashMap对象”，通过对象输出流保存到文件中。<br>&nbsp;&nbsp;&nbsp;&nbsp; 首先，新建文件TMP_FILE的文件输出流对象(即FileOutputStream对象)，再创建该文件输出流的对象输出流(即ObjectOutputStream对象)。<br>&nbsp;&nbsp;&nbsp;&nbsp; 然后，通过 writeBoolean(), writeByte(), … , writeDouble() 等一系列函数将“Boolean, byte, char, … , double等基本数据类型”写入到对象输出流中。实际上，相当于将这些内容写入到文件TMP_FILE中。<br>&nbsp;&nbsp;&nbsp;&nbsp; 最后，新建HashMap对象map，并通过out.writeObject(map) 将map写入到对象输出流中。实际上，相当于map写入到文件TMP_FILE中。<br>&nbsp;&nbsp;&nbsp;&nbsp; 关于HashMap的更多知识，可以参考“[Java 集合系列10之 HashMap详细介绍(源码解析)和使用示例][link_java_collection_10]”。</p>
+<p>(03) testRead()函数说明。testRead()的作用就是，从文件中读出testWrite()写入的对象。<br>&nbsp;&nbsp;&nbsp;&nbsp; 首先，新建文件TMP_FILE的文件输入流对象(即FileInputStream对象)，再创建该文件输入流的对象输入流(即ObjectInputStream对象)。<br>&nbsp;&nbsp;&nbsp;&nbsp; 然后，通过in.readObject() 从对象输入流中读取出testWrite()对象。实际上，相当于从文件TMP_FILE中读取出这些对象。</p>
+<p>在前面，我们提到过：若要支持序列化，除了“自定义实现Serializable接口的类”之外；java的“基本类型”和“java自带的实现了Serializable接口的类”，都支持序列化。为了验证这句话，我们看看HashMap是否实现了Serializable接口。  </p>
+<p>HashMap是java.util包中定义的类，它的接口声明如下：</p>
+<pre><code>public class HashMap&lt;K,V&gt; extends AbstractMap&lt;K,V&gt;
+    implements Map&lt;K,V&gt;, Cloneable, Serializable {} 
+</code></pre><p>至此，我们对序列化的认识已经比较深入了：即知道了“序列化的作用和用法”，也知道了“基本类型”、“java自带的支持Serializable接口的类”和“自定义实现Serializable接口的类”都能支持序列化。<br>应付序列化的简单使用应该足够了。但是，我们的目的是对序列化有更深层次的了解！更何况，写此文的作者(也就是区区在下)，应该比各位看官要累(既要写代码，又要总结，还得注意排版和用词，讲的通俗易懂，让各位看得轻松自在)；我这个菜鸟都能做到这些，何况对知识极其渴望的您呢？所以，请深吸一口气，然后继续……</p>
+<p>我们在介绍序列化定义时，说过“序列化/反序列化，是专门用于的保存/恢复对象状态的机制”。<br>从中，我们知道：序列化/反序列化，只支持保存/恢复对象状态，即仅支持保存/恢复类的成员变量，但不支持保存类的成员方法！<br>但是，序列化是不是对类的所有的成员变量的状态都能保存呢？</p>
+<p>答案当然是否定的！<br>(01) 序列化对static和transient变量，是不会自动进行状态保存的。<br>&nbsp;&nbsp;&nbsp;&nbsp; transient的作用就是，用transient声明的变量，不会被自动序列化。<br>(02) 对于Socket, Thread类，不支持序列化。若实现序列化的接口中，有Thread成员；在对该类进行序列化操作时，编译会出错！<br>&nbsp;&nbsp;&nbsp;&nbsp; 这主要是基于资源分配方面的原因。如果Socket，Thread类可以被序列化，但是被反序列化之后也无法对他们进行重新的资源分配；再者，也是没有必要这样实现。  </p>
+<p>下面，我们还是通过示例来查看“序列化对static和transient的处理”。</p>
+<p><a name="anchor4"></a></p>
+<h1 id="4-演示程序3"><a href="#4-演示程序3" class="headerlink" title="4. 演示程序3"></a>4. 演示程序3</h1><p>我们对前面的SerialTest1.java进行简单修改，得到源文件(SerialTest3.java)如下：</p>
+<pre><code>/**
+ * 序列化的演示测试程序
+ *
+ * @author skywang
+ */
+
+import java.io.FileInputStream;   
+import java.io.FileOutputStream;   
+import java.io.ObjectInputStream;   
+import java.io.ObjectOutputStream;   
+import java.io.Serializable;   
+
+public class SerialTest3 { 
+    private static final String TMP_FILE = &quot;.serialtest3.txt&quot;;
+
+    public static void main(String[] args) {   
+        // 将“对象”通过序列化保存
+        testWrite();
+        // 将序列化的“对象”读出来
+        testRead();
+    }
+
+
+    /**
+     * 将Box对象通过序列化，保存到文件中
+     */
+    private static void testWrite() {   
+        try {
+            // 获取文件TMP_FILE对应的对象输出流。
+            // ObjectOutputStream中，只能写入“基本数据”或“支持序列化的对象”
+            ObjectOutputStream out = new ObjectOutputStream(
+                    new FileOutputStream(TMP_FILE));
+            // 创建Box对象，Box实现了Serializable序列化接口
+            Box box = new Box(&quot;desk&quot;, 80, 48);
+            // 将box对象写入到对象输出流out中，即相当于将对象保存到文件TMP_FILE中
+            out.writeObject(box);
+            // 打印“Box对象”
+            System.out.println(&quot;testWrite box: &quot; + box);
+
+            out.close();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    /**
+     * 从文件中读取出“序列化的Box对象”
+     */
+    private static void testRead() {
+        try {
+            // 获取文件TMP_FILE对应的对象输入流。
+            ObjectInputStream in = new ObjectInputStream(
+                    new FileInputStream(TMP_FILE));
+            // 从对象输入流中，读取先前保存的box对象。
+            Box box = (Box) in.readObject();
+            // 打印“Box对象”
+            System.out.println(&quot;testRead  box: &quot; + box);
+            in.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+
+/**
+ * Box类“支持序列化”。因为Box实现了Serializable接口。
+ *
+ * 实际上，一个类只需要实现Serializable即可实现序列化，而不需要实现任何函数。
+ */
+class Box implements Serializable {
+    private static int width;   
+    private transient int height; 
+    private String name;   
+
+    public Box(String name, int width, int height) {
+        this.name = name;
+        this.width = width;
+        this.height = height;
+    }
+
+    @Override
+    public String toString() {
+        return &quot;[&quot;+name+&quot;: (&quot;+width+&quot;, &quot;+height+&quot;) ]&quot;;
+    }
+}
+</code></pre><p>SerialTest3.java 相比于 SerialTest1.java。仅仅对Box类中的 width 和 height 变量的定义进行了修改。<br>SerialTest1.java 中width和height定义</p>
+<pre><code>private int width;   
+private int height; 
+</code></pre><p>SerialTest3.java 中width和height定义</p>
+<pre><code>private static int width; 
+private transient int height; 
+</code></pre><p>在看后面的结果之前，我们建议大家对程序进行分析，先自己得出一个结论。</p>
+<p>运行结果：</p>
+<pre><code>testWrite box: [desk: (80, 48) ]
+testRead  box: [desk: (80, 0) ] 
+</code></pre><p>结果分析：</p>
+<p>我们前面说过，“序列化不对static和transient变量进行状态保存”。因此，testWrite()中保存Box对象时，不会保存width和height的值。这点是毋庸置疑的！但是，为什么testRead()中读取出来的Box对象的width=80，而height=0呢？<br>先说，为什么height=0。因为Box对象中height是int类型，而int类型的默认值是0。<br>再说，为什么width=80。这是因为height是static类型，而static类型就意味着所有的Box对象都共用一个height值；而在testWrite()中，我们已经将height初始化为80了。因此，我们通过序列化读取出来的Box对象的height值，也被就是80。  </p>
+<p>理解上面的内容之后，我们应该可以推断出下面的代码的运行结果。</p>
+<p>源码如下(SerialTest4.java)： </p>
+<pre><code>/**
+ * 序列化的演示测试程序
+ *
+ * @author skywang
+ */
+
+import java.io.FileInputStream;   
+import java.io.FileOutputStream;   
+import java.io.ObjectInputStream;   
+import java.io.ObjectOutputStream;   
+import java.io.Serializable;   
+
+public class SerialTest4 { 
+    private static final String TMP_FILE = &quot;.serialtest4.txt&quot;;
+
+    public static void main(String[] args) {   
+        // 将“对象”通过序列化保存
+        testWrite();
+        // 将序列化的“对象”读出来
+        testRead();
+    }
+
+
+    /**
+     * 将Box对象通过序列化，保存到文件中
+     */
+    private static void testWrite() {   
+        try {
+            // 获取文件TMP_FILE对应的对象输出流。
+            // ObjectOutputStream中，只能写入“基本数据”或“支持序列化的对象”
+            ObjectOutputStream out = new ObjectOutputStream(
+                    new FileOutputStream(TMP_FILE));
+            // 创建Box对象，Box实现了Serializable序列化接口
+            Box box = new Box(&quot;desk&quot;, 80, 48);
+            // 将box对象写入到对象输出流out中，即相当于将对象保存到文件TMP_FILE中
+            out.writeObject(box);
+            // 打印“Box对象”
+            System.out.println(&quot;testWrite box: &quot; + box);
+            // 修改box的值
+            box = new Box(&quot;room&quot;, 100, 50);
+
+            out.close();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    /**
+     * 从文件中读取出“序列化的Box对象”
+     */
+    private static void testRead() {
+        try {
+            // 获取文件TMP_FILE对应的对象输入流。
+            ObjectInputStream in = new ObjectInputStream(
+                    new FileInputStream(TMP_FILE));
+            // 从对象输入流中，读取先前保存的box对象。
+            Box box = (Box) in.readObject();
+            // 打印“Box对象”
+            System.out.println(&quot;testRead  box: &quot; + box);
+            in.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+
+/**
+ * Box类“支持序列化”。因为Box实现了Serializable接口。
+ *
+ * 实际上，一个类只需要实现Serializable即可实现序列化，而不需要实现任何函数。
+ */
+class Box implements Serializable {
+    private static int width;   
+    private transient int height; 
+    private String name;   
+
+    public Box(String name, int width, int height) {
+        this.name = name;
+        this.width = width;
+        this.height = height;
+    }
+
+    @Override
+    public String toString() {
+        return &quot;[&quot;+name+&quot;: (&quot;+width+&quot;, &quot;+height+&quot;) ]&quot;;
+    }
+}
+</code></pre><p>SerialTest4.java 相比于 SerialTest3.java，在testWrite()中添加了一行代码box = new Box(“room”, 100, 50);</p>
+<p>运行结果：</p>
+<pre><code>testWrite box: [desk: (80, 48) ]
+testRead  box: [desk: (100, 0) ]
+</code></pre><p>现在，我们更加确认“序列化不对static和transient变量进行状态保存”。但是，若我们想要保存static或transient变量，能不能办到呢？<br>当然可以！我们在类中重写两个方法writeObject()和readObject()即可。下面程序演示了如何手动保存static和transient变量。</p>
+<p><a name="anchor5"></a></p>
+<h1 id="5-演示程序4"><a href="#5-演示程序4" class="headerlink" title="5. 演示程序4"></a>5. 演示程序4</h1><p>我们对前面的SerialTest4.java进行简单修改，以达到：序列化存储static和transient变量的目的。</p>
+<p>源码如下(SerialTest5.java)： </p>
+<pre><code>/**
+ * 序列化的演示测试程序
+ *
+ * @author skywang
+ */
+
+import java.io.FileInputStream;   
+import java.io.FileOutputStream;   
+import java.io.ObjectInputStream;   
+import java.io.ObjectOutputStream;   
+import java.io.Serializable;   
+import java.io.IOException;   
+import java.lang.ClassNotFoundException;   
+
+public class SerialTest5 { 
+    private static final String TMP_FILE = &quot;.serialtest5.txt&quot;;
+
+    public static void main(String[] args) {   
+        // 将“对象”通过序列化保存
+        testWrite();
+        // 将序列化的“对象”读出来
+        testRead();
+    }
+
+
+    /**
+     * 将Box对象通过序列化，保存到文件中
+     */
+    private static void testWrite() {   
+        try {
+            // 获取文件TMP_FILE对应的对象输出流。
+            // ObjectOutputStream中，只能写入“基本数据”或“支持序列化的对象”
+            ObjectOutputStream out = new ObjectOutputStream(
+                    new FileOutputStream(TMP_FILE));
+            // 创建Box对象，Box实现了Serializable序列化接口
+            Box box = new Box(&quot;desk&quot;, 80, 48);
+            // 将box对象写入到对象输出流out中，即相当于将对象保存到文件TMP_FILE中
+            out.writeObject(box);
+            // 打印“Box对象”
+            System.out.println(&quot;testWrite box: &quot; + box);
+            // 修改box的值
+            box = new Box(&quot;room&quot;, 100, 50);
+
+            out.close();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    /**
+     * 从文件中读取出“序列化的Box对象”
+     */
+    private static void testRead() {
+        try {
+            // 获取文件TMP_FILE对应的对象输入流。
+            ObjectInputStream in = new ObjectInputStream(
+                    new FileInputStream(TMP_FILE));
+            // 从对象输入流中，读取先前保存的box对象。
+            Box box = (Box) in.readObject();
+            // 打印“Box对象”
+            System.out.println(&quot;testRead  box: &quot; + box);
+            in.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+
+/**
+ * Box类“支持序列化”。因为Box实现了Serializable接口。
+ *
+ * 实际上，一个类只需要实现Serializable即可实现序列化，而不需要实现任何函数。
+ */
+class Box implements Serializable {
+    private static int width;   
+    private transient int height; 
+    private String name;   
+
+    public Box(String name, int width, int height) {
+        this.name = name;
+        this.width = width;
+        this.height = height;
+    }
+
+    private void writeObject(ObjectOutputStream out) throws IOException{ 
+        out.defaultWriteObject();//使定制的writeObject()方法可以利用自动序列化中内置的逻辑。 
+        out.writeInt(height); 
+        out.writeInt(width); 
+        //System.out.println(&quot;Box--writeObject width=&quot;+width+&quot;, height=&quot;+height);
+    }
+
+    private void readObject(ObjectInputStream in) throws IOException,ClassNotFoundException{ 
+        in.defaultReadObject();//defaultReadObject()补充自动序列化 
+        height = in.readInt(); 
+        width = in.readInt(); 
+        //System.out.println(&quot;Box---readObject width=&quot;+width+&quot;, height=&quot;+height);
+    }
+
+    @Override
+    public String toString() {
+        return &quot;[&quot;+name+&quot;: (&quot;+width+&quot;, &quot;+height+&quot;) ]&quot;;
+    }
+}
+</code></pre><p>运行结果：</p>
+<pre><code>testWrite box: [desk: (80, 48) ]
+testRead  box: [desk: (80, 48) ]
+</code></pre><p>程序说明：</p>
+<p>“序列化不会自动保存static和transient变量”，因此我们若要保存它们，则需要通过writeObject()和readObject()去手动读写。<br>(01) 通过writeObject()方法，写入要保存的变量。writeObject的原始定义是在ObjectOutputStream.java中，我们按照如下示例覆盖即可：</p>
+<pre><code>private void writeObject(ObjectOutputStream out) throws IOException{ 
+    out.defaultWriteObject();// 使定制的writeObject()方法可以利用自动序列化中内置的逻辑。 
+    out.writeInt(ival);      // 若要保存“int类型的值”，则使用writeInt()
+    out.writeObject(obj);    // 若要保存“Object对象”，则使用writeObject()
+}
+</code></pre><p>(02) 通过readObject()方法，读取之前保存的变量。readObject的原始定义是在ObjectInputStream.java中，我们按照如下示例覆盖即可：</p>
+<pre><code>private void readObject(ObjectInputStream in) throws IOException,ClassNotFoundException{ 
+    in.defaultReadObject();       // 使定制的readObject()方法可以利用自动序列化中内置的逻辑。 
+    int ival = in.readInt();      // 若要读取“int类型的值”，则使用readInt()
+    Object obj = in.readObject(); // 若要读取“Object对象”，则使用readObject()
+}
+</code></pre><p>至此，我们就介绍完了“序列化对static和transient变量的处理”。<br>接下来，我们来研究“对于Socket, Thread类，不支持序列化”。还是通过示例来查看。</p>
+<p><a name="anchor6"></a></p>
+<h1 id="6-演示程序5"><a href="#6-演示程序5" class="headerlink" title="6. 演示程序5"></a>6. 演示程序5</h1><p>我们修改SerialTest5.java的源码，在Box类中添加一个Thread成员。</p>
+<p>源码如下(SerialTest6.java)：</p>
+<pre><code>/**
+ * 序列化的演示测试程序
+ *
+ * @author skywang
+ */
+
+import java.io.FileInputStream;   
+import java.io.FileOutputStream;   
+import java.io.ObjectInputStream;   
+import java.io.ObjectOutputStream;   
+import java.io.Serializable;   
+import java.lang.Thread;
+import java.io.IOException;   
+import java.lang.ClassNotFoundException;   
+
+public class SerialTest6 { 
+    private static final String TMP_FILE = &quot;.serialtest6.txt&quot;;
+
+    public static void main(String[] args) {   
+        // 将“对象”通过序列化保存
+        testWrite();
+        // 将序列化的“对象”读出来
+        testRead();
+    }
+
+
+    /**
+     * 将Box对象通过序列化，保存到文件中
+     */
+    private static void testWrite() {   
+        try {
+            // 获取文件TMP_FILE对应的对象输出流。
+            // ObjectOutputStream中，只能写入“基本数据”或“支持序列化的对象”
+            ObjectOutputStream out = new ObjectOutputStream(
+                    new FileOutputStream(TMP_FILE));
+            // 创建Box对象，Box实现了Serializable序列化接口
+            Box box = new Box(&quot;desk&quot;, 80, 48);
+            // 将box对象写入到对象输出流out中，即相当于将对象保存到文件TMP_FILE中
+            out.writeObject(box);
+            // 打印“Box对象”
+            System.out.println(&quot;testWrite box: &quot; + box);
+            // 修改box的值
+            box = new Box(&quot;room&quot;, 100, 50);
+
+            out.close();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    /**
+     * 从文件中读取出“序列化的Box对象”
+     */
+    private static void testRead() {
+        try {
+            // 获取文件TMP_FILE对应的对象输入流。
+            ObjectInputStream in = new ObjectInputStream(
+                    new FileInputStream(TMP_FILE));
+            // 从对象输入流中，读取先前保存的box对象。
+            Box box = (Box) in.readObject();
+            // 打印“Box对象”
+            System.out.println(&quot;testRead  box: &quot; + box);
+            in.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+
+/**
+ * Box类“支持序列化”。因为Box实现了Serializable接口。
+ *
+ * 实际上，一个类只需要实现Serializable即可实现序列化，而不需要实现任何函数。
+ */
+class Box implements Serializable {
+    private static int width;   
+    private transient int height; 
+    private String name;   
+    private Thread thread = new Thread() {
+        @Override
+        public void run() {
+            System.out.println(&quot;Serializable thread&quot;);
+        }
+    };
+
+    public Box(String name, int width, int height) {
+        this.name = name;
+        this.width = width;
+        this.height = height;
+    }
+
+    private void writeObject(ObjectOutputStream out) throws IOException{ 
+        out.defaultWriteObject();//使定制的writeObject()方法可以利用自动序列化中内置的逻辑。 
+        out.writeInt(height); 
+        out.writeInt(width); 
+        //System.out.println(&quot;Box--writeObject width=&quot;+width+&quot;, height=&quot;+height);
+    }
+
+    private void readObject(ObjectInputStream in) throws IOException,ClassNotFoundException{ 
+        in.defaultReadObject();//defaultReadObject()补充自动序列化 
+        height = in.readInt(); 
+        width = in.readInt(); 
+        //System.out.println(&quot;Box---readObject width=&quot;+width+&quot;, height=&quot;+height);
+    }
+
+    @Override
+    public String toString() {
+        return &quot;[&quot;+name+&quot;: (&quot;+width+&quot;, &quot;+height+&quot;) ]&quot;;
+    }
+}
+</code></pre><p>结果是，编译出错！<br>事实证明，不能对Thread进行序列化。若希望程序能编译通过，我们对Thread变量添加static或transient修饰即可！如下，是对Thread添加transient修饰的源码(SerialTest7.java)：</p>
+<pre><code>/**
+ * 序列化的演示测试程序
+ *
+ * @author skywang
+ */
+
+import java.io.FileInputStream;   
+import java.io.FileOutputStream;   
+import java.io.ObjectInputStream;   
+import java.io.ObjectOutputStream;   
+import java.io.Serializable;   
+import java.lang.Thread;
+import java.io.IOException;   
+import java.lang.ClassNotFoundException;   
+
+public class SerialTest7 { 
+    private static final String TMP_FILE = &quot;.serialtest7.txt&quot;;
+
+    public static void main(String[] args) {   
+        // 将“对象”通过序列化保存
+        testWrite();
+        // 将序列化的“对象”读出来
+        testRead();
+    }
+
+
+    /**
+     * 将Box对象通过序列化，保存到文件中
+     */
+    private static void testWrite() {   
+        try {
+            // 获取文件TMP_FILE对应的对象输出流。
+            // ObjectOutputStream中，只能写入“基本数据”或“支持序列化的对象”
+            ObjectOutputStream out = new ObjectOutputStream(
+                    new FileOutputStream(TMP_FILE));
+            // 创建Box对象，Box实现了Serializable序列化接口
+            Box box = new Box(&quot;desk&quot;, 80, 48);
+            // 将box对象写入到对象输出流out中，即相当于将对象保存到文件TMP_FILE中
+            out.writeObject(box);
+            // 打印“Box对象”
+            System.out.println(&quot;testWrite box: &quot; + box);
+            // 修改box的值
+            box = new Box(&quot;room&quot;, 100, 50);
+
+            out.close();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    /**
+     * 从文件中读取出“序列化的Box对象”
+     */
+    private static void testRead() {
+        try {
+            // 获取文件TMP_FILE对应的对象输入流。
+            ObjectInputStream in = new ObjectInputStream(
+                    new FileInputStream(TMP_FILE));
+            // 从对象输入流中，读取先前保存的box对象。
+            Box box = (Box) in.readObject();
+            // 打印“Box对象”
+            System.out.println(&quot;testRead  box: &quot; + box);
+            in.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+
+/**
+ * Box类“支持序列化”。因为Box实现了Serializable接口。
+ *
+ * 实际上，一个类只需要实现Serializable即可实现序列化，而不需要实现任何函数。
+ */
+class Box implements Serializable {
+    private static int width;   
+    private transient int height; 
+    private String name;   
+    private transient Thread thread = new Thread() {
+        @Override
+        public void run() {
+            System.out.println(&quot;Serializable thread&quot;);
+        }
+    };
+
+    public Box(String name, int width, int height) {
+        this.name = name;
+        this.width = width;
+        this.height = height;
+    }
+
+    private void writeObject(ObjectOutputStream out) throws IOException{ 
+        out.defaultWriteObject();//使定制的writeObject()方法可以利用自动序列化中内置的逻辑。 
+        out.writeInt(height); 
+        out.writeInt(width); 
+        //System.out.println(&quot;Box--writeObject width=&quot;+width+&quot;, height=&quot;+height);
+    }
+
+    private void readObject(ObjectInputStream in) throws IOException,ClassNotFoundException{ 
+        in.defaultReadObject();//defaultReadObject()补充自动序列化 
+        height = in.readInt(); 
+        width = in.readInt(); 
+        //System.out.println(&quot;Box---readObject width=&quot;+width+&quot;, height=&quot;+height);
+    }
+
+    @Override
+    public String toString() {
+        return &quot;[&quot;+name+&quot;: (&quot;+width+&quot;, &quot;+height+&quot;) ]&quot;;
+    }
+}
+</code></pre><p>至此，关于“Serializable接口”来实现序列化的内容，都说完了。为什么这么说？因为，实现序列化，除了Serializable之外，还有其它的方式，就是通过实现Externalizable来实现序列化。整理下心情，下面继续对Externalizable进行了解。</p>
+<p><a name="anchor7"></a></p>
+<h1 id="7-Externalizable和完全定制序列化过程"><a href="#7-Externalizable和完全定制序列化过程" class="headerlink" title="7. Externalizable和完全定制序列化过程"></a>7. Externalizable和完全定制序列化过程</h1><p>如果一个类要完全负责自己的序列化，则实现Externalizable接口，而不是Serializable接口。</p>
+<p>Externalizable接口定义包括两个方法writeExternal()与readExternal()。需要注意的是：声明类实现Externalizable接口会有重大的安全风险。writeExternal()与readExternal()方法声明为public，恶意类可以用这些方法读取和写入对象数据。如果对象包含敏感信息，则要格外小心。</p>
+<p>下面，我们修改之前的SerialTest1.java测试程序；将其中的Box由“实现Serializable接口” 改为 “实现Externalizable接口”。<br>修改后的源码如下( ExternalizableTest1.java)：</p>
+<pre><code>/**
+ * 序列化的演示测试程序
+ *
+ * @author skywang
+ */
+import java.io.FileInputStream;   
+import java.io.FileOutputStream;   
+import java.io.ObjectInputStream;   
+import java.io.ObjectOutputStream;   
+import java.io.ObjectOutput;   
+import java.io.ObjectInput;   
+import java.io.Serializable;   
+import java.io.Externalizable;   
+import java.io.IOException;   
+import java.lang.ClassNotFoundException;   
+
+public class ExternalizableTest1 { 
+    private static final String TMP_FILE = &quot;.externalizabletest1.txt&quot;;
+
+    public static void main(String[] args) {   
+        // 将“对象”通过序列化保存
+        testWrite();
+        // 将序列化的“对象”读出来
+        testRead();
+    }
+
+
+    /**
+     * 将Box对象通过序列化，保存到文件中
+     */
+    private static void testWrite() {   
+        try {
+            // 获取文件TMP_FILE对应的对象输出流。
+            // ObjectOutputStream中，只能写入“基本数据”或“支持序列化的对象”
+            ObjectOutputStream out = new ObjectOutputStream(
+                    new FileOutputStream(TMP_FILE));
+            // 创建Box对象
+            Box box = new Box(&quot;desk&quot;, 80, 48);
+            // 将box对象写入到对象输出流out中，即相当于将对象保存到文件TMP_FILE中
+            out.writeObject(box);
+            // 打印“Box对象”
+            System.out.println(&quot;testWrite box: &quot; + box);
+
+            out.close();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    /**
+     * 从文件中读取出“序列化的Box对象”
+     */
+    private static void testRead() {
+        try {
+            // 获取文件TMP_FILE对应的对象输入流。
+            ObjectInputStream in = new ObjectInputStream(
+                    new FileInputStream(TMP_FILE));
+            // 从对象输入流中，读取先前保存的box对象。
+            Box box = (Box) in.readObject();
+            // 打印“Box对象”
+            System.out.println(&quot;testRead  box: &quot; + box);
+            in.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+
+/**
+ * Box类实现Externalizable接口
+ */
+class Box implements Externalizable {
+    private int width;   
+    private int height; 
+    private String name;   
+
+    public Box() {
+    }
+
+    public Box(String name, int width, int height) {
+        this.name = name;
+        this.width = width;
+        this.height = height;
+    }
+
+    @Override
+    public void writeExternal(ObjectOutput out) throws IOException {
+    }
+
+    @Override
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+    }
+
+    @Override
+    public String toString() {
+        return &quot;[&quot;+name+&quot;: (&quot;+width+&quot;, &quot;+height+&quot;) ]&quot;;
+    }
+}
+</code></pre><p>运行结果：</p>
+<pre><code>testWrite box: [desk: (80, 48) ]
+testRead  box: [null: (0, 0) ]
+</code></pre><p>说明：</p>
+<p>(01) 实现Externalizable接口的类，不会像实现Serializable接口那样，会自动将数据保存。<br>(02) 实现Externalizable接口的类，必须实现writeExternal()和readExternal()接口！<br>否则，程序无法正常编译！<br>(03) 实现Externalizable接口的类，必须定义不带参数的构造函数！<br>否则，程序无法正常编译！<br>(04) writeExternal() 和 readExternal() 的方法都是public的，不是非常安全！</p>
+<p>接着，我们修改上面的ExternalizableTest1.java测试程序；实现Box类中的writeExternal()和readExternal()接口！<br>修改后的源码如下( ExternalizableTest2.java)：</p>
+<pre><code>/**
+ * 序列化的演示测试程序
+ *
+ * @author skywang
+ */
+import java.io.FileInputStream;   
+import java.io.FileOutputStream;   
+import java.io.ObjectInputStream;   
+import java.io.ObjectOutputStream;   
+import java.io.ObjectOutput;   
+import java.io.ObjectInput;   
+import java.io.Serializable;   
+import java.io.Externalizable;   
+import java.io.IOException;   
+import java.lang.ClassNotFoundException;   
+
+public class ExternalizableTest2 { 
+    private static final String TMP_FILE = &quot;.externalizabletest2.txt&quot;;
+
+    public static void main(String[] args) {   
+        // 将“对象”通过序列化保存
+        testWrite();
+        // 将序列化的“对象”读出来
+        testRead();
+    }
+
+
+    /**
+     * 将Box对象通过序列化，保存到文件中
+     */
+    private static void testWrite() {   
+        try {
+            // 获取文件TMP_FILE对应的对象输出流。
+            // ObjectOutputStream中，只能写入“基本数据”或“支持序列化的对象”
+            ObjectOutputStream out = new ObjectOutputStream(
+                    new FileOutputStream(TMP_FILE));
+            // 创建Box对象
+            Box box = new Box(&quot;desk&quot;, 80, 48);
+            // 将box对象写入到对象输出流out中，即相当于将对象保存到文件TMP_FILE中
+            out.writeObject(box);
+            // 打印“Box对象”
+            System.out.println(&quot;testWrite box: &quot; + box);
+
+            out.close();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    /**
+     * 从文件中读取出“序列化的Box对象”
+     */
+    private static void testRead() {
+        try {
+            // 获取文件TMP_FILE对应的对象输入流。
+            ObjectInputStream in = new ObjectInputStream(
+                    new FileInputStream(TMP_FILE));
+            // 从对象输入流中，读取先前保存的box对象。
+            Box box = (Box) in.readObject();
+            // 打印“Box对象”
+            System.out.println(&quot;testRead  box: &quot; + box);
+            in.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+
+/**
+ * Box类实现Externalizable接口
+ */
+class Box implements Externalizable {
+    private int width;   
+    private int height; 
+    private String name;   
+
+    public Box() {
+    }
+
+    public Box(String name, int width, int height) {
+        this.name = name;
+        this.width = width;
+        this.height = height;
+    }
+
+    @Override
+    public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeObject(name);
+        out.writeInt(width);
+        out.writeInt(height);
+    }
+
+    @Override
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        name = (String) in.readObject();
+        width = in.readInt();
+        height = in.readInt();
+    }
+
+    @Override
+    public String toString() {
+        return &quot;[&quot;+name+&quot;: (&quot;+width+&quot;, &quot;+height+&quot;) ]&quot;;
+    }
+}
+</code></pre><p>运行结果：</p>
+<pre><code>testWrite box: [desk: (80, 48) ]
+testRead  box: [desk: (80, 48) ]
+</code></pre>
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2018-06-27T09:39:57.941Z" itemprop="dateUpdated">2018-06-27 17:39:57</time>
+</span><br>
+
+
+        
+        本文固定链接：<a href="/2016/10/06/java-source-analysis-io-series/java io系列06之 序列化(Serializable和Externalizable)详解/" target="_blank" rel="external">https://smuwjs.github.io/2016/10/06/java-source-analysis-io-series/java io系列06之 序列化(Serializable和Externalizable)详解/</a>
+        
+    </div>
+    <footer>
+        <a href="https://smuwjs.github.io">
+            <img src="/img/head.png" alt="Jeeson">
+            Jeeson
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java-IO系列/">Java IO系列</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java源码分析/">Java源码分析</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/10/06/java-source-analysis-io-series/java io系列06之 序列化(Serializable和Externalizable)详解/&title=《java io系列06之 序列化(Serializable和Externalizable)详解》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/10/06/java-source-analysis-io-series/java io系列06之 序列化(Serializable和Externalizable)详解/&title=《java io系列06之 序列化(Serializable和Externalizable)详解》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/10/06/java-source-analysis-io-series/java io系列06之 序列化(Serializable和Externalizable)详解/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《java io系列06之 序列化(Serializable和Externalizable)详解》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/10/06/java-source-analysis-io-series/java io系列06之 序列化(Serializable和Externalizable)详解/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/10/06/java-source-analysis-io-series/java io系列06之 序列化(Serializable和Externalizable)详解/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2016/10/07/java-source-analysis-io-series/java io系列07之 FileInputStream和FileOutputStream详解/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">java io系列07之 FileInputStream和FileOutputStream详解</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2016/10/05/java-source-analysis-io-series/java io系列05之 ObjectInputStream和ObjectOutputStream详解/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">java io系列05之 ObjectInputStream和ObjectOutputStream详解</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="java-source-analysis-io-series/java io系列06之 序列化(Serializable和Externalizable)详解" data-title="java io系列06之 序列化(Serializable和Externalizable)详解" data-url="https://smuwjs.github.io/2016/10/06/java-source-analysis-io-series/java io系列06之 序列化(Serializable和Externalizable)详解/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'smuwjs', theme: 'none'};
+lazyScripts.push('//unpkg.com/hexo-theme-material-indigo@latest/js/embed.min.js');
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循<a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>Jeeson &copy; 2015 - 2018</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/10/06/java-source-analysis-io-series/java io系列06之 序列化(Serializable和Externalizable)详解/&title=《java io系列06之 序列化(Serializable和Externalizable)详解》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/10/06/java-source-analysis-io-series/java io系列06之 序列化(Serializable和Externalizable)详解/&title=《java io系列06之 序列化(Serializable和Externalizable)详解》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/10/06/java-source-analysis-io-series/java io系列06之 序列化(Serializable和Externalizable)详解/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《java io系列06之 序列化(Serializable和Externalizable)详解》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/10/06/java-source-analysis-io-series/java io系列06之 序列化(Serializable和Externalizable)详解/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/10/06/java-source-analysis-io-series/java io系列06之 序列化(Serializable和Externalizable)详解/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://smuwjs.github.io/2016/10/06/java-source-analysis-io-series/java io系列06之 序列化(Serializable和Externalizable)详解/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

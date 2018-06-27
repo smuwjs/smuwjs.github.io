@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>Java多线程系列--“JUC锁”05之 非公平锁 | Jeeson&#39;s Blog | Write the code. Change the world.</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="Java源码分析,Java多线程系列,JUC锁">
+    <meta name="description" content="前面两章分析了”公平锁的获取和释放机制”，这一章开始对“非公平锁”的获取锁/释放锁的过程进行分析。关于锁的数据结构请参考”Java多线程系列–“JUC锁”03之 公平锁(一) “，锁的使用示例请参考“Java多线程系列–“JUC锁”02之 互斥锁ReentrantLock”。   目录第1部分 获取非公平锁(基于JDK1.7.0_40)第2部分 释放非公平锁(基于JDK1.7.0_40)">
+<meta name="keywords" content="Java源码分析,Java多线程系列,JUC锁">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java多线程系列--“JUC锁”05之 非公平锁">
+<meta property="og:url" content="https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”05之 非公平锁/index.html">
+<meta property="og:site_name" content="Jeeson&#39;s Blog">
+<meta property="og:description" content="前面两章分析了”公平锁的获取和释放机制”，这一章开始对“非公平锁”的获取锁/释放锁的过程进行分析。关于锁的数据结构请参考”Java多线程系列–“JUC锁”03之 公平锁(一) “，锁的使用示例请参考“Java多线程系列–“JUC锁”02之 互斥锁ReentrantLock”。   目录第1部分 获取非公平锁(基于JDK1.7.0_40)第2部分 释放非公平锁(基于JDK1.7.0_40)">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-06-27T09:39:57.945Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java多线程系列--“JUC锁”05之 非公平锁">
+<meta name="twitter:description" content="前面两章分析了”公平锁的获取和释放机制”，这一章开始对“非公平锁”的获取锁/释放锁的过程进行分析。关于锁的数据结构请参考”Java多线程系列–“JUC锁”03之 公平锁(一) “，锁的使用示例请参考“Java多线程系列–“JUC锁”02之 互斥锁ReentrantLock”。   目录第1部分 获取非公平锁(基于JDK1.7.0_40)第2部分 释放非公平锁(基于JDK1.7.0_40)">
+    
+        <link rel="alternate" type="application/atom+xml" title="Jeeson&#39;s Blog" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/head.png">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Jeeson</h5>
+          <a href="mailto:smuwjs@163.com" title="smuwjs@163.com" class="mail">smuwjs@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/smuwjs" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Java多线程系列--“JUC锁”05之 非公平锁</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Java多线程系列--“JUC锁”05之 非公平锁</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2016-11-13T21:00:00.000Z" itemprop="datePublished" class="page-time">
+  2016-11-14
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#第1部分-获取非公平锁-基于JDK1-7-0-40"><span class="post-toc-number">1.</span> <span class="post-toc-text">第1部分 获取非公平锁(基于JDK1.7.0_40)</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#1-lock"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">1. lock()</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#2-acquire"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">2. acquire()</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#第2部分-释放非公平锁-基于JDK1-7-0-40"><span class="post-toc-number">2.</span> <span class="post-toc-text">第2部分 释放非公平锁(基于JDK1.7.0_40)</span></a></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”05之 非公平锁"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Java多线程系列--“JUC锁”05之 非公平锁</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2016-11-14 05:00:00" datetime="2016-11-13T21:00:00.000Z"  itemprop="datePublished">2016-11-14</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <blockquote>
+<p>前面两章分析了”公平锁的获取和释放机制”，这一章开始对“非公平锁”的获取锁/释放锁的过程进行分析。<br>关于锁的数据结构请参考”Java多线程系列–“JUC锁”03之 公平锁(一) “，锁的使用示例请参考“Java多线程系列–“JUC锁”02之 互斥锁ReentrantLock”。</p>
+</blockquote>
+<blockquote>
+<p><strong>目录</strong><br><a href="#anchor1">第1部分 获取非公平锁(基于JDK1.7.0_40)</a><br><a href="#anchor2">第2部分 释放非公平锁(基于JDK1.7.0_40)</a>  </p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="第1部分-获取非公平锁-基于JDK1-7-0-40"><a href="#第1部分-获取非公平锁-基于JDK1-7-0-40" class="headerlink" title="第1部分 获取非公平锁(基于JDK1.7.0_40)"></a>第1部分 获取非公平锁(基于JDK1.7.0_40)</h1><p>非公平锁和公平锁在获取锁的方法上，流程是一样的；它们的区别主要表现在“尝试获取锁的机制不同”。简单点说，“公平锁”在每次尝试获取锁时，都是采用公平策略(根据等待队列依次排序等待)；而“非公平锁”在每次尝试获取锁时，都是采用的非公平策略(无视等待队列，直接尝试获取锁，如果锁是空闲的，即可获取状态，则获取锁)。</p>
+<p>在前面的“Java多线程系列–“JUC锁”03之 公平锁(一)”中，已经详细介绍了获取公平锁的流程和机制；下面，通过代码分析以下获取非公平锁的流程。</p>
+<h2 id="1-lock"><a href="#1-lock" class="headerlink" title="1. lock()"></a>1. lock()</h2><p>lock()在ReentrantLock.java的NonfairSync类中实现，它的源码如下：</p>
+<pre><code>final void lock() {
+    if (compareAndSetState(0, 1))
+        setExclusiveOwnerThread(Thread.currentThread());
+    else
+        acquire(1);
+}
+</code></pre><p>说明：<br>lock()会先通过compareAndSet(0, 1)来判断“锁”是不是空闲状态。是的话，“当前线程”直接获取“锁”；否则的话，调用acquire(1)获取锁。<br>(01) compareAndSetState()是CAS函数，它的作用是比较并设置当前锁的状态。若锁的状态值为0，则设置锁的状态值为1。<br>(02) setExclusiveOwnerThread(Thread.currentThread())的作用是，设置“当前线程”为“锁”的持有者。</p>
+<p><strong>“公平锁”和“非公平锁”关于lock()的对比</strong></p>
+<blockquote>
+<p>公平锁   – 公平锁的lock()函数，会直接调用acquire(1)。<br>非公平锁 – 非公平锁会先判断当前锁的状态是不是空闲，是的话，就不排队，而是直接获取锁。</p>
+</blockquote>
+<h2 id="2-acquire"><a href="#2-acquire" class="headerlink" title="2. acquire()"></a>2. acquire()</h2><p>acquire()在AQS中实现的，它的源码如下：</p>
+<pre><code>public final void acquire(int arg) {
+    if (!tryAcquire(arg) &amp;&amp;
+        acquireQueued(addWaiter(Node.EXCLUSIVE), arg))
+        selfInterrupt();
+}
+</code></pre><p>(01) “当前线程”首先通过tryAcquire()尝试获取锁。获取成功的话，直接返回；尝试失败的话，进入到等待队列依次排序，然后获取锁。<br>(02) “当前线程”尝试失败的情况下，会先通过addWaiter(Node.EXCLUSIVE)来将“当前线程”加入到”CLH队列(非阻塞的FIFO队列)”末尾。<br>(03) 然后，调用acquireQueued()获取锁。在acquireQueued()中，当前线程会等待它在“CLH队列”中前面的所有线程执行并释放锁之后，才能获取锁并返回。如果“当前线程”在休眠等待过程中被中断过，则调用selfInterrupt()来自己产生一个中断。</p>
+<p><strong>“公平锁”和“非公平锁”关于acquire()的对比</strong></p>
+<p>公平锁和非公平锁，只有tryAcquire()函数的实现不同；即它们尝试获取锁的机制不同。这就是我们所说的“它们获取锁策略的不同所在之处”！<br>在“Java多线程系列–“JUC锁”03之 公平锁(一)”中，已经详细介绍了acquire()涉及到的各个函数。这里仅对它们有差异的函数tryAcquire()进行说明。</p>
+<p>非公平锁的tryAcquire()在ReentrantLock.java的NonfairSync类中实现，源码如下：</p>
+<pre><code>protected final boolean tryAcquire(int acquires) {
+    return nonfairTryAcquire(acquires);
+}
+</code></pre><p>nonfairTryAcquire()在ReentrantLock.java的Sync类中实现，源码如下：</p>
+<pre><code>final boolean nonfairTryAcquire(int acquires) {
+    // 获取“当前线程”
+    final Thread current = Thread.currentThread();
+    // 获取“锁”的状态
+    int c = getState();
+    // c=0意味着“锁没有被任何线程锁拥有”
+    if (c == 0) {
+        // 若“锁没有被任何线程锁拥有”，则通过CAS函数设置“锁”的状态为acquires。
+        // 同时，设置“当前线程”为锁的持有者。
+        if (compareAndSetState(0, acquires)) {
+            setExclusiveOwnerThread(current);
+            return true;
+        }
+    }
+    else if (current == getExclusiveOwnerThread()) {
+        // 如果“锁”的持有者已经是“当前线程”，
+        // 则将更新锁的状态。
+        int nextc = c + acquires;
+        if (nextc &lt; 0) // overflow
+            throw new Error(&quot;Maximum lock count exceeded&quot;);
+        setState(nextc);
+        return true;
+    }
+    return false;
+}
+</code></pre><p>说明：<br>根据代码，我们可以分析出，tryAcquire()的作用就是尝试去获取锁。<br>(01) 如果“锁”没有被任何线程拥有，则通过CAS函数设置“锁”的状态为acquires，同时，设置“当前线程”为锁的持有者，然后返回true。<br>(02) 如果“锁”的持有者已经是当前线程，则将更新锁的状态即可。<br>(03) 如果不术语上面的两种情况，则认为尝试失败。</p>
+<p>“公平锁”和“非公平锁”关于tryAcquire()的对比</p>
+<p>公平锁和非公平锁，它们尝试获取锁的方式不同。<br>公平锁在尝试获取锁时，即使“锁”没有被任何线程锁持有，它也会判断自己是不是CLH等待队列的表头；是的话，才获取锁。<br>而非公平锁在尝试获取锁时，如果“锁”没有被任何线程持有，则不管它在CLH队列的何处，它都直接获取锁。</p>
+<p><a name="anchor2"></a></p>
+<h1 id="第2部分-释放非公平锁-基于JDK1-7-0-40"><a href="#第2部分-释放非公平锁-基于JDK1-7-0-40" class="headerlink" title="第2部分 释放非公平锁(基于JDK1.7.0_40)"></a>第2部分 释放非公平锁(基于JDK1.7.0_40)</h1><p>非公平锁和公平锁在释放锁的方法和策略上是一样的。</p>
+<p>而在前面的“Java多线程系列–“JUC锁”04之 公平锁(二) ”中，已经对“释放公平锁”进行了介绍；这里就不再重复的进行说明。</p>
+<p><strong>总结</strong></p>
+<p>公平锁和非公平锁的区别，是在获取锁的机制上的区别。表现在，在尝试获取锁时 —— 公平锁，只有在当前线程是CLH等待队列的表头时，才获取锁；而非公平锁，只要当前锁处于空闲状态，则直接获取锁，而不管CLH等待队列中的顺序。<br>只有当非公平锁尝试获取锁失败的时候，它才会像公平锁一样，进入CLH等待队列排序等待。</p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2018-06-27T09:39:57.945Z" itemprop="dateUpdated">2018-06-27 17:39:57</time>
+</span><br>
+
+
+        
+        本文固定链接：<a href="/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”05之 非公平锁/" target="_blank" rel="external">https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”05之 非公平锁/</a>
+        
+    </div>
+    <footer>
+        <a href="https://smuwjs.github.io">
+            <img src="/img/head.png" alt="Jeeson">
+            Jeeson
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JUC锁/">JUC锁</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java多线程系列/">Java多线程系列</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java源码分析/">Java源码分析</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”05之 非公平锁/&title=《Java多线程系列--“JUC锁”05之 非公平锁》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”05之 非公平锁/&title=《Java多线程系列--“JUC锁”05之 非公平锁》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”05之 非公平锁/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Java多线程系列--“JUC锁”05之 非公平锁》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”05之 非公平锁/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”05之 非公平锁/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC线程池”05之 线程池原理(四)/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">Java多线程系列--“JUC线程池”05之 线程池原理(四)</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”04之 公平锁(二)/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Java多线程系列--“JUC锁”04之 公平锁(二)</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”05之 非公平锁" data-title="Java多线程系列--“JUC锁”05之 非公平锁" data-url="https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”05之 非公平锁/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'smuwjs', theme: 'none'};
+lazyScripts.push('//unpkg.com/hexo-theme-material-indigo@latest/js/embed.min.js');
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循<a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>Jeeson &copy; 2015 - 2018</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”05之 非公平锁/&title=《Java多线程系列--“JUC锁”05之 非公平锁》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”05之 非公平锁/&title=《Java多线程系列--“JUC锁”05之 非公平锁》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”05之 非公平锁/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Java多线程系列--“JUC锁”05之 非公平锁》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”05之 非公平锁/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”05之 非公平锁/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”05之 非公平锁/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

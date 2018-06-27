@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>Android Studio系列教程五--Gradle命令详解与导入第三方包 | Jeeson&#39;s Blog | Write the code. Change the world.</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="AndroidStudio,Gradle">
+    <meta name="description" content="blog">
+<meta name="keywords" content="blog">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android Studio系列教程五--Gradle命令详解与导入第三方包">
+<meta property="og:url" content="https://smuwjs.github.io/2016/09/12/android-studio-tutorial5/index.html">
+<meta property="og:site_name" content="Jeeson&#39;s Blog">
+<meta property="og:description" content="blog">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://opesdt6ii.bkt.clouddn.com/gradle_download1.png">
+<meta property="og:image" content="http://opesdt6ii.bkt.clouddn.com/studio_import1.png">
+<meta property="og:image" content="http://opesdt6ii.bkt.clouddn.com/gradle_download2.png">
+<meta property="og:image" content="http://opesdt6ii.bkt.clouddn.com/build-tools.png">
+<meta property="og:updated_time" content="2018-06-27T09:39:57.937Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android Studio系列教程五--Gradle命令详解与导入第三方包">
+<meta name="twitter:description" content="blog">
+<meta name="twitter:image" content="http://opesdt6ii.bkt.clouddn.com/gradle_download1.png">
+    
+        <link rel="alternate" type="application/atom+xml" title="Jeeson&#39;s Blog" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/head.png">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Jeeson</h5>
+          <a href="mailto:smuwjs@163.com" title="smuwjs@163.com" class="mail">smuwjs@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/smuwjs" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Android Studio系列教程五--Gradle命令详解与导入第三方包</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Android Studio系列教程五--Gradle命令详解与导入第三方包</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2016-09-11T17:01:05.000Z" itemprop="datePublished" class="page-time">
+  2016-09-12
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/DevTools/">DevTools</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Sublime-Terminal编译并查看源码"><span class="post-toc-number">1.</span> <span class="post-toc-text">Sublime + Terminal编译并查看源码</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#导入Android-Studio"><span class="post-toc-number">2.</span> <span class="post-toc-text">导入Android Studio</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Gradle常用命令"><span class="post-toc-number">3.</span> <span class="post-toc-text">Gradle常用命令</span></a></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-android-studio-tutorial5"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Android Studio系列教程五--Gradle命令详解与导入第三方包</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2016-09-12 01:01:05" datetime="2016-09-11T17:01:05.000Z"  itemprop="datePublished">2016-09-12</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/DevTools/">DevTools</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <blockquote>
+<p><a href="http://stormzhang.com/devtools/2014/11/25/android-studio-tutorial5/" target="_blank" rel="noopener">原文地址</a></p>
+</blockquote>
+<p>Android Studio + Gradle的组合用起来非常方便，很多第三方开源项目也早都迁移到了Studio，为此今天就来介绍下查看、编译并导入第三方开源项目的方法。</p>
+<h2 id="Sublime-Terminal编译并查看源码"><a href="#Sublime-Terminal编译并查看源码" class="headerlink" title="Sublime + Terminal编译并查看源码"></a>Sublime + Terminal编译并查看源码</h2><p>首先来给大家介绍一种简便并且个人最喜欢的一种办法。很多时候我们在GitHub上看到一个不错的开源项目，一般有两种需求，阅读源码和查看运行效果，如果是单纯的查看源码我更喜欢用一些轻量级编辑器，如vim，sublime等，vim不是很熟练，所以个人一种都习惯用sublime来查看并阅读源码（实际开发还是Android Studio、Eclipse等IDE更有效率）；至于查看运行效果首先得需要apk，对于一些开源项目已提供apk下载，那就好办，直接安装到手机即可。 而对于一些没有提供apk下载的，则需要自己手动编译打包。</p>
+<p>下面以<a href="https://github.com/stormzhang/9GAG" target="_blank" rel="noopener">9GAG</a>为例来讲解下命令行Gradle编译的过程。</p>
+<ul>
+<li>1、切换到9GAG项目的根目录，执行 <strong>./gradlew -v</strong> 来查看下项目所用的Gradle版本</li>
+</ul>
+<p>如果你是第一次执行会去下载Gradle，这个过程如果不翻墙非常慢，建议翻墙</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://opesdt6ii.bkt.clouddn.com/gradle_download1.png" alt="iamge" title="">
+                </div>
+                <div class="image-caption">iamge</div>
+            </figure>
+<p>紧接着下载成功会看到如下信息：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">------------------------------------------------------------</span><br><span class="line">Gradle 2.2.1</span><br><span class="line">------------------------------------------------------------</span><br><span class="line"></span><br><span class="line">Build time:   2014-11-24 09:45:35 UTC</span><br><span class="line">Build number: none</span><br><span class="line">Revision:     6fcb59c06f43a4e6b1bcb401f7686a8601a1fb4a</span><br><span class="line"></span><br><span class="line">Groovy:       2.3.6</span><br><span class="line">Ant:          Apache Ant(TM) version 1.9.3 compiled on December 23 2013</span><br><span class="line">JVM:          1.7.0_60 (Oracle Corporation 24.60-b09)</span><br><span class="line">OS:           Mac OS X 10.9.5 x86_64</span><br></pre></td></tr></table></figure>
+<ul>
+<li>2、接着执行 <strong>./gradlew clean</strong> </li>
+</ul>
+<p>执行这个命令会去下载Gradle的一些依赖，下载成功并编译通过时会看到如下信息：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">:app:clean UP-TO-DATE</span><br><span class="line">:extras:ShimmerAndroid:clean UP-TO-DATE</span><br><span class="line"></span><br><span class="line">BUILD SUCCESSFUL</span><br></pre></td></tr></table></figure>
+<ul>
+<li>3、最后执行 <strong>./gradlew build</strong></li>
+</ul>
+<p>这个命令会直接编译并生成相应的apk文件，如果看到如下字样就代表build成功了</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">BUILD SUCCESSFUL</span><br><span class="line"></span><br><span class="line">Total time: 31.456 secs</span><br></pre></td></tr></table></figure>
+<p>紧接着在 <strong>9GAG/app/build/outputs/apk</strong> 目录下会看到类似于app-debug-unaligned.apk, app-release-unsigned.apk等，看名字应该能理解意思，unaligned代表没有进行zip优化的，unsigned代表没有签名的。然后就可以直接安装apk查看运行效果了。</p>
+<p>以上是我个人习惯的一种阅读第三方源码的习惯，关于上面提到的一些gradle命令大家应该还不理解，后面会一一进行说明的。</p>
+<h2 id="导入Android-Studio"><a href="#导入Android-Studio" class="headerlink" title="导入Android Studio"></a>导入Android Studio</h2><p>但是如果你还是想导入Android Studio的话，下面就来简单介绍下导入Studio的方法以及一些注意事项。</p>
+<ul>
+<li>1、选择File-&gt;Import Project, 选择本地9GAG项目的目录</li>
+</ul>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://opesdt6ii.bkt.clouddn.com/studio_import1.png" alt="iamge" title="">
+                </div>
+                <div class="image-caption">iamge</div>
+            </figure>
+<ul>
+<li>2、第一次依然会下载Gradle，其实自己在命令行已经下载过了，但是这次依然还要下载一次（依然要翻墙），可能是个bug</li>
+</ul>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://opesdt6ii.bkt.clouddn.com/gradle_download2.png" alt="iamge" title="">
+                </div>
+                <div class="image-caption">iamge</div>
+            </figure>
+<ul>
+<li>3、导入之后你需要注意以下几个地方</li>
+</ul>
+<ol>
+<li>每个Module下的 <strong>build.gradle</strong> 下的buildToolsVersion，即<strong>9GAG/app/build.gradle</strong> 和 <strong>9GAG/extras/ShimmerAndroid/build.gradle</strong> , 可以打开 <strong>SDK Manager</strong> 查看本地你安装的 <strong>SDK Build-tools</strong>, 如下图，如果相应版本没有安装请先下载。</li>
+</ol>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://opesdt6ii.bkt.clouddn.com/build-tools.png" alt="iamge" title="">
+                </div>
+                <div class="image-caption">iamge</div>
+            </figure>
+<ol>
+<li><p>项目根目录下的 <strong>build.gradle</strong> 下gradle插件的版本，如 <strong>9GAG/build.gradle</strong> 的内容：</p>
+<p> classpath ‘com.android.tools.build:gradle:1.0.0’</p>
+</li>
+</ol>
+<p>Android Studio 1.0必须指定gradle插件1.0的版本</p>
+<ol>
+<li>Gradle Wrapper的版本，在 <strong>9GAG/gradle/wrapper/gralde-wrapper.properties</strong> 文件里有如下内容：</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">#Thu Dec 18 16:02:24 CST 2014</span><br><span class="line">distributionBase=GRADLE_USER_HOME</span><br><span class="line">distributionPath=wrapper/dists</span><br><span class="line">zipStoreBase=GRADLE_USER_HOME</span><br><span class="line">zipStorePath=wrapper/dists</span><br><span class="line">distributionUrl=https\://services.gradle.org/distributions/gradle-2.2.1-all.zip</span><br></pre></td></tr></table></figure>
+<p>上述内容制定了gradle的版本使用2.2.1，在Studio中如果你手动改了gradle插件的版本会有提示要不要更新Gradle Wrapper的版本。</p>
+<p>如果以上几个地方确定版本是ok的，那么导入Android Studio应该没有问题，有些老的项目可能gradle版本比较老，仍然在使用一些老的语法，如果编译还通不过参考<a href="http://stormzhang.com/devtools/2014/12/18/android-studio-tutorial4/" target="_blank" rel="noopener">Android Studio系列教程四–Gradle基础</a>更改成最新的语法。</p>
+<h2 id="Gradle常用命令"><a href="#Gradle常用命令" class="headerlink" title="Gradle常用命令"></a>Gradle常用命令</h2><p>上面大家接触了一些命令如 <strong>./gradlew -v</strong> <strong>./gradlew clean</strong> <strong>./gradlew build</strong>, 这里注意是<strong>./gradlew</strong>, <strong>./</strong>代表当前目录，<strong>gradlew</strong>代表 gradle wrapper，意思是gradle的一层包装，大家可以理解为在这个项目本地就封装了gradle，即gradle wrapper， 在<strong>9GAG/gradle/wrapper/gralde-wrapper.properties</strong>文件中声明了它指向的目录和版本。只要下载成功即可用grdlew wrapper的命令代替全局的gradle命令。</p>
+<p>理解了gradle wrapper的概念，下面一些常用命令也就容易理解了。</p>
+<ul>
+<li><p>./gradlew -v 版本号</p>
+</li>
+<li><p>./gradlew clean 清除9GAG/app目录下的build文件夹</p>
+</li>
+<li><p>./gradlew build 检查依赖并编译打包</p>
+</li>
+</ul>
+<p>这里注意的是 <strong>./gradlew build</strong> 命令把debug、release环境的包都打出来，如果正式发布只需要打Release的包，该怎么办呢，下面介绍一个很有用的命令 <strong>assemble<build type="" name=""></build></strong>, 如</p>
+<ul>
+<li><p>./gradlew assembleDebug 编译并打Debug包</p>
+</li>
+<li><p>./gradlew assembleRelease 编译并打Release的包</p>
+</li>
+</ul>
+<p>除此之外，assemble还可以和productFlavors结合使用，具体在下一篇多渠道打包进一步解释。</p>
+<ul>
+<li><p>./gradlew installRelease Release模式打包并安装</p>
+</li>
+<li><p>./gradlew uninstallRelease 卸载Release模式包</p>
+</li>
+</ul>
+<p>下一篇来介绍用Gradle进行方便的多渠道打包，以及项目中完整的Gradle配置。有问题或建议欢迎大家直接博客留言。</p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2018-06-27T09:39:57.937Z" itemprop="dateUpdated">2018-06-27 17:39:57</time>
+</span><br>
+
+
+        
+        本文固定链接：<a href="/2016/09/12/android-studio-tutorial5/" target="_blank" rel="external">https://smuwjs.github.io/2016/09/12/android-studio-tutorial5/</a>
+        
+    </div>
+    <footer>
+        <a href="https://smuwjs.github.io">
+            <img src="/img/head.png" alt="Jeeson">
+            Jeeson
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/AndroidStudio/">AndroidStudio</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Gradle/">Gradle</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/09/12/android-studio-tutorial5/&title=《Android Studio系列教程五--Gradle命令详解与导入第三方包》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/09/12/android-studio-tutorial5/&title=《Android Studio系列教程五--Gradle命令详解与导入第三方包》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/09/12/android-studio-tutorial5/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Android Studio系列教程五--Gradle命令详解与导入第三方包》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/09/12/android-studio-tutorial5/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/09/12/android-studio-tutorial5/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2016/09/12/android-studio-tutorial6/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">Android Studio系列教程六--Gradle多渠道打包</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2016/09/12/android-studio-tutorial4/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Android Studio系列教程四--Gradle基础</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="android-studio-tutorial5" data-title="Android Studio系列教程五--Gradle命令详解与导入第三方包" data-url="https://smuwjs.github.io/2016/09/12/android-studio-tutorial5/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'smuwjs', theme: 'none'};
+lazyScripts.push('//unpkg.com/hexo-theme-material-indigo@latest/js/embed.min.js');
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循<a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>Jeeson &copy; 2015 - 2018</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/09/12/android-studio-tutorial5/&title=《Android Studio系列教程五--Gradle命令详解与导入第三方包》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/09/12/android-studio-tutorial5/&title=《Android Studio系列教程五--Gradle命令详解与导入第三方包》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/09/12/android-studio-tutorial5/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Android Studio系列教程五--Gradle命令详解与导入第三方包》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/09/12/android-studio-tutorial5/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/09/12/android-studio-tutorial5/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://smuwjs.github.io/2016/09/12/android-studio-tutorial5/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

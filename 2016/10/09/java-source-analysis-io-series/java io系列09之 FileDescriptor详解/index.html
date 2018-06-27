@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>java io系列09之 FileDescriptor详解 | Jeeson&#39;s Blog | Write the code. Change the world.</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="Java源码分析,Java IO系列">
+    <meta name="description" content="本章对FileDescriptor进行介绍   目录1. FileDescriptor 介绍2. 示例代码      1. FileDescriptor 介绍FileDescriptor 是“文件描述符”。FileDescriptor 可以被用来表示开放文件、开放套接字等。以FileDescriptor表示文件来说：当FileDescriptor表示某文件时，我们可以通俗的将FileDescri">
+<meta name="keywords" content="Java源码分析,Java IO系列">
+<meta property="og:type" content="article">
+<meta property="og:title" content="java io系列09之 FileDescriptor详解">
+<meta property="og:url" content="https://smuwjs.github.io/2016/10/09/java-source-analysis-io-series/java io系列09之 FileDescriptor详解/index.html">
+<meta property="og:site_name" content="Jeeson&#39;s Blog">
+<meta property="og:description" content="本章对FileDescriptor进行介绍   目录1. FileDescriptor 介绍2. 示例代码      1. FileDescriptor 介绍FileDescriptor 是“文件描述符”。FileDescriptor 可以被用来表示开放文件、开放套接字等。以FileDescriptor表示文件来说：当FileDescriptor表示某文件时，我们可以通俗的将FileDescri">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-06-27T09:39:57.941Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="java io系列09之 FileDescriptor详解">
+<meta name="twitter:description" content="本章对FileDescriptor进行介绍   目录1. FileDescriptor 介绍2. 示例代码      1. FileDescriptor 介绍FileDescriptor 是“文件描述符”。FileDescriptor 可以被用来表示开放文件、开放套接字等。以FileDescriptor表示文件来说：当FileDescriptor表示某文件时，我们可以通俗的将FileDescri">
+    
+        <link rel="alternate" type="application/atom+xml" title="Jeeson&#39;s Blog" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/head.png">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Jeeson</h5>
+          <a href="mailto:smuwjs@163.com" title="smuwjs@163.com" class="mail">smuwjs@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/smuwjs" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">java io系列09之 FileDescriptor详解</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">java io系列09之 FileDescriptor详解</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2016-10-08T16:00:00.000Z" itemprop="datePublished" class="page-time">
+  2016-10-09
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#1-FileDescriptor-介绍"><span class="post-toc-number">1.</span> <span class="post-toc-text">1. FileDescriptor 介绍</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#1-1-out-的作用和原理"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">1.1 out 的作用和原理</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#2-示例代码"><span class="post-toc-number">2.</span> <span class="post-toc-text">2. 示例代码</span></a></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-java-source-analysis-io-series/java io系列09之 FileDescriptor详解"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">java io系列09之 FileDescriptor详解</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2016-10-09 00:00:00" datetime="2016-10-08T16:00:00.000Z"  itemprop="datePublished">2016-10-09</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <blockquote>
+<p>本章对FileDescriptor进行介绍</p>
+</blockquote>
+<blockquote>
+<p><strong>目录</strong><br><a href="#anchor1">1. FileDescriptor 介绍</a><br><a href="#anchor2">2. 示例代码</a>   </p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="1-FileDescriptor-介绍"><a href="#1-FileDescriptor-介绍" class="headerlink" title="1. FileDescriptor 介绍"></a>1. FileDescriptor 介绍</h1><p>FileDescriptor 是“文件描述符”。<br>FileDescriptor 可以被用来表示开放文件、开放套接字等。<br>以FileDescriptor表示文件来说：当FileDescriptor表示某文件时，我们可以通俗的将FileDescriptor看成是该文件。但是，我们不能直接通过FileDescriptor对该文件进行操作；若需要通过FileDescriptor对该文件进行操作，则需要新创建FileDescriptor对应的FileOutputStream，再对文件进行操作。</p>
+<p><strong>in, out, err介绍</strong><br>(01) in  – 标准输入(键盘)的描述符<br>(02) out – 标准输出(屏幕)的描述符<br>(03) err – 标准错误输出(屏幕)的描述符</p>
+<p>它们3个的原理和用法都类似，下面我们通过out来进行深入研究。</p>
+<h2 id="1-1-out-的作用和原理"><a href="#1-1-out-的作用和原理" class="headerlink" title="1.1 out 的作用和原理"></a>1.1 out 的作用和原理</h2><p>out是标准输出(屏幕)的描述符。但是它有什么作用呢？<br>我们可以通俗理解，out就代表了标准输出(屏幕)。若我们要输出信息到屏幕上，即可通过out来进行操作；但是，out又没有提供输出信息到屏幕的接口(因为out本质是FileDescriptor对象，而FileDescriptor没有输出接口)。怎么办呢？<br>很简单，我们创建out对应的“输出流对象”，然后通过“输出流”的write()等输出接口就可以将信息输出到屏幕上。如下代码：</p>
+<pre><code>try {
+    FileOutputStream out = new FileOutputStream(FileDescriptor.out);
+    out.write(&apos;A&apos;);
+    out.close();
+} catch (IOException e) {
+}
+</code></pre><p>执行上面的程序，会在屏幕上输出字母’A’。</p>
+<p>为了方便我们操作，java早已为我们封装好了“能方便的在屏幕上输出信息的接口”：通过System.out，我们能方便的输出信息到屏幕上。<br>因此，我们可以等价的将上面的程序转换为如下代码：</p>
+<pre><code>System.out.print(&apos;A&apos;);
+</code></pre><p>下面讲讲上面两段代码的原理<br>查看看out的定义。它的定义在FileDescriptor.java中，相关源码如下：</p>
+<pre><code>public final class FileDescriptor {
+
+    private int fd;
+
+    public static final FileDescriptor out = new FileDescriptor(1);
+
+    private FileDescriptor(int fd) {
+        this.fd = fd;
+        useCount = new AtomicInteger();
+    }
+
+    ...
+}
+</code></pre><p>从中，可以看出<br>(01) out就是一个FileDescriptor对象。它是通过构造函数FileDescriptor(int fd)创建的。<br>(02) FileDescriptor(int fd)的操作：就是给fd对象(int类型)赋值，并新建一个使用计数变量useCount。<br>fd对象是非常重要的一个变量，“fd=1”就代表了“标准输出”，“fd=0”就代表了“标准输入”，“fd=2”就代表了“标准错误输出”。</p>
+<p>FileOutputStream out = new FileOutputStream(FileDescriptor.out); 就是利用构造函数FileOutputStream(FileDescriptor fdObj)来创建“Filed.out对应的FileOutputStream对象”。</p>
+<p>关于System.out是如何定义的。可以参考”[深入了解System.out.println(“hello world”)][link_io_systemoutprintln] “</p>
+<p>通过上面的学习，我们知道，我们可以自定义标准的文件描述符[即，in(标准输入),out(标准输出),err(标准错误输出)]的流，从而完成输入/输出功能；但是，java已经为我们封装好了相应的接口，即我们可以更方便的System.in, System.out, System.err去使用它们。<br>另外，我们也可以自定义“文件”、“Socket”等的文件描述符，进而对它们进行操作。参考下面示例代码中的testWrite(), testRead()等接口。</p>
+<p><a name="anchor2"></a></p>
+<h1 id="2-示例代码"><a href="#2-示例代码" class="headerlink" title="2. 示例代码"></a>2. 示例代码</h1><p>源码如下(FileDescriptorTest.java)： </p>
+<pre><code>import java.io.PrintStream;
+import java.io.FileDescriptor;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+/**
+ * FileDescriptor 测试程序
+ *
+ * @author skywang
+ */
+public class FileDescriptorTest {
+
+    private static final String FileName = &quot;file.txt&quot;;
+    private static final String OutText = &quot;Hi FileDescriptor&quot;;
+    public static void main(String[] args) {
+        testWrite();
+        testRead();
+
+        testStandFD() ;
+        //System.out.println(OutText);
+    }
+
+    /**
+     * FileDescriptor.out 的测试程序
+     *
+     * 该程序的效果 等价于 System.out.println(OutText);
+     */
+    private static void testStandFD() {
+        // 创建FileDescriptor.out 对应的PrintStream
+        PrintStream out = new PrintStream(
+                new FileOutputStream(FileDescriptor.out));
+        // 在屏幕上输出“Hi FileDescriptor”
+        out.println(OutText);
+        out.close();
+    }
+
+    /**
+     * FileDescriptor写入示例程序
+     * 
+     * (01) 为了说明，&quot;通过文件名创建FileOutputStream&quot;与“通过文件描述符创建FileOutputStream”对象是等效的
+     * (02) 该程序会在“该源文件”所在目录新建文件&quot;file.txt&quot;，并且文件内容是&quot;Aa&quot;。
+     */
+    private static void testWrite() {
+        try {
+            // 新建文件“file.txt”对应的FileOutputStream对象
+            FileOutputStream out1 = new FileOutputStream(FileName);
+            // 获取文件“file.txt”对应的“文件描述符”
+            FileDescriptor fdout = out1.getFD();
+            // 根据“文件描述符”创建“FileOutputStream”对象
+            FileOutputStream out2 = new FileOutputStream(fdout);
+
+            out1.write(&apos;A&apos;);    // 通过out1向“file.txt”中写入&apos;A&apos;
+            out2.write(&apos;a&apos;);    // 通过out2向“file.txt”中写入&apos;A&apos;
+
+            if (fdout!=null)
+                System.out.printf(&quot;fdout(%s) is %s\n&quot;,fdout, fdout.valid());
+
+            out1.close();
+            out2.close();
+
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * FileDescriptor读取示例程序
+     *
+     * 为了说明，&quot;通过文件名创建FileInputStream&quot;与“通过文件描述符创建FileInputStream”对象是等效的
+     */
+    private static void testRead() {
+        try {
+            // 新建文件“file.txt”对应的FileInputStream对象
+            FileInputStream in1 = new FileInputStream(FileName);
+            // 获取文件“file.txt”对应的“文件描述符”
+            FileDescriptor fdin = in1.getFD();
+            // 根据“文件描述符”创建“FileInputStream”对象
+            FileInputStream in2 = new FileInputStream(fdin);
+
+            System.out.println(&quot;in1.read():&quot;+(char)in1.read());
+            System.out.println(&quot;in2.read():&quot;+(char)in2.read());
+
+            if (fdin!=null)
+                System.out.printf(&quot;fdin(%s) is %s\n&quot;, fdin, fdin.valid());
+
+            in1.close();
+            in2.close();
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+</code></pre><p>运行结果：</p>
+<pre><code>fdout(java.io.FileDescriptor@2b820dda) is true
+in1.read():A
+in2.read():a
+fdin(java.io.FileDescriptor@675b7986) is true
+Hi FileDescriptor
+</code></pre>
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2018-06-27T09:39:57.941Z" itemprop="dateUpdated">2018-06-27 17:39:57</time>
+</span><br>
+
+
+        
+        本文固定链接：<a href="/2016/10/09/java-source-analysis-io-series/java io系列09之 FileDescriptor详解/" target="_blank" rel="external">https://smuwjs.github.io/2016/10/09/java-source-analysis-io-series/java io系列09之 FileDescriptor详解/</a>
+        
+    </div>
+    <footer>
+        <a href="https://smuwjs.github.io">
+            <img src="/img/head.png" alt="Jeeson">
+            Jeeson
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java-IO系列/">Java IO系列</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java源码分析/">Java源码分析</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/10/09/java-source-analysis-io-series/java io系列09之 FileDescriptor详解/&title=《java io系列09之 FileDescriptor详解》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/10/09/java-source-analysis-io-series/java io系列09之 FileDescriptor详解/&title=《java io系列09之 FileDescriptor详解》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/10/09/java-source-analysis-io-series/java io系列09之 FileDescriptor详解/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《java io系列09之 FileDescriptor详解》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/10/09/java-source-analysis-io-series/java io系列09之 FileDescriptor详解/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/10/09/java-source-analysis-io-series/java io系列09之 FileDescriptor详解/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2016/10/10/java-source-analysis-io-series/java io系列10之 FilterInputStream详解/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">java io系列10之 FilterInputStream详解</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2016/10/08/java-source-analysis-io-series/java io系列08之 File详解/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">java io系列08之 File详解</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="java-source-analysis-io-series/java io系列09之 FileDescriptor详解" data-title="java io系列09之 FileDescriptor详解" data-url="https://smuwjs.github.io/2016/10/09/java-source-analysis-io-series/java io系列09之 FileDescriptor详解/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'smuwjs', theme: 'none'};
+lazyScripts.push('//unpkg.com/hexo-theme-material-indigo@latest/js/embed.min.js');
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循<a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>Jeeson &copy; 2015 - 2018</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/10/09/java-source-analysis-io-series/java io系列09之 FileDescriptor详解/&title=《java io系列09之 FileDescriptor详解》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/10/09/java-source-analysis-io-series/java io系列09之 FileDescriptor详解/&title=《java io系列09之 FileDescriptor详解》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/10/09/java-source-analysis-io-series/java io系列09之 FileDescriptor详解/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《java io系列09之 FileDescriptor详解》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/10/09/java-source-analysis-io-series/java io系列09之 FileDescriptor详解/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/10/09/java-source-analysis-io-series/java io系列09之 FileDescriptor详解/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://smuwjs.github.io/2016/10/09/java-source-analysis-io-series/java io系列09之 FileDescriptor详解/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

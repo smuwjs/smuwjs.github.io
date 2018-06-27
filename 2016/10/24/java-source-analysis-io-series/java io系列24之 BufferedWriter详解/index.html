@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>java io系列24之 BufferedWriter详解 | Jeeson&#39;s Blog | Write the code. Change the world.</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="Java源码分析,Java IO系列">
+    <meta name="description" content="目录1. BufferedWriter 介绍2. BufferedWriter 源码分析(基于jdk1.7.40)3. 示例代码      1. BufferedWriter 介绍BufferedWriter 是缓冲字符输出流。它继承于Writer。BufferedWriter 的作用是为其他字符输出流添加一些缓冲功能。 BufferedWriter 函数列表 // 构造函数 BufferedW">
+<meta name="keywords" content="Java源码分析,Java IO系列">
+<meta property="og:type" content="article">
+<meta property="og:title" content="java io系列24之 BufferedWriter详解">
+<meta property="og:url" content="https://smuwjs.github.io/2016/10/24/java-source-analysis-io-series/java io系列24之 BufferedWriter详解/index.html">
+<meta property="og:site_name" content="Jeeson&#39;s Blog">
+<meta property="og:description" content="目录1. BufferedWriter 介绍2. BufferedWriter 源码分析(基于jdk1.7.40)3. 示例代码      1. BufferedWriter 介绍BufferedWriter 是缓冲字符输出流。它继承于Writer。BufferedWriter 的作用是为其他字符输出流添加一些缓冲功能。 BufferedWriter 函数列表 // 构造函数 BufferedW">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-06-27T09:39:57.941Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="java io系列24之 BufferedWriter详解">
+<meta name="twitter:description" content="目录1. BufferedWriter 介绍2. BufferedWriter 源码分析(基于jdk1.7.40)3. 示例代码      1. BufferedWriter 介绍BufferedWriter 是缓冲字符输出流。它继承于Writer。BufferedWriter 的作用是为其他字符输出流添加一些缓冲功能。 BufferedWriter 函数列表 // 构造函数 BufferedW">
+    
+        <link rel="alternate" type="application/atom+xml" title="Jeeson&#39;s Blog" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/head.png">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Jeeson</h5>
+          <a href="mailto:smuwjs@163.com" title="smuwjs@163.com" class="mail">smuwjs@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/smuwjs" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">java io系列24之 BufferedWriter详解</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">java io系列24之 BufferedWriter详解</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2016-10-23T16:00:00.000Z" itemprop="datePublished" class="page-time">
+  2016-10-24
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#1-BufferedWriter-介绍"><span class="post-toc-number">1.</span> <span class="post-toc-text">1. BufferedWriter 介绍</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#2-BufferedWriter-源码分析-基于jdk1-7-40"><span class="post-toc-number">2.</span> <span class="post-toc-text">2. BufferedWriter 源码分析(基于jdk1.7.40)</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#3-示例代码"><span class="post-toc-number">3.</span> <span class="post-toc-text">3. 示例代码</span></a></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-java-source-analysis-io-series/java io系列24之 BufferedWriter详解"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">java io系列24之 BufferedWriter详解</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2016-10-24 00:00:00" datetime="2016-10-23T16:00:00.000Z"  itemprop="datePublished">2016-10-24</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <blockquote>
+<p><strong>目录</strong><br><a href="#anchor1">1. BufferedWriter 介绍</a><br><a href="#anchor2">2. BufferedWriter 源码分析(基于jdk1.7.40)</a><br><a href="#anchor3">3. 示例代码</a>   </p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="1-BufferedWriter-介绍"><a href="#1-BufferedWriter-介绍" class="headerlink" title="1. BufferedWriter 介绍"></a>1. BufferedWriter 介绍</h1><p>BufferedWriter 是缓冲字符输出流。它继承于Writer。<br>BufferedWriter 的作用是为其他字符输出流添加一些缓冲功能。</p>
+<p><strong>BufferedWriter 函数列表</strong></p>
+<pre><code>// 构造函数
+BufferedWriter(Writer out) 
+BufferedWriter(Writer out, int sz) 
+
+void    close()                              // 关闭此流，但要先刷新它。
+void    flush()                              // 刷新该流的缓冲。
+void    newLine()                            // 写入一个行分隔符。
+void    write(char[] cbuf, int off, int len) // 写入字符数组的某一部分。
+void    write(int c)                         // 写入单个字符。
+void    write(String s, int off, int len)    // 写入字符串的某一部分。
+</code></pre><p><a name="anchor2"></a></p>
+<h1 id="2-BufferedWriter-源码分析-基于jdk1-7-40"><a href="#2-BufferedWriter-源码分析-基于jdk1-7-40" class="headerlink" title="2. BufferedWriter 源码分析(基于jdk1.7.40)"></a>2. BufferedWriter 源码分析(基于jdk1.7.40)</h1><pre><code>package java.io;
+
+public class BufferedWriter extends Writer {
+
+    // 输出流对象
+    private Writer out;
+
+    // 保存“缓冲输出流”数据的字符数组
+    private char cb[];
+
+    // nChars 是cb缓冲区中字符的总的个数
+    // nextChar 是下一个要读取的字符在cb缓冲区中的位置
+    private int nChars, nextChar;
+
+    // 默认字符缓冲区大小
+    private static int defaultCharBufferSize = 8192;
+
+    // 行分割符
+    private String lineSeparator;
+
+    // 构造函数，传入“Writer对象”，默认缓冲区大小是8k
+    public BufferedWriter(Writer out) {
+        this(out, defaultCharBufferSize);
+    }
+
+    // 构造函数，传入“Writer对象”，指定缓冲区大小是sz
+    public BufferedWriter(Writer out, int sz) {
+        super(out);
+        if (sz &lt;= 0)
+            throw new IllegalArgumentException(&quot;Buffer size &lt;= 0&quot;);
+        this.out = out;
+        cb = new char[sz];
+        nChars = sz;
+        nextChar = 0;
+
+        lineSeparator = java.security.AccessController.doPrivileged(
+            new sun.security.action.GetPropertyAction(&quot;line.separator&quot;));
+    }
+
+    // 确保“BufferedWriter”是打开状态
+    private void ensureOpen() throws IOException {
+        if (out == null)
+            throw new IOException(&quot;Stream closed&quot;);
+    }
+
+    // 对缓冲区执行flush()操作，将缓冲区的数据写入到Writer中
+    void flushBuffer() throws IOException {
+        synchronized (lock) {
+            ensureOpen();
+            if (nextChar == 0)
+                return;
+            out.write(cb, 0, nextChar);
+            nextChar = 0;
+        }
+    }
+
+    // 将c写入到缓冲区中。先将c转换为char，然后将其写入到缓冲区。
+    public void write(int c) throws IOException {
+        synchronized (lock) {
+            ensureOpen();
+            // 若缓冲区满了，则清空缓冲，将缓冲数据写入到输出流中。
+            if (nextChar &gt;= nChars)
+                flushBuffer();
+            cb[nextChar++] = (char) c;
+        }
+    }
+
+    // 返回a，b中较小的数
+    private int min(int a, int b) {
+        if (a &lt; b) return a;
+        return b;
+    }
+
+    // 将字符数组cbuf写入到缓冲中，从cbuf的off位置开始写入，写入长度是len。
+    public void write(char cbuf[], int off, int len) throws IOException {
+        synchronized (lock) {
+            ensureOpen();
+            if ((off &lt; 0) || (off &gt; cbuf.length) || (len &lt; 0) ||
+                ((off + len) &gt; cbuf.length) || ((off + len) &lt; 0)) {
+                throw new IndexOutOfBoundsException();
+            } else if (len == 0) {
+                return;
+            }
+
+            if (len &gt;= nChars) {
+                /* If the request length exceeds the size of the output buffer,
+                   flush the buffer and then write the data directly.  In this
+                   way buffered streams will cascade harmlessly. */
+                flushBuffer();
+                out.write(cbuf, off, len);
+                return;
+            }
+
+            int b = off, t = off + len;
+            while (b &lt; t) {
+                int d = min(nChars - nextChar, t - b);
+                System.arraycopy(cbuf, b, cb, nextChar, d);
+                b += d;
+                nextChar += d;
+                if (nextChar &gt;= nChars)
+                    flushBuffer();
+            }
+        }
+    }
+
+    // 将字符串s写入到缓冲中，从s的off位置开始写入，写入长度是len。
+    public void write(String s, int off, int len) throws IOException {
+        synchronized (lock) {
+            ensureOpen();
+
+            int b = off, t = off + len;
+            while (b &lt; t) {
+                int d = min(nChars - nextChar, t - b);
+                s.getChars(b, b + d, cb, nextChar);
+                b += d;
+                nextChar += d;
+                if (nextChar &gt;= nChars)
+                    flushBuffer();
+            }
+        }
+    }
+
+    // 将换行符写入到缓冲中
+    public void newLine() throws IOException {
+        write(lineSeparator);
+    }
+
+    // 清空缓冲区数据
+    public void flush() throws IOException {
+        synchronized (lock) {
+            flushBuffer();
+            out.flush();
+        }
+    }
+
+    public void close() throws IOException {
+        synchronized (lock) {
+            if (out == null) {
+                return;
+            }
+            try {
+                flushBuffer();
+            } finally {
+                out.close();
+                out = null;
+                cb = null;
+            }
+        }
+    }
+}
+</code></pre><p>说明： BufferedWriter的源码非常简单，这里就BufferedWriter的思想进行简单说明：BufferedWriter通过字符数组来缓冲数据，当缓冲区满或者用户调用flush()函数时，它就会将缓冲区的数据写入到输出流中。</p>
+<p><a name="anchor3"></a></p>
+<h1 id="3-示例代码"><a href="#3-示例代码" class="headerlink" title="3. 示例代码"></a>3. 示例代码</h1><p>关于BufferedWriter中API的详细用法，参考示例代码(BufferedWriterTest.java)：</p>
+<pre><code>import java.io.BufferedWriter;
+import java.io.File;
+import java.io.OutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.FileNotFoundException;
+import java.lang.SecurityException;
+import java.util.Scanner;
+
+/**
+ * BufferedWriter 测试程序
+ *
+ * @author skywang
+ */
+public class BufferedWriterTest {
+
+    private static final int LEN = 5;
+    // 对应英文字母“abcdefghijklmnopqrstuvwxyz”
+    //private static final char[] ArrayLetters = &quot;abcdefghijklmnopqrstuvwxyz&quot;;
+    private static final char[] ArrayLetters = new char[] {&apos;a&apos;,&apos;b&apos;,&apos;c&apos;,&apos;d&apos;,&apos;e&apos;,&apos;f&apos;,&apos;g&apos;,&apos;h&apos;,&apos;i&apos;,&apos;j&apos;,&apos;k&apos;,&apos;l&apos;,&apos;m&apos;,&apos;n&apos;,&apos;o&apos;,&apos;p&apos;,&apos;q&apos;,&apos;r&apos;,&apos;s&apos;,&apos;t&apos;,&apos;u&apos;,&apos;v&apos;,&apos;w&apos;,&apos;x&apos;,&apos;y&apos;,&apos;z&apos;};
+
+    public static void main(String[] args) {
+        testBufferedWriter() ;
+    }
+
+    /**
+     * BufferedWriter的API测试函数
+     */
+    private static void testBufferedWriter() {
+
+        // 创建“文件输出流”对应的BufferedWriter
+        // 它对应缓冲区的大小是16，即缓冲区的数据&gt;=16时，会自动将缓冲区的内容写入到输出流。
+        try {
+            File file = new File(&quot;bufferwriter.txt&quot;);
+            BufferedWriter out =
+                  new BufferedWriter(
+                      new FileWriter(file));
+
+            // 将ArrayLetters数组的前10个字符写入到输出流中
+            out.write(ArrayLetters, 0, 10);
+            // 将“换行符\n”写入到输出流中
+            out.write(&apos;\n&apos;);
+
+            out.flush();
+            //readUserInput() ;
+
+            out.close();
+       } catch (FileNotFoundException e) {
+           e.printStackTrace();
+       } catch (SecurityException e) {
+           e.printStackTrace();
+       } catch (IOException e) {
+           e.printStackTrace();
+       }
+    }
+
+    /**
+     * 读取用户输入
+     */
+    private static void readUserInput() {
+        System.out.println(&quot;please input a text:&quot;);
+        Scanner reader=new Scanner(System.in);
+        // 等待一个输入
+        String str = reader.next();
+        System.out.printf(&quot;the input is : %s\n&quot;, str);
+    }
+}
+</code></pre><p>运行结果： 生成文件“bufferwriter.txt”，文件的内容是“abcdefghij”。</p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2018-06-27T09:39:57.941Z" itemprop="dateUpdated">2018-06-27 17:39:57</time>
+</span><br>
+
+
+        
+        本文固定链接：<a href="/2016/10/24/java-source-analysis-io-series/java io系列24之 BufferedWriter详解/" target="_blank" rel="external">https://smuwjs.github.io/2016/10/24/java-source-analysis-io-series/java io系列24之 BufferedWriter详解/</a>
+        
+    </div>
+    <footer>
+        <a href="https://smuwjs.github.io">
+            <img src="/img/head.png" alt="Jeeson">
+            Jeeson
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java-IO系列/">Java IO系列</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java源码分析/">Java源码分析</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/10/24/java-source-analysis-io-series/java io系列24之 BufferedWriter详解/&title=《java io系列24之 BufferedWriter详解》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/10/24/java-source-analysis-io-series/java io系列24之 BufferedWriter详解/&title=《java io系列24之 BufferedWriter详解》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/10/24/java-source-analysis-io-series/java io系列24之 BufferedWriter详解/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《java io系列24之 BufferedWriter详解》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/10/24/java-source-analysis-io-series/java io系列24之 BufferedWriter详解/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/10/24/java-source-analysis-io-series/java io系列24之 BufferedWriter详解/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2016/10/25/java-source-analysis-io-series/java io系列25之 PrintWriter详解/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">java io系列25之 PrintWriter详解</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2016/10/23/java-source-analysis-io-series/java io系列23之 BufferedReader详解/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">java io系列23之 BufferedReader详解</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="java-source-analysis-io-series/java io系列24之 BufferedWriter详解" data-title="java io系列24之 BufferedWriter详解" data-url="https://smuwjs.github.io/2016/10/24/java-source-analysis-io-series/java io系列24之 BufferedWriter详解/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'smuwjs', theme: 'none'};
+lazyScripts.push('//unpkg.com/hexo-theme-material-indigo@latest/js/embed.min.js');
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循<a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>Jeeson &copy; 2015 - 2018</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/10/24/java-source-analysis-io-series/java io系列24之 BufferedWriter详解/&title=《java io系列24之 BufferedWriter详解》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/10/24/java-source-analysis-io-series/java io系列24之 BufferedWriter详解/&title=《java io系列24之 BufferedWriter详解》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/10/24/java-source-analysis-io-series/java io系列24之 BufferedWriter详解/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《java io系列24之 BufferedWriter详解》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/10/24/java-source-analysis-io-series/java io系列24之 BufferedWriter详解/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/10/24/java-source-analysis-io-series/java io系列24之 BufferedWriter详解/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://smuwjs.github.io/2016/10/24/java-source-analysis-io-series/java io系列24之 BufferedWriter详解/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

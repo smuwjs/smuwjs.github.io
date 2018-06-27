@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>使用Travis CI自动部署Hexo博客到Github上 | Jeeson&#39;s Blog | Write the code. Change the world.</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="Hexo,Travis CI">
+    <meta name="description" content="写在前面自从在github page上搭建博客以来，都是使用的hexo，每次都是通过hexo命令build生成静态文件，再push到github上，后来找到一个deploy插件，只需要填写好github的repos地址就好。但是源码的保存是个问题，更换电脑想要写博客很不方便，甚至蠢到将源码保存到u盘里面，这样每次提交后又要备份一次，很容易忘记。说到这里那为什么不将源码保存到github上呢。 其实">
+<meta name="keywords" content="Hexo,Travis CI">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用Travis CI自动部署Hexo博客到Github上">
+<meta property="og:url" content="https://smuwjs.github.io/2017/05/04/travisci-hexo/index.html">
+<meta property="og:site_name" content="Jeeson&#39;s Blog">
+<meta property="og:description" content="写在前面自从在github page上搭建博客以来，都是使用的hexo，每次都是通过hexo命令build生成静态文件，再push到github上，后来找到一个deploy插件，只需要填写好github的repos地址就好。但是源码的保存是个问题，更换电脑想要写博客很不方便，甚至蠢到将源码保存到u盘里面，这样每次提交后又要备份一次，很容易忘记。说到这里那为什么不将源码保存到github上呢。 其实">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://7xjp74.com1.z0.glb.clouddn.com/travis.png">
+<meta property="og:image" content="http://7xjp74.com1.z0.glb.clouddn.com/list.png">
+<meta property="og:image" content="http://7xjp74.com1.z0.glb.clouddn.com/new.png">
+<meta property="og:image" content="http://7xjp74.com1.z0.glb.clouddn.com/config.png">
+<meta property="og:image" content="http://7xjp74.com1.z0.glb.clouddn.com/token.png">
+<meta property="og:image" content="http://7xjp74.com1.z0.glb.clouddn.com/success.png">
+<meta property="og:updated_time" content="2018-06-27T09:39:57.957Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="使用Travis CI自动部署Hexo博客到Github上">
+<meta name="twitter:description" content="写在前面自从在github page上搭建博客以来，都是使用的hexo，每次都是通过hexo命令build生成静态文件，再push到github上，后来找到一个deploy插件，只需要填写好github的repos地址就好。但是源码的保存是个问题，更换电脑想要写博客很不方便，甚至蠢到将源码保存到u盘里面，这样每次提交后又要备份一次，很容易忘记。说到这里那为什么不将源码保存到github上呢。 其实">
+<meta name="twitter:image" content="http://7xjp74.com1.z0.glb.clouddn.com/travis.png">
+    
+        <link rel="alternate" type="application/atom+xml" title="Jeeson&#39;s Blog" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/head.png">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Jeeson</h5>
+          <a href="mailto:smuwjs@163.com" title="smuwjs@163.com" class="mail">smuwjs@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/smuwjs" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">使用Travis CI自动部署Hexo博客到Github上</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">使用Travis CI自动部署Hexo博客到Github上</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2017-05-04T15:27:53.000Z" itemprop="datePublished" class="page-time">
+  2017-05-04
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/hexo/">hexo</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#写在前面"><span class="post-toc-number">1.</span> <span class="post-toc-text">写在前面</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#什么是Travis-CI？"><span class="post-toc-number">2.</span> <span class="post-toc-text">什么是Travis CI？</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#构建"><span class="post-toc-number">3.</span> <span class="post-toc-text">构建</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Access-Token"><span class="post-toc-number">4.</span> <span class="post-toc-text">Access Token</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#生成Access-Token"><span class="post-toc-number">4.1.</span> <span class="post-toc-text">生成Access Token</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#配置Travis-CI"><span class="post-toc-number">4.2.</span> <span class="post-toc-text">配置Travis CI</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#创建文章"><span class="post-toc-number">4.3.</span> <span class="post-toc-text">创建文章</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#写在后面"><span class="post-toc-number">5.</span> <span class="post-toc-text">写在后面</span></a></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-travisci-hexo"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">使用Travis CI自动部署Hexo博客到Github上</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2017-05-04 23:27:53" datetime="2017-05-04T15:27:53.000Z"  itemprop="datePublished">2017-05-04</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/hexo/">hexo</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h2 id="写在前面"><a href="#写在前面" class="headerlink" title="写在前面"></a>写在前面</h2><p>自从在<code>github page</code>上搭建博客以来，都是使用的<a href="http://hexo.io/" target="_blank" rel="noopener">hexo</a>，每次都是通过<code>hexo</code>命令<code>build</code>生成静态文件，再<code>push</code>到<code>github</code>上，后来找到一个<a href="https://github.com/hexojs/hexo-deployer-git" target="_blank" rel="noopener">deploy</a>插件，只需要填写好<code>github</code>的<code>repos</code>地址就好。但是源码的保存是个问题，更换电脑想要写博客很不方便，甚至蠢到将源码保存到u盘里面，这样每次提交后又要备份一次，很容易忘记。说到这里那为什么不将源码保存到<code>github</code>上呢。</p>
+<p>其实也是因为懒，给博客换了几次主题后，使得博客源码很乱，甚至自己也忘了改了主题的哪些代码，加上主题也是个<code>repos</code>，直接提交博客源码是提不上的，涉及到子模块问题，麻烦。想到自己还喜欢改动别人的主题，索性将主题文件夹<code>.git</code>文件删掉，让他成为一个普通的文件夹，这样就能提交到<code>github</code>了。废话不多说，估计是很久没写博客了，没有重点，下面简单说说使用<code>Travis CI</code>自动部署<code>Hexo</code>博客到<code>github</code>上。</p>
+<h2 id="什么是Travis-CI？"><a href="#什么是Travis-CI？" class="headerlink" title="什么是Travis CI？"></a>什么是Travis CI？</h2><blockquote>
+<p><code>Travis CI</code> 是目前新兴的开源持续集成构建项目，它与<code>jenkins</code>，<code>GO</code>的很明显的特别在于采用<code>yaml</code>格式，简洁清新独树一帜。目前大多数的github项目都已经移入到<code>Travis CI</code>的构建队列中，据说<code>Travis CI</code>每天运行超过<code>4000</code>次完整构建。</p>
+</blockquote>
+<h2 id="构建"><a href="#构建" class="headerlink" title="构建"></a>构建</h2><p>首先进入<a href="https://travis-ci.org/" target="_blank" rel="noopener">Travis CI</a>官网，使用<code>github</code>账号登录，如下图<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xjp74.com1.z0.glb.clouddn.com/travis.png" alt="travis" title="">
+                </div>
+                <div class="image-caption">travis</div>
+            </figure><br>登录成功后进入如下界面，以为我再此之前已经构建过，所以会用红色框内的内容，如果没有使用过是没有的。<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xjp74.com1.z0.glb.clouddn.com/list.png" alt="list" title="">
+                </div>
+                <div class="image-caption">list</div>
+            </figure><br>然后点击<code>My Repositories</code>右边的<code>+</code>，添加需要自动构建的<code>repos</code>，进入如下页面。<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xjp74.com1.z0.glb.clouddn.com/new.png" alt="new" title="">
+                </div>
+                <div class="image-caption">new</div>
+            </figure><br>可以看到这个界面会显示当前<code>github</code>账号的所以项目，如果没有显示，点击右上角的<code>Sync account</code>按钮，就可以同步过来了，点击需要构建的<code>repos</code>前面的按钮为<code>ON</code>，再点击其后的原形设置图标，进入如下界面<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xjp74.com1.z0.glb.clouddn.com/config.png" alt="config" title="">
+                </div>
+                <div class="image-caption">config</div>
+            </figure><br>如图中设置，将<code>Build only if .travis.yml is present</code>及另外两个设置为<code>ON</code>，功能如字面意思不多说。<br>到目前为止，已经将需要构建的<code>repos</code>开启，那么，我们如何在将源码提交到<code>github</code>的时候，它就自动构建并将<code>build</code>后的静态文件<code>push</code>到我的静态文件<code>branch</code>或者<code>repos</code>呢（我是将<code>build</code>后的静态文件放到一个单独的<code>repos</code>了，也可以放在源码<code>repos</code>的另一个<code>branch</code>，例如起名叫<code>hexo</code>），接下来说如何让<code>Travis CI</code>访问<code>github</code>.</p>
+<h2 id="Access-Token"><a href="#Access-Token" class="headerlink" title="Access Token"></a>Access Token</h2><p>我们需要在<code>Travis</code>上配置<code>Access Token</code>，就可以在构建完毕后自动<code>push</code>到<code>github</code>上保存静态文件的<code>repos</code>了。</p>
+<h3 id="生成Access-Token"><a href="#生成Access-Token" class="headerlink" title="生成Access Token"></a>生成Access Token</h3><p>登录<a href="https://github.com/" target="_blank" rel="noopener">github</a>，进入个人主页，点击<code>setting</code>，进入界面后找到下图所指位置。<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xjp74.com1.z0.glb.clouddn.com/token.png" alt="token" title="">
+                </div>
+                <div class="image-caption">token</div>
+            </figure><br>点击<code>Personal access tokens</code>，进入页面后，在点击右上角<code>Generate new token</code>,会再次让输入<code>github</code>密码，然后在<code>Token description</code>下起一个名字，再勾选一些权限，我是全给勾选上了，在点击下面<code>Generate token</code>这里就不多截图了。复制生成的<code>token</code>码。</p>
+<h3 id="配置Travis-CI"><a href="#配置Travis-CI" class="headerlink" title="配置Travis CI"></a>配置Travis CI</h3><p>回到<code>Travis</code>的<code>setting</code>页面，如上面图，在<code>Environment Variables</code>这一栏，点击<code>Add</code>，起一个名字到<code>Name</code>，将复制的<code>token</code>码粘贴到<code>Value</code>框中，到这步为止，已经完成了<code>Travis</code>的设置。到博客源码根目录，创建一个<code>.travis.yml</code>的配置文件，内容如下，附注释，注意缩进<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">language: node_js  #设置语言</span><br><span class="line"></span><br><span class="line">node_js: stable    #设置相应的版本</span><br><span class="line"></span><br><span class="line">install:</span><br><span class="line">  - npm install    #安装hexo及插件</span><br><span class="line"></span><br><span class="line">script:</span><br><span class="line">  - hexo clean     #清除，或者缩写hexo c</span><br><span class="line">  - hexo generate  #生成，或者缩写hexo g</span><br><span class="line"></span><br><span class="line">after_script:</span><br><span class="line">  - cd ./public</span><br><span class="line">  - git init</span><br><span class="line">  - git config user.name &quot;smuwjs&quot;  #修改name</span><br><span class="line">  - git config user.email &quot;smuwjs@163.com&quot;  #修改email</span><br><span class="line">  - git add .</span><br><span class="line">  - git commit -m &quot;update site&quot;</span><br><span class="line">  - git push --force  &quot;https://$&#123;travis&#125;@$&#123;GH_REF&#125;&quot; master:master  #travis是在Travis中配置token的名称</span><br><span class="line"></span><br><span class="line">branches:</span><br><span class="line">  only:</span><br><span class="line">    - blog-source  #只监测blog-source，可根据自己情况设置，若是存放同一个仓库，这儿可以选择存放源码的branch，如hexo</span><br><span class="line">env:</span><br><span class="line"> global:</span><br><span class="line">   - GH_REF: github.com/smuwjs/smuwjs.github.io.git  #设置GH_REF，注意更改yourname</span><br></pre></td></tr></table></figure></p>
+<p>因为我是新起了一个<code>repos</code>来存放静态文件了，所以上面的<code>GH_REF</code>是对应那个<code>repos</code>地址，若是放同一个<code>repos</code>中，那这儿一般都是<code>yourname.github.io</code>那个仓库。到此，配置已经完成了。</p>
+<h3 id="创建文章"><a href="#创建文章" class="headerlink" title="创建文章"></a>创建文章</h3><p>我们可以创建一篇文章<code>hexo new post use-travis-build-your-hexo-site</code>，添加内容后，并<code>push</code>到<code>github</code>，正常情况下，进入<code>Travis</code>网站就可以看到已经在构建了，如图<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xjp74.com1.z0.glb.clouddn.com/success.png" alt="success" title="">
+                </div>
+                <div class="image-caption">success</div>
+            </figure><br>完成后，<a href="http://dearxiaojie.xyz/tb/2017-05-04/use-travisci-build-your-hexo-site.html" target="_blank" rel="noopener">访问链接</a>就可以看到这篇文章了。</p>
+<h2 id="写在后面"><a href="#写在后面" class="headerlink" title="写在后面"></a>写在后面</h2><p>很久没有花时间写点东西了，不管有没有价值，总是一种对知识的积累和总结，输出也意味着输入，所以以后还是将学到的东西和积累总结下，自己可以将知识梳理的同时能帮助到别人是更好的了。</p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2018-06-27T09:39:57.957Z" itemprop="dateUpdated">2018-06-27 17:39:57</time>
+</span><br>
+
+
+        
+        本文固定链接：<a href="/2017/05/04/travisci-hexo/" target="_blank" rel="external">https://smuwjs.github.io/2017/05/04/travisci-hexo/</a>
+        
+    </div>
+    <footer>
+        <a href="https://smuwjs.github.io">
+            <img src="/img/head.png" alt="Jeeson">
+            Jeeson
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Hexo/">Hexo</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Travis-CI/">Travis CI</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2017/05/04/travisci-hexo/&title=《使用Travis CI自动部署Hexo博客到Github上》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2017/05/04/travisci-hexo/&title=《使用Travis CI自动部署Hexo博客到Github上》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2017/05/04/travisci-hexo/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《使用Travis CI自动部署Hexo博客到Github上》 — Jeeson's Blog&url=https://smuwjs.github.io/2017/05/04/travisci-hexo/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2017/05/04/travisci-hexo/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2017/07/28/android-architecture-components/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">浅谈Android Architecture Components</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2017/04/03/java-source-analysis-charsequence-series/Java 字符串系列03 StringBuffer详解/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Java 字符串系列03 StringBuffer详解</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="travisci-hexo" data-title="使用Travis CI自动部署Hexo博客到Github上" data-url="https://smuwjs.github.io/2017/05/04/travisci-hexo/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'smuwjs', theme: 'none'};
+lazyScripts.push('//unpkg.com/hexo-theme-material-indigo@latest/js/embed.min.js');
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循<a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>Jeeson &copy; 2015 - 2018</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2017/05/04/travisci-hexo/&title=《使用Travis CI自动部署Hexo博客到Github上》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2017/05/04/travisci-hexo/&title=《使用Travis CI自动部署Hexo博客到Github上》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2017/05/04/travisci-hexo/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《使用Travis CI自动部署Hexo博客到Github上》 — Jeeson's Blog&url=https://smuwjs.github.io/2017/05/04/travisci-hexo/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2017/05/04/travisci-hexo/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://smuwjs.github.io/2017/05/04/travisci-hexo/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

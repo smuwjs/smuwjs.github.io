@@ -1,0 +1,2481 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>Java多线程系列--“JUC集合”04之 ConcurrentHashMap | Jeeson&#39;s Blog | Write the code. Change the world.</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="Java源码分析,Java多线程系列,JUC集合">
+    <meta name="description" content="本章是JUC系列的ConcurrentHashMap篇。   目录1. ConcurrentHashMap介绍2. ConcurrentHashMap原理和数据结构3. ConcurrentHashMap函数列表4. ConcurrentHashMap源码分析(JDK1.7.0_40版本)&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; 4.1 创建&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp">
+<meta name="keywords" content="Java源码分析,Java多线程系列,JUC集合">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java多线程系列--“JUC集合”04之 ConcurrentHashMap">
+<meta property="og:url" content="https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”04之 ConcurrentHashMap/index.html">
+<meta property="og:site_name" content="Jeeson&#39;s Blog">
+<meta property="og:description" content="本章是JUC系列的ConcurrentHashMap篇。   目录1. ConcurrentHashMap介绍2. ConcurrentHashMap原理和数据结构3. ConcurrentHashMap函数列表4. ConcurrentHashMap源码分析(JDK1.7.0_40版本)&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; 4.1 创建&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://wangkuiwu.github.io/media/pic/java/threads/juc-col04-01.jpg">
+<meta property="og:updated_time" content="2018-06-27T09:39:57.945Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java多线程系列--“JUC集合”04之 ConcurrentHashMap">
+<meta name="twitter:description" content="本章是JUC系列的ConcurrentHashMap篇。   目录1. ConcurrentHashMap介绍2. ConcurrentHashMap原理和数据结构3. ConcurrentHashMap函数列表4. ConcurrentHashMap源码分析(JDK1.7.0_40版本)&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; 4.1 创建&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp">
+<meta name="twitter:image" content="http://wangkuiwu.github.io/media/pic/java/threads/juc-col04-01.jpg">
+    
+        <link rel="alternate" type="application/atom+xml" title="Jeeson&#39;s Blog" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/head.png">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Jeeson</h5>
+          <a href="mailto:smuwjs@163.com" title="smuwjs@163.com" class="mail">smuwjs@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/smuwjs" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Java多线程系列--“JUC集合”04之 ConcurrentHashMap</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Java多线程系列--“JUC集合”04之 ConcurrentHashMap</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2016-11-11T20:00:00.000Z" itemprop="datePublished" class="page-time">
+  2016-11-12
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#1-ConcurrentHashMap介绍"><span class="post-toc-number">1.</span> <span class="post-toc-text">1. ConcurrentHashMap介绍</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#2-ConcurrentHashMap原理和数据结构"><span class="post-toc-number">2.</span> <span class="post-toc-text">2. ConcurrentHashMap原理和数据结构</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#3-ConcurrentHashMap函数列表"><span class="post-toc-number">3.</span> <span class="post-toc-text">3. ConcurrentHashMap函数列表</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#4-ConcurrentHashMap源码分析-JDK1-7-0-40版本"><span class="post-toc-number">4.</span> <span class="post-toc-text">4. ConcurrentHashMap源码分析(JDK1.7.0_40版本)</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#4-1-创建"><span class="post-toc-number">4.1.</span> <span class="post-toc-text">4.1 创建</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#4-2-获取"><span class="post-toc-number">4.2.</span> <span class="post-toc-text">4.2 获取</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#4-3-增加"><span class="post-toc-number">5.</span> <span class="post-toc-text">4.3 增加</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#4-4-删除"><span class="post-toc-number">6.</span> <span class="post-toc-text">4.4 删除</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#5-ConcurrentHashMap示例"><span class="post-toc-number">7.</span> <span class="post-toc-text">5. ConcurrentHashMap示例</span></a></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”04之 ConcurrentHashMap"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Java多线程系列--“JUC集合”04之 ConcurrentHashMap</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2016-11-12 04:00:00" datetime="2016-11-11T20:00:00.000Z"  itemprop="datePublished">2016-11-12</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <blockquote>
+<p>本章是JUC系列的ConcurrentHashMap篇。</p>
+</blockquote>
+<blockquote>
+<p><strong>目录</strong><br><a href="#anchor1">1. ConcurrentHashMap介绍</a><br><a href="#anchor2">2. ConcurrentHashMap原理和数据结构</a><br><a href="#anchor3">3. ConcurrentHashMap函数列表</a><br><a href="#anchor4">4. ConcurrentHashMap源码分析(JDK1.7.0_40版本)</a><br>&nbsp;&nbsp;&nbsp;&nbsp; <a href="#anchor4_1">4.1 创建</a><br>&nbsp;&nbsp;&nbsp;&nbsp; <a href="#anchor4_2">4.2 获取</a><br>&nbsp;&nbsp;&nbsp;&nbsp; <a href="#anchor4_3">4.3 增加</a><br>&nbsp;&nbsp;&nbsp;&nbsp; <a href="#anchor4_4">4.4 删除</a><br><a href="#anchor5">5. ConcurrentHashMap示例</a>  </p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="1-ConcurrentHashMap介绍"><a href="#1-ConcurrentHashMap介绍" class="headerlink" title="1. ConcurrentHashMap介绍"></a>1. ConcurrentHashMap介绍</h1><p>ConcurrentHashMap是线程安全的哈希表。HashMap, Hashtable, ConcurrentHashMap之间的关联如下：</p>
+<p>(01) HashMap是非线程安全的哈希表，常用于单线程程序中。<br>(02) Hashtable是线程安全的哈希表，它是通过synchronized来保证线程安全的。<br>&nbsp;&nbsp;&nbsp;&nbsp; 即，多线程通过同一个“对象的同步锁”来实现并发控制。Hashtable在线程竞争激烈时，效率比较低(此时建议使用ConcurrentHashMap)！因为当一个线程访问Hashtable的同步方法时，其它线程就访问Hashtable的同步方法时，可能会进入阻塞状态。<br>(03) ConcurrentHashMap是线程安全的哈希表，它是通过“锁分段”来保证线程安全的。<br>&nbsp;&nbsp;&nbsp;&nbsp; ConcurrentHashMap将哈希表分成许多片段(Segment)，每一个片段除了保存哈希表之外，本质上也是一个“可重入的互斥锁”(ReentrantLock)。多线程对同一个片段的访问，是互斥的；但是，对于不同片段的访问，却是可以同步进行的。</p>
+<p>关于HashMap,Hashtable以及ReentrantLock的更多内容，可以参考：<br>[1. Java 集合系列10之 HashMap详细介绍(源码解析)和使用示例][link_java_collection_10]<br>[2. Java 集合系列11之 Hashtable详细介绍(源码解析)和使用示例][link_java_collection_11]<br>[3. Java多线程系列–“JUC锁”02之 互斥锁ReentrantLock][link_juc_lock02]</p>
+<p><a name="anchor2"></a></p>
+<h1 id="2-ConcurrentHashMap原理和数据结构"><a href="#2-ConcurrentHashMap原理和数据结构" class="headerlink" title="2. ConcurrentHashMap原理和数据结构"></a>2. ConcurrentHashMap原理和数据结构</h1><p>要想搞清ConcurrentHashMap，必须先弄清楚它的数据结构：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://wangkuiwu.github.io/media/pic/java/threads/juc-col04-01.jpg" alt="img" title="">
+                </div>
+                <div class="image-caption">img</div>
+            </figure>
+<p>(01) ConcurrentHashMap继承于AbstractMap抽象类。<br>(02) Segment是ConcurrentHashMap中的内部类，它就是ConcurrentHashMap中的“锁分段”对应的存储结构。ConcurrentHashMap与Segment是组合关系，1个ConcurrentHashMap对象包含若干个Segment对象。在代码中，这表现为ConcurrentHashMap类中存在“Segment数组”成员。<br>(03) Segment类继承于ReentrantLock类，所以Segment本质上是一个可重入的互斥锁。<br>(04) HashEntry也是ConcurrentHashMap的内部类，是单向链表节点，存储着key-value键值对。Segment与HashEntry是组合关系，Segment类中存在“HashEntry数组”成员，“HashEntry数组”中的每个HashEntry就是一个单向链表。</p>
+<p>对于多线程访问对一个“哈希表对象”竞争资源，Hashtable是通过一把锁来控制并发；而ConcurrentHashMap则是将哈希表分成许多片段，对于每一个片段分别通过一个互斥锁来控制并发。ConcurrentHashMap对并发的控制更加细腻，它也更加适应于高并发场景！</p>
+<p><a name="anchor3"></a></p>
+<h1 id="3-ConcurrentHashMap函数列表"><a href="#3-ConcurrentHashMap函数列表" class="headerlink" title="3. ConcurrentHashMap函数列表"></a>3. ConcurrentHashMap函数列表</h1><pre><code>// 创建一个带有默认初始容量 (16)、加载因子 (0.75) 和 concurrencyLevel (16) 的新的空映射。
+ConcurrentHashMap()
+// 创建一个带有指定初始容量、默认加载因子 (0.75) 和 concurrencyLevel (16) 的新的空映射。
+ConcurrentHashMap(int initialCapacity)
+// 创建一个带有指定初始容量、加载因子和默认 concurrencyLevel (16) 的新的空映射。
+ConcurrentHashMap(int initialCapacity, float loadFactor)
+// 创建一个带有指定初始容量、加载因子和并发级别的新的空映射。
+ConcurrentHashMap(int initialCapacity, float loadFactor, int concurrencyLevel)
+// 构造一个与给定映射具有相同映射关系的新映射。
+ConcurrentHashMap(Map&lt;? extends K,? extends V&gt; m)
+
+// 从该映射中移除所有映射关系
+void clear()
+// 一种遗留方法，测试此表中是否有一些与指定值存在映射关系的键。
+boolean contains(Object value)
+// 测试指定对象是否为此表中的键。
+boolean containsKey(Object key)
+// 如果此映射将一个或多个键映射到指定值，则返回 true。
+boolean containsValue(Object value)
+// 返回此表中值的枚举。
+Enumeration&lt;V&gt; elements()
+// 返回此映射所包含的映射关系的 Set 视图。
+Set&lt;Map.Entry&lt;K,V&gt;&gt; entrySet()
+// 返回指定键所映射到的值，如果此映射不包含该键的映射关系，则返回 null。
+V get(Object key)
+// 如果此映射不包含键-值映射关系，则返回 true。
+boolean isEmpty()
+// 返回此表中键的枚举。
+Enumeration&lt;K&gt; keys()
+// 返回此映射中包含的键的 Set 视图。
+Set&lt;K&gt; keySet()
+// 将指定键映射到此表中的指定值。
+V put(K key, V value)
+// 将指定映射中所有映射关系复制到此映射中。
+void putAll(Map&lt;? extends K,? extends V&gt; m)
+// 如果指定键已经不再与某个值相关联，则将它与给定值关联。
+V putIfAbsent(K key, V value)
+// 从此映射中移除键（及其相应的值）。
+V remove(Object key)
+// 只有目前将键的条目映射到给定值时，才移除该键的条目。
+boolean remove(Object key, Object value)
+// 只有目前将键的条目映射到某一值时，才替换该键的条目。
+V replace(K key, V value)
+// 只有目前将键的条目映射到给定值时，才替换该键的条目。
+boolean replace(K key, V oldValue, V newValue)
+// 返回此映射中的键-值映射关系数。
+int size()
+// 返回此映射中包含的值的 Collection 视图。
+Collection&lt;V&gt; values()
+</code></pre><p><a name="anchor4"></a></p>
+<h1 id="4-ConcurrentHashMap源码分析-JDK1-7-0-40版本"><a href="#4-ConcurrentHashMap源码分析-JDK1-7-0-40版本" class="headerlink" title="4. ConcurrentHashMap源码分析(JDK1.7.0_40版本)"></a>4. ConcurrentHashMap源码分析(JDK1.7.0_40版本)</h1><p>ConcurrentHashMap.java的完整源码如下：</p>
+<pre><code>public class ConcurrentHashMap&lt;K, V&gt; extends AbstractMap&lt;K, V&gt;
+        implements ConcurrentMap&lt;K, V&gt;, Serializable {
+    private static final long serialVersionUID = 7249069246763182397L;
+
+    /**
+     * The default initial capacity for this table,
+     * used when not otherwise specified in a constructor.
+     */
+    static final int DEFAULT_INITIAL_CAPACITY = 16;
+
+    /**
+     * The default load factor for this table, used when not
+     * otherwise specified in a constructor.
+     */
+    static final float DEFAULT_LOAD_FACTOR = 0.75f;
+
+    /**
+     * The default concurrency level for this table, used when not
+     * otherwise specified in a constructor.
+     */
+    static final int DEFAULT_CONCURRENCY_LEVEL = 16;
+
+    /**
+     * The maximum capacity, used if a higher value is implicitly
+     * specified by either of the constructors with arguments.  MUST
+     * be a power of two &lt;= 1&lt;&lt;30 to ensure that entries are indexable
+     * using ints.
+     */
+    static final int MAXIMUM_CAPACITY = 1 &lt;&lt; 30;
+
+    /**
+     * The minimum capacity for per-segment tables.  Must be a power
+     * of two, at least two to avoid immediate resizing on next use
+     * after lazy construction.
+     */
+    static final int MIN_SEGMENT_TABLE_CAPACITY = 2;
+
+    /**
+     * The maximum number of segments to allow; used to bound
+     * constructor arguments. Must be power of two less than 1 &lt;&lt; 24.
+     */
+    static final int MAX_SEGMENTS = 1 &lt;&lt; 16; // slightly conservative
+
+    /**
+     * Number of unsynchronized retries in size and containsValue
+     * methods before resorting to locking. This is used to avoid
+     * unbounded retries if tables undergo continuous modification
+     * which would make it impossible to obtain an accurate result.
+     */
+    static final int RETRIES_BEFORE_LOCK = 2;
+
+    /* ---------------- Fields -------------- */
+
+    /**
+     * holds values which can&apos;t be initialized until after VM is booted.
+     */
+    private static class Holder {
+
+        /**
+        * Enable alternative hashing of String keys?
+        *
+        * &lt;p&gt;Unlike the other hash map implementations we do not implement a
+        * threshold for regulating whether alternative hashing is used for
+        * String keys. Alternative hashing is either enabled for all instances
+        * or disabled for all instances.
+        */
+        static final boolean ALTERNATIVE_HASHING;
+
+        static {
+            // Use the &quot;threshold&quot; system property even though our threshold
+            // behaviour is &quot;ON&quot; or &quot;OFF&quot;.
+            String altThreshold = java.security.AccessController.doPrivileged(
+                new sun.security.action.GetPropertyAction(
+                    &quot;jdk.map.althashing.threshold&quot;));
+
+            int threshold;
+            try {
+                threshold = (null != altThreshold)
+                        ? Integer.parseInt(altThreshold)
+                        : Integer.MAX_VALUE;
+
+                // disable alternative hashing if -1
+                if (threshold == -1) {
+                    threshold = Integer.MAX_VALUE;
+                }
+
+                if (threshold &lt; 0) {
+                    throw new IllegalArgumentException(&quot;value must be positive integer.&quot;);
+                }
+            } catch(IllegalArgumentException failed) {
+                throw new Error(&quot;Illegal value for &apos;jdk.map.althashing.threshold&apos;&quot;, failed);
+            }
+            ALTERNATIVE_HASHING = threshold &lt;= MAXIMUM_CAPACITY;
+        }
+    }
+
+    /**
+     * A randomizing value associated with this instance that is applied to
+     * hash code of keys to make hash collisions harder to find.
+     */
+    private transient final int hashSeed = randomHashSeed(this);
+
+    private static int randomHashSeed(ConcurrentHashMap instance) {
+        if (sun.misc.VM.isBooted() &amp;&amp; Holder.ALTERNATIVE_HASHING) {
+            return sun.misc.Hashing.randomHashSeed(instance);
+        }
+
+        return 0;
+    }
+
+    /**
+     * Mask value for indexing into segments. The upper bits of a
+     * key&apos;s hash code are used to choose the segment.
+     */
+    final int segmentMask;
+
+    /**
+     * Shift value for indexing within segments.
+     */
+    final int segmentShift;
+
+    /**
+     * The segments, each of which is a specialized hash table.
+     */
+    final Segment&lt;K,V&gt;[] segments;
+
+    transient Set&lt;K&gt; keySet;
+    transient Set&lt;Map.Entry&lt;K,V&gt;&gt; entrySet;
+    transient Collection&lt;V&gt; values;
+
+    /**
+     * ConcurrentHashMap list entry. Note that this is never exported
+     * out as a user-visible Map.Entry.
+     */
+    static final class HashEntry&lt;K,V&gt; {
+        final int hash;
+        final K key;
+        volatile V value;
+        volatile HashEntry&lt;K,V&gt; next;
+
+        HashEntry(int hash, K key, V value, HashEntry&lt;K,V&gt; next) {
+            this.hash = hash;
+            this.key = key;
+            this.value = value;
+            this.next = next;
+        }
+
+        /**
+         * Sets next field with volatile write semantics.  (See above
+         * about use of putOrderedObject.)
+         */
+        final void setNext(HashEntry&lt;K,V&gt; n) {
+            UNSAFE.putOrderedObject(this, nextOffset, n);
+        }
+
+        // Unsafe mechanics
+        static final sun.misc.Unsafe UNSAFE;
+        static final long nextOffset;
+        static {
+            try {
+                UNSAFE = sun.misc.Unsafe.getUnsafe();
+                Class k = HashEntry.class;
+                nextOffset = UNSAFE.objectFieldOffset
+                    (k.getDeclaredField(&quot;next&quot;));
+            } catch (Exception e) {
+                throw new Error(e);
+            }
+        }
+    }
+
+    /**
+     * Gets the ith element of given table (if nonnull) with volatile
+     * read semantics. Note: This is manually integrated into a few
+     * performance-sensitive methods to reduce call overhead.
+     */
+    @SuppressWarnings(&quot;unchecked&quot;)
+    static final &lt;K,V&gt; HashEntry&lt;K,V&gt; entryAt(HashEntry&lt;K,V&gt;[] tab, int i) {
+        return (tab == null) ? null :
+            (HashEntry&lt;K,V&gt;) UNSAFE.getObjectVolatile
+            (tab, ((long)i &lt;&lt; TSHIFT) + TBASE);
+    }
+
+    /**
+     * Sets the ith element of given table, with volatile write
+     * semantics. (See above about use of putOrderedObject.)
+     */
+    static final &lt;K,V&gt; void setEntryAt(HashEntry&lt;K,V&gt;[] tab, int i,
+                                       HashEntry&lt;K,V&gt; e) {
+        UNSAFE.putOrderedObject(tab, ((long)i &lt;&lt; TSHIFT) + TBASE, e);
+    }
+
+    /**
+     * Applies a supplemental hash function to a given hashCode, which
+     * defends against poor quality hash functions.  This is critical
+     * because ConcurrentHashMap uses power-of-two length hash tables,
+     * that otherwise encounter collisions for hashCodes that do not
+     * differ in lower or upper bits.
+     */
+    private int hash(Object k) {
+        int h = hashSeed;
+
+        if ((0 != h) &amp;&amp; (k instanceof String)) {
+            return sun.misc.Hashing.stringHash32((String) k);
+        }
+
+        h ^= k.hashCode();
+
+        // Spread bits to regularize both segment and index locations,
+        // using variant of single-word Wang/Jenkins hash.
+        h += (h &lt;&lt;  15) ^ 0xffffcd7d;
+        h ^= (h &gt;&gt;&gt; 10);
+        h += (h &lt;&lt;   3);
+        h ^= (h &gt;&gt;&gt;  6);
+        h += (h &lt;&lt;   2) + (h &lt;&lt; 14);
+        return h ^ (h &gt;&gt;&gt; 16);
+    }
+
+    /**
+     * Segments are specialized versions of hash tables.  This
+     * subclasses from ReentrantLock opportunistically, just to
+     * simplify some locking and avoid separate construction.
+     */
+    static final class Segment&lt;K,V&gt; extends ReentrantLock implements Serializable {
+        /*
+         * Segments maintain a table of entry lists that are always
+         * kept in a consistent state, so can be read (via volatile
+         * reads of segments and tables) without locking.  This
+         * requires replicating nodes when necessary during table
+         * resizing, so the old lists can be traversed by readers
+         * still using old version of table.
+         *
+         * This class defines only mutative methods requiring locking.
+         * Except as noted, the methods of this class perform the
+         * per-segment versions of ConcurrentHashMap methods.  (Other
+         * methods are integrated directly into ConcurrentHashMap
+         * methods.) These mutative methods use a form of controlled
+         * spinning on contention via methods scanAndLock and
+         * scanAndLockForPut. These intersperse tryLocks with
+         * traversals to locate nodes.  The main benefit is to absorb
+         * cache misses (which are very common for hash tables) while
+         * obtaining locks so that traversal is faster once
+         * acquired. We do not actually use the found nodes since they
+         * must be re-acquired under lock anyway to ensure sequential
+         * consistency of updates (and in any case may be undetectably
+         * stale), but they will normally be much faster to re-locate.
+         * Also, scanAndLockForPut speculatively creates a fresh node
+         * to use in put if no node is found.
+         */
+
+        private static final long serialVersionUID = 2249069246763182397L;
+
+        /**
+         * The maximum number of times to tryLock in a prescan before
+         * possibly blocking on acquire in preparation for a locked
+         * segment operation. On multiprocessors, using a bounded
+         * number of retries maintains cache acquired while locating
+         * nodes.
+         */
+        static final int MAX_SCAN_RETRIES =
+            Runtime.getRuntime().availableProcessors() &gt; 1 ? 64 : 1;
+
+        /**
+         * The per-segment table. Elements are accessed via
+         * entryAt/setEntryAt providing volatile semantics.
+         */
+        transient volatile HashEntry&lt;K,V&gt;[] table;
+
+        /**
+         * The number of elements. Accessed only either within locks
+         * or among other volatile reads that maintain visibility.
+         */
+        transient int count;
+
+        /**
+         * The total number of mutative operations in this segment.
+         * Even though this may overflows 32 bits, it provides
+         * sufficient accuracy for stability checks in CHM isEmpty()
+         * and size() methods.  Accessed only either within locks or
+         * among other volatile reads that maintain visibility.
+         */
+        transient int modCount;
+
+        /**
+         * The table is rehashed when its size exceeds this threshold.
+         * (The value of this field is always &lt;tt&gt;(int)(capacity *
+         * loadFactor)&lt;/tt&gt;.)
+         */
+        transient int threshold;
+
+        /**
+         * The load factor for the hash table.  Even though this value
+         * is same for all segments, it is replicated to avoid needing
+         * links to outer object.
+         * @serial
+         */
+        final float loadFactor;
+
+        Segment(float lf, int threshold, HashEntry&lt;K,V&gt;[] tab) {
+            this.loadFactor = lf;
+            this.threshold = threshold;
+            this.table = tab;
+        }
+
+        final V put(K key, int hash, V value, boolean onlyIfAbsent) {
+            HashEntry&lt;K,V&gt; node = tryLock() ? null :
+                scanAndLockForPut(key, hash, value);
+            V oldValue;
+            try {
+                HashEntry&lt;K,V&gt;[] tab = table;
+                int index = (tab.length - 1) &amp; hash;
+                HashEntry&lt;K,V&gt; first = entryAt(tab, index);
+                for (HashEntry&lt;K,V&gt; e = first;;) {
+                    if (e != null) {
+                        K k;
+                        if ((k = e.key) == key ||
+                            (e.hash == hash &amp;&amp; key.equals(k))) {
+                            oldValue = e.value;
+                            if (!onlyIfAbsent) {
+                                e.value = value;
+                                ++modCount;
+                            }
+                            break;
+                        }
+                        e = e.next;
+                    }
+                    else {
+                        if (node != null)
+                            node.setNext(first);
+                        else
+                            node = new HashEntry&lt;K,V&gt;(hash, key, value, first);
+                        int c = count + 1;
+                        if (c &gt; threshold &amp;&amp; tab.length &lt; MAXIMUM_CAPACITY)
+                            rehash(node);
+                        else
+                            setEntryAt(tab, index, node);
+                        ++modCount;
+                        count = c;
+                        oldValue = null;
+                        break;
+                    }
+                }
+            } finally {
+                unlock();
+            }
+            return oldValue;
+        }
+
+        /**
+         * Doubles size of table and repacks entries, also adding the
+         * given node to new table
+         */
+        @SuppressWarnings(&quot;unchecked&quot;)
+        private void rehash(HashEntry&lt;K,V&gt; node) {
+            /*
+             * Reclassify nodes in each list to new table.  Because we
+             * are using power-of-two expansion, the elements from
+             * each bin must either stay at same index, or move with a
+             * power of two offset. We eliminate unnecessary node
+             * creation by catching cases where old nodes can be
+             * reused because their next fields won&apos;t change.
+             * Statistically, at the default threshold, only about
+             * one-sixth of them need cloning when a table
+             * doubles. The nodes they replace will be garbage
+             * collectable as soon as they are no longer referenced by
+             * any reader thread that may be in the midst of
+             * concurrently traversing table. Entry accesses use plain
+             * array indexing because they are followed by volatile
+             * table write.
+             */
+            HashEntry&lt;K,V&gt;[] oldTable = table;
+            int oldCapacity = oldTable.length;
+            int newCapacity = oldCapacity &lt;&lt; 1;
+            threshold = (int)(newCapacity * loadFactor);
+            HashEntry&lt;K,V&gt;[] newTable =
+                (HashEntry&lt;K,V&gt;[]) new HashEntry[newCapacity];
+            int sizeMask = newCapacity - 1;
+            for (int i = 0; i &lt; oldCapacity ; i++) {
+                HashEntry&lt;K,V&gt; e = oldTable[i];
+                if (e != null) {
+                    HashEntry&lt;K,V&gt; next = e.next;
+                    int idx = e.hash &amp; sizeMask;
+                    if (next == null)   //  Single node on list
+                        newTable[idx] = e;
+                    else { // Reuse consecutive sequence at same slot
+                        HashEntry&lt;K,V&gt; lastRun = e;
+                        int lastIdx = idx;
+                        for (HashEntry&lt;K,V&gt; last = next;
+                             last != null;
+                             last = last.next) {
+                            int k = last.hash &amp; sizeMask;
+                            if (k != lastIdx) {
+                                lastIdx = k;
+                                lastRun = last;
+                            }
+                        }
+                        newTable[lastIdx] = lastRun;
+                        // Clone remaining nodes
+                        for (HashEntry&lt;K,V&gt; p = e; p != lastRun; p = p.next) {
+                            V v = p.value;
+                            int h = p.hash;
+                            int k = h &amp; sizeMask;
+                            HashEntry&lt;K,V&gt; n = newTable[k];
+                            newTable[k] = new HashEntry&lt;K,V&gt;(h, p.key, v, n);
+                        }
+                    }
+                }
+            }
+            int nodeIndex = node.hash &amp; sizeMask; // add the new node
+            node.setNext(newTable[nodeIndex]);
+            newTable[nodeIndex] = node;
+            table = newTable;
+        }
+
+        /**
+         * Scans for a node containing given key while trying to
+         * acquire lock, creating and returning one if not found. Upon
+         * return, guarantees that lock is held. UNlike in most
+         * methods, calls to method equals are not screened: Since
+         * traversal speed doesn&apos;t matter, we might as well help warm
+         * up the associated code and accesses as well.
+         *
+         * @return a new node if key not found, else null
+         */
+        private HashEntry&lt;K,V&gt; scanAndLockForPut(K key, int hash, V value) {
+            HashEntry&lt;K,V&gt; first = entryForHash(this, hash);
+            HashEntry&lt;K,V&gt; e = first;
+            HashEntry&lt;K,V&gt; node = null;
+            int retries = -1; // negative while locating node
+            while (!tryLock()) {
+                HashEntry&lt;K,V&gt; f; // to recheck first below
+                if (retries &lt; 0) {
+                    if (e == null) {
+                        if (node == null) // speculatively create node
+                            node = new HashEntry&lt;K,V&gt;(hash, key, value, null);
+                        retries = 0;
+                    }
+                    else if (key.equals(e.key))
+                        retries = 0;
+                    else
+                        e = e.next;
+                }
+                else if (++retries &gt; MAX_SCAN_RETRIES) {
+                    lock();
+                    break;
+                }
+                else if ((retries &amp; 1) == 0 &amp;&amp;
+                         (f = entryForHash(this, hash)) != first) {
+                    e = first = f; // re-traverse if entry changed
+                    retries = -1;
+                }
+            }
+            return node;
+        }
+
+        /**
+         * Scans for a node containing the given key while trying to
+         * acquire lock for a remove or replace operation. Upon
+         * return, guarantees that lock is held.  Note that we must
+         * lock even if the key is not found, to ensure sequential
+         * consistency of updates.
+         */
+        private void scanAndLock(Object key, int hash) {
+            // similar to but simpler than scanAndLockForPut
+            HashEntry&lt;K,V&gt; first = entryForHash(this, hash);
+            HashEntry&lt;K,V&gt; e = first;
+            int retries = -1;
+            while (!tryLock()) {
+                HashEntry&lt;K,V&gt; f;
+                if (retries &lt; 0) {
+                    if (e == null || key.equals(e.key))
+                        retries = 0;
+                    else
+                        e = e.next;
+                }
+                else if (++retries &gt; MAX_SCAN_RETRIES) {
+                    lock();
+                    break;
+                }
+                else if ((retries &amp; 1) == 0 &amp;&amp;
+                         (f = entryForHash(this, hash)) != first) {
+                    e = first = f;
+                    retries = -1;
+                }
+            }
+        }
+
+        /**
+         * Remove; match on key only if value null, else match both.
+         */
+        final V remove(Object key, int hash, Object value) {
+            if (!tryLock())
+                scanAndLock(key, hash);
+            V oldValue = null;
+            try {
+                HashEntry&lt;K,V&gt;[] tab = table;
+                int index = (tab.length - 1) &amp; hash;
+                HashEntry&lt;K,V&gt; e = entryAt(tab, index);
+                HashEntry&lt;K,V&gt; pred = null;
+                while (e != null) {
+                    K k;
+                    HashEntry&lt;K,V&gt; next = e.next;
+                    if ((k = e.key) == key ||
+                        (e.hash == hash &amp;&amp; key.equals(k))) {
+                        V v = e.value;
+                        if (value == null || value == v || value.equals(v)) {
+                            if (pred == null)
+                                setEntryAt(tab, index, next);
+                            else
+                                pred.setNext(next);
+                            ++modCount;
+                            --count;
+                            oldValue = v;
+                        }
+                        break;
+                    }
+                    pred = e;
+                    e = next;
+                }
+            } finally {
+                unlock();
+            }
+            return oldValue;
+        }
+
+        final boolean replace(K key, int hash, V oldValue, V newValue) {
+            if (!tryLock())
+                scanAndLock(key, hash);
+            boolean replaced = false;
+            try {
+                HashEntry&lt;K,V&gt; e;
+                for (e = entryForHash(this, hash); e != null; e = e.next) {
+                    K k;
+                    if ((k = e.key) == key ||
+                        (e.hash == hash &amp;&amp; key.equals(k))) {
+                        if (oldValue.equals(e.value)) {
+                            e.value = newValue;
+                            ++modCount;
+                            replaced = true;
+                        }
+                        break;
+                    }
+                }
+            } finally {
+                unlock();
+            }
+            return replaced;
+        }
+
+        final V replace(K key, int hash, V value) {
+            if (!tryLock())
+                scanAndLock(key, hash);
+            V oldValue = null;
+            try {
+                HashEntry&lt;K,V&gt; e;
+                for (e = entryForHash(this, hash); e != null; e = e.next) {
+                    K k;
+                    if ((k = e.key) == key ||
+                        (e.hash == hash &amp;&amp; key.equals(k))) {
+                        oldValue = e.value;
+                        e.value = value;
+                        ++modCount;
+                        break;
+                    }
+                }
+            } finally {
+                unlock();
+            }
+            return oldValue;
+        }
+
+        final void clear() {
+            lock();
+            try {
+                HashEntry&lt;K,V&gt;[] tab = table;
+                for (int i = 0; i &lt; tab.length ; i++)
+                    setEntryAt(tab, i, null);
+                ++modCount;
+                count = 0;
+            } finally {
+                unlock();
+            }
+        }
+    }
+
+    // Accessing segments
+
+    /**
+     * Gets the jth element of given segment array (if nonnull) with
+     * volatile element access semantics via Unsafe. (The null check
+     * can trigger harmlessly only during deserialization.) Note:
+     * because each element of segments array is set only once (using
+     * fully ordered writes), some performance-sensitive methods rely
+     * on this method only as a recheck upon null reads.
+     */
+    @SuppressWarnings(&quot;unchecked&quot;)
+    static final &lt;K,V&gt; Segment&lt;K,V&gt; segmentAt(Segment&lt;K,V&gt;[] ss, int j) {
+        long u = (j &lt;&lt; SSHIFT) + SBASE;
+        return ss == null ? null :
+            (Segment&lt;K,V&gt;) UNSAFE.getObjectVolatile(ss, u);
+    }
+
+    /**
+     * Returns the segment for the given index, creating it and
+     * recording in segment table (via CAS) if not already present.
+     *
+     * @param k the index
+     * @return the segment
+     */
+    @SuppressWarnings(&quot;unchecked&quot;)
+    private Segment&lt;K,V&gt; ensureSegment(int k) {
+        final Segment&lt;K,V&gt;[] ss = this.segments;
+        long u = (k &lt;&lt; SSHIFT) + SBASE; // raw offset
+        Segment&lt;K,V&gt; seg;
+        if ((seg = (Segment&lt;K,V&gt;)UNSAFE.getObjectVolatile(ss, u)) == null) {
+            Segment&lt;K,V&gt; proto = ss[0]; // use segment 0 as prototype
+            int cap = proto.table.length;
+            float lf = proto.loadFactor;
+            int threshold = (int)(cap * lf);
+            HashEntry&lt;K,V&gt;[] tab = (HashEntry&lt;K,V&gt;[])new HashEntry[cap];
+            if ((seg = (Segment&lt;K,V&gt;)UNSAFE.getObjectVolatile(ss, u))
+                == null) { // recheck
+                Segment&lt;K,V&gt; s = new Segment&lt;K,V&gt;(lf, threshold, tab);
+                while ((seg = (Segment&lt;K,V&gt;)UNSAFE.getObjectVolatile(ss, u))
+                       == null) {
+                    if (UNSAFE.compareAndSwapObject(ss, u, null, seg = s))
+                        break;
+                }
+            }
+        }
+        return seg;
+    }
+
+    // Hash-based segment and entry accesses
+
+    /**
+     * Get the segment for the given hash
+     */
+    @SuppressWarnings(&quot;unchecked&quot;)
+    private Segment&lt;K,V&gt; segmentForHash(int h) {
+        long u = (((h &gt;&gt;&gt; segmentShift) &amp; segmentMask) &lt;&lt; SSHIFT) + SBASE;
+        return (Segment&lt;K,V&gt;) UNSAFE.getObjectVolatile(segments, u);
+    }
+
+    /**
+     * Gets the table entry for the given segment and hash
+     */
+    @SuppressWarnings(&quot;unchecked&quot;)
+    static final &lt;K,V&gt; HashEntry&lt;K,V&gt; entryForHash(Segment&lt;K,V&gt; seg, int h) {
+        HashEntry&lt;K,V&gt;[] tab;
+        return (seg == null || (tab = seg.table) == null) ? null :
+            (HashEntry&lt;K,V&gt;) UNSAFE.getObjectVolatile
+            (tab, ((long)(((tab.length - 1) &amp; h)) &lt;&lt; TSHIFT) + TBASE);
+    }
+
+    /* ---------------- Public operations -------------- */
+
+    /**
+     * Creates a new, empty map with the specified initial
+     * capacity, load factor and concurrency level.
+     *
+     * @param initialCapacity the initial capacity. The implementation
+     * performs internal sizing to accommodate this many elements.
+     * @param loadFactor  the load factor threshold, used to control resizing.
+     * Resizing may be performed when the average number of elements per
+     * bin exceeds this threshold.
+     * @param concurrencyLevel the estimated number of concurrently
+     * updating threads. The implementation performs internal sizing
+     * to try to accommodate this many threads.
+     * @throws IllegalArgumentException if the initial capacity is
+     * negative or the load factor or concurrencyLevel are
+     * nonpositive.
+     */
+    @SuppressWarnings(&quot;unchecked&quot;)
+    public ConcurrentHashMap(int initialCapacity,
+                             float loadFactor, int concurrencyLevel) {
+        if (!(loadFactor &gt; 0) || initialCapacity &lt; 0 || concurrencyLevel &lt;= 0)
+            throw new IllegalArgumentException();
+        if (concurrencyLevel &gt; MAX_SEGMENTS)
+            concurrencyLevel = MAX_SEGMENTS;
+        // Find power-of-two sizes best matching arguments
+        int sshift = 0;
+        int ssize = 1;
+        while (ssize &lt; concurrencyLevel) {
+            ++sshift;
+            ssize &lt;&lt;= 1;
+        }
+        this.segmentShift = 32 - sshift;
+        this.segmentMask = ssize - 1;
+        if (initialCapacity &gt; MAXIMUM_CAPACITY)
+            initialCapacity = MAXIMUM_CAPACITY;
+        int c = initialCapacity / ssize;
+        if (c * ssize &lt; initialCapacity)
+            ++c;
+        int cap = MIN_SEGMENT_TABLE_CAPACITY;
+        while (cap &lt; c)
+            cap &lt;&lt;= 1;
+        // create segments and segments[0]
+        Segment&lt;K,V&gt; s0 =
+            new Segment&lt;K,V&gt;(loadFactor, (int)(cap * loadFactor),
+                             (HashEntry&lt;K,V&gt;[])new HashEntry[cap]);
+        Segment&lt;K,V&gt;[] ss = (Segment&lt;K,V&gt;[])new Segment[ssize];
+        UNSAFE.putOrderedObject(ss, SBASE, s0); // ordered write of segments[0]
+        this.segments = ss;
+    }
+
+    /**
+     * Creates a new, empty map with the specified initial capacity
+     * and load factor and with the default concurrencyLevel (16).
+     *
+     * @param initialCapacity The implementation performs internal
+     * sizing to accommodate this many elements.
+     * @param loadFactor  the load factor threshold, used to control resizing.
+     * Resizing may be performed when the average number of elements per
+     * bin exceeds this threshold.
+     * @throws IllegalArgumentException if the initial capacity of
+     * elements is negative or the load factor is nonpositive
+     *
+     * @since 1.6
+     */
+    public ConcurrentHashMap(int initialCapacity, float loadFactor) {
+        this(initialCapacity, loadFactor, DEFAULT_CONCURRENCY_LEVEL);
+    }
+
+    /**
+     * Creates a new, empty map with the specified initial capacity,
+     * and with default load factor (0.75) and concurrencyLevel (16).
+     *
+     * @param initialCapacity the initial capacity. The implementation
+     * performs internal sizing to accommodate this many elements.
+     * @throws IllegalArgumentException if the initial capacity of
+     * elements is negative.
+     */
+    public ConcurrentHashMap(int initialCapacity) {
+        this(initialCapacity, DEFAULT_LOAD_FACTOR, DEFAULT_CONCURRENCY_LEVEL);
+    }
+
+    /**
+     * Creates a new, empty map with a default initial capacity (16),
+     * load factor (0.75) and concurrencyLevel (16).
+     */
+    public ConcurrentHashMap() {
+        this(DEFAULT_INITIAL_CAPACITY, DEFAULT_LOAD_FACTOR, DEFAULT_CONCURRENCY_LEVEL);
+    }
+
+    /**
+     * Creates a new map with the same mappings as the given map.
+     * The map is created with a capacity of 1.5 times the number
+     * of mappings in the given map or 16 (whichever is greater),
+     * and a default load factor (0.75) and concurrencyLevel (16).
+     *
+     * @param m the map
+     */
+    public ConcurrentHashMap(Map&lt;? extends K, ? extends V&gt; m) {
+        this(Math.max((int) (m.size() / DEFAULT_LOAD_FACTOR) + 1,
+                      DEFAULT_INITIAL_CAPACITY),
+             DEFAULT_LOAD_FACTOR, DEFAULT_CONCURRENCY_LEVEL);
+        putAll(m);
+    }
+
+    /**
+     * Returns &lt;tt&gt;true&lt;/tt&gt; if this map contains no key-value mappings.
+     *
+     * @return &lt;tt&gt;true&lt;/tt&gt; if this map contains no key-value mappings
+     */
+    public boolean isEmpty() {
+        /*
+         * Sum per-segment modCounts to avoid mis-reporting when
+         * elements are concurrently added and removed in one segment
+         * while checking another, in which case the table was never
+         * actually empty at any point. (The sum ensures accuracy up
+         * through at least 1&lt;&lt;31 per-segment modifications before
+         * recheck.)  Methods size() and containsValue() use similar
+         * constructions for stability checks.
+         */
+        long sum = 0L;
+        final Segment&lt;K,V&gt;[] segments = this.segments;
+        for (int j = 0; j &lt; segments.length; ++j) {
+            Segment&lt;K,V&gt; seg = segmentAt(segments, j);
+            if (seg != null) {
+                if (seg.count != 0)
+                    return false;
+                sum += seg.modCount;
+            }
+        }
+        if (sum != 0L) { // recheck unless no modifications
+            for (int j = 0; j &lt; segments.length; ++j) {
+                Segment&lt;K,V&gt; seg = segmentAt(segments, j);
+                if (seg != null) {
+                    if (seg.count != 0)
+                        return false;
+                    sum -= seg.modCount;
+                }
+            }
+            if (sum != 0L)
+                return false;
+        }
+        return true;
+    }
+
+    /**
+     * Returns the number of key-value mappings in this map.  If the
+     * map contains more than &lt;tt&gt;Integer.MAX_VALUE&lt;/tt&gt; elements, returns
+     * &lt;tt&gt;Integer.MAX_VALUE&lt;/tt&gt;.
+     *
+     * @return the number of key-value mappings in this map
+     */
+    public int size() {
+        // Try a few times to get accurate count. On failure due to
+        // continuous async changes in table, resort to locking.
+        final Segment&lt;K,V&gt;[] segments = this.segments;
+        int size;
+        boolean overflow; // true if size overflows 32 bits
+        long sum;         // sum of modCounts
+        long last = 0L;   // previous sum
+        int retries = -1; // first iteration isn&apos;t retry
+        try {
+            for (;;) {
+                if (retries++ == RETRIES_BEFORE_LOCK) {
+                    for (int j = 0; j &lt; segments.length; ++j)
+                        ensureSegment(j).lock(); // force creation
+                }
+                sum = 0L;
+                size = 0;
+                overflow = false;
+                for (int j = 0; j &lt; segments.length; ++j) {
+                    Segment&lt;K,V&gt; seg = segmentAt(segments, j);
+                    if (seg != null) {
+                        sum += seg.modCount;
+                        int c = seg.count;
+                        if (c &lt; 0 || (size += c) &lt; 0)
+                            overflow = true;
+                    }
+                }
+                if (sum == last)
+                    break;
+                last = sum;
+            }
+        } finally {
+            if (retries &gt; RETRIES_BEFORE_LOCK) {
+                for (int j = 0; j &lt; segments.length; ++j)
+                    segmentAt(segments, j).unlock();
+            }
+        }
+        return overflow ? Integer.MAX_VALUE : size;
+    }
+
+    /**
+     * Returns the value to which the specified key is mapped,
+     * or {@code null} if this map contains no mapping for the key.
+     *
+     * &lt;p&gt;More formally, if this map contains a mapping from a key
+     * {@code k} to a value {@code v} such that {@code key.equals(k)},
+     * then this method returns {@code v}; otherwise it returns
+     * {@code null}.  (There can be at most one such mapping.)
+     *
+     * @throws NullPointerException if the specified key is null
+     */
+    public V get(Object key) {
+        Segment&lt;K,V&gt; s; // manually integrate access methods to reduce overhead
+        HashEntry&lt;K,V&gt;[] tab;
+        int h = hash(key);
+        long u = (((h &gt;&gt;&gt; segmentShift) &amp; segmentMask) &lt;&lt; SSHIFT) + SBASE;
+        if ((s = (Segment&lt;K,V&gt;)UNSAFE.getObjectVolatile(segments, u)) != null &amp;&amp;
+            (tab = s.table) != null) {
+            for (HashEntry&lt;K,V&gt; e = (HashEntry&lt;K,V&gt;) UNSAFE.getObjectVolatile
+                     (tab, ((long)(((tab.length - 1) &amp; h)) &lt;&lt; TSHIFT) + TBASE);
+                 e != null; e = e.next) {
+                K k;
+                if ((k = e.key) == key || (e.hash == h &amp;&amp; key.equals(k)))
+                    return e.value;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Tests if the specified object is a key in this table.
+     *
+     * @param  key   possible key
+     * @return &lt;tt&gt;true&lt;/tt&gt; if and only if the specified object
+     *         is a key in this table, as determined by the
+     *         &lt;tt&gt;equals&lt;/tt&gt; method; &lt;tt&gt;false&lt;/tt&gt; otherwise.
+     * @throws NullPointerException if the specified key is null
+     */
+    @SuppressWarnings(&quot;unchecked&quot;)
+    public boolean containsKey(Object key) {
+        Segment&lt;K,V&gt; s; // same as get() except no need for volatile value read
+        HashEntry&lt;K,V&gt;[] tab;
+        int h = hash(key);
+        long u = (((h &gt;&gt;&gt; segmentShift) &amp; segmentMask) &lt;&lt; SSHIFT) + SBASE;
+        if ((s = (Segment&lt;K,V&gt;)UNSAFE.getObjectVolatile(segments, u)) != null &amp;&amp;
+            (tab = s.table) != null) {
+            for (HashEntry&lt;K,V&gt; e = (HashEntry&lt;K,V&gt;) UNSAFE.getObjectVolatile
+                     (tab, ((long)(((tab.length - 1) &amp; h)) &lt;&lt; TSHIFT) + TBASE);
+                 e != null; e = e.next) {
+                K k;
+                if ((k = e.key) == key || (e.hash == h &amp;&amp; key.equals(k)))
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Returns &lt;tt&gt;true&lt;/tt&gt; if this map maps one or more keys to the
+     * specified value. Note: This method requires a full internal
+     * traversal of the hash table, and so is much slower than
+     * method &lt;tt&gt;containsKey&lt;/tt&gt;.
+     *
+     * @param value value whose presence in this map is to be tested
+     * @return &lt;tt&gt;true&lt;/tt&gt; if this map maps one or more keys to the
+     *         specified value
+     * @throws NullPointerException if the specified value is null
+     */
+    public boolean containsValue(Object value) {
+        // Same idea as size()
+        if (value == null)
+            throw new NullPointerException();
+        final Segment&lt;K,V&gt;[] segments = this.segments;
+        boolean found = false;
+        long last = 0;
+        int retries = -1;
+        try {
+            outer: for (;;) {
+                if (retries++ == RETRIES_BEFORE_LOCK) {
+                    for (int j = 0; j &lt; segments.length; ++j)
+                        ensureSegment(j).lock(); // force creation
+                }
+                long hashSum = 0L;
+                int sum = 0;
+                for (int j = 0; j &lt; segments.length; ++j) {
+                    HashEntry&lt;K,V&gt;[] tab;
+                    Segment&lt;K,V&gt; seg = segmentAt(segments, j);
+                    if (seg != null &amp;&amp; (tab = seg.table) != null) {
+                        for (int i = 0 ; i &lt; tab.length; i++) {
+                            HashEntry&lt;K,V&gt; e;
+                            for (e = entryAt(tab, i); e != null; e = e.next) {
+                                V v = e.value;
+                                if (v != null &amp;&amp; value.equals(v)) {
+                                    found = true;
+                                    break outer;
+                                }
+                            }
+                        }
+                        sum += seg.modCount;
+                    }
+                }
+                if (retries &gt; 0 &amp;&amp; sum == last)
+                    break;
+                last = sum;
+            }
+        } finally {
+            if (retries &gt; RETRIES_BEFORE_LOCK) {
+                for (int j = 0; j &lt; segments.length; ++j)
+                    segmentAt(segments, j).unlock();
+            }
+        }
+        return found;
+    }
+
+    /**
+     * Legacy method testing if some key maps into the specified value
+     * in this table.  This method is identical in functionality to
+     * {@link #containsValue}, and exists solely to ensure
+     * full compatibility with class {@link java.util.Hashtable},
+     * which supported this method prior to introduction of the
+     * Java Collections framework.
+
+     * @param  value a value to search for
+     * @return &lt;tt&gt;true&lt;/tt&gt; if and only if some key maps to the
+     *         &lt;tt&gt;value&lt;/tt&gt; argument in this table as
+     *         determined by the &lt;tt&gt;equals&lt;/tt&gt; method;
+     *         &lt;tt&gt;false&lt;/tt&gt; otherwise
+     * @throws NullPointerException if the specified value is null
+     */
+    public boolean contains(Object value) {
+        return containsValue(value);
+    }
+
+    /**
+     * Maps the specified key to the specified value in this table.
+     * Neither the key nor the value can be null.
+     *
+     * &lt;p&gt; The value can be retrieved by calling the &lt;tt&gt;get&lt;/tt&gt; method
+     * with a key that is equal to the original key.
+     *
+     * @param key key with which the specified value is to be associated
+     * @param value value to be associated with the specified key
+     * @return the previous value associated with &lt;tt&gt;key&lt;/tt&gt;, or
+     *         &lt;tt&gt;null&lt;/tt&gt; if there was no mapping for &lt;tt&gt;key&lt;/tt&gt;
+     * @throws NullPointerException if the specified key or value is null
+     */
+    @SuppressWarnings(&quot;unchecked&quot;)
+    public V put(K key, V value) {
+        Segment&lt;K,V&gt; s;
+        if (value == null)
+            throw new NullPointerException();
+        int hash = hash(key);
+        int j = (hash &gt;&gt;&gt; segmentShift) &amp; segmentMask;
+        if ((s = (Segment&lt;K,V&gt;)UNSAFE.getObject          // nonvolatile; recheck
+             (segments, (j &lt;&lt; SSHIFT) + SBASE)) == null) //  in ensureSegment
+            s = ensureSegment(j);
+        return s.put(key, hash, value, false);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return the previous value associated with the specified key,
+     *         or &lt;tt&gt;null&lt;/tt&gt; if there was no mapping for the key
+     * @throws NullPointerException if the specified key or value is null
+     */
+    @SuppressWarnings(&quot;unchecked&quot;)
+    public V putIfAbsent(K key, V value) {
+        Segment&lt;K,V&gt; s;
+        if (value == null)
+            throw new NullPointerException();
+        int hash = hash(key);
+        int j = (hash &gt;&gt;&gt; segmentShift) &amp; segmentMask;
+        if ((s = (Segment&lt;K,V&gt;)UNSAFE.getObject
+             (segments, (j &lt;&lt; SSHIFT) + SBASE)) == null)
+            s = ensureSegment(j);
+        return s.put(key, hash, value, true);
+    }
+
+    /**
+     * Copies all of the mappings from the specified map to this one.
+     * These mappings replace any mappings that this map had for any of the
+     * keys currently in the specified map.
+     *
+     * @param m mappings to be stored in this map
+     */
+    public void putAll(Map&lt;? extends K, ? extends V&gt; m) {
+        for (Map.Entry&lt;? extends K, ? extends V&gt; e : m.entrySet())
+            put(e.getKey(), e.getValue());
+    }
+
+    /**
+     * Removes the key (and its corresponding value) from this map.
+     * This method does nothing if the key is not in the map.
+     *
+     * @param  key the key that needs to be removed
+     * @return the previous value associated with &lt;tt&gt;key&lt;/tt&gt;, or
+     *         &lt;tt&gt;null&lt;/tt&gt; if there was no mapping for &lt;tt&gt;key&lt;/tt&gt;
+     * @throws NullPointerException if the specified key is null
+     */
+    public V remove(Object key) {
+        int hash = hash(key);
+        Segment&lt;K,V&gt; s = segmentForHash(hash);
+        return s == null ? null : s.remove(key, hash, null);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws NullPointerException if the specified key is null
+     */
+    public boolean remove(Object key, Object value) {
+        int hash = hash(key);
+        Segment&lt;K,V&gt; s;
+        return value != null &amp;&amp; (s = segmentForHash(hash)) != null &amp;&amp;
+            s.remove(key, hash, value) != null;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws NullPointerException if any of the arguments are null
+     */
+    public boolean replace(K key, V oldValue, V newValue) {
+        int hash = hash(key);
+        if (oldValue == null || newValue == null)
+            throw new NullPointerException();
+        Segment&lt;K,V&gt; s = segmentForHash(hash);
+        return s != null &amp;&amp; s.replace(key, hash, oldValue, newValue);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return the previous value associated with the specified key,
+     *         or &lt;tt&gt;null&lt;/tt&gt; if there was no mapping for the key
+     * @throws NullPointerException if the specified key or value is null
+     */
+    public V replace(K key, V value) {
+        int hash = hash(key);
+        if (value == null)
+            throw new NullPointerException();
+        Segment&lt;K,V&gt; s = segmentForHash(hash);
+        return s == null ? null : s.replace(key, hash, value);
+    }
+
+    /**
+     * Removes all of the mappings from this map.
+     */
+    public void clear() {
+        final Segment&lt;K,V&gt;[] segments = this.segments;
+        for (int j = 0; j &lt; segments.length; ++j) {
+            Segment&lt;K,V&gt; s = segmentAt(segments, j);
+            if (s != null)
+                s.clear();
+        }
+    }
+
+    /**
+     * Returns a {@link Set} view of the keys contained in this map.
+     * The set is backed by the map, so changes to the map are
+     * reflected in the set, and vice-versa.  The set supports element
+     * removal, which removes the corresponding mapping from this map,
+     * via the &lt;tt&gt;Iterator.remove&lt;/tt&gt;, &lt;tt&gt;Set.remove&lt;/tt&gt;,
+     * &lt;tt&gt;removeAll&lt;/tt&gt;, &lt;tt&gt;retainAll&lt;/tt&gt;, and &lt;tt&gt;clear&lt;/tt&gt;
+     * operations.  It does not support the &lt;tt&gt;add&lt;/tt&gt; or
+     * &lt;tt&gt;addAll&lt;/tt&gt; operations.
+     *
+     * &lt;p&gt;The view&apos;s &lt;tt&gt;iterator&lt;/tt&gt; is a &quot;weakly consistent&quot; iterator
+     * that will never throw {@link ConcurrentModificationException},
+     * and guarantees to traverse elements as they existed upon
+     * construction of the iterator, and may (but is not guaranteed to)
+     * reflect any modifications subsequent to construction.
+     */
+    public Set&lt;K&gt; keySet() {
+        Set&lt;K&gt; ks = keySet;
+        return (ks != null) ? ks : (keySet = new KeySet());
+    }
+
+    /**
+     * Returns a {@link Collection} view of the values contained in this map.
+     * The collection is backed by the map, so changes to the map are
+     * reflected in the collection, and vice-versa.  The collection
+     * supports element removal, which removes the corresponding
+     * mapping from this map, via the &lt;tt&gt;Iterator.remove&lt;/tt&gt;,
+     * &lt;tt&gt;Collection.remove&lt;/tt&gt;, &lt;tt&gt;removeAll&lt;/tt&gt;,
+     * &lt;tt&gt;retainAll&lt;/tt&gt;, and &lt;tt&gt;clear&lt;/tt&gt; operations.  It does not
+     * support the &lt;tt&gt;add&lt;/tt&gt; or &lt;tt&gt;addAll&lt;/tt&gt; operations.
+     *
+     * &lt;p&gt;The view&apos;s &lt;tt&gt;iterator&lt;/tt&gt; is a &quot;weakly consistent&quot; iterator
+     * that will never throw {@link ConcurrentModificationException},
+     * and guarantees to traverse elements as they existed upon
+     * construction of the iterator, and may (but is not guaranteed to)
+     * reflect any modifications subsequent to construction.
+     */
+    public Collection&lt;V&gt; values() {
+        Collection&lt;V&gt; vs = values;
+        return (vs != null) ? vs : (values = new Values());
+    }
+
+    /**
+     * Returns a {@link Set} view of the mappings contained in this map.
+     * The set is backed by the map, so changes to the map are
+     * reflected in the set, and vice-versa.  The set supports element
+     * removal, which removes the corresponding mapping from the map,
+     * via the &lt;tt&gt;Iterator.remove&lt;/tt&gt;, &lt;tt&gt;Set.remove&lt;/tt&gt;,
+     * &lt;tt&gt;removeAll&lt;/tt&gt;, &lt;tt&gt;retainAll&lt;/tt&gt;, and &lt;tt&gt;clear&lt;/tt&gt;
+     * operations.  It does not support the &lt;tt&gt;add&lt;/tt&gt; or
+     * &lt;tt&gt;addAll&lt;/tt&gt; operations.
+     *
+     * &lt;p&gt;The view&apos;s &lt;tt&gt;iterator&lt;/tt&gt; is a &quot;weakly consistent&quot; iterator
+     * that will never throw {@link ConcurrentModificationException},
+     * and guarantees to traverse elements as they existed upon
+     * construction of the iterator, and may (but is not guaranteed to)
+     * reflect any modifications subsequent to construction.
+     */
+    public Set&lt;Map.Entry&lt;K,V&gt;&gt; entrySet() {
+        Set&lt;Map.Entry&lt;K,V&gt;&gt; es = entrySet;
+        return (es != null) ? es : (entrySet = new EntrySet());
+    }
+
+    /**
+     * Returns an enumeration of the keys in this table.
+     *
+     * @return an enumeration of the keys in this table
+     * @see #keySet()
+     */
+    public Enumeration&lt;K&gt; keys() {
+        return new KeyIterator();
+    }
+
+    /**
+     * Returns an enumeration of the values in this table.
+     *
+     * @return an enumeration of the values in this table
+     * @see #values()
+     */
+    public Enumeration&lt;V&gt; elements() {
+        return new ValueIterator();
+    }
+
+    /* ---------------- Iterator Support -------------- */
+
+    abstract class HashIterator {
+        int nextSegmentIndex;
+        int nextTableIndex;
+        HashEntry&lt;K,V&gt;[] currentTable;
+        HashEntry&lt;K, V&gt; nextEntry;
+        HashEntry&lt;K, V&gt; lastReturned;
+
+        HashIterator() {
+            nextSegmentIndex = segments.length - 1;
+            nextTableIndex = -1;
+            advance();
+        }
+
+        /**
+         * Set nextEntry to first node of next non-empty table
+         * (in backwards order, to simplify checks).
+         */
+        final void advance() {
+            for (;;) {
+                if (nextTableIndex &gt;= 0) {
+                    if ((nextEntry = entryAt(currentTable,
+                                             nextTableIndex--)) != null)
+                        break;
+                }
+                else if (nextSegmentIndex &gt;= 0) {
+                    Segment&lt;K,V&gt; seg = segmentAt(segments, nextSegmentIndex--);
+                    if (seg != null &amp;&amp; (currentTable = seg.table) != null)
+                        nextTableIndex = currentTable.length - 1;
+                }
+                else
+                    break;
+            }
+        }
+
+        final HashEntry&lt;K,V&gt; nextEntry() {
+            HashEntry&lt;K,V&gt; e = nextEntry;
+            if (e == null)
+                throw new NoSuchElementException();
+            lastReturned = e; // cannot assign until after null check
+            if ((nextEntry = e.next) == null)
+                advance();
+            return e;
+        }
+
+        public final boolean hasNext() { return nextEntry != null; }
+        public final boolean hasMoreElements() { return nextEntry != null; }
+
+        public final void remove() {
+            if (lastReturned == null)
+                throw new IllegalStateException();
+            ConcurrentHashMap.this.remove(lastReturned.key);
+            lastReturned = null;
+        }
+    }
+
+    final class KeyIterator
+        extends HashIterator
+        implements Iterator&lt;K&gt;, Enumeration&lt;K&gt;
+    {
+        public final K next()        { return super.nextEntry().key; }
+        public final K nextElement() { return super.nextEntry().key; }
+    }
+
+    final class ValueIterator
+        extends HashIterator
+        implements Iterator&lt;V&gt;, Enumeration&lt;V&gt;
+    {
+        public final V next()        { return super.nextEntry().value; }
+        public final V nextElement() { return super.nextEntry().value; }
+    }
+
+    /**
+     * Custom Entry class used by EntryIterator.next(), that relays
+     * setValue changes to the underlying map.
+     */
+    final class WriteThroughEntry
+        extends AbstractMap.SimpleEntry&lt;K,V&gt;
+    {
+        WriteThroughEntry(K k, V v) {
+            super(k,v);
+        }
+
+        /**
+         * Set our entry&apos;s value and write through to the map. The
+         * value to return is somewhat arbitrary here. Since a
+         * WriteThroughEntry does not necessarily track asynchronous
+         * changes, the most recent &quot;previous&quot; value could be
+         * different from what we return (or could even have been
+         * removed in which case the put will re-establish). We do not
+         * and cannot guarantee more.
+         */
+        public V setValue(V value) {
+            if (value == null) throw new NullPointerException();
+            V v = super.setValue(value);
+            ConcurrentHashMap.this.put(getKey(), value);
+            return v;
+        }
+    }
+
+    final class EntryIterator
+        extends HashIterator
+        implements Iterator&lt;Entry&lt;K,V&gt;&gt;
+    {
+        public Map.Entry&lt;K,V&gt; next() {
+            HashEntry&lt;K,V&gt; e = super.nextEntry();
+            return new WriteThroughEntry(e.key, e.value);
+        }
+    }
+
+    final class KeySet extends AbstractSet&lt;K&gt; {
+        public Iterator&lt;K&gt; iterator() {
+            return new KeyIterator();
+        }
+        public int size() {
+            return ConcurrentHashMap.this.size();
+        }
+        public boolean isEmpty() {
+            return ConcurrentHashMap.this.isEmpty();
+        }
+        public boolean contains(Object o) {
+            return ConcurrentHashMap.this.containsKey(o);
+        }
+        public boolean remove(Object o) {
+            return ConcurrentHashMap.this.remove(o) != null;
+        }
+        public void clear() {
+            ConcurrentHashMap.this.clear();
+        }
+    }
+
+    final class Values extends AbstractCollection&lt;V&gt; {
+        public Iterator&lt;V&gt; iterator() {
+            return new ValueIterator();
+        }
+        public int size() {
+            return ConcurrentHashMap.this.size();
+        }
+        public boolean isEmpty() {
+            return ConcurrentHashMap.this.isEmpty();
+        }
+        public boolean contains(Object o) {
+            return ConcurrentHashMap.this.containsValue(o);
+        }
+        public void clear() {
+            ConcurrentHashMap.this.clear();
+        }
+    }
+
+    final class EntrySet extends AbstractSet&lt;Map.Entry&lt;K,V&gt;&gt; {
+        public Iterator&lt;Map.Entry&lt;K,V&gt;&gt; iterator() {
+            return new EntryIterator();
+        }
+        public boolean contains(Object o) {
+            if (!(o instanceof Map.Entry))
+                return false;
+            Map.Entry&lt;?,?&gt; e = (Map.Entry&lt;?,?&gt;)o;
+            V v = ConcurrentHashMap.this.get(e.getKey());
+            return v != null &amp;&amp; v.equals(e.getValue());
+        }
+        public boolean remove(Object o) {
+            if (!(o instanceof Map.Entry))
+                return false;
+            Map.Entry&lt;?,?&gt; e = (Map.Entry&lt;?,?&gt;)o;
+            return ConcurrentHashMap.this.remove(e.getKey(), e.getValue());
+        }
+        public int size() {
+            return ConcurrentHashMap.this.size();
+        }
+        public boolean isEmpty() {
+            return ConcurrentHashMap.this.isEmpty();
+        }
+        public void clear() {
+            ConcurrentHashMap.this.clear();
+        }
+    }
+
+    /* ---------------- Serialization Support -------------- */
+
+    /**
+     * Save the state of the &lt;tt&gt;ConcurrentHashMap&lt;/tt&gt; instance to a
+     * stream (i.e., serialize it).
+     * @param s the stream
+     * @serialData
+     * the key (Object) and value (Object)
+     * for each key-value mapping, followed by a null pair.
+     * The key-value mappings are emitted in no particular order.
+     */
+    private void writeObject(java.io.ObjectOutputStream s) throws IOException {
+        // force all segments for serialization compatibility
+        for (int k = 0; k &lt; segments.length; ++k)
+            ensureSegment(k);
+        s.defaultWriteObject();
+
+        final Segment&lt;K,V&gt;[] segments = this.segments;
+        for (int k = 0; k &lt; segments.length; ++k) {
+            Segment&lt;K,V&gt; seg = segmentAt(segments, k);
+            seg.lock();
+            try {
+                HashEntry&lt;K,V&gt;[] tab = seg.table;
+                for (int i = 0; i &lt; tab.length; ++i) {
+                    HashEntry&lt;K,V&gt; e;
+                    for (e = entryAt(tab, i); e != null; e = e.next) {
+                        s.writeObject(e.key);
+                        s.writeObject(e.value);
+                    }
+                }
+            } finally {
+                seg.unlock();
+            }
+        }
+        s.writeObject(null);
+        s.writeObject(null);
+    }
+
+    /**
+     * Reconstitute the &lt;tt&gt;ConcurrentHashMap&lt;/tt&gt; instance from a
+     * stream (i.e., deserialize it).
+     * @param s the stream
+     */
+    @SuppressWarnings(&quot;unchecked&quot;)
+    private void readObject(java.io.ObjectInputStream s)
+        throws IOException, ClassNotFoundException {
+        // Don&apos;t call defaultReadObject()
+        ObjectInputStream.GetField oisFields = s.readFields();
+        final Segment&lt;K,V&gt;[] oisSegments = (Segment&lt;K,V&gt;[])oisFields.get(&quot;segments&quot;, null);
+
+        final int ssize = oisSegments.length;
+        if (ssize &lt; 1 || ssize &gt; MAX_SEGMENTS
+            || (ssize &amp; (ssize-1)) != 0 )  // ssize not power of two
+            throw new java.io.InvalidObjectException(&quot;Bad number of segments:&quot;
+                                                     + ssize);
+        int sshift = 0, ssizeTmp = ssize;
+        while (ssizeTmp &gt; 1) {
+            ++sshift;
+            ssizeTmp &gt;&gt;&gt;= 1;
+        }
+        UNSAFE.putIntVolatile(this, SEGSHIFT_OFFSET, 32 - sshift);
+        UNSAFE.putIntVolatile(this, SEGMASK_OFFSET, ssize - 1);
+        UNSAFE.putObjectVolatile(this, SEGMENTS_OFFSET, oisSegments);
+
+        // set hashMask
+        UNSAFE.putIntVolatile(this, HASHSEED_OFFSET, randomHashSeed(this));
+
+        // Re-initialize segments to be minimally sized, and let grow.
+        int cap = MIN_SEGMENT_TABLE_CAPACITY;
+        final Segment&lt;K,V&gt;[] segments = this.segments;
+        for (int k = 0; k &lt; segments.length; ++k) {
+            Segment&lt;K,V&gt; seg = segments[k];
+            if (seg != null) {
+                seg.threshold = (int)(cap * seg.loadFactor);
+                seg.table = (HashEntry&lt;K,V&gt;[]) new HashEntry[cap];
+            }
+        }
+
+        // Read the keys and values, and put the mappings in the table
+        for (;;) {
+            K key = (K) s.readObject();
+            V value = (V) s.readObject();
+            if (key == null)
+                break;
+            put(key, value);
+        }
+    }
+
+    // Unsafe mechanics
+    private static final sun.misc.Unsafe UNSAFE;
+    private static final long SBASE;
+    private static final int SSHIFT;
+    private static final long TBASE;
+    private static final int TSHIFT;
+    private static final long HASHSEED_OFFSET;
+    private static final long SEGSHIFT_OFFSET;
+    private static final long SEGMASK_OFFSET;
+    private static final long SEGMENTS_OFFSET;
+
+    static {
+        int ss, ts;
+        try {
+            UNSAFE = sun.misc.Unsafe.getUnsafe();
+            Class tc = HashEntry[].class;
+            Class sc = Segment[].class;
+            TBASE = UNSAFE.arrayBaseOffset(tc);
+            SBASE = UNSAFE.arrayBaseOffset(sc);
+            ts = UNSAFE.arrayIndexScale(tc);
+            ss = UNSAFE.arrayIndexScale(sc);
+            HASHSEED_OFFSET = UNSAFE.objectFieldOffset(
+                ConcurrentHashMap.class.getDeclaredField(&quot;hashSeed&quot;));
+            SEGSHIFT_OFFSET = UNSAFE.objectFieldOffset(
+                ConcurrentHashMap.class.getDeclaredField(&quot;segmentShift&quot;));
+            SEGMASK_OFFSET = UNSAFE.objectFieldOffset(
+                ConcurrentHashMap.class.getDeclaredField(&quot;segmentMask&quot;));
+            SEGMENTS_OFFSET = UNSAFE.objectFieldOffset(
+                ConcurrentHashMap.class.getDeclaredField(&quot;segments&quot;));
+        } catch (Exception e) {
+            throw new Error(e);
+        }
+        if ((ss &amp; (ss-1)) != 0 || (ts &amp; (ts-1)) != 0)
+            throw new Error(&quot;data type scale not a power of two&quot;);
+        SSHIFT = 31 - Integer.numberOfLeadingZeros(ss);
+        TSHIFT = 31 - Integer.numberOfLeadingZeros(ts);
+    }
+
+}
+</code></pre><p>下面从ConcurrentHashMap的创建，获取，添加，删除这4个方面对ConcurrentHashMap进行分析。</p>
+<p><a name="anchor4_1"></a></p>
+<h2 id="4-1-创建"><a href="#4-1-创建" class="headerlink" title="4.1 创建"></a>4.1 创建</h2><p>下面以ConcurrentHashMap(int initialCapacity,float loadFactor, int concurrencyLevel)来进行说明。</p>
+<pre><code>@SuppressWarnings(&quot;unchecked&quot;)
+public ConcurrentHashMap(int initialCapacity,
+                         float loadFactor, int concurrencyLevel) {
+    // 参数有效性判断
+    if (!(loadFactor &gt; 0) || initialCapacity &lt; 0 || concurrencyLevel &lt;= 0)
+        throw new IllegalArgumentException();
+    // concurrencyLevel是“用来计算segments的容量”
+    if (concurrencyLevel &gt; MAX_SEGMENTS)
+        concurrencyLevel = MAX_SEGMENTS;
+    int sshift = 0;
+    int ssize = 1;
+    // ssize=“大于或等于concurrencyLevel的最小的2的N次方值”
+    while (ssize &lt; concurrencyLevel) {
+        ++sshift;
+        ssize &lt;&lt;= 1;
+    }
+    // 初始化segmentShift和segmentMask
+    this.segmentShift = 32 - sshift;
+    this.segmentMask = ssize - 1;
+    // 哈希表的初始容量
+    // 哈希表的实际容量=“segments的容量” x “segments中数组的长度”
+    if (initialCapacity &gt; MAXIMUM_CAPACITY)
+        initialCapacity = MAXIMUM_CAPACITY;
+    // “哈希表的初始容量” / “segments的容量”
+    int c = initialCapacity / ssize;
+    if (c * ssize &lt; initialCapacity)
+        ++c;
+    // cap就是“segments中的HashEntry数组的长度”
+    int cap = MIN_SEGMENT_TABLE_CAPACITY;
+    while (cap &lt; c)
+        cap &lt;&lt;= 1;
+    // segments
+    Segment&lt;K,V&gt; s0 =
+        new Segment&lt;K,V&gt;(loadFactor, (int)(cap * loadFactor),
+                         (HashEntry&lt;K,V&gt;[])new HashEntry[cap]);
+    Segment&lt;K,V&gt;[] ss = (Segment&lt;K,V&gt;[])new Segment[ssize];
+    UNSAFE.putOrderedObject(ss, SBASE, s0); // ordered write of segments[0]
+    this.segments = ss;
+}
+</code></pre><p>说明：<br>(01) 前面我们说过，ConcurrentHashMap采用了“锁分段”技术；在代码中，它通过“segments数组”对象来保存各个分段。segments的定义如下：</p>
+<pre><code>final Segment&lt;K,V&gt;[] segments;
+</code></pre><p>concurrencyLevel的作用就是用来计算segments数组的容量大小。先计算出“大于或等于concurrencyLevel的最小的2的N次方值”，然后将其保存为“segments的容量大小(ssize)”。<br>(02) initialCapacity是哈希表的初始容量。需要注意的是，哈希表的实际容量=“segments的容量” x “segments中数组的长度”。<br>(03) loadFactor是加载因子。它是哈希表在其容量自动增加之前可以达到多满的一种尺度。</p>
+<p>ConcurrentHashMap的构造函数中涉及到的非常重要的一个结构体，它就是Segment。下面看看Segment的声明：</p>
+<pre><code>static final class Segment&lt;K,V&gt; extends ReentrantLock implements Serializable {
+    ...
+
+    transient volatile HashEntry&lt;K,V&gt;[] table;
+    // threshold阈，是哈希表在其容量自动增加之前可以达到多满的一种尺度。
+    transient int threshold;
+    // loadFactor是加载因子
+    final float loadFactor;
+
+    Segment(float lf, int threshold, HashEntry&lt;K,V&gt;[] tab) {
+        this.loadFactor = lf;
+        this.threshold = threshold;
+        this.table = tab;
+    }
+
+    ...
+}
+</code></pre><p>说明：Segment包含HashEntry数组，HashEntry保存了哈希表中的键值对。<br>此外，还需要说明的Segment继承于ReentrantLock。这意味着，Segment本质上就是可重入的互斥锁。</p>
+<p>HashEntry的源码如下：</p>
+<pre><code>static final class HashEntry&lt;K,V&gt; {
+    final int hash;    // 哈希值
+    final K key;       // 键
+    volatile V value;  // 值
+    volatile HashEntry&lt;K,V&gt; next; // 下一个HashEntry节点
+
+    HashEntry(int hash, K key, V value, HashEntry&lt;K,V&gt; next) {
+        this.hash = hash;
+        this.key = key;
+        this.value = value;
+        this.next = next;
+    }
+
+    ...
+}
+</code></pre><p>说明：和HashMap的节点一样，HashEntry也是链表。这就说明，ConcurrentHashMap是链式哈希表，它是通过“拉链法”来解决哈希冲突的。</p>
+<p><a name="anchor4_2"></a></p>
+<h2 id="4-2-获取"><a href="#4-2-获取" class="headerlink" title="4.2 获取"></a>4.2 获取</h2><p>下面以get(Object key)为例，对ConcurrentHashMap的获取方法进行说明。</p>
+<pre><code>public V get(Object key) {
+    Segment&lt;K,V&gt; s; // manually integrate access methods to reduce overhead
+    HashEntry&lt;K,V&gt;[] tab;
+    int h = hash(key);
+    long u = (((h &gt;&gt;&gt; segmentShift) &amp; segmentMask) &lt;&lt; SSHIFT) + SBASE;
+    // 获取key对应的Segment片段。
+    // 如果Segment片段不为null，则在“Segment片段的HashEntry数组中”中找到key所对应的HashEntry列表；
+    // 接着遍历该HashEntry链表，找到于key-value键值对对应的HashEntry节点。
+    if ((s = (Segment&lt;K,V&gt;)UNSAFE.getObjectVolatile(segments, u)) != null &amp;&amp;
+        (tab = s.table) != null) {
+        for (HashEntry&lt;K,V&gt; e = (HashEntry&lt;K,V&gt;) UNSAFE.getObjectVolatile
+                 (tab, ((long)(((tab.length - 1) &amp; h)) &lt;&lt; TSHIFT) + TBASE);
+             e != null; e = e.next) {
+            K k;
+            if ((k = e.key) == key || (e.hash == h &amp;&amp; key.equals(k)))
+                return e.value;
+        }
+    }
+    return null;
+}
+</code></pre><p>说明：get(Object key)的作用是返回key在ConcurrentHashMap哈希表中对应的值。<br>它首先根据key计算出来的哈希值，获取key所对应的Segment片段。<br>如果Segment片段不为null，则在“Segment片段的HashEntry数组中”中找到key所对应的HashEntry列表。Segment包含“HashEntry数组”对象，而每一个HashEntry本质上是一个单向链表。<br>接着遍历该HashEntry链表，找到于key-value键值对对应的HashEntry节点。</p>
+<p>下面是hash()的源码</p>
+<pre><code>private int hash(Object k) {
+    int h = hashSeed;
+
+    if ((0 != h) &amp;&amp; (k instanceof String)) {
+        return sun.misc.Hashing.stringHash32((String) k);
+    }
+
+    h ^= k.hashCode();
+
+    // Spread bits to regularize both segment and index locations,
+    // using variant of single-word Wang/Jenkins hash.
+    h += (h &lt;&lt;  15) ^ 0xffffcd7d;
+    h ^= (h &gt;&gt;&gt; 10);
+    h += (h &lt;&lt;   3);
+    h ^= (h &gt;&gt;&gt;  6);
+    h += (h &lt;&lt;   2) + (h &lt;&lt; 14);
+    return h ^ (h &gt;&gt;&gt; 16);
+}
+</code></pre><p><a name="anchor4_3"></a></p>
+<h1 id="4-3-增加"><a href="#4-3-增加" class="headerlink" title="4.3 增加"></a>4.3 增加</h1><p>下面以put(K key, V value)来对ConcurrentHashMap中增加键值对来进行说明。</p>
+<pre><code>public V put(K key, V value) {
+    Segment&lt;K,V&gt; s;
+    if (value == null)
+        throw new NullPointerException();
+    // 获取key对应的哈希值
+    int hash = hash(key);
+    int j = (hash &gt;&gt;&gt; segmentShift) &amp; segmentMask;
+    // 如果找不到该Segment，则新建一个。
+    if ((s = (Segment&lt;K,V&gt;)UNSAFE.getObject          // nonvolatile; recheck
+         (segments, (j &lt;&lt; SSHIFT) + SBASE)) == null) // in ensureSegment
+        s = ensureSegment(j);
+    return s.put(key, hash, value, false);
+}
+</code></pre><p>说明：<br>(01) put()根据key获取对应的哈希值，再根据哈希值找到对应的Segment片段。如果Segment片段不存在，则新增一个Segment。<br>(02) 将key-value键值对添加到Segment片段中。</p>
+<pre><code>final V put(K key, int hash, V value, boolean onlyIfAbsent) {
+    // tryLock()获取锁，成功返回true，失败返回false。
+    // 获取锁失败的话，则通过scanAndLockForPut()获取锁，并返回”要插入的key-value“对应的”HashEntry链表“。
+    HashEntry&lt;K,V&gt; node = tryLock() ? null :
+        scanAndLockForPut(key, hash, value);
+    V oldValue;
+    try {
+        // tab代表”当前Segment中的HashEntry数组“
+        HashEntry&lt;K,V&gt;[] tab = table;
+        //  根据”hash值“获取”HashEntry数组中对应的HashEntry链表“
+        int index = (tab.length - 1) &amp; hash;
+        HashEntry&lt;K,V&gt; first = entryAt(tab, index);
+        for (HashEntry&lt;K,V&gt; e = first;;) {
+            // 如果”HashEntry链表中的当前HashEntry节点“不为null，
+            if (e != null) {
+                K k;
+                // 当”要插入的key-value键值对“已经存在于”HashEntry链表中“时，先保存原有的值。
+                // 若”onlyIfAbsent“为true，即”要插入的key不存在时才插入”，则直接退出；
+                // 否则，用新的value值覆盖原有的原有的值。
+                if ((k = e.key) == key ||
+                    (e.hash == hash &amp;&amp; key.equals(k))) {
+                    oldValue = e.value;
+                    if (!onlyIfAbsent) {
+                        e.value = value;
+                        ++modCount;
+                    }
+                    break;
+                }
+                e = e.next;
+            }
+            else {
+                // 如果node非空，则将first设置为“node的下一个节点”。
+                // 否则，新建HashEntry链表
+                if (node != null)
+                    node.setNext(first);
+                else
+                    node = new HashEntry&lt;K,V&gt;(hash, key, value, first);
+                int c = count + 1;
+                // 如果添加key-value键值对之后，Segment中的元素超过阈值(并且，HashEntry数组的长度没超过限制)，则rehash；
+                // 否则，直接添加key-value键值对。
+                if (c &gt; threshold &amp;&amp; tab.length &lt; MAXIMUM_CAPACITY)
+                    rehash(node);
+                else
+                    setEntryAt(tab, index, node);
+                ++modCount;
+                count = c;
+                oldValue = null;
+                break;
+            }
+        }
+    } finally {
+        // 释放锁
+        unlock();
+    }
+    return oldValue;
+}
+</code></pre><p>说明：<br>put()的作用是将key-value键值对插入到“当前Segment对应的HashEntry中”，在插入前它会获取Segment对应的互斥锁，插入后会释放锁。具体的插入过程如下：<br>(01) 首先根据“hash值”获取“当前Segment的HashEntry数组对象”中的“HashEntry节点”，每个HashEntry节点都是一个单向链表。<br>(02) 接着，遍历HashEntry链表。<br>&nbsp;&nbsp;&nbsp;&nbsp; 若在遍历HashEntry链表时，找到与“要key-value键值对”对应的节点，即“要插入的key-value键值对”的key已经存在于HashEntry链表中。则根据onlyIfAbsent进行判断，若onlyIfAbsent为true，即“当要插入的key不存在时才插入”，则不进行插入，直接返回；否则，用新的value值覆盖原始的value值，然后再返回。<br>&nbsp;&nbsp;&nbsp;&nbsp; 若在遍历HashEntry链表时，没有找到与“要key-value键值对”对应的节点。当node!=null时，即在scanAndLockForPut()获取锁时，已经新建了key-value对应的HashEntry节点，则”将HashEntry添加到Segment中“；否则，新建key-value对应的HashEntry节点，然后再“将HashEntry添加到Segment中”。 在”将HashEntry添加到Segment中“前，会判断是否需要rehash。如果在添加key-value键值之后，容量会超过阈值，并且HashEntry数组的长度没有超过限制，则进行rehash；否则，直接通过setEntryAt()将key-value键值对添加到Segment中。</p>
+<p>在介绍rehash()和setEntryAt()之前，我们先看看自旋函数scanAndLockForPut()。下面是它的源码：</p>
+<pre><code>private HashEntry&lt;K,V&gt; scanAndLockForPut(K key, int hash, V value) {
+    // 第一个HashEntry节点
+    HashEntry&lt;K,V&gt; first = entryForHash(this, hash);
+    // 当前的HashEntry节点
+    HashEntry&lt;K,V&gt; e = first;
+    HashEntry&lt;K,V&gt; node = null;
+    // 重复计数(自旋计数器)
+    int retries = -1; // negative while locating node
+
+    // 查找”key-value键值对“在”HashEntry链表上对应的节点“；
+    // 若找到的话，则不断的自旋；在自旋期间，若通过tryLock()获取锁成功则返回；否则自旋MAX_SCAN_RETRIES次数之后，强制获取”锁“并退出。
+    // 若没有找到的话，则新建一个HashEntry链表。然后不断的自旋。
+    // 此外，若在自旋期间，HashEntry链表的表头发生变化；则重新进行查找和自旋工作！
+    while (!tryLock()) {
+        HashEntry&lt;K,V&gt; f; // to recheck first below
+        // 1. retries&lt;0的处理情况
+        if (retries &lt; 0) {
+            // 1.1 如果当前的HashEntry节点为空(意味着，在该HashEntry链表上上没有找到”要插入的键值对“对应的节点)，而且node=null；则新建HashEntry链表。
+            if (e == null) {
+                if (node == null) // speculatively create node
+                    node = new HashEntry&lt;K,V&gt;(hash, key, value, null);
+                retries = 0;
+            }
+            // 1.2 如果当前的HashEntry节点是”要插入的键值对在该HashEntry上对应的节点“，则设置retries=0
+            else if (key.equals(e.key))
+                retries = 0;
+            // 1.3 设置为下一个HashEntry。
+            else
+                e = e.next;
+        }
+        // 2. 如果自旋次数超过限制，则获取“锁”并退出
+        else if (++retries &gt; MAX_SCAN_RETRIES) {
+            lock();
+            break;
+        }
+        // 3. 当“尝试了偶数次”时，就获取“当前Segment的第一个HashEntry”，即f。
+        // 然后，通过f!=first来判断“当前Segment的第一个HashEntry是否发生了改变”。
+        // 若是的话，则重置e，first和retries的值，并重新遍历。
+        else if ((retries &amp; 1) == 0 &amp;&amp;
+                 (f = entryForHash(this, hash)) != first) {
+            e = first = f; // re-traverse if entry changed
+            retries = -1;
+        }
+    }
+    return node;
+}
+</code></pre><p>说明：<br>scanAndLockForPut()的目标是获取锁。流程如下：</p>
+<p>它首先会调用entryForHash()，根据hash值获取”当前Segment中对应的HashEntry节点(first)，即找到对应的HashEntry链表“。<br>紧接着进入while循环。在while循环中，它会遍历”HashEntry链表(e)“，查找”要插入的key-value键值对“在”该HashEntry链表上对应的节点“。<br>&nbsp;&nbsp;&nbsp;&nbsp; 若找到的话，则不断的自旋，即不断的执行while循环。在自旋期间，若通过tryLock()获取锁成功则返回；否则，在自旋MAX_SCAN_RETRIES次数之后，强制获取锁并退出。<br>&nbsp;&nbsp;&nbsp;&nbsp; 若没有找到的话，则新建一个HashEntry链表，然后不断的自旋。在自旋期间，若通过tryLock()获取锁成功则返回；否则，在自旋MAX_SCAN_RETRIES次数之后，强制获取锁并退出。<br> 此外，若在自旋期间，HashEntry链表的表头发生变化；则重新进行查找和自旋工作！</p>
+<p>理解scanAndLockForPut()时，务必要联系”哈希表“的数据结构。一个Segment本身就是一个哈希表，Segment中包含了”HashEntry数组“对象，而每一个HashEntry对象本身是一个”单向链表“。</p>
+<p>下面看看rehash()的实现代码。</p>
+<pre><code>private void rehash(HashEntry&lt;K,V&gt; node) {
+    HashEntry&lt;K,V&gt;[] oldTable = table;
+    // ”Segment中原始的HashEntry数组的长度“
+    int oldCapacity = oldTable.length;
+    // ”Segment中新HashEntry数组的长度“
+    int newCapacity = oldCapacity &lt;&lt; 1;
+    // 新的阈值
+    threshold = (int)(newCapacity * loadFactor);
+    // 新的HashEntry数组
+    HashEntry&lt;K,V&gt;[] newTable =
+        (HashEntry&lt;K,V&gt;[]) new HashEntry[newCapacity];
+    int sizeMask = newCapacity - 1;
+    // 遍历”原始的HashEntry数组“，
+    // 将”原始的HashEntry数组“中的每个”HashEntry链表“的值，都复制到”新的HashEntry数组的HashEntry元素“中。
+    for (int i = 0; i &lt; oldCapacity ; i++) {
+        // 获取”原始的HashEntry数组“中的”第i个HashEntry链表“
+        HashEntry&lt;K,V&gt; e = oldTable[i];
+        if (e != null) {
+            HashEntry&lt;K,V&gt; next = e.next;
+            int idx = e.hash &amp; sizeMask;
+            if (next == null)   //  Single node on list
+                newTable[idx] = e;
+            else { // Reuse consecutive sequence at same slot
+                HashEntry&lt;K,V&gt; lastRun = e;
+                int lastIdx = idx;
+                for (HashEntry&lt;K,V&gt; last = next;
+                     last != null;
+                     last = last.next) {
+                    int k = last.hash &amp; sizeMask;
+                    if (k != lastIdx) {
+                        lastIdx = k;
+                        lastRun = last;
+                    }
+                }
+                newTable[lastIdx] = lastRun;
+                // 将”原始的HashEntry数组“中的”HashEntry链表(e)“的值，都复制到”新的HashEntry数组的HashEntry“中。
+                for (HashEntry&lt;K,V&gt; p = e; p != lastRun; p = p.next) {
+                    V v = p.value;
+                    int h = p.hash;
+                    int k = h &amp; sizeMask;
+                    HashEntry&lt;K,V&gt; n = newTable[k];
+                    newTable[k] = new HashEntry&lt;K,V&gt;(h, p.key, v, n);
+                }
+            }
+        }
+    }
+    // 将新的node节点添加到“Segment的新HashEntry数组(newTable)“中。
+    int nodeIndex = node.hash &amp; sizeMask; // add the new node
+    node.setNext(newTable[nodeIndex]);
+    newTable[nodeIndex] = node;
+    table = newTable;
+}
+</code></pre><p>说明：rehash()的作用是将”Segment的容量“变为”原始的Segment容量的2倍“。<br>在将原始的数据拷贝到“新的Segment”中后，会将新增加的key-value键值对添加到“新的Segment”中。</p>
+<p>setEntryAt()的源码如下：</p>
+<pre><code>static final &lt;K,V&gt; void setEntryAt(HashEntry&lt;K,V&gt;[] tab, int i,
+                                   HashEntry&lt;K,V&gt; e) {
+    UNSAFE.putOrderedObject(tab, ((long)i &lt;&lt; TSHIFT) + TBASE, e);
+}
+</code></pre><p>UNSAFE是Segment类中定义的“静态sun.misc.Unsafe”对象。源码如下：</p>
+<pre><code>static final sun.misc.Unsafe UNSAFE;
+</code></pre><p>Unsafe.java在openjdk6中的路径是：openjdk6/jdk/src/share/classes/sun/misc/Unsafe.java。其中，putOrderedObject()的源码下：</p>
+<pre><code>public native void putOrderedObject(Object o, long offset, Object x);
+</code></pre><p>说明：putOrderedObject()是一个本地方法。<br>它会设置obj对象中offset偏移地址对应的object型field的值为指定值。它是一个有序或者有延迟的putObjectVolatile()方法，并且不保证值的改变被其他线程立即看到。只有在field被volatile修饰并且期望被意外修改的时候，使用putOrderedObject()才有用。</p>
+<p>总之，setEntryAt()的目的是设置tab中第i位置元素的值为e，且该设置会有延迟。</p>
+<p><a name="anchor4_4"></a></p>
+<h1 id="4-4-删除"><a href="#4-4-删除" class="headerlink" title="4.4 删除"></a>4.4 删除</h1><p>下面以remove(Object key)来对ConcurrentHashMap中的删除操作来进行说明。</p>
+<pre><code>public V remove(Object key) {
+    int hash = hash(key);
+    // 根据hash值，找到key对应的Segment片段。
+    Segment&lt;K,V&gt; s = segmentForHash(hash);
+    return s == null ? null : s.remove(key, hash, null);
+}
+</code></pre><p>说明：remove()首先根据“key的计算出来的哈希值”找到对应的Segment片段，然后再从该Segment片段中删除对应的“key-value键值对”。</p>
+<p>remove()的方法如下：</p>
+<pre><code>final V remove(Object key, int hash, Object value) {
+    // 尝试获取Segment对应的锁。
+    // 尝试失败的话，则通过scanAndLock()来获取锁。
+    if (!tryLock())
+        scanAndLock(key, hash);
+    V oldValue = null;
+    try {
+        // 根据“hash值”找到“Segment的HashEntry数组”中对应的“HashEntry节点(e)”，该HashEntry节点是一HashEntry个链表。
+        HashEntry&lt;K,V&gt;[] tab = table;
+        int index = (tab.length - 1) &amp; hash;
+        HashEntry&lt;K,V&gt; e = entryAt(tab, index);
+        HashEntry&lt;K,V&gt; pred = null;
+        // 遍历“HashEntry链表”，删除key-value键值对
+        while (e != null) {
+            K k;
+            HashEntry&lt;K,V&gt; next = e.next;
+            if ((k = e.key) == key ||
+                (e.hash == hash &amp;&amp; key.equals(k))) {
+                V v = e.value;
+                if (value == null || value == v || value.equals(v)) {
+                    if (pred == null)
+                        setEntryAt(tab, index, next);
+                    else
+                        pred.setNext(next);
+                    ++modCount;
+                    --count;
+                    oldValue = v;
+                }
+                break;
+            }
+            pred = e;
+            e = next;
+        }
+    } finally {
+        // 释放锁
+        unlock();
+    }
+    return oldValue;
+}
+</code></pre><p>说明：remove()的目的就是删除key-value键值对。在删除之前，它会获取到Segment的互斥锁，在删除之后，再释放锁。<br>它的删除过程也比较简单，它会先根据hash值，找到“Segment的HashEntry数组”中对应的“HashEntry”节点。根据Segment的数据结构，我们知道Segment中包含一个HashEntry数组对象，而每一个HashEntry本质上是一个单向链表。 在找到“HashEntry”节点之后，就遍历该“HashEntry”节点对应的链表，找到key-value键值对对应的节点，然后删除。</p>
+<p>下面对scanAndLock()进行说明。它的源码如下：</p>
+<pre><code>private void scanAndLock(Object key, int hash) {
+    // 第一个HashEntry节点
+    HashEntry&lt;K,V&gt; first = entryForHash(this, hash);
+    HashEntry&lt;K,V&gt; e = first;
+    int retries = -1;
+
+    // 查找”key-value键值对“在”HashEntry链表上对应的节点“；
+    // 无论找没找到，最后都会不断的自旋；在自旋期间，若通过tryLock()获取锁成功则返回；否则自旋MAX_SCAN_RETRIES次数之后，强制获取”锁“并退出。
+    // 若在自旋期间，HashEntry链表的表头发生变化；则重新进行查找和自旋！
+    while (!tryLock()) {
+        HashEntry&lt;K,V&gt; f;
+        if (retries &lt; 0) {
+            // 如果“遍历完该HashEntry链表，仍然没找到”要删除的键值对“对应的节点”
+            // 或者“在该HashEntry链表上找到”要删除的键值对“对应的节点”，则设置retries=0
+            // 否则，设置e为下一个HashEntry节点。
+            if (e == null || key.equals(e.key))
+                retries = 0;
+            else
+                e = e.next;
+        }
+        // 自旋超过限制次数之后，获取锁并退出。
+        else if (++retries &gt; MAX_SCAN_RETRIES) {
+            lock();
+            break;
+        }
+        // 当“尝试了偶数次”时，就获取“当前Segment的第一个HashEntry”，即f。
+        // 然后，通过f!=first来判断“当前Segment的第一个HashEntry是否发生了改变”。
+        // 若是的话，则重置e，first和retries的值，并重新遍历。
+        else if ((retries &amp; 1) == 0 &amp;&amp;
+                 (f = entryForHash(this, hash)) != first) {
+            e = first = f;
+            retries = -1;
+        }
+    }
+}
+</code></pre><p>说明：scanAndLock()的目标是获取锁。它的实现与scanAndLockForPut()类似，这里就不再过多说明。</p>
+<p>总结：ConcurrentHashMap是线程安全的哈希表，它是通过“锁分段”来实现的。ConcurrentHashMap中包括了“Segment(锁分段)数组”，每个Segment就是一个哈希表，而且也是可重入的互斥锁。第一，Segment是哈希表表现在，Segment包含了“HashEntry数组”，而“HashEntry数组”中的每一个HashEntry元素是一个单向链表。即Segment是通过链式哈希表。第二，Segment是可重入的互斥锁表现在，Segment继承于ReentrantLock，而ReentrantLock就是可重入的互斥锁。<br>对于ConcurrentHashMap的添加，删除操作，在操作开始前，线程都会获取Segment的互斥锁；操作完毕之后，才会释放。而对于读取操作，它是通过volatile去实现的，HashEntry数组是volatile类型的，而volatile能保证“即对一个volatile变量的读，总是能看到（任意线程）对这个volatile变量最后的写入”，即我们总能读到其它线程写入HashEntry之后的值。 以上这些方式，就是ConcurrentHashMap线程安全的实现原理。</p>
+<p><a name="anchor5"></a></p>
+<h1 id="5-ConcurrentHashMap示例"><a href="#5-ConcurrentHashMap示例" class="headerlink" title="5. ConcurrentHashMap示例"></a>5. ConcurrentHashMap示例</h1><p>下面，我们通过一个例子去对比HashMap和ConcurrentHashMap。</p>
+<pre><code>import java.util.*;
+import java.util.concurrent.*;
+
+/*
+ *   ConcurrentHashMap是“线程安全”的哈希表，而HashMap是非线程安全的。
+ *
+ *   下面是“多个线程同时操作并且遍历map”的示例
+ *   (01) 当map是ConcurrentHashMap对象时，程序能正常运行。
+ *   (02) 当map是HashMap对象时，程序会产生ConcurrentModificationException异常。
+ *
+ * @author skywang
+ */
+public class ConcurrentHashMapDemo1 {
+
+    // TODO: map是HashMap对象时，程序会出错。
+    //private static Map&lt;String, String&gt; map = new HashMap&lt;String, String&gt;();
+    private static Map&lt;String, String&gt; map = new ConcurrentHashMap&lt;String, String&gt;();
+    public static void main(String[] args) {
+
+        // 同时启动两个线程对map进行操作！
+        new MyThread(&quot;ta&quot;).start();
+        new MyThread(&quot;tb&quot;).start();
+    }
+
+    private static void printAll() {
+        String key, value;
+        Iterator iter = map.entrySet().iterator();
+        while(iter.hasNext()) {
+            Map.Entry entry = (Map.Entry)iter.next();
+            key = (String)entry.getKey();
+            value = (String)entry.getValue();
+            System.out.print(key+&quot; - &quot;+value+&quot;, &quot;);
+        }
+        System.out.println();
+    }
+
+    private static class MyThread extends Thread {
+        MyThread(String name) {
+            super(name);
+        }
+        @Override
+        public void run() {
+                int i = 0;
+            while (i++ &lt; 6) {
+                // “线程名” + &quot;-&quot; + &quot;序号&quot;
+                String val = Thread.currentThread().getName()+i;
+                map.put(String.valueOf(i), val);
+                // 通过“Iterator”遍历map。
+                printAll();
+            }
+        }
+    }
+}
+</code></pre><p>(某一次)运行结果：</p>
+<pre><code>1 - tb1, 
+1 - tb1, 
+1 - tb1, 1 - tb1, 2 - tb2, 
+2 - tb2, 1 - tb1, 
+3 - ta3, 1 - tb1, 2 - tb2, 
+3 - tb3, 1 - tb1, 2 - tb2, 
+3 - tb3, 1 - tb1, 4 - tb4, 3 - tb3, 2 - tb2, 
+4 - tb4, 1 - tb1, 2 - tb2, 
+5 - ta5, 1 - tb1, 3 - tb3, 5 - tb5, 4 - tb4, 3 - tb3, 2 - tb2, 
+4 - tb4, 1 - tb1, 2 - tb2, 
+5 - tb5, 1 - tb1, 6 - tb6, 5 - tb5, 3 - tb3, 6 - tb6, 4 - tb4, 3 - tb3, 2 - tb2, 
+4 - tb4, 2 - tb2, 
+</code></pre><p>结果说明：如果将源码中的map改成HashMap对象时，程序会产生ConcurrentModificationException异常。</p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2018-06-27T09:39:57.945Z" itemprop="dateUpdated">2018-06-27 17:39:57</time>
+</span><br>
+
+
+        
+        本文固定链接：<a href="/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”04之 ConcurrentHashMap/" target="_blank" rel="external">https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”04之 ConcurrentHashMap/</a>
+        
+    </div>
+    <footer>
+        <a href="https://smuwjs.github.io">
+            <img src="/img/head.png" alt="Jeeson">
+            Jeeson
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JUC集合/">JUC集合</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java多线程系列/">Java多线程系列</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java源码分析/">Java源码分析</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”04之 ConcurrentHashMap/&title=《Java多线程系列--“JUC集合”04之 ConcurrentHashMap》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”04之 ConcurrentHashMap/&title=《Java多线程系列--“JUC集合”04之 ConcurrentHashMap》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”04之 ConcurrentHashMap/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Java多线程系列--“JUC集合”04之 ConcurrentHashMap》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”04之 ConcurrentHashMap/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”04之 ConcurrentHashMap/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”05之 ConcurrentSkipListMap/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">Java多线程系列--“JUC集合”05之 ConcurrentSkipListMap</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”03之 CopyOnWriteArraySet/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Java多线程系列--“JUC集合”03之 CopyOnWriteArraySet</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”04之 ConcurrentHashMap" data-title="Java多线程系列--“JUC集合”04之 ConcurrentHashMap" data-url="https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”04之 ConcurrentHashMap/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'smuwjs', theme: 'none'};
+lazyScripts.push('//unpkg.com/hexo-theme-material-indigo@latest/js/embed.min.js');
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循<a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>Jeeson &copy; 2015 - 2018</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”04之 ConcurrentHashMap/&title=《Java多线程系列--“JUC集合”04之 ConcurrentHashMap》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”04之 ConcurrentHashMap/&title=《Java多线程系列--“JUC集合”04之 ConcurrentHashMap》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”04之 ConcurrentHashMap/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Java多线程系列--“JUC集合”04之 ConcurrentHashMap》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”04之 ConcurrentHashMap/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”04之 ConcurrentHashMap/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”04之 ConcurrentHashMap/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>Java多线程系列--“基础篇”09之 interrupt()和线程终止方式 | Jeeson&#39;s Blog | Write the code. Change the world.</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="Java源码分析,Java多线程系列">
+    <meta name="description" content="本章，会对线程的interrupt()中断和终止方式进行介绍。   目录1. interrupt()说明2. 终止线程的方式&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; 2.1 终止处于“阻塞状态”的线程&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; 2.2 终止处于“运行状态”的线程3. 终止线程的示例4. interrupted() 和 isInterrupted()的区别     1">
+<meta name="keywords" content="Java源码分析,Java多线程系列">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java多线程系列--“基础篇”09之 interrupt()和线程终止方式">
+<meta property="og:url" content="https://smuwjs.github.io/2016/11/09/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”09之 interrupt()和线程终止方式/index.html">
+<meta property="og:site_name" content="Jeeson&#39;s Blog">
+<meta property="og:description" content="本章，会对线程的interrupt()中断和终止方式进行介绍。   目录1. interrupt()说明2. 终止线程的方式&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; 2.1 终止处于“阻塞状态”的线程&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; 2.2 终止处于“运行状态”的线程3. 终止线程的示例4. interrupted() 和 isInterrupted()的区别     1">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-06-27T09:39:57.949Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java多线程系列--“基础篇”09之 interrupt()和线程终止方式">
+<meta name="twitter:description" content="本章，会对线程的interrupt()中断和终止方式进行介绍。   目录1. interrupt()说明2. 终止线程的方式&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; 2.1 终止处于“阻塞状态”的线程&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; 2.2 终止处于“运行状态”的线程3. 终止线程的示例4. interrupted() 和 isInterrupted()的区别     1">
+    
+        <link rel="alternate" type="application/atom+xml" title="Jeeson&#39;s Blog" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/head.png">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Jeeson</h5>
+          <a href="mailto:smuwjs@163.com" title="smuwjs@163.com" class="mail">smuwjs@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/smuwjs" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Java多线程系列--“基础篇”09之 interrupt()和线程终止方式</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Java多线程系列--“基础篇”09之 interrupt()和线程终止方式</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2016-11-08T16:00:00.000Z" itemprop="datePublished" class="page-time">
+  2016-11-09
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#1-interrupt-说明"><span class="post-toc-number">1.</span> <span class="post-toc-text">1. interrupt()说明</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#2-终止线程的方式"><span class="post-toc-number">2.</span> <span class="post-toc-text">2. 终止线程的方式</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#2-1-终止处于“阻塞状态”的线程"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">2.1 终止处于“阻塞状态”的线程</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#2-2-终止处于“运行状态”的线程"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">2.2 终止处于“运行状态”的线程</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#3-终止线程的示例"><span class="post-toc-number">3.</span> <span class="post-toc-text">3. 终止线程的示例</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#4-interrupted-和-isInterrupted-的区别"><span class="post-toc-number">4.</span> <span class="post-toc-text">4. interrupted() 和 isInterrupted()的区别</span></a></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”09之 interrupt()和线程终止方式"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Java多线程系列--“基础篇”09之 interrupt()和线程终止方式</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2016-11-09 00:00:00" datetime="2016-11-08T16:00:00.000Z"  itemprop="datePublished">2016-11-09</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <blockquote>
+<p>本章，会对线程的interrupt()中断和终止方式进行介绍。</p>
+</blockquote>
+<blockquote>
+<p><strong>目录</strong><br><a href="#anchor1">1. interrupt()说明</a><br><a href="#anchor2">2. 终止线程的方式</a><br>&nbsp;&nbsp;&nbsp;&nbsp; <a href="#anchor2_1">2.1 终止处于“阻塞状态”的线程</a><br>&nbsp;&nbsp;&nbsp;&nbsp; <a href="#anchor2_2">2.2 终止处于“运行状态”的线程</a><br><a href="#anchor3">3. 终止线程的示例</a><br><a href="#anchor4">4. interrupted() 和 isInterrupted()的区别</a>  </p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="1-interrupt-说明"><a href="#1-interrupt-说明" class="headerlink" title="1. interrupt()说明"></a>1. interrupt()说明</h1><p>在介绍终止线程的方式之前，有必要先对interrupt()进行了解。<br>关于interrupt()，java的djk文档描述如下：<a href="http://docs.oracle.com/javase/7/docs/api/" target="_blank" rel="noopener">http://docs.oracle.com/javase/7/docs/api/</a></p>
+<blockquote>
+<p>Interrupts this thread.<br>Unless the current thread is interrupting itself, which is always permitted, the checkAccess method of this thread is invoked, which may cause a SecurityException to be thrown.</p>
+</blockquote>
+<blockquote>
+<p>If this thread is blocked in an invocation of the wait(), wait(long), or wait(long, int) methods of the Object class, or of the join(), join(long), join(long, int), sleep(long), or sleep(long, int), methods of this class, then its interrupt status will be cleared and it will receive an InterruptedException.</p>
+</blockquote>
+<blockquote>
+<p>If this thread is blocked in an I/O operation upon an interruptible channel then the channel will be closed, the thread’s interrupt status will be set, and the thread will receive a ClosedByInterruptException.</p>
+</blockquote>
+<blockquote>
+<p>If this thread is blocked in a Selector then the thread’s interrupt status will be set and it will return immediately from the selection operation, possibly with a non-zero value, just as if the selector’s wakeup method were invoked.</p>
+</blockquote>
+<blockquote>
+<p>If none of the previous conditions hold then this thread’s interrupt status will be set.</p>
+</blockquote>
+<blockquote>
+<p>Interrupting a thread that is not alive need not have any effect.</p>
+</blockquote>
+<p>大致意思是：</p>
+<blockquote>
+<p>interrupt()的作用是中断本线程。<br>本线程中断自己是被允许的；其它线程调用本线程的interrupt()方法时，会通过checkAccess()检查权限。这有可能抛出SecurityException异常。</p>
+</blockquote>
+<blockquote>
+<p>如果本线程是处于阻塞状态：调用线程的wait(), wait(long)或wait(long, int)会让它进入等待(阻塞)状态，或者调用线程的join(), join(long), join(long, int), sleep(long), sleep(long, int)也会让它进入阻塞状态。若线程在阻塞状态时，调用了它的interrupt()方法，那么它的“中断状态”会被清除并且会收到一个InterruptedException异常。例如，线程通过wait()进入阻塞状态，此时通过interrupt()中断该线程；调用interrupt()会立即将线程的中断标记设为“true”，但是由于线程处于阻塞状态，所以该“中断标记”会立即被清除为“false”，同时，会产生一个InterruptedException的异常。<br>如果线程被阻塞在一个Selector选择器中，那么通过interrupt()中断它时；线程的中断标记会被设置为true，并且它会立即从选择操作中返回。<br>如果不属于前面所说的情况，那么通过interrupt()中断线程时，它的中断标记会被设置为“true”。<br>中断一个“已终止的线程”不会产生任何操作。</p>
+</blockquote>
+<p><a name="anchor2"></a></p>
+<h1 id="2-终止线程的方式"><a href="#2-终止线程的方式" class="headerlink" title="2. 终止线程的方式"></a>2. 终止线程的方式</h1><p>Thread中的stop()和suspend()方法，由于固有的不安全性，已经建议不再使用！<br>下面，我先分别讨论线程在“阻塞状态”和“运行状态”的终止方式，然后再总结出一个通用的方式。</p>
+<p><a name="anchor2_1"></a></p>
+<h2 id="2-1-终止处于“阻塞状态”的线程"><a href="#2-1-终止处于“阻塞状态”的线程" class="headerlink" title="2.1 终止处于“阻塞状态”的线程"></a>2.1 终止处于“阻塞状态”的线程</h2><p>通常，我们通过“中断”方式终止处于“阻塞状态”的线程。<br>当线程由于被调用了sleep(), wait(), join()等方法而进入阻塞状态；若此时调用线程的interrupt()将线程的中断标记设为true。由于处于阻塞状态，中断标记会被清除，同时产生一个InterruptedException异常。将InterruptedException放在适当的为止就能终止线程，形式如下：</p>
+<pre><code>@Override
+public void run() {
+    try {
+        while (true) {
+            // 执行任务...
+        }
+    } catch (InterruptedException ie) {  
+        // 由于产生InterruptedException异常，退出while(true)循环，线程终止！
+    }
+}
+</code></pre><p>说明：在while(true)中不断的执行任务，当线程处于阻塞状态时，调用线程的interrupt()产生InterruptedException中断。中断的捕获在while(true)之外，这样就退出了while(true)循环！<br>注意：对InterruptedException的捕获务一般放在while(true)循环体的外面，这样，在产生异常时就退出了while(true)循环。否则，InterruptedException在while(true)循环体之内，就需要额外的添加退出处理。形式如下：</p>
+<pre><code>@Override
+public void run() {
+    while (true) {
+        try {
+            // 执行任务...
+        } catch (InterruptedException ie) {  
+            // InterruptedException在while(true)循环体内。
+            // 当线程产生了InterruptedException异常时，while(true)仍能继续运行！需要手动退出
+            break;
+        }
+    }
+}
+</code></pre><p>说明：上面的InterruptedException异常的捕获在whle(true)之内。当产生InterruptedException异常时，被catch处理之外，仍然在while(true)循环体内；要退出while(true)循环体，需要额外的执行退出while(true)的操作。</p>
+<p><a name="anchor2_2"></a></p>
+<h2 id="2-2-终止处于“运行状态”的线程"><a href="#2-2-终止处于“运行状态”的线程" class="headerlink" title="2.2 终止处于“运行状态”的线程"></a>2.2 终止处于“运行状态”的线程</h2><p>通常，我们通过“标记”方式终止处于“运行状态”的线程。其中，包括“中断标记”和“额外添加标记”。</p>
+<p><strong>(01) 通过“中断标记”终止线程。</strong><br>形式如下：</p>
+<pre><code>@Override
+public void run() {
+    while (!isInterrupted()) {
+        // 执行任务...
+    }
+}
+</code></pre><p>说明：isInterrupted()是判断线程的中断标记是不是为true。当线程处于运行状态，并且我们需要终止它时；可以调用线程的interrupt()方法，使用线程的中断标记为true，即isInterrupted()会返回true。此时，就会退出while循环。<br>注意：interrupt()并不会终止处于“运行状态”的线程！它会将线程的中断标记设为true。</p>
+<p><strong>(02) 通过“额外添加标记”。</strong><br>形式如下：</p>
+<pre><code>private volatile boolean flag= true;
+protected void stopTask() {
+    flag = false;
+}
+
+@Override
+public void run() {
+    while (flag) {
+        // 执行任务...
+    }
+}
+</code></pre><p>说明：线程中有一个flag标记，它的默认值是true；并且我们提供stopTask()来设置flag标记。当我们需要终止该线程时，调用该线程的stopTask()方法就可以让线程退出while循环。<br>注意：将flag定义为volatile类型，是为了保证flag的可见性。即其它线程通过stopTask()修改了flag之后，本线程能看到修改后的flag的值。</p>
+<p>综合线程处于“阻塞状态”和“运行状态”的终止方式，比较通用的终止线程的形式如下：</p>
+<pre><code>@Override
+public void run() {
+    try {
+        // 1. isInterrupted()保证，只要中断标记为true就终止线程。
+        while (!isInterrupted()) {
+            // 执行任务...
+        }
+    } catch (InterruptedException ie) {  
+        // 2. InterruptedException异常保证，当InterruptedException异常产生时，线程被终止。
+    }
+}
+</code></pre><p><a name="anchor3"></a></p>
+<h1 id="3-终止线程的示例"><a href="#3-终止线程的示例" class="headerlink" title="3. 终止线程的示例"></a>3. 终止线程的示例</h1><p>interrupt()常常被用来终止“阻塞状态”线程。参考下面示例：</p>
+<pre><code>// Demo1.java的源码
+class MyThread extends Thread {
+
+    public MyThread(String name) {
+        super(name);
+    }
+
+    @Override
+    public void run() {
+        try {  
+            int i=0;
+            while (!isInterrupted()) {
+                Thread.sleep(100); // 休眠100ms
+                i++;
+                System.out.println(Thread.currentThread().getName()+&quot; (&quot;+this.getState()+&quot;) loop &quot; + i);  
+            }
+        } catch (InterruptedException e) {  
+            System.out.println(Thread.currentThread().getName() +&quot; (&quot;+this.getState()+&quot;) catch InterruptedException.&quot;);  
+        }
+    }
+}
+
+public class Demo1 {
+
+    public static void main(String[] args) {  
+        try {  
+            Thread t1 = new MyThread(&quot;t1&quot;);  // 新建“线程t1”
+            System.out.println(t1.getName() +&quot; (&quot;+t1.getState()+&quot;) is new.&quot;);  
+
+            t1.start();                      // 启动“线程t1”
+            System.out.println(t1.getName() +&quot; (&quot;+t1.getState()+&quot;) is started.&quot;);  
+
+            // 主线程休眠300ms，然后主线程给t1发“中断”指令。
+            Thread.sleep(300);
+            t1.interrupt();
+            System.out.println(t1.getName() +&quot; (&quot;+t1.getState()+&quot;) is interrupted.&quot;);
+
+            // 主线程休眠300ms，然后查看t1的状态。
+            Thread.sleep(300);
+            System.out.println(t1.getName() +&quot; (&quot;+t1.getState()+&quot;) is interrupted now.&quot;);
+        } catch (InterruptedException e) {  
+            e.printStackTrace();
+        }
+    } 
+}
+</code></pre><p>运行结果：</p>
+<pre><code>t1 (NEW) is new.
+t1 (RUNNABLE) is started.
+t1 (RUNNABLE) loop 1
+t1 (RUNNABLE) loop 2
+t1 (TIMED_WAITING) is interrupted.
+t1 (RUNNABLE) catch InterruptedException.
+t1 (TERMINATED) is interrupted now.
+</code></pre><p>结果说明：<br>(01) 主线程main中通过new MyThread(“t1”)创建线程t1，之后通过t1.start()启动线程t1。<br>(02) t1启动之后，会不断的检查它的中断标记，如果中断标记为“false”；则休眠100ms。<br>(03) t1休眠之后，会切换到主线程main；主线程再次运行时，会执行t1.interrupt()中断线程t1。t1收到中断指令之后，会将t1的中断标记设置“false”，而且会抛出InterruptedException异常。在t1的run()方法中，是在循环体while之外捕获的异常；因此循环被终止。</p>
+<p>我们对上面的结果进行小小的修改，将run()方法中捕获InterruptedException异常的代码块移到while循环体内。</p>
+<pre><code>// Demo2.java的源码
+class MyThread extends Thread {
+
+    public MyThread(String name) {
+        super(name);
+    }
+
+    @Override
+    public void run() {
+        int i=0;
+        while (!isInterrupted()) {
+            try {
+                Thread.sleep(100); // 休眠100ms
+            } catch (InterruptedException ie) {  
+                System.out.println(Thread.currentThread().getName() +&quot; (&quot;+this.getState()+&quot;) catch InterruptedException.&quot;);  
+            }
+            i++;
+            System.out.println(Thread.currentThread().getName()+&quot; (&quot;+this.getState()+&quot;) loop &quot; + i);  
+        }
+    }
+}
+
+public class Demo2 {
+
+    public static void main(String[] args) {  
+        try {  
+            Thread t1 = new MyThread(&quot;t1&quot;);  // 新建“线程t1”
+            System.out.println(t1.getName() +&quot; (&quot;+t1.getState()+&quot;) is new.&quot;);  
+
+            t1.start();                      // 启动“线程t1”
+            System.out.println(t1.getName() +&quot; (&quot;+t1.getState()+&quot;) is started.&quot;);  
+
+            // 主线程休眠300ms，然后主线程给t1发“中断”指令。
+            Thread.sleep(300);
+            t1.interrupt();
+            System.out.println(t1.getName() +&quot; (&quot;+t1.getState()+&quot;) is interrupted.&quot;);
+
+            // 主线程休眠300ms，然后查看t1的状态。
+            Thread.sleep(300);
+            System.out.println(t1.getName() +&quot; (&quot;+t1.getState()+&quot;) is interrupted now.&quot;);
+        } catch (InterruptedException e) {  
+            e.printStackTrace();
+        }
+    } 
+}
+</code></pre><p>运行结果：</p>
+<pre><code>t1 (NEW) is new.
+t1 (RUNNABLE) is started.
+t1 (RUNNABLE) loop 1
+t1 (RUNNABLE) loop 2
+t1 (TIMED_WAITING) is interrupted.
+t1 (RUNNABLE) catch InterruptedException.
+t1 (RUNNABLE) loop 3
+t1 (RUNNABLE) loop 4
+t1 (RUNNABLE) loop 5
+t1 (TIMED_WAITING) is interrupted now.
+t1 (RUNNABLE) loop 6
+t1 (RUNNABLE) loop 7
+t1 (RUNNABLE) loop 8
+t1 (RUNNABLE) loop 9
+...
+</code></pre><p>结果说明：<br>程序进入了死循环！<br>为什么会这样呢？这是因为，t1在“等待(阻塞)状态”时，被interrupt()中断；此时，会清除中断标记[即isInterrupted()会返回false]，而且会抛出InterruptedException异常[该异常在while循环体内被捕获]。因此，t1理所当然的会进入死循环了。<br>解决该问题，需要我们在捕获异常时，额外的进行退出while循环的处理。例如，在MyThread的catch(InterruptedException)中添加break 或 return就能解决该问题。</p>
+<p>下面是通过“额外添加标记”的方式终止“状态状态”的线程的示例：</p>
+<pre><code>// Demo3.java的源码
+class MyThread extends Thread {
+
+    private volatile boolean flag= true;
+    public void stopTask() {
+        flag = false;
+    }
+
+    public MyThread(String name) {
+        super(name);
+    }
+
+    @Override
+    public void run() {
+        synchronized(this) {
+            try {
+                int i=0;
+                while (flag) {
+                    Thread.sleep(100); // 休眠100ms
+                    i++;
+                    System.out.println(Thread.currentThread().getName()+&quot; (&quot;+this.getState()+&quot;) loop &quot; + i);  
+                }
+            } catch (InterruptedException ie) {  
+                System.out.println(Thread.currentThread().getName() +&quot; (&quot;+this.getState()+&quot;) catch InterruptedException.&quot;);  
+            }
+        }  
+    }
+}
+
+public class Demo3 {
+
+    public static void main(String[] args) {  
+        try {  
+            MyThread t1 = new MyThread(&quot;t1&quot;);  // 新建“线程t1”
+            System.out.println(t1.getName() +&quot; (&quot;+t1.getState()+&quot;) is new.&quot;);  
+
+            t1.start();                      // 启动“线程t1”
+            System.out.println(t1.getName() +&quot; (&quot;+t1.getState()+&quot;) is started.&quot;);  
+
+            // 主线程休眠300ms，然后主线程给t1发“中断”指令。
+            Thread.sleep(300);
+            t1.stopTask();
+            System.out.println(t1.getName() +&quot; (&quot;+t1.getState()+&quot;) is interrupted.&quot;);
+
+            // 主线程休眠300ms，然后查看t1的状态。
+            Thread.sleep(300);
+            System.out.println(t1.getName() +&quot; (&quot;+t1.getState()+&quot;) is interrupted now.&quot;);
+        } catch (InterruptedException e) {  
+            e.printStackTrace();
+        }
+    } 
+}
+</code></pre><p>运行结果：</p>
+<pre><code>t1 (NEW) is new.
+t1 (RUNNABLE) is started.
+t1 (RUNNABLE) loop 1
+t1 (RUNNABLE) loop 2
+t1 (TIMED_WAITING) is interrupted.
+t1 (RUNNABLE) loop 3
+t1 (TERMINATED) is interrupted now.
+</code></pre><p><a name="anchor4"></a></p>
+<h1 id="4-interrupted-和-isInterrupted-的区别"><a href="#4-interrupted-和-isInterrupted-的区别" class="headerlink" title="4. interrupted() 和 isInterrupted()的区别"></a>4. interrupted() 和 isInterrupted()的区别</h1><p>最后谈谈 interrupted() 和 isInterrupted()。<br>interrupted() 和 isInterrupted()都能够用于检测对象的“中断标记”。<br>区别是，interrupted()除了返回中断标记之外，它还会清除中断标记(即将中断标记设为false)；而isInterrupted()仅仅返回中断标记。</p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2018-06-27T09:39:57.949Z" itemprop="dateUpdated">2018-06-27 17:39:57</time>
+</span><br>
+
+
+        
+        本文固定链接：<a href="/2016/11/09/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”09之 interrupt()和线程终止方式/" target="_blank" rel="external">https://smuwjs.github.io/2016/11/09/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”09之 interrupt()和线程终止方式/</a>
+        
+    </div>
+    <footer>
+        <a href="https://smuwjs.github.io">
+            <img src="/img/head.png" alt="Jeeson">
+            Jeeson
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java多线程系列/">Java多线程系列</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java源码分析/">Java源码分析</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/11/09/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”09之 interrupt()和线程终止方式/&title=《Java多线程系列--“基础篇”09之 interrupt()和线程终止方式》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/11/09/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”09之 interrupt()和线程终止方式/&title=《Java多线程系列--“基础篇”09之 interrupt()和线程终止方式》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/11/09/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”09之 interrupt()和线程终止方式/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Java多线程系列--“基础篇”09之 interrupt()和线程终止方式》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/11/09/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”09之 interrupt()和线程终止方式/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/11/09/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”09之 interrupt()和线程终止方式/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2016/11/10/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”10之 线程优先级和守护线程/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">Java多线程系列--“基础篇”10之 线程优先级和守护线程</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2016/11/08/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”08之 join()/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Java多线程系列--“基础篇”08之 join()</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”09之 interrupt()和线程终止方式" data-title="Java多线程系列--“基础篇”09之 interrupt()和线程终止方式" data-url="https://smuwjs.github.io/2016/11/09/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”09之 interrupt()和线程终止方式/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'smuwjs', theme: 'none'};
+lazyScripts.push('//unpkg.com/hexo-theme-material-indigo@latest/js/embed.min.js');
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循<a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>Jeeson &copy; 2015 - 2018</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/11/09/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”09之 interrupt()和线程终止方式/&title=《Java多线程系列--“基础篇”09之 interrupt()和线程终止方式》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/11/09/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”09之 interrupt()和线程终止方式/&title=《Java多线程系列--“基础篇”09之 interrupt()和线程终止方式》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/11/09/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”09之 interrupt()和线程终止方式/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Java多线程系列--“基础篇”09之 interrupt()和线程终止方式》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/11/09/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”09之 interrupt()和线程终止方式/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/11/09/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”09之 interrupt()和线程终止方式/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://smuwjs.github.io/2016/11/09/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”09之 interrupt()和线程终止方式/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

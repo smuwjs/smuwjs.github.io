@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>java io系列08之 File详解 | Jeeson&#39;s Blog | Write the code. Change the world.</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="Java源码分析,Java IO系列">
+    <meta name="description" content="本文对File的API和常用方法进行介绍。   目录第1部分 File 介绍第2部分 File API使用示例      第1部分 File 介绍File 是“文件”和“目录路径名”的抽象表示形式。 File 直接继承于Object，实现了Serializable接口和Comparable接口。实现Serializable接口，意味着File对象支持序列化操作。而实现Comparable接口，意">
+<meta name="keywords" content="Java源码分析,Java IO系列">
+<meta property="og:type" content="article">
+<meta property="og:title" content="java io系列08之 File详解">
+<meta property="og:url" content="https://smuwjs.github.io/2016/10/08/java-source-analysis-io-series/java io系列08之 File详解/index.html">
+<meta property="og:site_name" content="Jeeson&#39;s Blog">
+<meta property="og:description" content="本文对File的API和常用方法进行介绍。   目录第1部分 File 介绍第2部分 File API使用示例      第1部分 File 介绍File 是“文件”和“目录路径名”的抽象表示形式。 File 直接继承于Object，实现了Serializable接口和Comparable接口。实现Serializable接口，意味着File对象支持序列化操作。而实现Comparable接口，意">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://wangkuiwu.github.io/media/pic/java/io/file01.jpg">
+<meta property="og:updated_time" content="2018-06-27T09:39:57.941Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="java io系列08之 File详解">
+<meta name="twitter:description" content="本文对File的API和常用方法进行介绍。   目录第1部分 File 介绍第2部分 File API使用示例      第1部分 File 介绍File 是“文件”和“目录路径名”的抽象表示形式。 File 直接继承于Object，实现了Serializable接口和Comparable接口。实现Serializable接口，意味着File对象支持序列化操作。而实现Comparable接口，意">
+<meta name="twitter:image" content="http://wangkuiwu.github.io/media/pic/java/io/file01.jpg">
+    
+        <link rel="alternate" type="application/atom+xml" title="Jeeson&#39;s Blog" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/head.png">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Jeeson</h5>
+          <a href="mailto:smuwjs@163.com" title="smuwjs@163.com" class="mail">smuwjs@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/smuwjs" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">java io系列08之 File详解</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">java io系列08之 File详解</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2016-10-07T16:00:00.000Z" itemprop="datePublished" class="page-time">
+  2016-10-08
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#第1部分-File-介绍"><span class="post-toc-number">1.</span> <span class="post-toc-text">第1部分 File 介绍</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#1-新建目录的常用方法"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">1. 新建目录的常用方法</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#2-新建子目录的几种常用方法"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">2. 新建子目录的几种常用方法</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#3-新建文件的几种常用方法"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">3. 新建文件的几种常用方法</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#第2部分-File-API使用示例"><span class="post-toc-number">2.</span> <span class="post-toc-text">第2部分 File API使用示例</span></a></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-java-source-analysis-io-series/java io系列08之 File详解"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">java io系列08之 File详解</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2016-10-08 00:00:00" datetime="2016-10-07T16:00:00.000Z"  itemprop="datePublished">2016-10-08</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <blockquote>
+<p>本文对File的API和常用方法进行介绍。</p>
+</blockquote>
+<blockquote>
+<p><strong>目录</strong><br><a href="#anchor1">第1部分 File 介绍</a><br><a href="#anchor2">第2部分 File API使用示例</a>   </p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="第1部分-File-介绍"><a href="#第1部分-File-介绍" class="headerlink" title="第1部分 File 介绍"></a>第1部分 File 介绍</h1><p>File 是“文件”和“目录路径名”的抽象表示形式。</p>
+<p>File 直接继承于Object，实现了Serializable接口和Comparable接口。实现Serializable接口，意味着File对象支持序列化操作。而实现Comparable接口，意味着File对象之间可以比较大小；File能直接被存储在有序集合(如TreeSet、TreeMap中)。</p>
+<p>File 函数列表</p>
+<pre><code>// 静态成员
+public static final String     pathSeparator        // 路径分割符&quot;:&quot;
+public static final char     pathSeparatorChar    // 路径分割符&apos;:&apos;
+public static final String     separator            // 分隔符&quot;/&quot;
+public static final char     separatorChar        // 分隔符&apos;/&apos;
+
+// 构造函数
+File(File dir, String name)
+File(String path)
+File(String dirPath, String name)
+File(URI uri)
+
+// 成员函数
+boolean    canExecute()    // 测试应用程序是否可以执行此抽象路径名表示的文件。
+boolean    canRead()       // 测试应用程序是否可以读取此抽象路径名表示的文件。
+boolean    canWrite()      // 测试应用程序是否可以修改此抽象路径名表示的文件。
+int    compareTo(File pathname)    // 按字母顺序比较两个抽象路径名。
+boolean    createNewFile()         // 当且仅当不存在具有此抽象路径名指定名称的文件时，不可分地创建一个新的空文件。
+static File    createTempFile(String prefix, String suffix)    // 在默认临时文件目录中创建一个空文件，使用给定前缀和后缀生成其名称。
+static File    createTempFile(String prefix, String suffix, File directory)    // 在指定目录中创建一个新的空文件，使用给定的前缀和后缀字符串生成其名称。
+boolean    delete()             // 删除此抽象路径名表示的文件或目录。
+void    deleteOnExit()       // 在虚拟机终止时，请求删除此抽象路径名表示的文件或目录。
+boolean    equals(Object obj)   // 测试此抽象路径名与给定对象是否相等。
+boolean    exists()             // 测试此抽象路径名表示的文件或目录是否存在。
+File    getAbsoluteFile()    // 返回此抽象路径名的绝对路径名形式。
+String    getAbsolutePath()    // 返回此抽象路径名的绝对路径名字符串。
+File    getCanonicalFile()   // 返回此抽象路径名的规范形式。
+String    getCanonicalPath()   // 返回此抽象路径名的规范路径名字符串。
+long    getFreeSpace()       // 返回此抽象路径名指定的分区中未分配的字节数。
+String    getName()            // 返回由此抽象路径名表示的文件或目录的名称。
+String    getParent()          // 返回此抽象路径名父目录的路径名字符串；如果此路径名没有指定父目录，则返回 null。
+File    getParentFile()      // 返回此抽象路径名父目录的抽象路径名；如果此路径名没有指定父目录，则返回 null。
+String    getPath()            // 将此抽象路径名转换为一个路径名字符串。
+long    getTotalSpace()      // 返回此抽象路径名指定的分区大小。
+long    getUsableSpace()     // 返回此抽象路径名指定的分区上可用于此虚拟机的字节数。
+int    hashCode()               // 计算此抽象路径名的哈希码。
+boolean    isAbsolute()         // 测试此抽象路径名是否为绝对路径名。
+boolean    isDirectory()        // 测试此抽象路径名表示的文件是否是一个目录。
+boolean    isFile()             // 测试此抽象路径名表示的文件是否是一个标准文件。
+boolean    isHidden()           // 测试此抽象路径名指定的文件是否是一个隐藏文件。
+long    lastModified()       // 返回此抽象路径名表示的文件最后一次被修改的时间。
+long    length()             // 返回由此抽象路径名表示的文件的长度。
+String[]    list()           // 返回一个字符串数组，这些字符串指定此抽象路径名表示的目录中的文件和目录。
+String[]    list(FilenameFilter filter)    // 返回一个字符串数组，这些字符串指定此抽象路径名表示的目录中满足指定过滤器的文件和目录。
+File[]    listFiles()                        // 返回一个抽象路径名数组，这些路径名表示此抽象路径名表示的目录中的文件。
+File[]    listFiles(FileFilter filter)       // 返回抽象路径名数组，这些路径名表示此抽象路径名表示的目录中满足指定过滤器的文件和目录。
+File[]    listFiles(FilenameFilter filter)   // 返回抽象路径名数组，这些路径名表示此抽象路径名表示的目录中满足指定过滤器的文件和目录。
+static File[]    listRoots()    // 列出可用的文件系统根。
+boolean    mkdir()     // 创建此抽象路径名指定的目录。
+boolean    mkdirs()    // 创建此抽象路径名指定的目录，包括所有必需但不存在的父目录。
+boolean    renameTo(File dest)    // 重新命名此抽象路径名表示的文件。
+boolean    setExecutable(boolean executable)    // 设置此抽象路径名所有者执行权限的一个便捷方法。
+boolean    setExecutable(boolean executable, boolean ownerOnly)    // 设置此抽象路径名的所有者或所有用户的执行权限。
+boolean    setLastModified(long time)       // 设置此抽象路径名指定的文件或目录的最后一次修改时间。
+boolean    setReadable(boolean readable)    // 设置此抽象路径名所有者读权限的一个便捷方法。
+boolean    setReadable(boolean readable, boolean ownerOnly)    // 设置此抽象路径名的所有者或所有用户的读权限。
+boolean    setReadOnly()                    // 标记此抽象路径名指定的文件或目录，从而只能对其进行读操作。
+boolean    setWritable(boolean writable)    // 设置此抽象路径名所有者写权限的一个便捷方法。
+boolean    setWritable(boolean writable, boolean ownerOnly)    // 设置此抽象路径名的所有者或所有用户的写权限。
+String    toString()    // 返回此抽象路径名的路径名字符串。
+URI    toURI()    // 构造一个表示此抽象路径名的 file: URI。
+URL    toURL()    // 已过时。 此方法不会自动转义 URL 中的非法字符。建议新的代码使用以下方式将抽象路径名转换为 URL：首先通过 toURI 方法将其转换为 URI，然后通过 URI.toURL 方法将 URI 装换为 URL。
+</code></pre><h2 id="1-新建目录的常用方法"><a href="#1-新建目录的常用方法" class="headerlink" title="1. 新建目录的常用方法"></a>1. 新建目录的常用方法</h2><p>方法1：根据相对路径新建目录。</p>
+<p>示例代码如下(在当前路径下新建目录“dir”)：</p>
+<pre><code>File dir = new File(&quot;dir&quot;);
+dir.mkdir();
+</code></pre><p>方法2：根据绝对路径新建目录。</p>
+<p>示例代码如下(新建目录“/home/skywang/dir”)：</p>
+<pre><code>File dir = new File(&quot;/home/skywang/dir&quot;);
+dir.mkdirs();
+</code></pre><p>说明：上面是在linux系统下新建目录“/home/skywang/dir”的源码。在windows下面，若要新建目录“D:/dir”，源码如下：</p>
+<pre><code>File dir = new File(&quot;D:/dir&quot;);
+dir.mkdir();
+</code></pre><p>方法3</p>
+<pre><code>URI uri = new URI(&quot;file:/home/skywang/dir&quot;); 
+File dir = new File(uri);
+sub.mkdir();
+</code></pre><p>说明： 和“方法2”类似，只不过“方法2”中传入的是完整路径，而“方法3”中传入的是完整路径对应URI。</p>
+<h2 id="2-新建子目录的几种常用方法"><a href="#2-新建子目录的几种常用方法" class="headerlink" title="2. 新建子目录的几种常用方法"></a>2. 新建子目录的几种常用方法</h2><p>例如，我们想要在当前目录的子目录“dir”下，再新建一个子目录。有一下几种方法:</p>
+<p>方法1</p>
+<pre><code>File sub1 = new File(&quot;dir&quot;, &quot;sub1&quot;);
+sub1.mkdir();
+</code></pre><p>说明：上面的方法作用是，在当前目录下 “dir/sub1”。它能正常运行的前提是“sub1”的父目录“dir”已经存在！</p>
+<p>方法2</p>
+<pre><code>File sub2 = new File(dir, &quot;sub2&quot;);
+sub2.mkdir();
+</code></pre><p>说明：上面的方法作用是，在当前目录下 “dir/sub2”。它能正常运行的前提是“sub2”的父目录“dir”已经存在！</p>
+<p>方法3</p>
+<pre><code>File sub3 = new File(&quot;dir/sub3&quot;);
+sub3.mkdirs();
+</code></pre><p>说明：上面的方法作用是，在当前目录下 “dir/sub3”。它不需要dir已经存在，也能正常运行；若“sub3”的父母路不存在，mkdirs()方法会自动创建父目录。</p>
+<p>方法4</p>
+<pre><code>File sub4 = new File(&quot;/home/skywang/dir/sub4&quot;);
+sub4.mkdirs();
+</code></pre><p>说明：上面的方法作用是，新建目录”/home/skywang/dir/sub3”。它不需要dir已经存在，也能正常运行；若“sub4”的父母路不存在，mkdirs()方法会自动创建父目录。</p>
+<p>方法5</p>
+<pre><code>URI uri = new URI(&quot;file:/home/skywang/dir/sub5&quot;); 
+File sub5 = new File(uri);
+sub5.mkdirs();
+</code></pre><p>说明： 和“方法4”类似，只不过“方法4”中传入的是完整路径，而“方法5”中传入的是完整路径对应URI。</p>
+<h2 id="3-新建文件的几种常用方法"><a href="#3-新建文件的几种常用方法" class="headerlink" title="3. 新建文件的几种常用方法"></a>3. 新建文件的几种常用方法</h2><p>例如，我们想要在当前目录的子目录“dir”下，新建一个文件。有一下几种方法</p>
+<p>方法1</p>
+<pre><code>try {
+    File dir = new File(&quot;dir&quot;);    // 获取目录“dir”对应的File对象
+    File file1 = new File(dir, &quot;file1.txt&quot;);
+    file1.createNewFile();
+} catch (IOException e) {
+    e.printStackTrace();
+}
+</code></pre><p>说明：上面代码作用是，在“dir”目录(相对路径)下新建文件“file1.txt”。</p>
+<p>方法2</p>
+<pre><code>try {
+    File file2 = new File(&quot;dir&quot;, &quot;file2.txt&quot;);
+    file2.createNewFile();
+} catch (IOException e) {
+    e.printStackTrace();
+}
+</code></pre><p>说明：上面代码作用是，在“dir”目录(相对路径)下新建文件“file2.txt”。</p>
+<p>方法3</p>
+<pre><code>try {
+    File file3 = new File(&quot;/home/skywang/dir/file3.txt&quot;);
+    file3.createNewFile();
+} catch (IOException e) {
+    e.printStackTrace();
+}
+</code></pre><p>说明：上面代码作用是，下新建文件“/home/skywang/dir/file3.txt”(绝对路径)。这是在linux下根据绝对路径的方法，在windows下可以通过以下代码新建文件”D:/dir/file4.txt”。</p>
+<pre><code>try {
+    File file3 = new File(&quot;D:/dir/file4.txt&quot;);
+    file3.createNewFile();
+} catch (IOException e) {
+    e.printStackTrace();
+}
+</code></pre><p>方法4</p>
+<pre><code>try {
+    URI uri = new URI(&quot;file:/home/skywang/dir/file4.txt&quot;); 
+    File file4 = new File(uri);
+    file4.createNewFile();
+} catch (IOException e) {
+    e.printStackTrace();
+}
+</code></pre><p>说明：<br>和“方法3”类似，只不过“方法3”中传入的是完整路径，而“方法4”中传入的是完整路径对应URI。  </p>
+<p><a name="anchor2"></a></p>
+<h1 id="第2部分-File-API使用示例"><a href="#第2部分-File-API使用示例" class="headerlink" title="第2部分 File API使用示例"></a>第2部分 File API使用示例</h1><p>关于File中API的详细用法，参考示例代码(FileTest.java)：</p>
+<pre><code>import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.util.Calendar;
+import java.text.SimpleDateFormat;
+
+public class FileTest {
+
+    public static void main(String[] args) {
+        testFileStaticFields() ;
+    testFileDirAPIS() ;
+    }
+
+    public static void testFileStaticFields() {
+        // 打印 路径分隔符&quot;:&quot;
+        System.out.printf(&quot;File.pathSeparator=\&quot;%s\&quot;\n&quot;, File.pathSeparator);
+        // 打印 路径分隔符&apos;:&apos;
+        System.out.printf(&quot;File.pathSeparatorChar=\&quot;%c\&quot;\n&quot;, File.pathSeparatorChar);
+        // 打印 分隔符&quot;/&quot;
+        System.out.printf(&quot;File.separator=\&quot;%s\&quot;\n&quot;, File.separator);
+        // 打印 分隔符&apos;/&apos;
+        System.out.printf(&quot;File.separatorChar=\&quot;%c\&quot;\n&quot;, File.separatorChar);
+    }
+
+    public static void testFileDirAPIS() {
+        try {
+        // 新建目录 &quot;dir&quot;
+        File dir = new File(&quot;dir&quot;);
+        dir.mkdir();
+
+        // 方法1：新建目录 &quot;dir/sub1&quot;。父目录“dir”必须已经存在！
+        File sub1 = new File(&quot;dir&quot;, &quot;sub1&quot;);
+        sub1.mkdir();
+        // 方法2：新建目录 &quot;dir/sub2&quot;。父目录“dir”必须已经存在！
+        File sub2 = new File(dir, &quot;sub2&quot;);
+        sub2.mkdir();
+        // 方法3：新建目录 &quot;dir/sub3&quot;。mkdirs()会自动创建不存在的父目录。
+        File sub3 = new File(&quot;dir/sub3&quot;);
+        sub3.mkdirs();
+        // 方法4：新建目录 &quot;dir/sub4&quot;。根据“绝对路径”创建，前面3个方法都是根据“相对路径”创建。
+        String dirPath = dir.getAbsolutePath();    // 获取“dir”的绝对路径
+        String sub4AbsPath = dirPath + File.separator + &quot;sub4&quot;;    // File.separator是分隔符&quot;/&quot;
+        File sub4 = new File(sub4AbsPath);
+        sub4.mkdirs();
+        // 方法5：新建目录 &quot;dir/sub5&quot;。根据uri
+        String uri_sub5_path = &quot;file:&quot;+ dirPath + File.separator + &quot;sub5&quot;;
+        URI uri_sub5 = new URI(uri_sub5_path); 
+        File sub5 = new File(uri_sub5);
+        sub5.mkdirs();
+
+        // 方法1：新建文件 &quot;dir/l1_normal.txt&quot;
+        File l1_normal = new File(dir, &quot;l1_normal.txt&quot;);
+        l1_normal.createNewFile();
+        // 方法2：新建文件 &quot;dir/.l1_hide.txt&quot;。
+        File l1_hide = new File(&quot;dir&quot;, &quot;.l1_hide.txt&quot;); // 在linux中, &quot;.&quot;开头的文件是隐藏文件。
+        l1_hide.createNewFile();
+        // 方法3：新建文件 &quot;dir/l1_abs.txt&quot;。
+        String dirAbsPah =  dir.getAbsolutePath();    // 获取dir的绝对路径
+        String l1_abs_path = dirAbsPah+File.separator+&quot;l1_abs.txt&quot;;
+        File l1_abs = new File(l1_abs_path);
+        l1_abs.createNewFile();
+        //System.out.printf(&quot;l1_abs_path=%s\n&quot;, l1_abs_path);
+        //System.out.printf(&quot;l1_abs path=%s\n&quot;, l1_abs.getAbsolutePath());
+        // 方法4：新建文件 &quot;dir/l1_uri.txt&quot;。根据URI新建文件
+        String uri_path = &quot;file:&quot;+ dirAbsPah + File.separator + &quot;l1_uri.txt&quot;;
+        URI uri_l1 = new URI(uri_path); 
+        //System.out.printf(&quot;uri_l1=%s\n&quot;, l1_abs.getAbsolutePath());
+        File l1_uri = new File(uri_l1); 
+        l1_uri.createNewFile();
+
+        // 新建文件 &quot;dir/sub/s1_normal&quot;
+        File s1_normal = new File(sub1, &quot;s1_normal.txt&quot;);
+        s1_normal.createNewFile();
+
+        System.out.printf(&quot;%30s = %s\n&quot;, &quot;s1_normal.exists()&quot;, s1_normal.exists());
+        System.out.printf(&quot;%30s = %s\n&quot;, &quot;s1_normal.getName()&quot;, s1_normal.getName());
+        System.out.printf(&quot;%30s = %s\n&quot;, &quot;s1_normal.getParent()&quot;, s1_normal.getParent());
+        System.out.printf(&quot;%30s = %s\n&quot;, &quot;s1_normal.getPath()&quot;, s1_normal.getPath());
+        System.out.printf(&quot;%30s = %s\n&quot;, &quot;s1_normal.getAbsolutePath()&quot;, s1_normal.getAbsolutePath());
+        System.out.printf(&quot;%30s = %s\n&quot;, &quot;s1_normal.getCanonicalPath()&quot;, s1_normal.getCanonicalPath());
+        System.out.printf(&quot;%30s = %s is \&quot;%s\&quot;\n&quot;, &quot;s1_normal.lastModified()&quot;, s1_normal.lastModified(), getModifyTime(s1_normal.lastModified()));
+        System.out.printf(&quot;%30s = %s\n&quot;, &quot;s1_normal.toURI()&quot;, s1_normal.toURI());
+
+
+        // 列出“dir”目录下的“文件”和“文件夹”。
+        // 注意：dir.listFiles()只会遍历目录dir，而不会遍历dir的子目录！
+        System.out.println(&quot;---- list files and folders ----&quot;);
+        File[] fs = dir.listFiles();
+        for (File f:fs) {
+            String fname = f.getName();
+            String absStr = f.isAbsolute() ? &quot;[Absolute]&quot; : &quot;&quot;;
+            String hidStr = f.isHidden() ? &quot;[Hidden]&quot; : &quot;&quot;;
+            String dirStr = f.isDirectory() ? &quot;[Directory]&quot; : &quot;&quot;;
+            String fileStr = f.isFile() ? &quot;[File]&quot; : &quot;&quot;;
+
+            System.out.printf(&quot;%-30s  %s%s%s%s\n&quot;, fname, fileStr, dirStr, absStr, hidStr);
+        }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static String getModifyTime(long millis) {
+        // 获取Calendar对象
+        Calendar cal = Calendar.getInstance();
+        // 设置时间为 millis
+        cal.setTimeInMillis(millis);
+        // 获取格式化对象，它会按照&quot;yyyy-MM-dd HH:mm:ss&quot;格式化日期
+        SimpleDateFormat sdf = new SimpleDateFormat(&quot;yyyy-MM-dd HH:mm:ss&quot;);
+        //System.out.printf(&quot;TIME %s\n&quot;, str);
+        return sdf.format(cal.getTime()); 
+    }
+
+}
+</code></pre><p>运行结果(在ubuntu 12.04系统下的运行结果，而不是windows！)：</p>
+<pre><code>File.pathSeparator=&quot;:&quot;
+File.pathSeparatorChar=&quot;:&quot;
+File.separator=&quot;/&quot;
+File.separatorChar=&quot;/&quot;
+            s1_normal.exists() = true
+           s1_normal.getName() = s1_normal.txt
+         s1_normal.getParent() = dir/sub1
+           s1_normal.getPath() = dir/sub1/s1_normal.txt
+   s1_normal.getAbsolutePath() = /home/skywang/wind_talker/workout/java/skywang/io/io/src/file/dir/sub1/s1_normal.txt
+  s1_normal.getCanonicalPath() = /home/skywang/wind_talker/workout/java/skywang/io/io/src/file/dir/sub1/s1_normal.txt
+      s1_normal.lastModified() = 1381730064000 is &quot;2013-10-14 13:54:24&quot;
+             s1_normal.toURI() = file:/home/skywang/wind_talker/workout/java/skywang/io/io/src/file/dir/sub1/s1_normal.txt
+---- list files and folders ----
+l1_uri.txt                      [File]
+sub1                            [Directory]
+l1_abs.txt                      [File]
+sub5                            [Directory]
+sub4                            [Directory]
+.l1_hide.txt                    [File][Hidden]
+sub3                            [Directory]
+sub2                            [Directory]
+l1_normal.txt                   [File]
+</code></pre><p>结果说明：运行程序，会在源文件所在的目录新建目录”dir”及其子目录和子文件。如下图：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://wangkuiwu.github.io/media/pic/java/io/file01.jpg" alt="img" title="">
+                </div>
+                <div class="image-caption">img</div>
+            </figure>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2018-06-27T09:39:57.941Z" itemprop="dateUpdated">2018-06-27 17:39:57</time>
+</span><br>
+
+
+        
+        本文固定链接：<a href="/2016/10/08/java-source-analysis-io-series/java io系列08之 File详解/" target="_blank" rel="external">https://smuwjs.github.io/2016/10/08/java-source-analysis-io-series/java io系列08之 File详解/</a>
+        
+    </div>
+    <footer>
+        <a href="https://smuwjs.github.io">
+            <img src="/img/head.png" alt="Jeeson">
+            Jeeson
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java-IO系列/">Java IO系列</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java源码分析/">Java源码分析</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/10/08/java-source-analysis-io-series/java io系列08之 File详解/&title=《java io系列08之 File详解》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/10/08/java-source-analysis-io-series/java io系列08之 File详解/&title=《java io系列08之 File详解》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/10/08/java-source-analysis-io-series/java io系列08之 File详解/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《java io系列08之 File详解》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/10/08/java-source-analysis-io-series/java io系列08之 File详解/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/10/08/java-source-analysis-io-series/java io系列08之 File详解/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2016/10/09/java-source-analysis-io-series/java io系列09之 FileDescriptor详解/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">java io系列09之 FileDescriptor详解</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2016/10/07/java-source-analysis-io-series/java io系列07之 FileInputStream和FileOutputStream详解/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">java io系列07之 FileInputStream和FileOutputStream详解</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="java-source-analysis-io-series/java io系列08之 File详解" data-title="java io系列08之 File详解" data-url="https://smuwjs.github.io/2016/10/08/java-source-analysis-io-series/java io系列08之 File详解/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'smuwjs', theme: 'none'};
+lazyScripts.push('//unpkg.com/hexo-theme-material-indigo@latest/js/embed.min.js');
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循<a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>Jeeson &copy; 2015 - 2018</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/10/08/java-source-analysis-io-series/java io系列08之 File详解/&title=《java io系列08之 File详解》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/10/08/java-source-analysis-io-series/java io系列08之 File详解/&title=《java io系列08之 File详解》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/10/08/java-source-analysis-io-series/java io系列08之 File详解/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《java io系列08之 File详解》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/10/08/java-source-analysis-io-series/java io系列08之 File详解/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/10/08/java-source-analysis-io-series/java io系列08之 File详解/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://smuwjs.github.io/2016/10/08/java-source-analysis-io-series/java io系列08之 File详解/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

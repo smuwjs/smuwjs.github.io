@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>Java多线程系列--“基础篇”02之 常用的实现多线程的两种方式 | Jeeson&#39;s Blog | Write the code. Change the world.</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="Java源码分析,Java多线程系列">
+    <meta name="description" content="本章，我们学习“常用的实现多线程的2种方式”：Thread 和 Runnable。之所以说是常用的，是因为通过还可以通过java.util.concurrent包中的线程池来实现多线程。关于线程池的内容，我们以后会详细介绍；现在，先对的Thread和Runnable进行了解。   目录1. Thread和Runnable简介2. Thread和Runnable的异同点3. Thread和Runn">
+<meta name="keywords" content="Java源码分析,Java多线程系列">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java多线程系列--“基础篇”02之 常用的实现多线程的两种方式">
+<meta property="og:url" content="https://smuwjs.github.io/2016/11/02/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”02之 常用的实现多线程的两种方式/index.html">
+<meta property="og:site_name" content="Jeeson&#39;s Blog">
+<meta property="og:description" content="本章，我们学习“常用的实现多线程的2种方式”：Thread 和 Runnable。之所以说是常用的，是因为通过还可以通过java.util.concurrent包中的线程池来实现多线程。关于线程池的内容，我们以后会详细介绍；现在，先对的Thread和Runnable进行了解。   目录1. Thread和Runnable简介2. Thread和Runnable的异同点3. Thread和Runn">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-06-27T09:39:57.949Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java多线程系列--“基础篇”02之 常用的实现多线程的两种方式">
+<meta name="twitter:description" content="本章，我们学习“常用的实现多线程的2种方式”：Thread 和 Runnable。之所以说是常用的，是因为通过还可以通过java.util.concurrent包中的线程池来实现多线程。关于线程池的内容，我们以后会详细介绍；现在，先对的Thread和Runnable进行了解。   目录1. Thread和Runnable简介2. Thread和Runnable的异同点3. Thread和Runn">
+    
+        <link rel="alternate" type="application/atom+xml" title="Jeeson&#39;s Blog" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/head.png">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Jeeson</h5>
+          <a href="mailto:smuwjs@163.com" title="smuwjs@163.com" class="mail">smuwjs@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/smuwjs" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Java多线程系列--“基础篇”02之 常用的实现多线程的两种方式</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Java多线程系列--“基础篇”02之 常用的实现多线程的两种方式</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2016-11-01T16:00:00.000Z" itemprop="datePublished" class="page-time">
+  2016-11-02
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#1-Thread和Runnable简介"><span class="post-toc-number">1.</span> <span class="post-toc-text">1. Thread和Runnable简介</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#2-Thread和Runnable的异同点"><span class="post-toc-number">2.</span> <span class="post-toc-text">2. Thread和Runnable的异同点</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#3-Thread和Runnable的多线程示例"><span class="post-toc-number">3.</span> <span class="post-toc-text">3. Thread和Runnable的多线程示例</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#3-1-Thread的多线程示例"><span class="post-toc-number">3.1.</span> <span class="post-toc-text">3.1 Thread的多线程示例</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#3-2-Runnable的多线程示例"><span class="post-toc-number">3.2.</span> <span class="post-toc-text">3.2 Runnable的多线程示例</span></a></li></ol></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”02之 常用的实现多线程的两种方式"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Java多线程系列--“基础篇”02之 常用的实现多线程的两种方式</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2016-11-02 00:00:00" datetime="2016-11-01T16:00:00.000Z"  itemprop="datePublished">2016-11-02</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <blockquote>
+<p>本章，我们学习“常用的实现多线程的2种方式”：Thread 和 Runnable。<br>之所以说是常用的，是因为通过还可以通过java.util.concurrent包中的线程池来实现多线程。关于线程池的内容，我们以后会详细介绍；现在，先对的Thread和Runnable进行了解。</p>
+</blockquote>
+<blockquote>
+<p><strong>目录</strong><br><a href="#anchor1">1. Thread和Runnable简介</a><br><a href="#anchor2">2. Thread和Runnable的异同点</a><br><a href="#anchor3">3. Thread和Runnable的多线程示例</a>   </p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="1-Thread和Runnable简介"><a href="#1-Thread和Runnable简介" class="headerlink" title="1. Thread和Runnable简介"></a>1. Thread和Runnable简介</h1><p>Runnable 是一个接口，该接口中只包含了一个run()方法。它的定义如下：</p>
+<pre><code>public interface Runnable {
+    public abstract void run();
+}
+</code></pre><p>Runnable的作用，实现多线程。我们可以定义一个类A实现Runnable接口；然后，通过new Thread(new A())等方式新建线程。</p>
+<p>Thread 是一个类。Thread本身就实现了Runnable接口。它的声明如下：</p>
+<pre><code>public class Thread implements Runnable {}
+</code></pre><p>Thread的作用，实现多线程。</p>
+<p><a name="anchor2"></a></p>
+<h1 id="2-Thread和Runnable的异同点"><a href="#2-Thread和Runnable的异同点" class="headerlink" title="2. Thread和Runnable的异同点"></a>2. Thread和Runnable的异同点</h1><p>Thread 和 Runnable 的相同点：都是“多线程的实现方式”。</p>
+<p>Thread 和 Runnable 的不同点：<br>Thread 是类，而Runnable是接口；Thread本身是实现了Runnable接口的类。我们知道“一个类只能有一个父类，但是却能实现多个接口”，因此Runnable具有更好的扩展性。<br>此外，Runnable还可以用于“资源的共享”。即，多个线程都是基于某一个Runnable对象建立的，它们会共享Runnable对象上的资源。</p>
+<p>通常，建议通过“Runnable”实现多线程！</p>
+<p><a name="anchor3"></a></p>
+<h1 id="3-Thread和Runnable的多线程示例"><a href="#3-Thread和Runnable的多线程示例" class="headerlink" title="3. Thread和Runnable的多线程示例"></a>3. Thread和Runnable的多线程示例</h1><h2 id="3-1-Thread的多线程示例"><a href="#3-1-Thread的多线程示例" class="headerlink" title="3.1 Thread的多线程示例"></a>3.1 Thread的多线程示例</h2><p>下面通过示例更好的理解Thread和Runnable，借鉴网上一个例子比较具有说服性的例子。</p>
+<pre><code>// ThreadTest.java 源码
+class MyThread extends Thread{
+    private int ticket=10;  
+    public void run(){
+        for(int i=0;i&lt;20;i++){ 
+            if(this.ticket&gt;0){
+                System.out.println(this.getName()+&quot; 卖票：ticket&quot;+this.ticket--);
+            }
+        }
+    } 
+};
+
+public class ThreadTest {  
+    public static void main(String[] args) {  
+        // 启动3个线程t1,t2,t3；每个线程各卖10张票！
+        MyThread t1=new MyThread();
+        MyThread t2=new MyThread();
+        MyThread t3=new MyThread();
+        t1.start();
+        t2.start();
+        t3.start();
+    }  
+} 
+</code></pre><p>运行结果：</p>
+<pre><code>Thread-0 卖票：ticket10
+Thread-1 卖票：ticket10
+Thread-2 卖票：ticket10
+Thread-1 卖票：ticket9
+Thread-0 卖票：ticket9
+Thread-1 卖票：ticket8
+Thread-2 卖票：ticket9
+Thread-1 卖票：ticket7
+Thread-0 卖票：ticket8
+Thread-1 卖票：ticket6
+Thread-2 卖票：ticket8
+Thread-1 卖票：ticket5
+Thread-0 卖票：ticket7
+Thread-1 卖票：ticket4
+Thread-2 卖票：ticket7
+Thread-1 卖票：ticket3
+Thread-0 卖票：ticket6
+Thread-1 卖票：ticket2
+Thread-2 卖票：ticket6
+Thread-2 卖票：ticket5
+Thread-2 卖票：ticket4
+Thread-1 卖票：ticket1
+Thread-0 卖票：ticket5
+Thread-2 卖票：ticket3
+Thread-0 卖票：ticket4
+Thread-2 卖票：ticket2
+Thread-0 卖票：ticket3
+Thread-2 卖票：ticket1
+Thread-0 卖票：ticket2
+Thread-0 卖票：ticket1
+</code></pre><p>结果说明：<br>(01) MyThread继承于Thread，它是自定义个线程。每个MyThread都会卖出10张票。<br>(02) 主线程main创建并启动3个MyThread子线程。每个子线程都各自卖出了10张票。</p>
+<h2 id="3-2-Runnable的多线程示例"><a href="#3-2-Runnable的多线程示例" class="headerlink" title="3.2 Runnable的多线程示例"></a>3.2 Runnable的多线程示例</h2><p>下面，我们对上面的程序进行修改。通过Runnable实现一个接口，从而实现多线程。</p>
+<pre><code>// RunnableTest.java 源码
+class MyThread implements Runnable{  
+    private int ticket=10;  
+    public void run(){
+        for(int i=0;i&lt;20;i++){ 
+            if(this.ticket&gt;0){
+                System.out.println(Thread.currentThread().getName()+&quot; 卖票：ticket&quot;+this.ticket--);
+            }
+        }
+    } 
+}; 
+
+public class RunnableTest {  
+    public static void main(String[] args) {  
+        MyThread mt=new MyThread();
+
+        // 启动3个线程t1,t2,t3(它们共用一个Runnable对象)，这3个线程一共卖10张票！
+        Thread t1=new Thread(mt);
+        Thread t2=new Thread(mt);
+        Thread t3=new Thread(mt);
+        t1.start();
+        t2.start();
+        t3.start();
+    }  
+}
+</code></pre><p>运行结果：</p>
+<pre><code>Thread-0 卖票：ticket10
+Thread-2 卖票：ticket8
+Thread-1 卖票：ticket9
+Thread-2 卖票：ticket6
+Thread-0 卖票：ticket7
+Thread-2 卖票：ticket4
+Thread-1 卖票：ticket5
+Thread-2 卖票：ticket2
+Thread-0 卖票：ticket3
+Thread-1 卖票：ticket1
+</code></pre><p>结果说明：<br>(01) 和上面“MyThread继承于Thread”不同；这里的MyThread实现了Thread接口。<br>(02) 主线程main创建并启动3个子线程，而且这3个子线程都是基于“mt这个Runnable对象”而创建的。运行结果是这3个子线程一共卖出了10张票。这说明它们是共享了MyThread接口的。</p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2018-06-27T09:39:57.949Z" itemprop="dateUpdated">2018-06-27 17:39:57</time>
+</span><br>
+
+
+        
+        本文固定链接：<a href="/2016/11/02/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”02之 常用的实现多线程的两种方式/" target="_blank" rel="external">https://smuwjs.github.io/2016/11/02/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”02之 常用的实现多线程的两种方式/</a>
+        
+    </div>
+    <footer>
+        <a href="https://smuwjs.github.io">
+            <img src="/img/head.png" alt="Jeeson">
+            Jeeson
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java多线程系列/">Java多线程系列</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java源码分析/">Java源码分析</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/11/02/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”02之 常用的实现多线程的两种方式/&title=《Java多线程系列--“基础篇”02之 常用的实现多线程的两种方式》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/11/02/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”02之 常用的实现多线程的两种方式/&title=《Java多线程系列--“基础篇”02之 常用的实现多线程的两种方式》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/11/02/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”02之 常用的实现多线程的两种方式/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Java多线程系列--“基础篇”02之 常用的实现多线程的两种方式》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/11/02/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”02之 常用的实现多线程的两种方式/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/11/02/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”02之 常用的实现多线程的两种方式/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2016/11/03/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”03之  Thread中start()和run()的区别/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">Java多线程系列--“基础篇”03之  Thread中start()和run()的区别</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2016/11/01/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”01之 基本概念/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Java多线程系列--“基础篇”01之 基本概念</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”02之 常用的实现多线程的两种方式" data-title="Java多线程系列--“基础篇”02之 常用的实现多线程的两种方式" data-url="https://smuwjs.github.io/2016/11/02/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”02之 常用的实现多线程的两种方式/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'smuwjs', theme: 'none'};
+lazyScripts.push('//unpkg.com/hexo-theme-material-indigo@latest/js/embed.min.js');
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循<a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>Jeeson &copy; 2015 - 2018</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/11/02/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”02之 常用的实现多线程的两种方式/&title=《Java多线程系列--“基础篇”02之 常用的实现多线程的两种方式》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/11/02/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”02之 常用的实现多线程的两种方式/&title=《Java多线程系列--“基础篇”02之 常用的实现多线程的两种方式》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/11/02/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”02之 常用的实现多线程的两种方式/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Java多线程系列--“基础篇”02之 常用的实现多线程的两种方式》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/11/02/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”02之 常用的实现多线程的两种方式/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/11/02/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”02之 常用的实现多线程的两种方式/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://smuwjs.github.io/2016/11/02/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”02之 常用的实现多线程的两种方式/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

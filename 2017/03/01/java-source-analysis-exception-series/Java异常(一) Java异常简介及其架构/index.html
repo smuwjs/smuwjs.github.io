@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>Java异常(一) Java异常简介及其架构 | Jeeson&#39;s Blog | Write the code. Change the world.</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="Java源码分析,Java异常系列">
+    <meta name="description" content="本章对Java中的异常进行介绍。   目录第1部分 Java异常简介第2部分 Java异常框架     第1部分 Java异常简介Java异常是Java提供的一种识别及响应错误的一致性机制。 Java异常机制可以使程序中异常处理代码和正常业务代码分离，保证程序代码更加优雅，并提高程序健壮性。在有效使用异常的情况下，异常能清晰的回答what, where, why这3个问题：异常类型回答了“什么”">
+<meta name="keywords" content="Java源码分析,Java异常系列">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java异常(一) Java异常简介及其架构">
+<meta property="og:url" content="https://smuwjs.github.io/2017/03/01/java-source-analysis-exception-series/Java异常(一) Java异常简介及其架构/index.html">
+<meta property="og:site_name" content="Jeeson&#39;s Blog">
+<meta property="og:description" content="本章对Java中的异常进行介绍。   目录第1部分 Java异常简介第2部分 Java异常框架     第1部分 Java异常简介Java异常是Java提供的一种识别及响应错误的一致性机制。 Java异常机制可以使程序中异常处理代码和正常业务代码分离，保证程序代码更加优雅，并提高程序健壮性。在有效使用异常的情况下，异常能清晰的回答what, where, why这3个问题：异常类型回答了“什么”">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://wangkuiwu.github.io/media/pic/java/exception/exception01-01.jpg">
+<meta property="og:updated_time" content="2018-06-27T09:39:57.941Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java异常(一) Java异常简介及其架构">
+<meta name="twitter:description" content="本章对Java中的异常进行介绍。   目录第1部分 Java异常简介第2部分 Java异常框架     第1部分 Java异常简介Java异常是Java提供的一种识别及响应错误的一致性机制。 Java异常机制可以使程序中异常处理代码和正常业务代码分离，保证程序代码更加优雅，并提高程序健壮性。在有效使用异常的情况下，异常能清晰的回答what, where, why这3个问题：异常类型回答了“什么”">
+<meta name="twitter:image" content="http://wangkuiwu.github.io/media/pic/java/exception/exception01-01.jpg">
+    
+        <link rel="alternate" type="application/atom+xml" title="Jeeson&#39;s Blog" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/head.png">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Jeeson</h5>
+          <a href="mailto:smuwjs@163.com" title="smuwjs@163.com" class="mail">smuwjs@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/smuwjs" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Java异常(一) Java异常简介及其架构</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Java异常(一) Java异常简介及其架构</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2017-02-28T16:00:00.000Z" itemprop="datePublished" class="page-time">
+  2017-03-01
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#第1部分-Java异常简介"><span class="post-toc-number">1.</span> <span class="post-toc-text">第1部分 Java异常简介</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#示例一-了解try和catch基本用法"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">示例一: 了解try和catch基本用法</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#示例二-了解finally的基本用法"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">示例二: 了解finally的基本用法</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#示例三-了解throws和throw的基本用法"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">示例三: 了解throws和throw的基本用法</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#第2部分-Java异常框架"><span class="post-toc-number">2.</span> <span class="post-toc-text">第2部分 Java异常框架</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#1-Throwable"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">1. Throwable</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#2-Exception"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">2. Exception</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#3-RuntimeException"><span class="post-toc-number">2.3.</span> <span class="post-toc-text">3. RuntimeException</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#4-Error"><span class="post-toc-number">2.4.</span> <span class="post-toc-text">4. Error</span></a></li></ol></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-java-source-analysis-exception-series/Java异常(一) Java异常简介及其架构"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Java异常(一) Java异常简介及其架构</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2017-03-01 00:00:00" datetime="2017-02-28T16:00:00.000Z"  itemprop="datePublished">2017-03-01</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <blockquote>
+<p>本章对Java中的异常进行介绍。</p>
+</blockquote>
+<blockquote>
+<p><strong>目录</strong><br><a href="#anchor1">第1部分 Java异常简介</a><br><a href="#anchor2">第2部分 Java异常框架</a>  </p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="第1部分-Java异常简介"><a href="#第1部分-Java异常简介" class="headerlink" title="第1部分 Java异常简介"></a>第1部分 Java异常简介</h1><p>Java异常是Java提供的一种识别及响应错误的一致性机制。</p>
+<p>Java异常机制可以使程序中异常处理代码和正常业务代码分离，保证程序代码更加优雅，并提高程序健壮性。在有效使用异常的情况下，异常能清晰的回答what, where, why这3个问题：异常类型回答了“什么”被抛出，异常堆栈跟踪回答了“在哪“抛出，异常信息回答了“为什么“会抛出。</p>
+<p>Java异常机制用到的几个关键字：try、catch、finally、throw、throws。</p>
+<table>
+<thead>
+<tr>
+<th>关键字</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>try</td>
+<td>用于监听。将要被监听的代码(可能抛出异常的代码)放在try语句块之内，当try语句块内发生异常时，异常就被抛出。</td>
+</tr>
+<tr>
+<td>catch</td>
+<td>用于捕获异常。catch用来捕获try语句块中发生的异常。</td>
+</tr>
+<tr>
+<td>finally</td>
+<td>finally语句块总是会被执行。它主要用于回收在try块里打开的物力资源(如数据库连接、网络连接和磁盘文件)。只有finally块，执行完成之后，才会回来执行try或者catch块中的return或者throw语句，如果finally中使用了return或者throw等终止方法的语句，则就不会跳回执行，直接停止。</td>
+</tr>
+<tr>
+<td>throw</td>
+<td>用于抛出异常。</td>
+</tr>
+<tr>
+<td>throws</td>
+<td>用在方法签名中，用于声明该方法可能抛出的异常。</td>
+</tr>
+</tbody>
+</table>
+<p>下面通过几个示例对这几个关键字进行简单了解。</p>
+<h2 id="示例一-了解try和catch基本用法"><a href="#示例一-了解try和catch基本用法" class="headerlink" title="示例一: 了解try和catch基本用法"></a>示例一: 了解try和catch基本用法</h2><pre><code>public class Demo1 {
+
+    public static void main(String[] args) {
+        try {
+            int i = 10/0;
+              System.out.println(&quot;i=&quot;+i); 
+        } catch (ArithmeticException e) {
+              System.out.println(&quot;Caught Exception&quot;); 
+            System.out.println(&quot;e.getMessage(): &quot; + e.getMessage()); 
+            System.out.println(&quot;e.toString(): &quot; + e.toString()); 
+            System.out.println(&quot;e.printStackTrace():&quot;);
+            e.printStackTrace(); 
+        }
+    }
+}
+</code></pre><p>运行结果：</p>
+<pre><code>Caught Exception
+e.getMessage(): / by zero
+e.toString(): java.lang.ArithmeticException: / by zero
+e.printStackTrace():
+java.lang.ArithmeticException: / by zero
+    at Demo1.main(Demo1.java:6)
+</code></pre><p>结果说明：在try语句块中有除数为0的操作，该操作会抛出java.lang.ArithmeticException异常。通过catch，对该异常进行捕获。<br>观察结果我们发现，并没有执行System.out.println(“i=”+i)。这说明try语句块发生异常之后，try语句块中的剩余内容就不会再被执行了。</p>
+<h2 id="示例二-了解finally的基本用法"><a href="#示例二-了解finally的基本用法" class="headerlink" title="示例二: 了解finally的基本用法"></a>示例二: 了解finally的基本用法</h2><p>在”示例一”的基础上，我们添加finally语句。</p>
+<pre><code>public class Demo2 {
+
+    public static void main(String[] args) {
+        try {
+            int i = 10/0;
+              System.out.println(&quot;i=&quot;+i); 
+        } catch (ArithmeticException e) {
+              System.out.println(&quot;Caught Exception&quot;); 
+            System.out.println(&quot;e.getMessage(): &quot; + e.getMessage()); 
+            System.out.println(&quot;e.toString(): &quot; + e.toString()); 
+            System.out.println(&quot;e.printStackTrace():&quot;);
+            e.printStackTrace(); 
+        } finally {
+            System.out.println(&quot;run finally&quot;);
+        }
+    }
+}
+</code></pre><p>运行结果：</p>
+<pre><code>Caught Exception
+e.getMessage(): / by zero
+e.toString(): java.lang.ArithmeticException: / by zero
+e.printStackTrace():
+java.lang.ArithmeticException: / by zero
+    at Demo2.main(Demo2.java:6)
+run finally
+</code></pre><p>结果说明：最终执行了finally语句块。</p>
+<h2 id="示例三-了解throws和throw的基本用法"><a href="#示例三-了解throws和throw的基本用法" class="headerlink" title="示例三: 了解throws和throw的基本用法"></a>示例三: 了解throws和throw的基本用法</h2><p>throws是用于声明抛出的异常，而throw是用于抛出异常。</p>
+<pre><code>class MyException extends Exception {
+    public MyException() {}
+    public MyException(String msg) {
+        super(msg);
+    }
+}
+
+public class Demo3 {
+
+    public static void main(String[] args) {
+        try {
+            test();
+        } catch (MyException e) {
+            System.out.println(&quot;Catch My Exception&quot;);
+            e.printStackTrace();
+        }
+    }
+    public static void test() throws MyException{
+        try {
+            int i = 10/0;
+              System.out.println(&quot;i=&quot;+i); 
+        } catch (ArithmeticException e) {
+            throw new MyException(&quot;This is MyException&quot;); 
+        }
+    }
+}
+</code></pre><p>运行结果：</p>
+<pre><code>Catch My Exception
+MyException: This is MyException
+    at Demo3.test(Demo3.java:24)
+    at Demo3.main(Demo3.java:13)
+</code></pre><p>结果说明：MyException是继承于Exception的子类。test()的try语句块中产生ArithmeticException异常(除数为0)，并在catch中捕获该异常；接着抛出MyException异常。main()方法对test()中抛出的MyException进行捕获处理。</p>
+<p><a name="anchor2"></a></p>
+<h1 id="第2部分-Java异常框架"><a href="#第2部分-Java异常框架" class="headerlink" title="第2部分 Java异常框架"></a>第2部分 Java异常框架</h1><p>Java异常架构图</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://wangkuiwu.github.io/media/pic/java/exception/exception01-01.jpg" alt="img" title="">
+                </div>
+                <div class="image-caption">img</div>
+            </figure>
+<h2 id="1-Throwable"><a href="#1-Throwable" class="headerlink" title="1. Throwable"></a>1. Throwable</h2><p>Throwable是 Java 语言中所有错误或异常的超类。<br>Throwable包含两个子类: Error 和 Exception。它们通常用于指示发生了异常情况。<br>Throwable包含了其线程创建时线程执行堆栈的快照，它提供了printStackTrace()等接口用于获取堆栈跟踪数据等信息。</p>
+<h2 id="2-Exception"><a href="#2-Exception" class="headerlink" title="2. Exception"></a>2. Exception</h2><p>Exception及其子类是 Throwable 的一种形式，它指出了合理的应用程序想要捕获的条件。</p>
+<h2 id="3-RuntimeException"><a href="#3-RuntimeException" class="headerlink" title="3. RuntimeException"></a>3. RuntimeException</h2><p>RuntimeException是那些可能在 Java 虚拟机正常运行期间抛出的异常的超类。</p>
+<p>编译器不会检查RuntimeException异常。例如，除数为零时，抛出ArithmeticException异常。RuntimeException是ArithmeticException的超类。当代码发生除数为零的情况时，倘若既”没有通过throws声明抛出ArithmeticException异常”，也”没有通过try…catch…处理该异常”，也能通过编译。这就是我们所说的”编译器不会检查RuntimeException异常”！<br>如果代码会产生RuntimeException异常，则需要通过修改代码进行避免。例如，若会发生除数为零的情况，则需要通过代码避免该情况的发生！</p>
+<h2 id="4-Error"><a href="#4-Error" class="headerlink" title="4. Error"></a>4. Error</h2><p>和Exception一样，Error也是Throwable的子类。它用于指示合理的应用程序不应该试图捕获的严重问题，大多数这样的错误都是异常条件。<br>和RuntimeException一样，编译器也不会检查Error。</p>
+<p>Java将可抛出(Throwable)的结构分为三种类型：被检查的异常(Checked Exception)，运行时异常(RuntimeException)和错误(Error)。</p>
+<p><br><br><strong>(01) 运行时异常</strong></p>
+<p>定义: RuntimeException及其子类都被称为运行时异常。<br>特点: Java编译器不会检查它。也就是说，当程序中可能出现这类异常时，倘若既”没有通过throws声明抛出它”，也”没有用try-catch语句捕获它”，还是会编译通过。例如，除数为零时产生的ArithmeticException异常，数组越界时产生的IndexOutOfBoundsException异常，fail-fail机制产生的ConcurrentModificationException异常等，都属于运行时异常。<br>&nbsp;&nbsp;&nbsp;&nbsp; 虽然Java编译器不会检查运行时异常，但是我们也可以通过throws进行声明抛出，也可以通过try-catch对它进行捕获处理。<br>&nbsp;&nbsp;&nbsp;&nbsp; 如果产生运行时异常，则需要通过修改代码来进行避免。例如，若会发生除数为零的情况，则需要通过代码避免该情况的发生！</p>
+<p><br><br><strong>(02) 被检查的异常</strong></p>
+<p>定义: Exception类本身，以及Exception的子类中除了”运行时异常”之外的其它子类都属于被检查异常。<br>特点: Java编译器会检查它。此类异常，要么通过throws进行声明抛出，要么通过try-catch进行捕获处理，否则不能通过编译。例如，CloneNotSupportedException就属于被检查异常。当通过clone()接口去克隆一个对象，而该对象对应的类没有实现Cloneable接口，就会抛出CloneNotSupportedException异常。<br>&nbsp;&nbsp;&nbsp;&nbsp; 被检查异常通常都是可以恢复的。</p>
+<p><br><br><strong>(03) 错误</strong></p>
+<p>定义: Error类及其子类。<br>特点: 和运行时异常一样，编译器也不会对错误进行检查。<br>&nbsp;&nbsp;&nbsp;&nbsp; 当资源不足、约束失败、或是其它程序无法继续运行的条件发生时，就产生错误。程序本身无法修复这些错误的。例如，VirtualMachineError就属于错误。<br>&nbsp;&nbsp;&nbsp;&nbsp; 按照Java惯例，我们是不应该是实现任何新的Error子类的！</p>
+<p>对于上面的3种结构，我们在抛出异常或错误时，到底该哪一种？《Effective Java》中给出的建议是：对于可以恢复的条件使用被检查异常，对于程序错误使用运行时异常。</p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2018-06-27T09:39:57.941Z" itemprop="dateUpdated">2018-06-27 17:39:57</time>
+</span><br>
+
+
+        
+        本文固定链接：<a href="/2017/03/01/java-source-analysis-exception-series/Java异常(一) Java异常简介及其架构/" target="_blank" rel="external">https://smuwjs.github.io/2017/03/01/java-source-analysis-exception-series/Java异常(一) Java异常简介及其架构/</a>
+        
+    </div>
+    <footer>
+        <a href="https://smuwjs.github.io">
+            <img src="/img/head.png" alt="Jeeson">
+            Jeeson
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java异常系列/">Java异常系列</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java源码分析/">Java源码分析</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2017/03/01/java-source-analysis-exception-series/Java异常(一) Java异常简介及其架构/&title=《Java异常(一) Java异常简介及其架构》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2017/03/01/java-source-analysis-exception-series/Java异常(一) Java异常简介及其架构/&title=《Java异常(一) Java异常简介及其架构》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2017/03/01/java-source-analysis-exception-series/Java异常(一) Java异常简介及其架构/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Java异常(一) Java异常简介及其架构》 — Jeeson's Blog&url=https://smuwjs.github.io/2017/03/01/java-source-analysis-exception-series/Java异常(一) Java异常简介及其架构/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2017/03/01/java-source-analysis-exception-series/Java异常(一) Java异常简介及其架构/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2017/03/02/java-source-analysis-exception-series/Java异常(二) 《Effective Java》中关于异常处理的几条建议/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">Java异常(二) 《Effective Java》中关于异常处理的几条建议</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2017/02/07/java-source-analysis-time-series/Java 时间相关内容07 TimeZone/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Java 时间相关内容07 TimeZone</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="java-source-analysis-exception-series/Java异常(一) Java异常简介及其架构" data-title="Java异常(一) Java异常简介及其架构" data-url="https://smuwjs.github.io/2017/03/01/java-source-analysis-exception-series/Java异常(一) Java异常简介及其架构/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'smuwjs', theme: 'none'};
+lazyScripts.push('//unpkg.com/hexo-theme-material-indigo@latest/js/embed.min.js');
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循<a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>Jeeson &copy; 2015 - 2018</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2017/03/01/java-source-analysis-exception-series/Java异常(一) Java异常简介及其架构/&title=《Java异常(一) Java异常简介及其架构》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2017/03/01/java-source-analysis-exception-series/Java异常(一) Java异常简介及其架构/&title=《Java异常(一) Java异常简介及其架构》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2017/03/01/java-source-analysis-exception-series/Java异常(一) Java异常简介及其架构/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Java异常(一) Java异常简介及其架构》 — Jeeson's Blog&url=https://smuwjs.github.io/2017/03/01/java-source-analysis-exception-series/Java异常(一) Java异常简介及其架构/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2017/03/01/java-source-analysis-exception-series/Java异常(一) Java异常简介及其架构/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://smuwjs.github.io/2017/03/01/java-source-analysis-exception-series/Java异常(一) Java异常简介及其架构/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

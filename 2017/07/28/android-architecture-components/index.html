@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>浅谈Android Architecture Components | Jeeson&#39;s Blog | Write the code. Change the world.</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="Android,Android Architecture">
+    <meta name="description" content="原文地址  浅谈Android Architecture Components [TOC] 简介Google IO 2017发布Android Architecture Components，自己先研究了一下，蛮有意思的，特来记录一下。本文内容主要是参考官方文档以及自己的理解，如有错误之处，恳请指出。 Android Architecture ComponentsAndroid Architec">
+<meta name="keywords" content="Android,Android Architecture">
+<meta property="og:type" content="article">
+<meta property="og:title" content="浅谈Android Architecture Components">
+<meta property="og:url" content="https://smuwjs.github.io/2017/07/28/android-architecture-components/index.html">
+<meta property="og:site_name" content="Jeeson&#39;s Blog">
+<meta property="og:description" content="原文地址  浅谈Android Architecture Components [TOC] 简介Google IO 2017发布Android Architecture Components，自己先研究了一下，蛮有意思的，特来记录一下。本文内容主要是参考官方文档以及自己的理解，如有错误之处，恳请指出。 Android Architecture ComponentsAndroid Architec">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/LiushuiXiaoxia/AndroidArchitectureComponents/master/doc/final-architecture.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/LiushuiXiaoxia/AndroidArchitectureComponents/master/doc/lifecycle-states.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/LiushuiXiaoxia/AndroidArchitectureComponents/master/doc/viewmodel-lifecycle.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/LiushuiXiaoxia/AndroidArchitectureComponents/master/doc/room_architecture.png">
+<meta property="og:updated_time" content="2018-06-27T09:39:57.937Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="浅谈Android Architecture Components">
+<meta name="twitter:description" content="原文地址  浅谈Android Architecture Components [TOC] 简介Google IO 2017发布Android Architecture Components，自己先研究了一下，蛮有意思的，特来记录一下。本文内容主要是参考官方文档以及自己的理解，如有错误之处，恳请指出。 Android Architecture ComponentsAndroid Architec">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/LiushuiXiaoxia/AndroidArchitectureComponents/master/doc/final-architecture.png">
+    
+        <link rel="alternate" type="application/atom+xml" title="Jeeson&#39;s Blog" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/head.png">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Jeeson</h5>
+          <a href="mailto:smuwjs@163.com" title="smuwjs@163.com" class="mail">smuwjs@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/smuwjs" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">浅谈Android Architecture Components</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">浅谈Android Architecture Components</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2017-07-27T17:01:01.000Z" itemprop="datePublished" class="page-time">
+  2017-07-28
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/architecture/">architecture</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#浅谈Android-Architecture-Components"><span class="post-toc-number">1.</span> <span class="post-toc-text">浅谈Android Architecture Components</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#简介"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">简介</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Android-Architecture-Components"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">Android Architecture Components</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Gradle-集成"><span class="post-toc-number">1.2.1.</span> <span class="post-toc-text">Gradle 集成</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#LifeCycles"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">LifeCycles</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#LiveData"><span class="post-toc-number">1.4.</span> <span class="post-toc-text">LiveData</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Transformations"><span class="post-toc-number">1.4.1.</span> <span class="post-toc-text">Transformations</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#ViewModel"><span class="post-toc-number">1.5.</span> <span class="post-toc-text">ViewModel</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Room"><span class="post-toc-number">1.6.</span> <span class="post-toc-text">Room</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Entities"><span class="post-toc-number">1.6.1.</span> <span class="post-toc-text">Entities</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Entity的参数-primaryKeys"><span class="post-toc-number">1.6.2.</span> <span class="post-toc-text">Entity的参数 primaryKeys</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Entity的参数-tableName"><span class="post-toc-number">1.6.3.</span> <span class="post-toc-text">Entity的参数 tableName</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Entity的参数-indices"><span class="post-toc-number">1.6.4.</span> <span class="post-toc-text">Entity的参数 indices</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Entity的参数-foreignKeys"><span class="post-toc-number">1.6.5.</span> <span class="post-toc-text">Entity的参数 foreignKeys</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Dao"><span class="post-toc-number">1.6.6.</span> <span class="post-toc-text">Dao</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#DAO的Insert-操作"><span class="post-toc-number">1.6.7.</span> <span class="post-toc-text">DAO的Insert 操作</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#DAO的Update、Delete操作"><span class="post-toc-number">1.6.8.</span> <span class="post-toc-text">DAO的Update、Delete操作</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#DAO的Query-操作"><span class="post-toc-number">1.6.9.</span> <span class="post-toc-text">DAO的Query 操作</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#返回子集"><span class="post-toc-number">1.6.10.</span> <span class="post-toc-text">返回子集</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#支持集合参数"><span class="post-toc-number">1.6.11.</span> <span class="post-toc-text">支持集合参数</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#支持Observable"><span class="post-toc-number">1.6.12.</span> <span class="post-toc-text">支持Observable</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#支持RxJava"><span class="post-toc-number">1.6.13.</span> <span class="post-toc-text">支持RxJava</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#支持Cursor"><span class="post-toc-number">1.6.14.</span> <span class="post-toc-text">支持Cursor</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#多表查询"><span class="post-toc-number">1.6.15.</span> <span class="post-toc-text">多表查询</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#类型转换"><span class="post-toc-number">1.6.16.</span> <span class="post-toc-text">类型转换</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#数据库升级"><span class="post-toc-number">1.6.17.</span> <span class="post-toc-text">数据库升级</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#输出模式"><span class="post-toc-number">1.6.18.</span> <span class="post-toc-text">输出模式</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Sample"><span class="post-toc-number">1.7.</span> <span class="post-toc-text">Sample</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#总结"><span class="post-toc-number">1.8.</span> <span class="post-toc-text">总结</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#相关资料"><span class="post-toc-number">1.9.</span> <span class="post-toc-text">相关资料</span></a></li></ol></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-android-architecture-components"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">浅谈Android Architecture Components</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2017-07-28 01:01:01" datetime="2017-07-27T17:01:01.000Z"  itemprop="datePublished">2017-07-28</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/architecture/">architecture</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <blockquote>
+<p><a href="https://github.com/LiushuiXiaoxia/AndroidArchitectureComponents/" target="_blank" rel="noopener">原文地址</a></p>
+</blockquote>
+<h1 id="浅谈Android-Architecture-Components"><a href="#浅谈Android-Architecture-Components" class="headerlink" title="浅谈Android Architecture Components"></a>浅谈Android Architecture Components</h1><hr>
+<p>[TOC]</p>
+<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>Google IO 2017发布Android Architecture Components，自己先研究了一下，蛮有意思的，特来记录一下。本文内容主要是参考<a href="https://developer.android.com/topic/libraries/architecture/index.html" target="_blank" rel="noopener">官方文档</a>以及自己的理解，如有错误之处，恳请指出。</p>
+<h2 id="Android-Architecture-Components"><a href="#Android-Architecture-Components" class="headerlink" title="Android Architecture Components"></a>Android Architecture Components</h2><p>Android Architecture Components是Google发布的一套新的架构组件，使App的架构更加健壮，后面简称AAC。</p>
+<p>AAC主要提供了Lifecycle，ViewModel，LiveData，Room等功能，下面依次说明：</p>
+<ul>
+<li>Lifecycle</li>
+</ul>
+<p>生命周期管理，把原先Android生命周期的中的代码抽取出来，如将原先需要在onStart()等生命周期中执行的代码分离到Activity或者Fragment之外。</p>
+<ul>
+<li>LiveData</li>
+</ul>
+<p>一个数据持有类，持有数据并且这个数据可以被观察被监听，和其他Observer不同的是，它是和Lifecycle是绑定的，在生命周期内使用有效，减少内存泄露和引用问题。</p>
+<ul>
+<li>ViewModel</li>
+</ul>
+<p>用于实现架构中的ViewModel，同时是与Lifecycle绑定的，使用者无需担心生命周期。可以在多个Fragment之间共享数据，比如旋转屏幕后Activity会重新create，这时候使用ViewModel还是之前的数据，不需要再次请求网络数据。</p>
+<ul>
+<li>Room</li>
+</ul>
+<p>谷歌推出的一个Sqlite ORM库，不过使用起来还不错，使用注解，极大简化数据库的操作，有点类似Retrofit的风格。</p>
+<p>AAC的架构是这样的：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="https://raw.githubusercontent.com/LiushuiXiaoxia/AndroidArchitectureComponents/master/doc/final-architecture.png" alt="新的架构" title="">
+                </div>
+                <div class="image-caption">新的架构</div>
+            </figure>
+<ul>
+<li>Activity/Fragment</li>
+</ul>
+<p>UI层，通常是Activity/Fragment等，监听ViewModel，当VIewModel数据更新时刷新UI，监听用户事件反馈到ViewModel，主流的数据驱动界面。</p>
+<ul>
+<li>ViewModel</li>
+</ul>
+<p>持有或保存数据，向Repository中获取数据，响应UI层的事件，执行响应的操作，响应数据变化并通知到UI层。</p>
+<ul>
+<li>Repository</li>
+</ul>
+<p>App的完全的数据模型，ViewModel交互的对象，提供简单的数据修改和获取的接口，配合好网络层数据的更新与本地持久化数据的更新，同步等</p>
+<ul>
+<li>Data Source</li>
+</ul>
+<p>包含本地的数据库等，网络api等，这些基本上和现有的一些MVVM，以及Clean架构的组合比较相似</p>
+<h3 id="Gradle-集成"><a href="#Gradle-集成" class="headerlink" title="Gradle 集成"></a>Gradle 集成</h3><p>根目录gradle文件中添加Google Maven Repository</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">allprojects</span> &#123;</span><br><span class="line">    <span class="keyword">repositories</span> &#123;</span><br><span class="line">        jcenter()</span><br><span class="line">        maven &#123; url <span class="string">'https://maven.google.com'</span> &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在模块中添加对应的依赖</p>
+<p>如使用Lifecycle,LiveData、ViewModel，添加如下依赖。</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">compile</span> <span class="string">"android.arch.lifecycle:runtime:1.0.0-alpha1"</span></span><br><span class="line"><span class="keyword">compile</span> <span class="string">"android.arch.lifecycle:extensions:1.0.0-alpha1"</span></span><br><span class="line">annotationProcessor <span class="string">"android.arch.lifecycle:compiler:1.0.0-alpha1"</span></span><br></pre></td></tr></table></figure>
+<p>如使用Room功能，添加如下依赖。</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">compile</span> <span class="string">"android.arch.persistence.room:runtime:1.0.0-alpha1"</span></span><br><span class="line">annotationProcessor <span class="string">"android.arch.persistence.room:compiler:1.0.0-alpha1"</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// For testing Room migrations, add:</span></span><br><span class="line">testCompile <span class="string">"android.arch.persistence.room:testing:1.0.0-alpha1"</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// For Room RxJava support, add:</span></span><br><span class="line"><span class="keyword">compile</span> <span class="string">"android.arch.persistence.room:rxjava2:1.0.0-alpha1"</span></span><br></pre></td></tr></table></figure>
+<h2 id="LifeCycles"><a href="#LifeCycles" class="headerlink" title="LifeCycles"></a>LifeCycles</h2><p>Android开发中，经常需要管理生命周期。举个栗子，我们需要获取用户的地址位置，当这个Activity在显示的时候，我们开启定位功能，然后实时获取到定位信息，当页面被销毁的时候，需要关闭定位功能。</p>
+<p>下面是简单的示例代码。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyLocationListener</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">MyLocationListener</span><span class="params">(Context context, Callback callback)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">start</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">// connect to system location service</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">stop</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">// disconnect from system location service</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyActivity</span> <span class="keyword">extends</span> <span class="title">AppCompatActivity</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> MyLocationListener myLocationListener;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(...)</span> </span>&#123;</span><br><span class="line">        myLocationListener = <span class="keyword">new</span> MyLocationListener(<span class="keyword">this</span>, (location) -&gt; &#123;</span><br><span class="line">            <span class="comment">// update UI</span></span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onStart</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onStart();</span><br><span class="line">        myLocationListener.start();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onStop</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onStop();</span><br><span class="line">        myLocationListener.stop();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上面只是一个简单的场景，我们来个复杂一点的场景。当定位功能需要满足一些条件下才开启，那么会变得复杂多了。可能在执行Activity的stop方法时，定位的start方法才刚刚开始执行，比如如下代码，这样生命周期管理就变得很麻烦了。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyActivity</span> <span class="keyword">extends</span> <span class="title">AppCompatActivity</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> MyLocationListener myLocationListener;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(...)</span> </span>&#123;</span><br><span class="line">        myLocationListener = <span class="keyword">new</span> MyLocationListener(<span class="keyword">this</span>, location -&gt; &#123;</span><br><span class="line">            <span class="comment">// update UI</span></span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onStart</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onStart();</span><br><span class="line">        Util.checkUserStatus(result -&gt; &#123;</span><br><span class="line">            <span class="comment">// what if this callback is invoked AFTER activity is stopped?</span></span><br><span class="line">            <span class="keyword">if</span> (result) &#123;</span><br><span class="line">                myLocationListener.start();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onStop</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onStop();</span><br><span class="line">        myLocationListener.stop();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>AAC中提供了Lifecycle，用来帮助我们解决这样的问题。LifeCycle使用2个枚举类来解决生命周期管理问题。一个是事件，一个是状态。</p>
+<p>事件：</p>
+<p>生命周期事件由系统来分发，这些事件对于与Activity和Fragment的生命周期函数。</p>
+<p>状态：</p>
+<p>Lifecycle的状态，用于追踪中Lifecycle对象，如下图所示。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="https://raw.githubusercontent.com/LiushuiXiaoxia/AndroidArchitectureComponents/master/doc/lifecycle-states.png" alt="Lifecycle的状态" title="">
+                </div>
+                <div class="image-caption">Lifecycle的状态</div>
+            </figure>
+<p>上面的定位功能代码，使用LifeCycle实现以后是这样的，实现一个<code>LifecycleObserver</code>接口，然后用注解标注状态，最后在LifecycleOwner中添加监听。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyObserver</span> <span class="keyword">implements</span> <span class="title">LifecycleObserver</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@OnLifecycleEvent</span>(Lifecycle.Event.ON_RESUME)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onResume</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@OnLifecycleEvent</span>(Lifecycle.Event.ON_PAUSE)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onPause</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">aLifecycleOwner.getLifecycle().addObserver(<span class="keyword">new</span> MyObserver());</span><br></pre></td></tr></table></figure>
+<p>上面代码中用到了<code>aLifecycleOwner</code>是<code>LifecycleOwner</code>接口对象，<code>LifecycleOwner</code>是一个只有一个方法的接口<code>getLifecycle()</code>，需要由子类来实现。</p>
+<p>在Lib中已经有实现好的子类，我们可以直接拿来使用。比如<code>LifecycleActivity</code>和<code>LifecycleFragment</code>，我们只需要继承此类就行了。</p>
+<p>当然实际开发的时候我们会自己定义BaseActivity，Java是单继承模式，那么需要自己实现<code>LifecycleRegistryOwner</code>接口。</p>
+<p>如下所示即可，代码很近简单</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BaseFragment</span> <span class="keyword">extends</span> <span class="title">Fragment</span> <span class="keyword">implements</span> <span class="title">LifecycleRegistryOwner</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    LifecycleRegistry lifecycleRegistry = <span class="keyword">new</span> LifecycleRegistry(<span class="keyword">this</span>);</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> LifecycleRegistry <span class="title">getLifecycle</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> lifecycleRegistry;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="LiveData"><a href="#LiveData" class="headerlink" title="LiveData"></a>LiveData</h2><p>LiveData 是一个 Data Holder 类，可以持有数据，同时这个数据可以被监听的，当数据改变的时候，可以触发回调。但是又不像普通的<code>Observable</code>，LiveData绑定了App的组件，LiveData可以指定在LifeCycle的某个状态被触发。比如LiveData可以指定在LifeCycle的 STARTED 或 RESUMED状体被触发。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">LocationLiveData</span> <span class="keyword">extends</span> <span class="title">LiveData</span>&lt;<span class="title">Location</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> LocationManager locationManager;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> SimpleLocationListener listener = <span class="keyword">new</span> SimpleLocationListener() &#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onLocationChanged</span><span class="params">(Location location)</span> </span>&#123;</span><br><span class="line">            setValue(location);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">LocationLiveData</span><span class="params">(Context context)</span> </span>&#123;</span><br><span class="line">        locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onActive</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, <span class="number">0</span>, <span class="number">0</span>, listener);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onInactive</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        locationManager.removeUpdates(listener);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>onActive()</li>
+</ul>
+<p>这个方法在LiveData在被激活的状态下执行，我们可以开始执行一些操作。</p>
+<ul>
+<li>onActive()</li>
+</ul>
+<p>这个方法在LiveData在的失去活性状态下执行，我们可以结束执行一些操作。</p>
+<ul>
+<li>setValue()</li>
+</ul>
+<p>执行这个方法的时候，LiveData可以触发它的回调。</p>
+<p><code>LocationLiveData</code>可以这样使用。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyFragment</span> <span class="keyword">extends</span> <span class="title">LifecycleFragment</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onActivityCreated</span> <span class="params">(Bundle savedInstanceState)</span> </span>&#123;</span><br><span class="line">        LiveData&lt;Location&gt; myLocationListener = ...;</span><br><span class="line">        Util.checkUserStatus(result -&gt; &#123;</span><br><span class="line">            <span class="keyword">if</span> (result) &#123;</span><br><span class="line">                myLocationListener.addObserver(<span class="keyword">this</span>, location -&gt; &#123;</span><br><span class="line">                    <span class="comment">// update UI</span></span><br><span class="line">                &#125;);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>注意，上面的<code>addObserver</code>方法，必须传<code>LifecycleOwner</code>对象，也就是说添加的对象必须是可以被LifeCycle管理的。</p>
+<p>如果LifeCycle没有触发对对应的状态（STARTED or RESUMED），它的值被改变了，那么Observe就不会被执行，</p>
+<p>如果LifeCycle被销毁了，那么Observe将自动被删除。</p>
+<p>实际上LiveData就提供一种新的供数据共享方式。可以用它在多个Activity、Fragment等其他有生命周期管理的类中实现数据共享。</p>
+<p>还是上面的定位例子。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">LocationLiveData</span> <span class="keyword">extends</span> <span class="title">LiveData</span>&lt;<span class="title">Location</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> LocationLiveData sInstance;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> LocationManager locationManager;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@MainThread</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> LocationLiveData <span class="title">get</span><span class="params">(Context context)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (sInstance == <span class="keyword">null</span>) &#123;</span><br><span class="line">            sInstance = <span class="keyword">new</span> LocationLiveData(context.getApplicationContext());</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> sInstance;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> SimpleLocationListener listener = <span class="keyword">new</span> SimpleLocationListener() &#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onLocationChanged</span><span class="params">(Location location)</span> </span>&#123;</span><br><span class="line">            setValue(location);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="title">LocationLiveData</span><span class="params">(Context context)</span> </span>&#123;</span><br><span class="line">        locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onActive</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, <span class="number">0</span>, <span class="number">0</span>, listener);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onInactive</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        locationManager.removeUpdates(listener);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>然后在Fragment中调用。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyFragment</span> <span class="keyword">extends</span> <span class="title">LifecycleFragment</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onActivityCreated</span> <span class="params">(Bundle savedInstanceState)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        Util.checkUserStatus(result -&gt; &#123;</span><br><span class="line">            <span class="keyword">if</span> (result) &#123;</span><br><span class="line">                LocationLiveData.get(getActivity()).observe(<span class="keyword">this</span>, location -&gt; &#123;</span><br><span class="line">                   <span class="comment">// update UI</span></span><br><span class="line">                &#125;);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>从上面的示例，可以得到使用LiveData优点：</p>
+<ul>
+<li><p>没有内存泄露的风险，全部绑定到对应的生命周期，当LifeCycle被销毁的时候，它们也自动被移除</p>
+</li>
+<li><p>降低Crash，当Activity被销毁的时候，LiveData的Observer自动被删除，然后UI就不会再接受到通知</p>
+</li>
+<li><p>实时数据，因为LiveData是持有真正的数据的，所以当生命周期又重新开始的时候，又可以重新拿到数据</p>
+</li>
+<li><p>正常配置改变，当Activity或者Fragment重新创建的时候，可以从LiveData中获取上一次有用的数据</p>
+</li>
+<li><p>不再需要手动的管理生命周期</p>
+</li>
+</ul>
+<h3 id="Transformations"><a href="#Transformations" class="headerlink" title="Transformations"></a>Transformations</h3><p>有时候需要对一个LiveData做Observer，但是这个LiveData是依赖另外一个LiveData，有点类似于RxJava中的操作符，我们可以这样做。</p>
+<ul>
+<li>Transformations.map()</li>
+</ul>
+<p>用于事件流的传递，用于触发下游数据。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">LiveData&lt;User&gt; userLiveData = ...;</span><br><span class="line">LiveData&lt;String&gt; userName = Transformations.map(userLiveData, user -&gt; &#123;</span><br><span class="line">    user.name + <span class="string">" "</span> + user.lastName</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<ul>
+<li>Transformations.switchMap()</li>
+</ul>
+<p>这个和map类似，只不过这个是用来触发上游数据。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> LiveData&lt;User&gt; <span class="title">getUser</span><span class="params">(String id)</span> </span>&#123;</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">LiveData&lt;String&gt; userId = ...;</span><br><span class="line">LiveData&lt;User&gt; user = Transformations.switchMap(userId, id -&gt; getUser(id) );</span><br></pre></td></tr></table></figure>
+<h2 id="ViewModel"><a href="#ViewModel" class="headerlink" title="ViewModel"></a>ViewModel</h2><p>ViewModel是用来存储UI层的数据，以及管理对应的数据，当数据修改的时候，可以马上刷新UI。</p>
+<p>Android系统提供控件，比如Activity和Fragment，这些控件都是具有生命周期方法，这些生命周期方法被系统调用。</p>
+<p>当这些控件被销毁或者被重建的时候，如果数据保存在这些对象中，那么数据就会丢失。比如在一个界面，保存了一些用户信息，当界面重新创建的时候，就需要重新去获取数据。当然了也可以使用控件自动再带的方法，在<code>onSaveInstanceState</code>方法中保存数据，在onCreate中重新获得数据，但这仅仅在数据量比较小的情况下。如果数据量很大，这种方法就不能适用了。</p>
+<p>另外一个问题就是，经常需要在Activity中加载数据，这些数据可能是异步的，因为获取数据需要花费很长的时间。那么Activity就需要管理这些数据调用，否则很有可能会产生内存泄露问题。最后需要做很多额外的操作，来保证程序的正常运行。</p>
+<p>同时Activity不仅仅只是用来加载数据的，还要加载其他资源，做其他的操作，最后Activity类变大，就是我们常讲的上帝类。也有不少架构是把一些操作放到单独的类中，比如MVP就是这样，创建相同类似于生命周期的函数做代理，这样可以减少Activity的代码量，但是这样就会变得很复杂，同时也难以测试。</p>
+<p>AAC中提供ViewModel可以很方便的用来管理数据。我们可以利用它来管理UI组件与数据的绑定关系。ViewModel提供自动绑定的形式，当数据源有更新的时候，可以自动立即的更新UI。</p>
+<p>下面是一个简单的代码示例。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyViewModel</span> <span class="keyword">extends</span> <span class="title">ViewModel</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> MutableLiveData&lt;List&lt;User&gt;&gt; users;</span><br><span class="line">    <span class="keyword">public</span> LiveData&lt;List&lt;User&gt;&gt; getUsers() &#123;</span><br><span class="line">        <span class="keyword">if</span> (users == <span class="keyword">null</span>) &#123;</span><br><span class="line">            users = <span class="keyword">new</span> MutableLiveData&lt;List&lt;Users&gt;&gt;();</span><br><span class="line">            loadUsers();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> users;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">loadUsers</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">// do async operation to fetch users</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyActivity</span> <span class="keyword">extends</span> <span class="title">AppCompatActivity</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>&#123;</span><br><span class="line">        MyViewModel model = ViewModelProviders.of(<span class="keyword">this</span>).get(MyViewModel.class);</span><br><span class="line">        model.getUsers().observe(<span class="keyword">this</span>, users -&gt; &#123;</span><br><span class="line">            <span class="comment">// update UI</span></span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>当我们获取ViewModel实例的时候，ViewModel是通过ViewModelProvider保存在LifeCycle中，ViewModel会一直保存在LifeCycle中，直到Activity或者Fragment销毁了，触发LifeCycle被销毁，那么ViewModel也会被销毁的。下面是ViewModel的生命周期图。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="https://raw.githubusercontent.com/LiushuiXiaoxia/AndroidArchitectureComponents/master/doc/viewmodel-lifecycle.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<h2 id="Room"><a href="#Room" class="headerlink" title="Room"></a>Room</h2><p>Room是一个持久化工具，和ormlite、greenDao类似，都是ORM工具。在开发中我们可以利用Room来操作sqlite数据库。</p>
+<p>Room主要分为三个部分:</p>
+<ul>
+<li>Database</li>
+</ul>
+<p>使用注解申明一个类，注解中包含若干个Entity类，这个Database类主要负责创建数据库以及获取数据对象的。</p>
+<ul>
+<li>Entity</li>
+</ul>
+<p>表示每个数据库的总的一个表结构，同样也是使用注解表示，类中的每个字段都对应表中的一列。</p>
+<ul>
+<li>DAO</li>
+</ul>
+<p>DAO是 Data Access Object的缩写，表示从从代码中直接访问数据库，屏蔽sql语句。</p>
+<p>下面是官方给的结构图。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="https://raw.githubusercontent.com/LiushuiXiaoxia/AndroidArchitectureComponents/master/doc/room_architecture.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>代码示例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// User.java</span></span><br><span class="line"><span class="meta">@Entity</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">User</span> </span>&#123;</span><br><span class="line">    <span class="meta">@PrimaryKey</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> uid;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@ColumnInfo</span>(name = <span class="string">"first_name"</span>)</span><br><span class="line">    <span class="keyword">private</span> String firstName;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@ColumnInfo</span>(name = <span class="string">"last_name"</span>)</span><br><span class="line">    <span class="keyword">private</span> String lastName;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Getters and setters are ignored for brevity,</span></span><br><span class="line">    <span class="comment">// but they're required for Room to work.</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// UserDao.java</span></span><br><span class="line"><span class="meta">@Dao</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">UserDao</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Query</span>(<span class="string">"SELECT * FROM user"</span>)</span><br><span class="line">    <span class="function">List&lt;User&gt; <span class="title">getAll</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Query</span>(<span class="string">"SELECT * FROM user WHERE uid IN (:userIds)"</span>)</span><br><span class="line">    <span class="function">List&lt;User&gt; <span class="title">loadAllByIds</span><span class="params">(<span class="keyword">int</span>[] userIds)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Query</span>(<span class="string">"SELECT * FROM user WHERE first_name LIKE :first AND "</span></span><br><span class="line">           + <span class="string">"last_name LIKE :last LIMIT 1"</span>)</span><br><span class="line">    <span class="function">User <span class="title">findByName</span><span class="params">(String first, String last)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Insert</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">insertAll</span><span class="params">(User... users)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Delete</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">delete</span><span class="params">(User user)</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// AppDatabase.java</span></span><br><span class="line"><span class="meta">@Database</span>(entities = &#123;User.class&#125;, version = <span class="number">1</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">AppDatabase</span> <span class="keyword">extends</span> <span class="title">RoomDatabase</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> UserDao <span class="title">userDao</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>最后在代码中调用Database对象</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">AppDatabase db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, <span class="string">"database-name"</span>).build();</span><br></pre></td></tr></table></figure>
+<p><strong>注意：</strong> Database最好设计成单利模式，否则对象太多会有性能的影响。</p>
+<h3 id="Entities"><a href="#Entities" class="headerlink" title="Entities"></a>Entities</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Entity</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">User</span> </span>&#123;</span><br><span class="line">    <span class="meta">@PrimaryKey</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> id;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@ColumnInfo</span>(name = <span class="string">"first_name"</span>)</span><br><span class="line">    <span class="keyword">public</span> String firstName;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@ColumnInfo</span>(name = <span class="string">"last_name"</span>)</span><br><span class="line">    <span class="keyword">public</span> String lastName;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Ignore</span></span><br><span class="line">    Bitmap picture;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>@Entity用来注解一个实体类，对应数据库一张表。默认情况下，Room为实体中定义的每个成员变量在数据中创建对应的字段，我们可能不想保存到数据库的字段，这时候就要用道@Ignore注解。</p>
+<p><strong>注意：</strong> 为了保存每一个字段，这个字段需要有可以访问的gettter/setter方法或者是public的属性</p>
+<h3 id="Entity的参数-primaryKeys"><a href="#Entity的参数-primaryKeys" class="headerlink" title="Entity的参数 primaryKeys"></a>Entity的参数 primaryKeys</h3><p>每个实体必须至少定义1个字段作为主键，即使只有一个成员变量，除了使用@PrimaryKey 将字段标记为主键的方式之外，还可以通过在@Entity注解中指定参数的形式</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Entity</span>(primaryKeys = &#123;<span class="string">"firstName"</span>, <span class="string">"lastName"</span>&#125;)</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">User</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> String firstName;</span><br><span class="line">    <span class="keyword">public</span> String lastName;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Ignore</span></span><br><span class="line">    Bitmap picture;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="Entity的参数-tableName"><a href="#Entity的参数-tableName" class="headerlink" title="Entity的参数 tableName"></a>Entity的参数 tableName</h3><p>默认情况下，Room使用类名作为数据库表名。如果你想表都有一个不同的名称，就可以在@Entity中使用tableName参数指定</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Entity</span>(tableName = <span class="string">"users"</span>)</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">User</span> </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>和tableName作用类似； @ColumnInfo注解是改变成员变量对应的数据库的字段名称。</p>
+<h3 id="Entity的参数-indices"><a href="#Entity的参数-indices" class="headerlink" title="Entity的参数 indices"></a>Entity的参数 indices</h3><p>indices的参数值是@Index的数组，在某些情况写为了加快查询速度我们可以需要加入索引</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Entity</span>(indices = &#123;<span class="meta">@Index</span>(<span class="string">"name"</span>), <span class="meta">@Index</span>(<span class="string">"last_name"</span>, <span class="string">"address"</span>)&#125;)</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">User</span> </span>&#123;</span><br><span class="line">    <span class="meta">@PrimaryKey</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> id;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> String firstName;</span><br><span class="line">    <span class="keyword">public</span> String address;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@ColumnInfo</span>(name = <span class="string">"last_name"</span>)</span><br><span class="line">    <span class="keyword">public</span> String lastName;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Ignore</span></span><br><span class="line">    Bitmap picture;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>有时，数据库中某些字段或字段组必须是唯一的。通过将@Index的unique 设置为true，可以强制执行此唯一性属性。</p>
+<p>下面的代码示例防止表有两行包含FirstName和LastName列值相同的一组：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Entity</span>(indices = &#123;<span class="meta">@Index</span>(value = &#123;<span class="string">"first_name"</span>, <span class="string">"last_name"</span>&#125;, unique = <span class="keyword">true</span>)&#125;)</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">User</span> </span>&#123;</span><br><span class="line">    <span class="meta">@PrimaryKey</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> id;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@ColumnInfo</span>(name = <span class="string">"first_name"</span>)</span><br><span class="line">    <span class="keyword">public</span> String firstName;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@ColumnInfo</span>(name = <span class="string">"last_name"</span>)</span><br><span class="line">    <span class="keyword">public</span> String lastName;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Ignore</span></span><br><span class="line">    Bitmap picture;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="Entity的参数-foreignKeys"><a href="#Entity的参数-foreignKeys" class="headerlink" title="Entity的参数 foreignKeys"></a>Entity的参数 foreignKeys</h3><p>因为SQLite是一个关系型数据库，你可以指定对象之间的关系。尽管大多数ORM库允许实体对象相互引用，但Room明确禁止。实体之间没有对象引用。</p>
+<p>不能使用直接关系，所以就要用到foreignKeys（外键）。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Entity</span>(foreignKeys = <span class="meta">@ForeignKey</span>(entity = User.class,</span><br><span class="line">                                  parentColumns = <span class="string">"id"</span>,</span><br><span class="line">                                  childColumns = <span class="string">"user_id"</span>))</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Book</span> </span>&#123;</span><br><span class="line">    <span class="meta">@PrimaryKey</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> bookId;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> String title;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@ColumnInfo</span>(name = <span class="string">"user_id"</span>)</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> userId;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>外键是非常强大的，因为它允许指定引用实体更新时发生的操作。例如，级联删除，你可以告诉SQLite删除所有书籍的用户如果用户对应的实例是由包括OnDelete =CASCADE在@ForeignKey注释。ON_CONFLICT ： @Insert(onConflict=REPLACE) REMOVE 或者 REPLACE</p>
+<p>有时候可能还需要对象嵌套这时候可以用@Embedded注解</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Address</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> String street;</span><br><span class="line">    <span class="keyword">public</span> String state;</span><br><span class="line">    <span class="keyword">public</span> String city;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@ColumnInfo</span>(name = <span class="string">"post_code"</span>)</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> postCode;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Entity</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">User</span> </span>&#123;</span><br><span class="line">    <span class="meta">@PrimaryKey</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> id;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> String firstName;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Embedded</span></span><br><span class="line">    <span class="keyword">public</span> Address address;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="Dao"><a href="#Dao" class="headerlink" title="Dao"></a>Dao</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Dao</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">UserDao</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Query</span>(<span class="string">"SELECT * FROM user"</span>)</span><br><span class="line">    <span class="function">List&lt;User&gt; <span class="title">getAll</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Query</span>(<span class="string">"SELECT * FROM user WHERE uid IN (:userIds)"</span>)</span><br><span class="line">    <span class="function">List&lt;User&gt; <span class="title">loadAllByIds</span><span class="params">(<span class="keyword">int</span>[] userIds)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Query</span>(<span class="string">"SELECT * FROM user WHERE first_name LIKE :first AND "</span></span><br><span class="line">           + <span class="string">"last_name LIKE :last LIMIT 1"</span>)</span><br><span class="line">    <span class="function">User <span class="title">findByName</span><span class="params">(String first, String last)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Insert</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">insertAll</span><span class="params">(User... users)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Delete</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">delete</span><span class="params">(User user)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>数据访问对象Data Access Objects (DAOs)是一种抽象访问数据库的干净的方式。</p>
+<h3 id="DAO的Insert-操作"><a href="#DAO的Insert-操作" class="headerlink" title="DAO的Insert 操作"></a>DAO的Insert 操作</h3><p>当创建DAO方法并用@Insert注释它时，生成一个实现时会在一个事务中完成插入所有参数到数据库。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Dao</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">MyDao</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Insert</span>(onConflict = OnConflictStrategy.REPLACE)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">insertUsers</span><span class="params">(User... users)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Insert</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">insertBothUsers</span><span class="params">(User user1, User user2)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Insert</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">insertUsersAndFriends</span><span class="params">(User user, List&lt;User&gt; friends)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="DAO的Update、Delete操作"><a href="#DAO的Update、Delete操作" class="headerlink" title="DAO的Update、Delete操作"></a>DAO的Update、Delete操作</h3><p>与上面类似</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Dao</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">MyDao</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Update</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">updateUsers</span><span class="params">(User... users)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Delete</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">deleteUsers</span><span class="params">(User... users)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="DAO的Query-操作"><a href="#DAO的Query-操作" class="headerlink" title="DAO的Query 操作"></a>DAO的Query 操作</h3><p>一个简单查询示例</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Dao</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">MyDao</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Query</span>(<span class="string">"SELECT * FROM user"</span>)</span><br><span class="line">    <span class="keyword">public</span> User[] loadAllUsers();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>稍微复杂的，带参数的查询操作</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">@Dao</span><br><span class="line">public interface MyDao &#123;</span><br><span class="line">    @Query(&quot;SELECT * FROM user WHERE age &gt; :minAge&quot;)</span><br><span class="line">    public User[] loadAllUsersOlderThan(int minAge);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>也可以带多个参数</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Dao</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">MyDao</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Query</span>(<span class="string">"SELECT * FROM user WHERE age BETWEEN :minAge AND :maxAge"</span>)</span><br><span class="line">    <span class="keyword">public</span> User[] loadAllUsersBetweenAges(<span class="keyword">int</span> minAge, <span class="keyword">int</span> maxAge);</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Query</span>(<span class="string">"SELECT * FROM user WHERE first_name LIKE :search OR last_name LIKE :search"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> List&lt;User&gt; <span class="title">findUserWithName</span><span class="params">(String search)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="返回子集"><a href="#返回子集" class="headerlink" title="返回子集"></a>返回子集</h3><p>上面示例都是查询一个表中的所有字段，结果用对应的Entity即可，但是如果我只要其中的几个字段，那么该怎么使用呢？</p>
+<p>比如上面的User，我只需要firstName和lastName，首先定义一个子集，然后结果改成对应子集即可。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">NameTuple</span> </span>&#123;</span><br><span class="line">    <span class="meta">@ColumnInfo</span>(name=<span class="string">"first_name"</span>)</span><br><span class="line">    <span class="keyword">public</span> String firstName;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@ColumnInfo</span>(name=<span class="string">"last_name"</span>)</span><br><span class="line">    <span class="keyword">public</span> String lastName;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Dao</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">MyDao</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Query</span>(<span class="string">"SELECT first_name, last_name FROM user"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> List&lt;NameTuple&gt; <span class="title">loadFullName</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="支持集合参数"><a href="#支持集合参数" class="headerlink" title="支持集合参数"></a>支持集合参数</h3><p>有个这样一个查询需求，比如要查询某两个地区的所有用户，直接用sql中的in即可，但是如果这个地区是程序指定的，个数不确定，那么改怎么办？</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">@Dao</span><br><span class="line">public interface MyDao &#123;</span><br><span class="line">    @Query(&quot;SELECT first_name, last_name FROM user WHERE region IN (:regions)&quot;)</span><br><span class="line">    public List&lt;NameTuple&gt; loadUsersFromRegions(List&lt;String&gt; regions);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="支持Observable"><a href="#支持Observable" class="headerlink" title="支持Observable"></a>支持Observable</h3><p>前面提到了LiveData，可以异步的获取数据，那么我们的Room也是支持异步查询的。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">@Dao</span><br><span class="line">public interface MyDao &#123;</span><br><span class="line">    @Query(&quot;SELECT first_name, last_name FROM user WHERE region IN (:regions)&quot;)</span><br><span class="line">    public LiveData&lt;List&lt;User&gt;&gt; loadUsersFromRegionsSync(List&lt;String&gt; regions);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="支持RxJava"><a href="#支持RxJava" class="headerlink" title="支持RxJava"></a>支持RxJava</h3><p>RxJava是另外一个异步操作库，同样也是支持的。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Dao</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">MyDao</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Query</span>(<span class="string">"SELECT * from user where id = :id LIMIT 1"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> Flowable&lt;User&gt; <span class="title">loadUserById</span><span class="params">(<span class="keyword">int</span> id)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="支持Cursor"><a href="#支持Cursor" class="headerlink" title="支持Cursor"></a>支持Cursor</h3><p>原始的Android系统查询结果是通过Cursor来获取的，同样也支持。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Dao</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">MyDao</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Query</span>(<span class="string">"SELECT * FROM user WHERE age &gt; :minAge LIMIT 5"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> Cursor <span class="title">loadRawUsersOlderThan</span><span class="params">(<span class="keyword">int</span> minAge)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="多表查询"><a href="#多表查询" class="headerlink" title="多表查询"></a>多表查询</h3><p>有时候数据库存在范式相关，数据拆到了多个表中，那么就需要关联多个表进行查询，如果结果只是一个表的数据，那么很简单，直接用Entity定义的类型即可。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Dao</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">MyDao</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Query</span>(<span class="string">"SELECT * FROM book "</span></span><br><span class="line">           + <span class="string">"INNER JOIN loan ON loan.book_id = book.id "</span></span><br><span class="line">           + <span class="string">"INNER JOIN user ON user.id = loan.user_id "</span></span><br><span class="line">           + <span class="string">"WHERE user.name LIKE :userName"</span>)</span><br><span class="line">   <span class="function"><span class="keyword">public</span> List&lt;Book&gt; <span class="title">findBooksBorrowedByNameSync</span><span class="params">(String userName)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如果结果是部分字段，同上面一样，需要单独定义一个POJO，来接受数据。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserPet</span> </span>&#123;</span><br><span class="line">   <span class="keyword">public</span> String userName;</span><br><span class="line">   <span class="keyword">public</span> String petName;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Dao</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">MyDao</span> </span>&#123;</span><br><span class="line">   <span class="meta">@Query</span>(<span class="string">"SELECT user.name AS userName, pet.name AS petName "</span></span><br><span class="line">          + <span class="string">"FROM user, pet "</span></span><br><span class="line">          + <span class="string">"WHERE user.id = pet.user_id"</span>)</span><br><span class="line">   <span class="keyword">public</span> LiveData&lt;List&lt;UserPet&gt;&gt; loadUserAndPetNames();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="类型转换"><a href="#类型转换" class="headerlink" title="类型转换"></a>类型转换</h3><p>有时候Java定义的数据类型和数据库中存储的数据类型是不一样的，Room提供类型转换，这样在操作数据库的时候，可以自动转换。</p>
+<p>比如在Java中，时间用Date表示，但是在数据库中类型确实long，这样有利于存储。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Converters</span> </span>&#123;</span><br><span class="line">    <span class="meta">@TypeConverter</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Date <span class="title">fromTimestamp</span><span class="params">(Long value)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> value == <span class="keyword">null</span> ? <span class="keyword">null</span> : <span class="keyword">new</span> Date(value);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@TypeConverter</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Long <span class="title">dateToTimestamp</span><span class="params">(Date date)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> date == <span class="keyword">null</span> ? <span class="keyword">null</span> : date.getTime();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>定义数据库时候需要指定类型转换，同时定义好Entity和Dao。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Database</span>(entities = &#123;User.java&#125;, version = <span class="number">1</span>)</span><br><span class="line"><span class="meta">@TypeConverters</span>(&#123;Converter.class&#125;)</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">AppDatabase</span> <span class="keyword">extends</span> <span class="title">RoomDatabase</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> UserDao <span class="title">userDao</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Entity</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">User</span> </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">private</span> Date birthday;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Dao</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">UserDao</span> </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="meta">@Query</span>(<span class="string">"SELECT * FROM user WHERE birthday BETWEEN :from AND :to"</span>)</span><br><span class="line">    <span class="function">List&lt;User&gt; <span class="title">findUsersBornBetweenDates</span><span class="params">(Date from, Date to)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="数据库升级"><a href="#数据库升级" class="headerlink" title="数据库升级"></a>数据库升级</h3><p>版本迭代中，我们不可避免的会遇到数据库升级问题，Room也为我们提供了数据库升级的处理接口。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">Room.databaseBuilder(getApplicationContext(), MyDb.class, &quot;database-name&quot;).addMigrations(MIGRATION_1_2, MIGRATION_2_3).build();</span><br><span class="line"></span><br><span class="line">static final Migration MIGRATION_1_2 = new Migration(1, 2) &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public void migrate(SupportSQLiteDatabase database) &#123;</span><br><span class="line">        database.execSQL(&quot;CREATE TABLE `Fruit` (`id` INTEGER, `name` TEXT, PRIMARY KEY(`id`))&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">static final Migration MIGRATION_2_3 = new Migration(2, 3) &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public void migrate(SupportSQLiteDatabase database) &#123;</span><br><span class="line">        database.execSQL(&quot;ALTER TABLE Book ADD COLUMN pub_year INTEGER&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>迁移过程结束后，Room将验证架构以确保迁移正确发生。如果Room发现问题，则抛出包含不匹配信息的异常。</p>
+<p><strong>警告：</strong> 如果不提供必要的迁移，Room会重新构建数据库，这意味着将丢失数据库中的所有数据。</p>
+<h3 id="输出模式"><a href="#输出模式" class="headerlink" title="输出模式"></a>输出模式</h3><p>可以在gradle中设置开启输出模式，便于我们调试，查看数据库表情况，以及做数据库迁移。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">android &#123;</span><br><span class="line">    ...</span><br><span class="line">    defaultConfig &#123;</span><br><span class="line">        ...</span><br><span class="line">        javaCompileOptions &#123;</span><br><span class="line">            annotationProcessorOptions &#123;</span><br><span class="line">                arguments = [<span class="string">"room.schemaLocation"</span>:</span><br><span class="line">                             <span class="string">"$projectDir/schemas"</span>.toString()]</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Sample"><a href="#Sample" class="headerlink" title="Sample"></a>Sample</h2><p>这里是官方示例，本人自己参考官方文档和示例<a href="https://github.com/googlesamples/android-architecture-components" target="_blank" rel="noopener">Android Architecture Components samples</a>后，也写出了一个类似的示例项目<a href="https://github.com/LiushuiXiaoxia/XiaoxiaZhihu_AAC" target="_blank" rel="noopener">XiaoxiaZhihu_AAC</a>，还请多多指教。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>原先IO是在5月底已经结束，本来想尽快参照官方文档和示例，把API撸一遍，然后写个Demo和文章来介绍一下。代码示例早已经写出来了，但6月分工作太忙，然后又出差到北京，最后等到了6月底了，才把这篇文章给写出来了。中间可能有内容以及改变，如果有发现稳重有错误，请及时指出，不理赐教。同时以后做事一定要有始有终，确定的事一定要坚持。</p>
+<h2 id="相关资料"><a href="#相关资料" class="headerlink" title="相关资料"></a>相关资料</h2><p><a href="https://developer.android.com/topic/libraries/architecture/index.html" target="_blank" rel="noopener">Android Architecture Components</a></p>
+<p><a href="http://www.cocoachina.com/android/20170519/19309.html" target="_blank" rel="noopener">简单聊聊Android Architecture Componets</a></p>
+<p><a href="https://github.com/googlesamples/android-architecture-components" target="_blank" rel="noopener">Android Architecture Components samples</a></p>
+<p><a href="https://github.com/LiushuiXiaoxia/XiaoxiaZhihu_AAC" target="_blank" rel="noopener">XiaoxiaZhihu_AAC</a></p>
+<p><a href="https://github.com/LiushuiXiaoxia/AndroidArchitectureComponents" target="_blank" rel="noopener">浅谈Android Architecture Components</a></p>
+<p><a href="https://juejin.im/entry/591d41c70ce463006923f937" target="_blank" rel="noopener">Room ORM 数据库框架</a></p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2018-06-27T09:39:57.937Z" itemprop="dateUpdated">2018-06-27 17:39:57</time>
+</span><br>
+
+
+        
+        本文固定链接：<a href="/2017/07/28/android-architecture-components/" target="_blank" rel="external">https://smuwjs.github.io/2017/07/28/android-architecture-components/</a>
+        
+    </div>
+    <footer>
+        <a href="https://smuwjs.github.io">
+            <img src="/img/head.png" alt="Jeeson">
+            Jeeson
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android/">Android</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android-Architecture/">Android Architecture</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2017/07/28/android-architecture-components/&title=《浅谈Android Architecture Components》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2017/07/28/android-architecture-components/&title=《浅谈Android Architecture Components》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2017/07/28/android-architecture-components/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《浅谈Android Architecture Components》 — Jeeson's Blog&url=https://smuwjs.github.io/2017/07/28/android-architecture-components/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2017/07/28/android-architecture-components/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2017/12/07/android-standard-develop/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">Android开发规范</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2017/05/04/travisci-hexo/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">使用Travis CI自动部署Hexo博客到Github上</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="android-architecture-components" data-title="浅谈Android Architecture Components" data-url="https://smuwjs.github.io/2017/07/28/android-architecture-components/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'smuwjs', theme: 'none'};
+lazyScripts.push('//unpkg.com/hexo-theme-material-indigo@latest/js/embed.min.js');
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循<a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>Jeeson &copy; 2015 - 2018</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2017/07/28/android-architecture-components/&title=《浅谈Android Architecture Components》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2017/07/28/android-architecture-components/&title=《浅谈Android Architecture Components》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2017/07/28/android-architecture-components/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《浅谈Android Architecture Components》 — Jeeson's Blog&url=https://smuwjs.github.io/2017/07/28/android-architecture-components/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2017/07/28/android-architecture-components/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://smuwjs.github.io/2017/07/28/android-architecture-components/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

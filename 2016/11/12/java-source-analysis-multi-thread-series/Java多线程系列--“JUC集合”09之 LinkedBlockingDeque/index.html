@@ -1,0 +1,2023 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>Java多线程系列--“JUC集合”09之 LinkedBlockingDeque | Jeeson&#39;s Blog | Write the code. Change the world.</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="Java源码分析,Java多线程系列,JUC集合">
+    <meta name="description" content="本章介绍JUC包中的LinkedBlockingDeque。   目录1. LinkedBlockingDeque介绍2. LinkedBlockingDeque原理和数据结构3. LinkedBlockingDeque函数列表4. LinkedBlockingDeque源码分析(JDK1.7.0_40版本)&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; 4.1 创建&amp;nbsp;&amp;nbsp;&amp;">
+<meta name="keywords" content="Java源码分析,Java多线程系列,JUC集合">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java多线程系列--“JUC集合”09之 LinkedBlockingDeque">
+<meta property="og:url" content="https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”09之 LinkedBlockingDeque/index.html">
+<meta property="og:site_name" content="Jeeson&#39;s Blog">
+<meta property="og:description" content="本章介绍JUC包中的LinkedBlockingDeque。   目录1. LinkedBlockingDeque介绍2. LinkedBlockingDeque原理和数据结构3. LinkedBlockingDeque函数列表4. LinkedBlockingDeque源码分析(JDK1.7.0_40版本)&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; 4.1 创建&amp;nbsp;&amp;nbsp;&amp;">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://wangkuiwu.github.io/media/pic/java/threads/juc-col09-01.jpg">
+<meta property="og:updated_time" content="2018-06-27T09:39:57.949Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java多线程系列--“JUC集合”09之 LinkedBlockingDeque">
+<meta name="twitter:description" content="本章介绍JUC包中的LinkedBlockingDeque。   目录1. LinkedBlockingDeque介绍2. LinkedBlockingDeque原理和数据结构3. LinkedBlockingDeque函数列表4. LinkedBlockingDeque源码分析(JDK1.7.0_40版本)&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; 4.1 创建&amp;nbsp;&amp;nbsp;&amp;">
+<meta name="twitter:image" content="http://wangkuiwu.github.io/media/pic/java/threads/juc-col09-01.jpg">
+    
+        <link rel="alternate" type="application/atom+xml" title="Jeeson&#39;s Blog" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/head.png">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Jeeson</h5>
+          <a href="mailto:smuwjs@163.com" title="smuwjs@163.com" class="mail">smuwjs@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/smuwjs" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Java多线程系列--“JUC集合”09之 LinkedBlockingDeque</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Java多线程系列--“JUC集合”09之 LinkedBlockingDeque</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2016-11-12T01:00:00.000Z" itemprop="datePublished" class="page-time">
+  2016-11-12
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#1-LinkedBlockingDeque介绍"><span class="post-toc-number">1.</span> <span class="post-toc-text">1. LinkedBlockingDeque介绍</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#2-LinkedBlockingDeque原理和数据结构"><span class="post-toc-number">2.</span> <span class="post-toc-text">2. LinkedBlockingDeque原理和数据结构</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#3-LinkedBlockingDeque函数列表"><span class="post-toc-number">3.</span> <span class="post-toc-text">3. LinkedBlockingDeque函数列表</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#4-LinkedBlockingDeque源码分析-JDK1-7-0-40版本"><span class="post-toc-number">4.</span> <span class="post-toc-text">4. LinkedBlockingDeque源码分析(JDK1.7.0_40版本)</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#4-1-创建"><span class="post-toc-number">4.1.</span> <span class="post-toc-text">4.1 创建</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#4-2-添加"><span class="post-toc-number">4.2.</span> <span class="post-toc-text">4.2 添加</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#4-3-删除"><span class="post-toc-number">4.3.</span> <span class="post-toc-text">4.3 删除</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#4-4-遍历"><span class="post-toc-number">4.4.</span> <span class="post-toc-text">4.4 遍历</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#5-LinkedBlockingDeque示例"><span class="post-toc-number">5.</span> <span class="post-toc-text">5. LinkedBlockingDeque示例</span></a></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”09之 LinkedBlockingDeque"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Java多线程系列--“JUC集合”09之 LinkedBlockingDeque</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2016-11-12 09:00:00" datetime="2016-11-12T01:00:00.000Z"  itemprop="datePublished">2016-11-12</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <blockquote>
+<p>本章介绍JUC包中的LinkedBlockingDeque。</p>
+</blockquote>
+<blockquote>
+<p><strong>目录</strong><br><a href="#anchor1">1. LinkedBlockingDeque介绍</a><br><a href="#anchor2">2. LinkedBlockingDeque原理和数据结构</a><br><a href="#anchor3">3. LinkedBlockingDeque函数列表</a><br><a href="#anchor4">4. LinkedBlockingDeque源码分析(JDK1.7.0_40版本)</a><br>&nbsp;&nbsp;&nbsp;&nbsp; <a href="#anchor4_1">4.1 创建</a><br>&nbsp;&nbsp;&nbsp;&nbsp; <a href="#anchor4_2">4.2 添加</a><br>&nbsp;&nbsp;&nbsp;&nbsp; <a href="#anchor4_3">4.3 删除</a><br>&nbsp;&nbsp;&nbsp;&nbsp; <a href="#anchor4_4">4.4 遍历</a><br><a href="#anchor5">5. LinkedBlockingDeque示例</a>  </p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="1-LinkedBlockingDeque介绍"><a href="#1-LinkedBlockingDeque介绍" class="headerlink" title="1. LinkedBlockingDeque介绍"></a>1. LinkedBlockingDeque介绍</h1><p>LinkedBlockingDeque是双向链表实现的双向并发阻塞队列。该阻塞队列同时支持FIFO和FILO两种操作方式，即可以从队列的头和尾同时操作(插入/删除)；并且，该阻塞队列是支持线程安全。</p>
+<p>此外，LinkedBlockingDeque还是可选容量的(防止过度膨胀)，即可以指定队列的容量。如果不指定，默认容量大小等于Integer.MAX_VALUE。</p>
+<p><a name="anchor2"></a></p>
+<h1 id="2-LinkedBlockingDeque原理和数据结构"><a href="#2-LinkedBlockingDeque原理和数据结构" class="headerlink" title="2. LinkedBlockingDeque原理和数据结构"></a>2. LinkedBlockingDeque原理和数据结构</h1><p>LinkedBlockingDeque的数据结构，如下图所示：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://wangkuiwu.github.io/media/pic/java/threads/juc-col09-01.jpg" alt="img" title="">
+                </div>
+                <div class="image-caption">img</div>
+            </figure>
+<p>说明：<br>(1) LinkedBlockingDeque继承于AbstractQueue，它本质上是一个支持FIFO和FILO的双向的队列。<br>(2) LinkedBlockingDeque实现了BlockingDeque接口，它支持多线程并发。当多线程竞争同一个资源时，某线程获取到该资源之后，其它线程需要阻塞等待。<br>(3) LinkedBlockingDeque是通过双向链表实现的。<br>&nbsp;&nbsp;&nbsp;&nbsp; (3.1) first是双向链表的表头。<br>&nbsp;&nbsp;&nbsp;&nbsp; (3.2) last是双向链表的表尾。<br>&nbsp;&nbsp;&nbsp;&nbsp; (3.3) count是LinkedBlockingDeque的实际大小，即双向链表中当前节点个数。<br>&nbsp;&nbsp;&nbsp;&nbsp; (3.4) capacity是LinkedBlockingDeque的容量，它是在创建LinkedBlockingDeque时指定的。<br>&nbsp;&nbsp;&nbsp;&nbsp; (3.5) lock是控制对LinkedBlockingDeque的互斥锁，当多个线程竞争同时访问LinkedBlockingDeque时，某线程获取到了互斥锁lock，其它线程则需要阻塞等待，直到该线程释放lock，其它线程才有机会获取lock从而获取cpu执行权。<br>&nbsp;&nbsp;&nbsp;&nbsp; (3.6) notEmpty和notFull分别是“非空条件”和“未满条件”。通过它们能够更加细腻进行并发控制。</p>
+<blockquote>
+<p>– 若某线程(线程A)要取出数据时，队列正好为空，则该线程会执行notEmpty.await()进行等待；当其它某个线程(线程B)向队列中插入了数据之后，会调用notEmpty.signal()唤醒“notEmpty上的等待线程”。此时，线程A会被唤醒从而得以继续运行。 此外，线程A在执行取操作前，会获取takeLock，在取操作执行完毕再释放takeLock。<br>– 若某线程(线程H)要插入数据时，队列已满，则该线程会它执行notFull.await()进行等待；当其它某个线程(线程I)取出数据之后，会调用notFull.signal()唤醒“notFull上的等待线程”。此时，线程H就会被唤醒从而得以继续运行。 此外，线程H在执行插入操作前，会获取putLock，在插入操作执行完毕才释放putLock。</p>
+</blockquote>
+<p>关于ReentrantLock，公平锁，非公平锁，以及Condition等更多的内容，可以参考前面的文章。</p>
+<p><a name="anchor3"></a></p>
+<h1 id="3-LinkedBlockingDeque函数列表"><a href="#3-LinkedBlockingDeque函数列表" class="headerlink" title="3. LinkedBlockingDeque函数列表"></a>3. LinkedBlockingDeque函数列表</h1><pre><code>// 创建一个容量为 Integer.MAX_VALUE 的 LinkedBlockingDeque。
+LinkedBlockingDeque()
+// 创建一个容量为 Integer.MAX_VALUE 的 LinkedBlockingDeque，最初包含给定 collection 的元素，以该 collection 迭代器的遍历顺序添加。
+LinkedBlockingDeque(Collection&lt;? extends E&gt; c)
+// 创建一个具有给定（固定）容量的 LinkedBlockingDeque。
+LinkedBlockingDeque(int capacity)
+
+// 在不违反容量限制的情况下，将指定的元素插入此双端队列的末尾。
+boolean add(E e)
+// 如果立即可行且不违反容量限制，则将指定的元素插入此双端队列的开头；如果当前没有空间可用，则抛出 IllegalStateException。
+void addFirst(E e)
+// 如果立即可行且不违反容量限制，则将指定的元素插入此双端队列的末尾；如果当前没有空间可用，则抛出 IllegalStateException。
+void addLast(E e)
+// 以原子方式 (atomically) 从此双端队列移除所有元素。
+void clear()
+// 如果此双端队列包含指定的元素，则返回 true。
+boolean contains(Object o)
+// 返回在此双端队列的元素上以逆向连续顺序进行迭代的迭代器。
+Iterator&lt;E&gt; descendingIterator()
+// 移除此队列中所有可用的元素，并将它们添加到给定 collection 中。
+int drainTo(Collection&lt;? super E&gt; c)
+// 最多从此队列中移除给定数量的可用元素，并将这些元素添加到给定 collection 中。
+int drainTo(Collection&lt;? super E&gt; c, int maxElements)
+// 获取但不移除此双端队列表示的队列的头部。
+E element()
+// 获取，但不移除此双端队列的第一个元素。
+E getFirst()
+// 获取，但不移除此双端队列的最后一个元素。
+E getLast()
+// 返回在此双端队列元素上以恰当顺序进行迭代的迭代器。
+Iterator&lt;E&gt; iterator()
+// 如果立即可行且不违反容量限制，则将指定的元素插入此双端队列表示的队列中（即此双端队列的尾部），并在成功时返回 true；如果当前没有空间可用，则返回 false。
+boolean offer(E e)
+// 将指定的元素插入此双端队列表示的队列中（即此双端队列的尾部），必要时将在指定的等待时间内一直等待可用空间。
+boolean offer(E e, long timeout, TimeUnit unit)
+// 如果立即可行且不违反容量限制，则将指定的元素插入此双端队列的开头，并在成功时返回 true；如果当前没有空间可用，则返回 false。
+boolean offerFirst(E e)
+// 将指定的元素插入此双端队列的开头，必要时将在指定的等待时间内等待可用空间。
+boolean offerFirst(E e, long timeout, TimeUnit unit)
+// 如果立即可行且不违反容量限制，则将指定的元素插入此双端队列的末尾，并在成功时返回 true；如果当前没有空间可用，则返回 false。
+boolean offerLast(E e)
+// 将指定的元素插入此双端队列的末尾，必要时将在指定的等待时间内等待可用空间。
+boolean offerLast(E e, long timeout, TimeUnit unit)
+// 获取但不移除此双端队列表示的队列的头部（即此双端队列的第一个元素）；如果此双端队列为空，则返回 null。
+E peek()
+// 获取，但不移除此双端队列的第一个元素；如果此双端队列为空，则返回 null。
+E peekFirst()
+// 获取，但不移除此双端队列的最后一个元素；如果此双端队列为空，则返回 null。
+E peekLast()
+// 获取并移除此双端队列表示的队列的头部（即此双端队列的第一个元素）；如果此双端队列为空，则返回 null。
+E poll()
+// 获取并移除此双端队列表示的队列的头部（即此双端队列的第一个元素），如有必要将在指定的等待时间内等待可用元素。
+E poll(long timeout, TimeUnit unit)
+// 获取并移除此双端队列的第一个元素；如果此双端队列为空，则返回 null。
+E pollFirst()
+// 获取并移除此双端队列的第一个元素，必要时将在指定的等待时间等待可用元素。
+E pollFirst(long timeout, TimeUnit unit)
+// 获取并移除此双端队列的最后一个元素；如果此双端队列为空，则返回 null。
+E pollLast()
+// 获取并移除此双端队列的最后一个元素，必要时将在指定的等待时间内等待可用元素。
+E pollLast(long timeout, TimeUnit unit)
+// 从此双端队列所表示的堆栈中弹出一个元素。
+E pop()
+// 将元素推入此双端队列表示的栈。
+void push(E e)
+// 将指定的元素插入此双端队列表示的队列中（即此双端队列的尾部），必要时将一直等待可用空间。
+void put(E e)
+// 将指定的元素插入此双端队列的开头，必要时将一直等待可用空间。
+void putFirst(E e)
+// 将指定的元素插入此双端队列的末尾，必要时将一直等待可用空间。
+void putLast(E e)
+// 返回理想情况下（没有内存和资源约束）此双端队列可不受阻塞地接受的额外元素数。
+int remainingCapacity()
+// 获取并移除此双端队列表示的队列的头部。
+E remove()
+// 从此双端队列移除第一次出现的指定元素。
+boolean remove(Object o)
+// 获取并移除此双端队列第一个元素。
+E removeFirst()
+// 从此双端队列移除第一次出现的指定元素。
+boolean removeFirstOccurrence(Object o)
+// 获取并移除此双端队列的最后一个元素。
+E removeLast()
+// 从此双端队列移除最后一次出现的指定元素。
+boolean removeLastOccurrence(Object o)
+// 返回此双端队列中的元素数。
+int size()
+// 获取并移除此双端队列表示的队列的头部（即此双端队列的第一个元素），必要时将一直等待可用元素。
+E take()
+// 获取并移除此双端队列的第一个元素，必要时将一直等待可用元素。
+E takeFirst()
+// 获取并移除此双端队列的最后一个元素，必要时将一直等待可用元素。
+E takeLast()
+// 返回以恰当顺序（从第一个元素到最后一个元素）包含此双端队列所有元素的数组。
+Object[] toArray()
+// 返回以恰当顺序包含此双端队列所有元素的数组；返回数组的运行时类型是指定数组的运行时类型。
+&lt;T&gt; T[] toArray(T[] a)
+// 返回此 collection 的字符串表示形式。
+String toString()
+</code></pre><p><a name="anchor4"></a></p>
+<h1 id="4-LinkedBlockingDeque源码分析-JDK1-7-0-40版本"><a href="#4-LinkedBlockingDeque源码分析-JDK1-7-0-40版本" class="headerlink" title="4. LinkedBlockingDeque源码分析(JDK1.7.0_40版本)"></a>4. LinkedBlockingDeque源码分析(JDK1.7.0_40版本)</h1><p>LinkedBlockingDeque.java的完整源码如下：</p>
+<pre><code>package java.util.concurrent;
+
+import java.util.AbstractQueue;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
+
+/**
+ * An optionally-bounded {@linkplain BlockingDeque blocking deque} based on
+ * linked nodes.
+ *
+ * &lt;p&gt; The optional capacity bound constructor argument serves as a
+ * way to prevent excessive expansion. The capacity, if unspecified,
+ * is equal to {@link Integer#MAX_VALUE}.  Linked nodes are
+ * dynamically created upon each insertion unless this would bring the
+ * deque above capacity.
+ *
+ * &lt;p&gt;Most operations run in constant time (ignoring time spent
+ * blocking).  Exceptions include {@link #remove(Object) remove},
+ * {@link #removeFirstOccurrence removeFirstOccurrence}, {@link
+ * #removeLastOccurrence removeLastOccurrence}, {@link #contains
+ * contains}, {@link #iterator iterator.remove()}, and the bulk
+ * operations, all of which run in linear time.
+ *
+ * &lt;p&gt;This class and its iterator implement all of the
+ * &lt;em&gt;optional&lt;/em&gt; methods of the {@link Collection} and {@link
+ * Iterator} interfaces.
+ *
+ * &lt;p&gt;This class is a member of the
+ * &lt;a href=&quot;{@docRoot}/../technotes/guides/collections/index.html&quot;&gt;
+ * Java Collections Framework&lt;/a&gt;.
+ *
+ * @since 1.6
+ * @author  Doug Lea
+ * @param &lt;E&gt; the type of elements held in this collection
+ */
+public class LinkedBlockingDeque&lt;E&gt;
+    extends AbstractQueue&lt;E&gt;
+    implements BlockingDeque&lt;E&gt;,  java.io.Serializable {
+
+    /*
+     * Implemented as a simple doubly-linked list protected by a
+     * single lock and using conditions to manage blocking.
+     *
+     * To implement weakly consistent iterators, it appears we need to
+     * keep all Nodes GC-reachable from a predecessor dequeued Node.
+     * That would cause two problems:
+     * - allow a rogue Iterator to cause unbounded memory retention
+     * - cause cross-generational linking of old Nodes to new Nodes if
+     *   a Node was tenured while live, which generational GCs have a
+     *   hard time dealing with, causing repeated major collections.
+     * However, only non-deleted Nodes need to be reachable from
+     * dequeued Nodes, and reachability does not necessarily have to
+     * be of the kind understood by the GC.  We use the trick of
+     * linking a Node that has just been dequeued to itself.  Such a
+     * self-link implicitly means to jump to &quot;first&quot; (for next links)
+     * or &quot;last&quot; (for prev links).
+     */
+
+    /*
+     * We have &quot;diamond&quot; multiple interface/abstract class inheritance
+     * here, and that introduces ambiguities. Often we want the
+     * BlockingDeque javadoc combined with the AbstractQueue
+     * implementation, so a lot of method specs are duplicated here.
+     */
+
+    private static final long serialVersionUID = -387911632671998426L;
+
+    /** Doubly-linked list node class */
+    static final class Node&lt;E&gt; {
+        /**
+         * The item, or null if this node has been removed.
+         */
+        E item;
+
+        /**
+         * One of:
+         * - the real predecessor Node
+         * - this Node, meaning the predecessor is tail
+         * - null, meaning there is no predecessor
+         */
+        Node&lt;E&gt; prev;
+
+        /**
+         * One of:
+         * - the real successor Node
+         * - this Node, meaning the successor is head
+         * - null, meaning there is no successor
+         */
+        Node&lt;E&gt; next;
+
+        Node(E x) {
+            item = x;
+        }
+    }
+
+    /**
+     * Pointer to first node.
+     * Invariant: (first == null &amp;&amp; last == null) ||
+     *            (first.prev == null &amp;&amp; first.item != null)
+     */
+    transient Node&lt;E&gt; first;
+
+    /**
+     * Pointer to last node.
+     * Invariant: (first == null &amp;&amp; last == null) ||
+     *            (last.next == null &amp;&amp; last.item != null)
+     */
+    transient Node&lt;E&gt; last;
+
+    /** Number of items in the deque */
+    private transient int count;
+
+    /** Maximum number of items in the deque */
+    private final int capacity;
+
+    /** Main lock guarding all access */
+    final ReentrantLock lock = new ReentrantLock();
+
+    /** Condition for waiting takes */
+    private final Condition notEmpty = lock.newCondition();
+
+    /** Condition for waiting puts */
+    private final Condition notFull = lock.newCondition();
+
+    /**
+     * Creates a {@code LinkedBlockingDeque} with a capacity of
+     * {@link Integer#MAX_VALUE}.
+     */
+    public LinkedBlockingDeque() {
+        this(Integer.MAX_VALUE);
+    }
+
+    /**
+     * Creates a {@code LinkedBlockingDeque} with the given (fixed) capacity.
+     *
+     * @param capacity the capacity of this deque
+     * @throws IllegalArgumentException if {@code capacity} is less than 1
+     */
+    public LinkedBlockingDeque(int capacity) {
+        if (capacity &lt;= 0) throw new IllegalArgumentException();
+        this.capacity = capacity;
+    }
+
+    /**
+     * Creates a {@code LinkedBlockingDeque} with a capacity of
+     * {@link Integer#MAX_VALUE}, initially containing the elements of
+     * the given collection, added in traversal order of the
+     * collection&apos;s iterator.
+     *
+     * @param c the collection of elements to initially contain
+     * @throws NullPointerException if the specified collection or any
+     *         of its elements are null
+     */
+    public LinkedBlockingDeque(Collection&lt;? extends E&gt; c) {
+        this(Integer.MAX_VALUE);
+        final ReentrantLock lock = this.lock;
+        lock.lock(); // Never contended, but necessary for visibility
+        try {
+            for (E e : c) {
+                if (e == null)
+                    throw new NullPointerException();
+                if (!linkLast(new Node&lt;E&gt;(e)))
+                    throw new IllegalStateException(&quot;Deque full&quot;);
+            }
+        } finally {
+            lock.unlock();
+        }
+    }
+
+
+    // Basic linking and unlinking operations, called only while holding lock
+
+    /**
+     * Links node as first element, or returns false if full.
+     */
+    private boolean linkFirst(Node&lt;E&gt; node) {
+        // assert lock.isHeldByCurrentThread();
+        if (count &gt;= capacity)
+            return false;
+        Node&lt;E&gt; f = first;
+        node.next = f;
+        first = node;
+        if (last == null)
+            last = node;
+        else
+            f.prev = node;
+        ++count;
+        notEmpty.signal();
+        return true;
+    }
+
+    /**
+     * Links node as last element, or returns false if full.
+     */
+    private boolean linkLast(Node&lt;E&gt; node) {
+        // assert lock.isHeldByCurrentThread();
+        if (count &gt;= capacity)
+            return false;
+        Node&lt;E&gt; l = last;
+        node.prev = l;
+        last = node;
+        if (first == null)
+            first = node;
+        else
+            l.next = node;
+        ++count;
+        notEmpty.signal();
+        return true;
+    }
+
+    /**
+     * Removes and returns first element, or null if empty.
+     */
+    private E unlinkFirst() {
+        // assert lock.isHeldByCurrentThread();
+        Node&lt;E&gt; f = first;
+        if (f == null)
+            return null;
+        Node&lt;E&gt; n = f.next;
+        E item = f.item;
+        f.item = null;
+        f.next = f; // help GC
+        first = n;
+        if (n == null)
+            last = null;
+        else
+            n.prev = null;
+        --count;
+        notFull.signal();
+        return item;
+    }
+
+    /**
+     * Removes and returns last element, or null if empty.
+     */
+    private E unlinkLast() {
+        // assert lock.isHeldByCurrentThread();
+        Node&lt;E&gt; l = last;
+        if (l == null)
+            return null;
+        Node&lt;E&gt; p = l.prev;
+        E item = l.item;
+        l.item = null;
+        l.prev = l; // help GC
+        last = p;
+        if (p == null)
+            first = null;
+        else
+            p.next = null;
+        --count;
+        notFull.signal();
+        return item;
+    }
+
+    /**
+     * Unlinks x.
+     */
+    void unlink(Node&lt;E&gt; x) {
+        // assert lock.isHeldByCurrentThread();
+        Node&lt;E&gt; p = x.prev;
+        Node&lt;E&gt; n = x.next;
+        if (p == null) {
+            unlinkFirst();
+        } else if (n == null) {
+            unlinkLast();
+        } else {
+            p.next = n;
+            n.prev = p;
+            x.item = null;
+            // Don&apos;t mess with x&apos;s links.  They may still be in use by
+            // an iterator.
+            --count;
+            notFull.signal();
+        }
+    }
+
+    // BlockingDeque methods
+
+    /**
+     * @throws IllegalStateException {@inheritDoc}
+     * @throws NullPointerException  {@inheritDoc}
+     */
+    public void addFirst(E e) {
+        if (!offerFirst(e))
+            throw new IllegalStateException(&quot;Deque full&quot;);
+    }
+
+    /**
+     * @throws IllegalStateException {@inheritDoc}
+     * @throws NullPointerException  {@inheritDoc}
+     */
+    public void addLast(E e) {
+        if (!offerLast(e))
+            throw new IllegalStateException(&quot;Deque full&quot;);
+    }
+
+    /**
+     * @throws NullPointerException {@inheritDoc}
+     */
+    public boolean offerFirst(E e) {
+        if (e == null) throw new NullPointerException();
+        Node&lt;E&gt; node = new Node&lt;E&gt;(e);
+        final ReentrantLock lock = this.lock;
+        lock.lock();
+        try {
+            return linkFirst(node);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * @throws NullPointerException {@inheritDoc}
+     */
+    public boolean offerLast(E e) {
+        if (e == null) throw new NullPointerException();
+        Node&lt;E&gt; node = new Node&lt;E&gt;(e);
+        final ReentrantLock lock = this.lock;
+        lock.lock();
+        try {
+            return linkLast(node);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * @throws NullPointerException {@inheritDoc}
+     * @throws InterruptedException {@inheritDoc}
+     */
+    public void putFirst(E e) throws InterruptedException {
+        if (e == null) throw new NullPointerException();
+        Node&lt;E&gt; node = new Node&lt;E&gt;(e);
+        final ReentrantLock lock = this.lock;
+        lock.lock();
+        try {
+            while (!linkFirst(node))
+                notFull.await();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * @throws NullPointerException {@inheritDoc}
+     * @throws InterruptedException {@inheritDoc}
+     */
+    public void putLast(E e) throws InterruptedException {
+        if (e == null) throw new NullPointerException();
+        Node&lt;E&gt; node = new Node&lt;E&gt;(e);
+        final ReentrantLock lock = this.lock;
+        lock.lock();
+        try {
+            while (!linkLast(node))
+                notFull.await();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * @throws NullPointerException {@inheritDoc}
+     * @throws InterruptedException {@inheritDoc}
+     */
+    public boolean offerFirst(E e, long timeout, TimeUnit unit)
+        throws InterruptedException {
+        if (e == null) throw new NullPointerException();
+        Node&lt;E&gt; node = new Node&lt;E&gt;(e);
+        long nanos = unit.toNanos(timeout);
+        final ReentrantLock lock = this.lock;
+        lock.lockInterruptibly();
+        try {
+            while (!linkFirst(node)) {
+                if (nanos &lt;= 0)
+                    return false;
+                nanos = notFull.awaitNanos(nanos);
+            }
+            return true;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * @throws NullPointerException {@inheritDoc}
+     * @throws InterruptedException {@inheritDoc}
+     */
+    public boolean offerLast(E e, long timeout, TimeUnit unit)
+        throws InterruptedException {
+        if (e == null) throw new NullPointerException();
+        Node&lt;E&gt; node = new Node&lt;E&gt;(e);
+        long nanos = unit.toNanos(timeout);
+        final ReentrantLock lock = this.lock;
+        lock.lockInterruptibly();
+        try {
+            while (!linkLast(node)) {
+                if (nanos &lt;= 0)
+                    return false;
+                nanos = notFull.awaitNanos(nanos);
+            }
+            return true;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * @throws NoSuchElementException {@inheritDoc}
+     */
+    public E removeFirst() {
+        E x = pollFirst();
+        if (x == null) throw new NoSuchElementException();
+        return x;
+    }
+
+    /**
+     * @throws NoSuchElementException {@inheritDoc}
+     */
+    public E removeLast() {
+        E x = pollLast();
+        if (x == null) throw new NoSuchElementException();
+        return x;
+    }
+
+    public E pollFirst() {
+        final ReentrantLock lock = this.lock;
+        lock.lock();
+        try {
+            return unlinkFirst();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public E pollLast() {
+        final ReentrantLock lock = this.lock;
+        lock.lock();
+        try {
+            return unlinkLast();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public E takeFirst() throws InterruptedException {
+        final ReentrantLock lock = this.lock;
+        lock.lock();
+        try {
+            E x;
+            while ( (x = unlinkFirst()) == null)
+                notEmpty.await();
+            return x;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public E takeLast() throws InterruptedException {
+        final ReentrantLock lock = this.lock;
+        lock.lock();
+        try {
+            E x;
+            while ( (x = unlinkLast()) == null)
+                notEmpty.await();
+            return x;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public E pollFirst(long timeout, TimeUnit unit)
+        throws InterruptedException {
+        long nanos = unit.toNanos(timeout);
+        final ReentrantLock lock = this.lock;
+        lock.lockInterruptibly();
+        try {
+            E x;
+            while ( (x = unlinkFirst()) == null) {
+                if (nanos &lt;= 0)
+                    return null;
+                nanos = notEmpty.awaitNanos(nanos);
+            }
+            return x;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public E pollLast(long timeout, TimeUnit unit)
+        throws InterruptedException {
+        long nanos = unit.toNanos(timeout);
+        final ReentrantLock lock = this.lock;
+        lock.lockInterruptibly();
+        try {
+            E x;
+            while ( (x = unlinkLast()) == null) {
+                if (nanos &lt;= 0)
+                    return null;
+                nanos = notEmpty.awaitNanos(nanos);
+            }
+            return x;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * @throws NoSuchElementException {@inheritDoc}
+     */
+    public E getFirst() {
+        E x = peekFirst();
+        if (x == null) throw new NoSuchElementException();
+        return x;
+    }
+
+    /**
+     * @throws NoSuchElementException {@inheritDoc}
+     */
+    public E getLast() {
+        E x = peekLast();
+        if (x == null) throw new NoSuchElementException();
+        return x;
+    }
+
+    public E peekFirst() {
+        final ReentrantLock lock = this.lock;
+        lock.lock();
+        try {
+            return (first == null) ? null : first.item;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public E peekLast() {
+        final ReentrantLock lock = this.lock;
+        lock.lock();
+        try {
+            return (last == null) ? null : last.item;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public boolean removeFirstOccurrence(Object o) {
+        if (o == null) return false;
+        final ReentrantLock lock = this.lock;
+        lock.lock();
+        try {
+            for (Node&lt;E&gt; p = first; p != null; p = p.next) {
+                if (o.equals(p.item)) {
+                    unlink(p);
+                    return true;
+                }
+            }
+            return false;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public boolean removeLastOccurrence(Object o) {
+        if (o == null) return false;
+        final ReentrantLock lock = this.lock;
+        lock.lock();
+        try {
+            for (Node&lt;E&gt; p = last; p != null; p = p.prev) {
+                if (o.equals(p.item)) {
+                    unlink(p);
+                    return true;
+                }
+            }
+            return false;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    // BlockingQueue methods
+
+    /**
+     * Inserts the specified element at the end of this deque unless it would
+     * violate capacity restrictions.  When using a capacity-restricted deque,
+     * it is generally preferable to use method {@link #offer(Object) offer}.
+     *
+     * &lt;p&gt;This method is equivalent to {@link #addLast}.
+     *
+     * @throws IllegalStateException if the element cannot be added at this
+     *         time due to capacity restrictions
+     * @throws NullPointerException if the specified element is null
+     */
+    public boolean add(E e) {
+        addLast(e);
+        return true;
+    }
+
+    /**
+     * @throws NullPointerException if the specified element is null
+     */
+    public boolean offer(E e) {
+        return offerLast(e);
+    }
+
+    /**
+     * @throws NullPointerException {@inheritDoc}
+     * @throws InterruptedException {@inheritDoc}
+     */
+    public void put(E e) throws InterruptedException {
+        putLast(e);
+    }
+
+    /**
+     * @throws NullPointerException {@inheritDoc}
+     * @throws InterruptedException {@inheritDoc}
+     */
+    public boolean offer(E e, long timeout, TimeUnit unit)
+        throws InterruptedException {
+        return offerLast(e, timeout, unit);
+    }
+
+    /**
+     * Retrieves and removes the head of the queue represented by this deque.
+     * This method differs from {@link #poll poll} only in that it throws an
+     * exception if this deque is empty.
+     *
+     * &lt;p&gt;This method is equivalent to {@link #removeFirst() removeFirst}.
+     *
+     * @return the head of the queue represented by this deque
+     * @throws NoSuchElementException if this deque is empty
+     */
+    public E remove() {
+        return removeFirst();
+    }
+
+    public E poll() {
+        return pollFirst();
+    }
+
+    public E take() throws InterruptedException {
+        return takeFirst();
+    }
+
+    public E poll(long timeout, TimeUnit unit) throws InterruptedException {
+        return pollFirst(timeout, unit);
+    }
+
+    /**
+     * Retrieves, but does not remove, the head of the queue represented by
+     * this deque.  This method differs from {@link #peek peek} only in that
+     * it throws an exception if this deque is empty.
+     *
+     * &lt;p&gt;This method is equivalent to {@link #getFirst() getFirst}.
+     *
+     * @return the head of the queue represented by this deque
+     * @throws NoSuchElementException if this deque is empty
+     */
+    public E element() {
+        return getFirst();
+    }
+
+    public E peek() {
+        return peekFirst();
+    }
+
+    /**
+     * Returns the number of additional elements that this deque can ideally
+     * (in the absence of memory or resource constraints) accept without
+     * blocking. This is always equal to the initial capacity of this deque
+     * less the current {@code size} of this deque.
+     *
+     * &lt;p&gt;Note that you &lt;em&gt;cannot&lt;/em&gt; always tell if an attempt to insert
+     * an element will succeed by inspecting {@code remainingCapacity}
+     * because it may be the case that another thread is about to
+     * insert or remove an element.
+     */
+    public int remainingCapacity() {
+        final ReentrantLock lock = this.lock;
+        lock.lock();
+        try {
+            return capacity - count;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * @throws UnsupportedOperationException {@inheritDoc}
+     * @throws ClassCastException            {@inheritDoc}
+     * @throws NullPointerException          {@inheritDoc}
+     * @throws IllegalArgumentException      {@inheritDoc}
+     */
+    public int drainTo(Collection&lt;? super E&gt; c) {
+        return drainTo(c, Integer.MAX_VALUE);
+    }
+
+    /**
+     * @throws UnsupportedOperationException {@inheritDoc}
+     * @throws ClassCastException            {@inheritDoc}
+     * @throws NullPointerException          {@inheritDoc}
+     * @throws IllegalArgumentException      {@inheritDoc}
+     */
+    public int drainTo(Collection&lt;? super E&gt; c, int maxElements) {
+        if (c == null)
+            throw new NullPointerException();
+        if (c == this)
+            throw new IllegalArgumentException();
+        final ReentrantLock lock = this.lock;
+        lock.lock();
+        try {
+            int n = Math.min(maxElements, count);
+            for (int i = 0; i &lt; n; i++) {
+                c.add(first.item);   // In this order, in case add() throws.
+                unlinkFirst();
+            }
+            return n;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    // Stack methods
+
+    /**
+     * @throws IllegalStateException {@inheritDoc}
+     * @throws NullPointerException  {@inheritDoc}
+     */
+    public void push(E e) {
+        addFirst(e);
+    }
+
+    /**
+     * @throws NoSuchElementException {@inheritDoc}
+     */
+    public E pop() {
+        return removeFirst();
+    }
+
+    // Collection methods
+
+    /**
+     * Removes the first occurrence of the specified element from this deque.
+     * If the deque does not contain the element, it is unchanged.
+     * More formally, removes the first element {@code e} such that
+     * {@code o.equals(e)} (if such an element exists).
+     * Returns {@code true} if this deque contained the specified element
+     * (or equivalently, if this deque changed as a result of the call).
+     *
+     * &lt;p&gt;This method is equivalent to
+     * {@link #removeFirstOccurrence(Object) removeFirstOccurrence}.
+     *
+     * @param o element to be removed from this deque, if present
+     * @return {@code true} if this deque changed as a result of the call
+     */
+    public boolean remove(Object o) {
+        return removeFirstOccurrence(o);
+    }
+
+    /**
+     * Returns the number of elements in this deque.
+     *
+     * @return the number of elements in this deque
+     */
+    public int size() {
+        final ReentrantLock lock = this.lock;
+        lock.lock();
+        try {
+            return count;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * Returns {@code true} if this deque contains the specified element.
+     * More formally, returns {@code true} if and only if this deque contains
+     * at least one element {@code e} such that {@code o.equals(e)}.
+     *
+     * @param o object to be checked for containment in this deque
+     * @return {@code true} if this deque contains the specified element
+     */
+    public boolean contains(Object o) {
+        if (o == null) return false;
+        final ReentrantLock lock = this.lock;
+        lock.lock();
+        try {
+            for (Node&lt;E&gt; p = first; p != null; p = p.next)
+                if (o.equals(p.item))
+                    return true;
+            return false;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /*
+     * TODO: Add support for more efficient bulk operations.
+     *
+     * We don&apos;t want to acquire the lock for every iteration, but we
+     * also want other threads a chance to interact with the
+     * collection, especially when count is close to capacity.
+     */
+
+//     /**
+//      * Adds all of the elements in the specified collection to this
+//      * queue.  Attempts to addAll of a queue to itself result in
+//      * {@code IllegalArgumentException}. Further, the behavior of
+//      * this operation is undefined if the specified collection is
+//      * modified while the operation is in progress.
+//      *
+//      * @param c collection containing elements to be added to this queue
+//      * @return {@code true} if this queue changed as a result of the call
+//      * @throws ClassCastException            {@inheritDoc}
+//      * @throws NullPointerException          {@inheritDoc}
+//      * @throws IllegalArgumentException      {@inheritDoc}
+//      * @throws IllegalStateException         {@inheritDoc}
+//      * @see #add(Object)
+//      */
+//     public boolean addAll(Collection&lt;? extends E&gt; c) {
+//         if (c == null)
+//             throw new NullPointerException();
+//         if (c == this)
+//             throw new IllegalArgumentException();
+//         final ReentrantLock lock = this.lock;
+//         lock.lock();
+//         try {
+//             boolean modified = false;
+//             for (E e : c)
+//                 if (linkLast(e))
+//                     modified = true;
+//             return modified;
+//         } finally {
+//             lock.unlock();
+//         }
+//     }
+
+    /**
+     * Returns an array containing all of the elements in this deque, in
+     * proper sequence (from first to last element).
+     *
+     * &lt;p&gt;The returned array will be &quot;safe&quot; in that no references to it are
+     * maintained by this deque.  (In other words, this method must allocate
+     * a new array).  The caller is thus free to modify the returned array.
+     *
+     * &lt;p&gt;This method acts as bridge between array-based and collection-based
+     * APIs.
+     *
+     * @return an array containing all of the elements in this deque
+     */
+    @SuppressWarnings(&quot;unchecked&quot;)
+    public Object[] toArray() {
+        final ReentrantLock lock = this.lock;
+        lock.lock();
+        try {
+            Object[] a = new Object[count];
+            int k = 0;
+            for (Node&lt;E&gt; p = first; p != null; p = p.next)
+                a[k++] = p.item;
+            return a;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * Returns an array containing all of the elements in this deque, in
+     * proper sequence; the runtime type of the returned array is that of
+     * the specified array.  If the deque fits in the specified array, it
+     * is returned therein.  Otherwise, a new array is allocated with the
+     * runtime type of the specified array and the size of this deque.
+     *
+     * &lt;p&gt;If this deque fits in the specified array with room to spare
+     * (i.e., the array has more elements than this deque), the element in
+     * the array immediately following the end of the deque is set to
+     * {@code null}.
+     *
+     * &lt;p&gt;Like the {@link #toArray()} method, this method acts as bridge between
+     * array-based and collection-based APIs.  Further, this method allows
+     * precise control over the runtime type of the output array, and may,
+     * under certain circumstances, be used to save allocation costs.
+     *
+     * &lt;p&gt;Suppose {@code x} is a deque known to contain only strings.
+     * The following code can be used to dump the deque into a newly
+     * allocated array of {@code String}:
+     *
+     * &lt;pre&gt;
+     *     String[] y = x.toArray(new String[0]);&lt;/pre&gt;
+     *
+     * Note that {@code toArray(new Object[0])} is identical in function to
+     * {@code toArray()}.
+     *
+     * @param a the array into which the elements of the deque are to
+     *          be stored, if it is big enough; otherwise, a new array of the
+     *          same runtime type is allocated for this purpose
+     * @return an array containing all of the elements in this deque
+     * @throws ArrayStoreException if the runtime type of the specified array
+     *         is not a supertype of the runtime type of every element in
+     *         this deque
+     * @throws NullPointerException if the specified array is null
+     */
+    @SuppressWarnings(&quot;unchecked&quot;)
+    public &lt;T&gt; T[] toArray(T[] a) {
+        final ReentrantLock lock = this.lock;
+        lock.lock();
+        try {
+            if (a.length &lt; count)
+                a = (T[])java.lang.reflect.Array.newInstance
+                    (a.getClass().getComponentType(), count);
+
+            int k = 0;
+            for (Node&lt;E&gt; p = first; p != null; p = p.next)
+                a[k++] = (T)p.item;
+            if (a.length &gt; k)
+                a[k] = null;
+            return a;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public String toString() {
+        final ReentrantLock lock = this.lock;
+        lock.lock();
+        try {
+            Node&lt;E&gt; p = first;
+            if (p == null)
+                return &quot;[]&quot;;
+
+            StringBuilder sb = new StringBuilder();
+            sb.append(&apos;[&apos;);
+            for (;;) {
+                E e = p.item;
+                sb.append(e == this ? &quot;(this Collection)&quot; : e);
+                p = p.next;
+                if (p == null)
+                    return sb.append(&apos;]&apos;).toString();
+                sb.append(&apos;,&apos;).append(&apos; &apos;);
+            }
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * Atomically removes all of the elements from this deque.
+     * The deque will be empty after this call returns.
+     */
+    public void clear() {
+        final ReentrantLock lock = this.lock;
+        lock.lock();
+        try {
+            for (Node&lt;E&gt; f = first; f != null; ) {
+                f.item = null;
+                Node&lt;E&gt; n = f.next;
+                f.prev = null;
+                f.next = null;
+                f = n;
+            }
+            first = last = null;
+            count = 0;
+            notFull.signalAll();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * Returns an iterator over the elements in this deque in proper sequence.
+     * The elements will be returned in order from first (head) to last (tail).
+     *
+     * &lt;p&gt;The returned iterator is a &quot;weakly consistent&quot; iterator that
+     * will never throw {@link java.util.ConcurrentModificationException
+     * ConcurrentModificationException}, and guarantees to traverse
+     * elements as they existed upon construction of the iterator, and
+     * may (but is not guaranteed to) reflect any modifications
+     * subsequent to construction.
+     *
+     * @return an iterator over the elements in this deque in proper sequence
+     */
+    public Iterator&lt;E&gt; iterator() {
+        return new Itr();
+    }
+
+    /**
+     * Returns an iterator over the elements in this deque in reverse
+     * sequential order.  The elements will be returned in order from
+     * last (tail) to first (head).
+     *
+     * &lt;p&gt;The returned iterator is a &quot;weakly consistent&quot; iterator that
+     * will never throw {@link java.util.ConcurrentModificationException
+     * ConcurrentModificationException}, and guarantees to traverse
+     * elements as they existed upon construction of the iterator, and
+     * may (but is not guaranteed to) reflect any modifications
+     * subsequent to construction.
+     *
+     * @return an iterator over the elements in this deque in reverse order
+     */
+    public Iterator&lt;E&gt; descendingIterator() {
+        return new DescendingItr();
+    }
+
+    /**
+     * Base class for Iterators for LinkedBlockingDeque
+     */
+    private abstract class AbstractItr implements Iterator&lt;E&gt; {
+        /**
+         * The next node to return in next()
+         */
+         Node&lt;E&gt; next;
+
+        /**
+         * nextItem holds on to item fields because once we claim that
+         * an element exists in hasNext(), we must return item read
+         * under lock (in advance()) even if it was in the process of
+         * being removed when hasNext() was called.
+         */
+        E nextItem;
+
+        /**
+         * Node returned by most recent call to next. Needed by remove.
+         * Reset to null if this element is deleted by a call to remove.
+         */
+        private Node&lt;E&gt; lastRet;
+
+        abstract Node&lt;E&gt; firstNode();
+        abstract Node&lt;E&gt; nextNode(Node&lt;E&gt; n);
+
+        AbstractItr() {
+            // set to initial position
+            final ReentrantLock lock = LinkedBlockingDeque.this.lock;
+            lock.lock();
+            try {
+                next = firstNode();
+                nextItem = (next == null) ? null : next.item;
+            } finally {
+                lock.unlock();
+            }
+        }
+
+        /**
+         * Returns the successor node of the given non-null, but
+         * possibly previously deleted, node.
+         */
+        private Node&lt;E&gt; succ(Node&lt;E&gt; n) {
+            // Chains of deleted nodes ending in null or self-links
+            // are possible if multiple interior nodes are removed.
+            for (;;) {
+                Node&lt;E&gt; s = nextNode(n);
+                if (s == null)
+                    return null;
+                else if (s.item != null)
+                    return s;
+                else if (s == n)
+                    return firstNode();
+                else
+                    n = s;
+            }
+        }
+
+        /**
+         * Advances next.
+         */
+        void advance() {
+            final ReentrantLock lock = LinkedBlockingDeque.this.lock;
+            lock.lock();
+            try {
+                // assert next != null;
+                next = succ(next);
+                nextItem = (next == null) ? null : next.item;
+            } finally {
+                lock.unlock();
+            }
+        }
+
+        public boolean hasNext() {
+            return next != null;
+        }
+
+        public E next() {
+            if (next == null)
+                throw new NoSuchElementException();
+            lastRet = next;
+            E x = nextItem;
+            advance();
+            return x;
+        }
+
+        public void remove() {
+            Node&lt;E&gt; n = lastRet;
+            if (n == null)
+                throw new IllegalStateException();
+            lastRet = null;
+            final ReentrantLock lock = LinkedBlockingDeque.this.lock;
+            lock.lock();
+            try {
+                if (n.item != null)
+                    unlink(n);
+            } finally {
+                lock.unlock();
+            }
+        }
+    }
+
+    /** Forward iterator */
+    private class Itr extends AbstractItr {
+        Node&lt;E&gt; firstNode() { return first; }
+        Node&lt;E&gt; nextNode(Node&lt;E&gt; n) { return n.next; }
+    }
+
+    /** Descending iterator */
+    private class DescendingItr extends AbstractItr {
+        Node&lt;E&gt; firstNode() { return last; }
+        Node&lt;E&gt; nextNode(Node&lt;E&gt; n) { return n.prev; }
+    }
+
+    /**
+     * Save the state of this deque to a stream (that is, serialize it).
+     *
+     * @serialData The capacity (int), followed by elements (each an
+     * {@code Object}) in the proper order, followed by a null
+     * @param s the stream
+     */
+    private void writeObject(java.io.ObjectOutputStream s)
+        throws java.io.IOException {
+        final ReentrantLock lock = this.lock;
+        lock.lock();
+        try {
+            // Write out capacity and any hidden stuff
+            s.defaultWriteObject();
+            // Write out all elements in the proper order.
+            for (Node&lt;E&gt; p = first; p != null; p = p.next)
+                s.writeObject(p.item);
+            // Use trailing null as sentinel
+            s.writeObject(null);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * Reconstitute this deque from a stream (that is,
+     * deserialize it).
+     * @param s the stream
+     */
+    private void readObject(java.io.ObjectInputStream s)
+        throws java.io.IOException, ClassNotFoundException {
+        s.defaultReadObject();
+        count = 0;
+        first = null;
+        last = null;
+        // Read in all elements and place in queue
+        for (;;) {
+            @SuppressWarnings(&quot;unchecked&quot;)
+            E item = (E)s.readObject();
+            if (item == null)
+                break;
+            add(item);
+        }
+    }
+
+}
+</code></pre><p>下面从ArrayBlockingQueue的创建，添加，取出，遍历这几个方面对LinkedBlockingDeque进行分析</p>
+<p><a name="anchor4_1"></a></p>
+<h2 id="4-1-创建"><a href="#4-1-创建" class="headerlink" title="4.1 创建"></a>4.1 创建</h2><p>下面以LinkedBlockingDeque(int capacity)来进行说明。</p>
+<pre><code>public LinkedBlockingDeque(int capacity) {
+    if (capacity &lt;= 0) throw new IllegalArgumentException();
+    this.capacity = capacity;
+}
+</code></pre><p>说明：capacity是“链式阻塞队列”的容量。</p>
+<p>LinkedBlockingDeque中相关的数据结果定义如下：</p>
+<pre><code>// “双向队列”的表头
+transient Node&lt;E&gt; first;
+// “双向队列”的表尾
+transient Node&lt;E&gt; last;
+// 节点数量
+private transient int count;
+// 容量
+private final int capacity;
+// 互斥锁 , 互斥锁对应的“非空条件notEmpty”, 互斥锁对应的“未满条件notFull”
+final ReentrantLock lock = new ReentrantLock();
+private final Condition notEmpty = lock.newCondition();
+private final Condition notFull = lock.newCondition();
+</code></pre><p>说明：lock是互斥锁，用于控制多线程对LinkedBlockingDeque中元素的互斥访问；而notEmpty和notFull是与lock绑定的条件，它们用于实现对多线程更精确的控制。</p>
+<p>双向链表的节点Node的定义如下：</p>
+<pre><code>static final class Node&lt;E&gt; {
+    E item;       // 数据
+    Node&lt;E&gt; prev; // 前一节点
+    Node&lt;E&gt; next; // 后一节点
+
+    Node(E x) { item = x; }
+}
+</code></pre><p><a name="anchor4_2"></a></p>
+<h2 id="4-2-添加"><a href="#4-2-添加" class="headerlink" title="4.2 添加"></a>4.2 添加</h2><p>下面以offer(E e)为例，对LinkedBlockingDeque的添加方法进行说明。</p>
+<pre><code>public boolean offer(E e) {
+    return offerLast(e);
+}
+</code></pre><p>offer()实际上是调用offerLast()将元素添加到队列的末尾。</p>
+<p>offerLast()的源码如下：</p>
+<pre><code>public boolean offerLast(E e) {
+    if (e == null) throw new NullPointerException();
+    // 新建节点
+    Node&lt;E&gt; node = new Node&lt;E&gt;(e);
+    final ReentrantLock lock = this.lock;
+    // 获取锁
+    lock.lock();
+    try {
+        // 将“新节点”添加到双向链表的末尾
+        return linkLast(node);
+    } finally {
+        // 释放锁
+        lock.unlock();
+    }
+}
+</code></pre><p>说明：offerLast()的作用，是新建节点并将该节点插入到双向链表的末尾。它在插入节点前，会获取锁；操作完毕，再释放锁。</p>
+<p>linkLast()的源码如下：</p>
+<pre><code>private boolean linkLast(Node&lt;E&gt; node) {
+    // 如果“双向链表的节点数量” &gt; “容量”，则返回false，表示插入失败。
+    if (count &gt;= capacity)
+        return false;
+    // 将“node添加到链表末尾”，并设置node为新的尾节点
+    Node&lt;E&gt; l = last;
+    node.prev = l;
+    last = node;
+    if (first == null)
+        first = node;
+    else
+        l.next = node;
+    // 将“节点数量”+1
+    ++count;
+    // 插入节点之后，唤醒notEmpty上的等待线程。
+    notEmpty.signal();
+    return true;
+}
+</code></pre><p>说明：linkLast()的作用，是将节点插入到双向队列的末尾；插入节点之后，唤醒notEmpty上的等待线程。</p>
+<p><a name="anchor4_3"></a></p>
+<h2 id="4-3-删除"><a href="#4-3-删除" class="headerlink" title="4.3 删除"></a>4.3 删除</h2><p>下面以take()为例，对LinkedBlockingDeque的取出方法进行说明。</p>
+<pre><code>public E take() throws InterruptedException {
+    return takeFirst();
+}
+</code></pre><p>take()实际上是调用takeFirst()队列的第一个元素。</p>
+<p>takeFirst()的源码如下：</p>
+<pre><code>public E takeFirst() throws InterruptedException {
+    final ReentrantLock lock = this.lock;
+    // 获取锁
+    lock.lock();
+    try {
+        E x;
+        // 若“队列为空”，则一直等待。否则，通过unlinkFirst()删除第一个节点。
+        while ( (x = unlinkFirst()) == null)
+            notEmpty.await();
+        return x;
+    } finally {
+        // 释放锁
+        lock.unlock();
+    }
+}
+</code></pre><p>说明：takeFirst()的作用，是删除双向链表的第一个节点，并返回节点对应的值。它在插入节点前，会获取锁；操作完毕，再释放锁。</p>
+<p>unlinkFirst()的源码如下：</p>
+<pre><code>private E unlinkFirst() {
+    // assert lock.isHeldByCurrentThread();
+    Node&lt;E&gt; f = first;
+    if (f == null)
+        return null;
+    // 删除并更新“第一个节点”
+    Node&lt;E&gt; n = f.next;
+    E item = f.item;
+    f.item = null;
+    f.next = f; // help GC
+    first = n;
+    if (n == null)
+        last = null;
+    else
+        n.prev = null;
+    // 将“节点数量”-1
+    --count;
+    // 删除节点之后，唤醒notFull上的等待线程。
+    notFull.signal();
+    return item;
+}
+</code></pre><p>说明：unlinkFirst()的作用，是将双向队列的第一个节点删除；删除节点之后，唤醒notFull上的等待线程。</p>
+<p><a name="anchor4_4"></a></p>
+<h2 id="4-4-遍历"><a href="#4-4-遍历" class="headerlink" title="4.4 遍历"></a>4.4 遍历</h2><p>下面对LinkedBlockingDeque的遍历方法进行说明。</p>
+<pre><code>public Iterator&lt;E&gt; iterator() {
+    return new Itr();
+}
+</code></pre><p>iterator()实际上是返回一个Iter对象。</p>
+<p>Itr类的定义如下：</p>
+<pre><code>private class Itr extends AbstractItr {
+    // “双向队列”的表头
+    Node&lt;E&gt; firstNode() { return first; }
+    // 获取“节点n的下一个节点”
+    Node&lt;E&gt; nextNode(Node&lt;E&gt; n) { return n.next; }
+}
+</code></pre><p>Itr继承于AbstractItr，而AbstractItr的定义如下：</p>
+<pre><code>private abstract class AbstractItr implements Iterator&lt;E&gt; {
+    // next是下一次调用next()会返回的节点。
+    Node&lt;E&gt; next;
+    // nextItem是next()返回节点对应的数据。
+    E nextItem;
+    // 上一次next()返回的节点。
+    private Node&lt;E&gt; lastRet;
+    // 返回第一个节点
+    abstract Node&lt;E&gt; firstNode();
+    // 返回下一个节点
+    abstract Node&lt;E&gt; nextNode(Node&lt;E&gt; n);
+
+    AbstractItr() {
+        final ReentrantLock lock = LinkedBlockingDeque.this.lock;
+        // 获取“LinkedBlockingDeque的互斥锁”
+        lock.lock();
+        try {
+            // 获取“双向队列”的表头
+            next = firstNode();
+            // 获取表头对应的数据
+            nextItem = (next == null) ? null : next.item;
+        } finally {
+            // 释放“LinkedBlockingDeque的互斥锁”
+            lock.unlock();
+        }
+    }
+
+    // 获取n的后继节点
+    private Node&lt;E&gt; succ(Node&lt;E&gt; n) {
+        // Chains of deleted nodes ending in null or self-links
+        // are possible if multiple interior nodes are removed.
+        for (;;) {
+            Node&lt;E&gt; s = nextNode(n);
+            if (s == null)
+                return null;
+            else if (s.item != null)
+                return s;
+            else if (s == n)
+                return firstNode();
+            else
+                n = s;
+        }
+    }
+
+    // 更新next和nextItem。
+    void advance() {
+        final ReentrantLock lock = LinkedBlockingDeque.this.lock;
+        lock.lock();
+        try {
+            // assert next != null;
+            next = succ(next);
+            nextItem = (next == null) ? null : next.item;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    // 返回“下一个节点是否为null”
+    public boolean hasNext() {
+        return next != null;
+    }
+
+    // 返回下一个节点
+    public E next() {
+        if (next == null)
+            throw new NoSuchElementException();
+        lastRet = next;
+        E x = nextItem;
+        advance();
+        return x;
+    }
+
+    // 删除下一个节点
+    public void remove() {
+        Node&lt;E&gt; n = lastRet;
+        if (n == null)
+            throw new IllegalStateException();
+        lastRet = null;
+        final ReentrantLock lock = LinkedBlockingDeque.this.lock;
+        lock.lock();
+        try {
+            if (n.item != null)
+                unlink(n);
+        } finally {
+            lock.unlock();
+        }
+    }
+}
+</code></pre><p><a name="anchor5"></a></p>
+<h1 id="5-LinkedBlockingDeque示例"><a href="#5-LinkedBlockingDeque示例" class="headerlink" title="5. LinkedBlockingDeque示例"></a>5. LinkedBlockingDeque示例</h1><pre><code>import java.util.*;
+import java.util.concurrent.*;
+
+/*
+ *   LinkedBlockingDeque是“线程安全”的队列，而LinkedList是非线程安全的。
+ *
+ *   下面是“多个线程同时操作并且遍历queue”的示例
+ *   (01) 当queue是LinkedBlockingDeque对象时，程序能正常运行。
+ *   (02) 当queue是LinkedList对象时，程序会产生ConcurrentModificationException异常。
+ *
+ * @author skywang
+ */
+public class LinkedBlockingDequeDemo1 {
+
+    // TODO: queue是LinkedList对象时，程序会出错。
+    //private static Queue&lt;String&gt; queue = new LinkedList&lt;String&gt;();
+    private static Queue&lt;String&gt; queue = new LinkedBlockingDeque&lt;String&gt;();
+    public static void main(String[] args) {
+
+        // 同时启动两个线程对queue进行操作！
+        new MyThread(&quot;ta&quot;).start();
+        new MyThread(&quot;tb&quot;).start();
+    }
+
+    private static void printAll() {
+        String value;
+        Iterator iter = queue.iterator();
+        while(iter.hasNext()) {
+            value = (String)iter.next();
+            System.out.print(value+&quot;, &quot;);
+        }
+        System.out.println();
+    }
+
+    private static class MyThread extends Thread {
+        MyThread(String name) {
+            super(name);
+        }
+        @Override
+        public void run() {
+                int i = 0;
+            while (i++ &lt; 6) {
+                // “线程名” + &quot;-&quot; + &quot;序号&quot;
+                String val = Thread.currentThread().getName()+i;
+                queue.add(val);
+                // 通过“Iterator”遍历queue。
+                printAll();
+            }
+        }
+    }
+}
+</code></pre><p>(某一次)运行结果：</p>
+<pre><code>ta1, ta1, tb1, tb1,
+
+ta1, ta1, tb1, tb1, tb2, tb2, ta2, 
+ta2, 
+ta1, ta1, tb1, tb1, tb2, tb2, ta2, ta2, tb3, tb3, ta3, 
+ta3, ta1, 
+tb1, ta1, tb2, tb1, ta2, tb2, tb3, ta2, ta3, tb3, tb4, ta3, ta4, 
+tb4, ta1, ta4, tb1, tb5, 
+tb2, ta1, ta2, tb1, tb3, tb2, ta3, ta2, tb4, tb3, ta4, ta3, tb5, tb4, ta5, 
+ta4, ta1, tb5, tb1, ta5, tb2, tb6, 
+ta2, ta1, tb3, tb1, ta3, tb2, tb4, ta2, ta4, tb3, tb5, ta3, ta5, tb4, tb6, ta4, ta6, 
+tb5, ta5, tb6, ta6,
+</code></pre><p>结果说明：示例程序中，启动两个线程(线程ta和线程tb)分别对LinkedBlockingDeque进行操作。以线程ta而言，它会先获取“线程名”+“序号”，然后将该字符串添加到LinkedBlockingDeque中；接着，遍历并输出LinkedBlockingDeque中的全部元素。 线程tb的操作和线程ta一样，只不过线程tb的名字和线程ta的名字不同。<br>当queue是LinkedBlockingDeque对象时，程序能正常运行。如果将queue改为LinkedList时，程序会产生ConcurrentModificationException异常。</p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2018-06-27T09:39:57.949Z" itemprop="dateUpdated">2018-06-27 17:39:57</time>
+</span><br>
+
+
+        
+        本文固定链接：<a href="/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”09之 LinkedBlockingDeque/" target="_blank" rel="external">https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”09之 LinkedBlockingDeque/</a>
+        
+    </div>
+    <footer>
+        <a href="https://smuwjs.github.io">
+            <img src="/img/head.png" alt="Jeeson">
+            Jeeson
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JUC集合/">JUC集合</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java多线程系列/">Java多线程系列</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java源码分析/">Java源码分析</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”09之 LinkedBlockingDeque/&title=《Java多线程系列--“JUC集合”09之 LinkedBlockingDeque》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”09之 LinkedBlockingDeque/&title=《Java多线程系列--“JUC集合”09之 LinkedBlockingDeque》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”09之 LinkedBlockingDeque/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Java多线程系列--“JUC集合”09之 LinkedBlockingDeque》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”09之 LinkedBlockingDeque/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”09之 LinkedBlockingDeque/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”10之 ConcurrentHashMap/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">Java多线程系列--“JUC集合”10之 ConcurrentHashMap</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”08之 LinkedBlockingQueue/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Java多线程系列--“JUC集合”08之 LinkedBlockingQueue</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”09之 LinkedBlockingDeque" data-title="Java多线程系列--“JUC集合”09之 LinkedBlockingDeque" data-url="https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”09之 LinkedBlockingDeque/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'smuwjs', theme: 'none'};
+lazyScripts.push('//unpkg.com/hexo-theme-material-indigo@latest/js/embed.min.js');
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循<a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>Jeeson &copy; 2015 - 2018</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”09之 LinkedBlockingDeque/&title=《Java多线程系列--“JUC集合”09之 LinkedBlockingDeque》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”09之 LinkedBlockingDeque/&title=《Java多线程系列--“JUC集合”09之 LinkedBlockingDeque》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”09之 LinkedBlockingDeque/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Java多线程系列--“JUC集合”09之 LinkedBlockingDeque》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”09之 LinkedBlockingDeque/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”09之 LinkedBlockingDeque/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”09之 LinkedBlockingDeque/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

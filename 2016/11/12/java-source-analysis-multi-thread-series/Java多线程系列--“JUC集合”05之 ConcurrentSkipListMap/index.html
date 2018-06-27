@@ -1,0 +1,3970 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>Java多线程系列--“JUC集合”05之 ConcurrentSkipListMap | Jeeson&#39;s Blog | Write the code. Change the world.</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="Java源码分析,Java多线程系列,JUC集合">
+    <meta name="description" content="本章对Java.util.concurrent包中的ConcurrentSkipListMap类进行详细的介绍。   目录1. ConcurrentSkipListMap介绍2. ConcurrentSkipListMap原理和数据结构3. ConcurrentSkipListMap函数列表4. ConcurrentSkipListMap源码分析(JDK1.7.0_40版本)&amp;nbsp;&amp;nbs">
+<meta name="keywords" content="Java源码分析,Java多线程系列,JUC集合">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java多线程系列--“JUC集合”05之 ConcurrentSkipListMap">
+<meta property="og:url" content="https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”05之 ConcurrentSkipListMap/index.html">
+<meta property="og:site_name" content="Jeeson&#39;s Blog">
+<meta property="og:description" content="本章对Java.util.concurrent包中的ConcurrentSkipListMap类进行详细的介绍。   目录1. ConcurrentSkipListMap介绍2. ConcurrentSkipListMap原理和数据结构3. ConcurrentSkipListMap函数列表4. ConcurrentSkipListMap源码分析(JDK1.7.0_40版本)&amp;nbsp;&amp;nbs">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://wangkuiwu.github.io/media/pic/java/threads/juc-col05-01.jpg">
+<meta property="og:image" content="http://wangkuiwu.github.io/media/pic/java/threads/juc-col05-02.jpg">
+<meta property="og:image" content="http://wangkuiwu.github.io/media/pic/java/threads/juc-col05-03.jpg">
+<meta property="og:updated_time" content="2018-06-27T09:39:57.949Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java多线程系列--“JUC集合”05之 ConcurrentSkipListMap">
+<meta name="twitter:description" content="本章对Java.util.concurrent包中的ConcurrentSkipListMap类进行详细的介绍。   目录1. ConcurrentSkipListMap介绍2. ConcurrentSkipListMap原理和数据结构3. ConcurrentSkipListMap函数列表4. ConcurrentSkipListMap源码分析(JDK1.7.0_40版本)&amp;nbsp;&amp;nbs">
+<meta name="twitter:image" content="http://wangkuiwu.github.io/media/pic/java/threads/juc-col05-01.jpg">
+    
+        <link rel="alternate" type="application/atom+xml" title="Jeeson&#39;s Blog" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/head.png">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Jeeson</h5>
+          <a href="mailto:smuwjs@163.com" title="smuwjs@163.com" class="mail">smuwjs@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/smuwjs" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Java多线程系列--“JUC集合”05之 ConcurrentSkipListMap</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Java多线程系列--“JUC集合”05之 ConcurrentSkipListMap</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2016-11-11T21:00:00.000Z" itemprop="datePublished" class="page-time">
+  2016-11-12
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#1-ConcurrentSkipListMap介绍"><span class="post-toc-number">1.</span> <span class="post-toc-text">1. ConcurrentSkipListMap介绍</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#2-ConcurrentSkipListMap原理和数据结构"><span class="post-toc-number">2.</span> <span class="post-toc-text">2. ConcurrentSkipListMap原理和数据结构</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#3-ConcurrentSkipListMap函数列表"><span class="post-toc-number">3.</span> <span class="post-toc-text">3. ConcurrentSkipListMap函数列表</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#4-ConcurrentSkipListMap源码分析-JDK1-7-0-40版本"><span class="post-toc-number">4.</span> <span class="post-toc-text">4. ConcurrentSkipListMap源码分析(JDK1.7.0_40版本)</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#4-1-添加"><span class="post-toc-number">4.1.</span> <span class="post-toc-text">4.1 添加</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#4-2-删除"><span class="post-toc-number">5.</span> <span class="post-toc-text">4.2 删除</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#4-3-获取"><span class="post-toc-number">5.1.</span> <span class="post-toc-text">4.3 获取</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#5-ConcurrentSkipListMap示例"><span class="post-toc-number">6.</span> <span class="post-toc-text">5. ConcurrentSkipListMap示例</span></a></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”05之 ConcurrentSkipListMap"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Java多线程系列--“JUC集合”05之 ConcurrentSkipListMap</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2016-11-12 05:00:00" datetime="2016-11-11T21:00:00.000Z"  itemprop="datePublished">2016-11-12</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <blockquote>
+<p>本章对Java.util.concurrent包中的ConcurrentSkipListMap类进行详细的介绍。</p>
+</blockquote>
+<blockquote>
+<p><strong>目录</strong><br><a href="#anchor1">1. ConcurrentSkipListMap介绍</a><br><a href="#anchor2">2. ConcurrentSkipListMap原理和数据结构</a><br><a href="#anchor3">3. ConcurrentSkipListMap函数列表</a><br><a href="#anchor4">4. ConcurrentSkipListMap源码分析(JDK1.7.0_40版本)</a><br>&nbsp;&nbsp;&nbsp;&nbsp; <a href="#anchor4_1">4.1 添加</a><br>&nbsp;&nbsp;&nbsp;&nbsp; <a href="#anchor4_2">4.2 删除</a><br>&nbsp;&nbsp;&nbsp;&nbsp; <a href="#anchor4_3">4.3 获取</a><br><a href="#anchor5">5. ConcurrentSkipListMap示例</a>  </p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="1-ConcurrentSkipListMap介绍"><a href="#1-ConcurrentSkipListMap介绍" class="headerlink" title="1. ConcurrentSkipListMap介绍"></a>1. ConcurrentSkipListMap介绍</h1><p>ConcurrentSkipListMap是线程安全的有序的哈希表，适用于高并发的场景。</p>
+<p>ConcurrentSkipListMap和TreeMap，它们虽然都是有序的哈希表。 但是，<br>第一，它们的线程安全机制不同，TreeMap是非线程安全的，而ConcurrentSkipListMap是线程安全的。<br>第二，ConcurrentSkipListMap是通过跳表实现的，而TreeMap是通过红黑树实现的。</p>
+<p>关于跳表(Skip List)，它是平衡树的一种替代的数据结构，但是和红黑树不相同的是，跳表对于树的平衡的实现是基于一种随机化的算法的，这样也就是说跳表的插入和删除的工作是比较简单的。</p>
+<p><a name="anchor2"></a></p>
+<h1 id="2-ConcurrentSkipListMap原理和数据结构"><a href="#2-ConcurrentSkipListMap原理和数据结构" class="headerlink" title="2. ConcurrentSkipListMap原理和数据结构"></a>2. ConcurrentSkipListMap原理和数据结构</h1><p>ConcurrentSkipListMap的数据结构，如下图所示：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://wangkuiwu.github.io/media/pic/java/threads/juc-col05-01.jpg" alt="img" title="">
+                </div>
+                <div class="image-caption">img</div>
+            </figure>
+<p>说明：<br>先以数据“7,14,21,32,37,71,85”序列为例，来对跳表进行简单说明。</p>
+<p>跳表分为许多层(level)，每一层都可以看作是数据的索引，这些索引的意义就是加快跳表查找数据速度。每一层的数据都是有序的，上一层数据是下一层数据的子集，并且第一层(level 1)包含了全部的数据；层次越高，跳跃性越大，包含的数据越少。<br>跳表包含一个表头，它查找数据时，是从上往下，从左往右进行查找。现在“需要找出值为32的节点”为例，来对比说明跳表和普遍的链表。</p>
+<p>情况1：链表中查找“32”节点<br>路径如下图所示：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://wangkuiwu.github.io/media/pic/java/threads/juc-col05-02.jpg" alt="img" title="">
+                </div>
+                <div class="image-caption">img</div>
+            </figure>
+<p>需要4步(红色部分表示路径)。</p>
+<p>情况2：跳表中查找“32”节点<br>路径如下图1-03所示：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://wangkuiwu.github.io/media/pic/java/threads/juc-col05-03.jpg" alt="img" title="">
+                </div>
+                <div class="image-caption">img</div>
+            </figure>
+<p>忽略索引垂直线路上路径的情况下，只需要2步(红色部分表示路径)。</p>
+<p>下面说说Java中ConcurrentSkipListMap的数据结构。<br>(01) ConcurrentSkipListMap继承于AbstractMap类，也就意味着它是一个哈希表。<br>(02) Index是ConcurrentSkipListMap的内部类，它与“跳表中的索引相对应”。HeadIndex继承于Index，ConcurrentSkipListMap中含有一个HeadIndex的对象head，head是“跳表的表头”。<br>(03) Index是跳表中的索引，它包含“右索引的指针(right)”，“下索引的指针(down)”和“哈希表节点node”。node是Node的对象，Node也是ConcurrentSkipListMap中的内部类。</p>
+<p><a name="anchor3"></a></p>
+<h1 id="3-ConcurrentSkipListMap函数列表"><a href="#3-ConcurrentSkipListMap函数列表" class="headerlink" title="3. ConcurrentSkipListMap函数列表"></a>3. ConcurrentSkipListMap函数列表</h1><pre><code>// 构造一个新的空映射，该映射按照键的自然顺序进行排序。
+ConcurrentSkipListMap()
+// 构造一个新的空映射，该映射按照指定的比较器进行排序。
+ConcurrentSkipListMap(Comparator&lt;? super K&gt; comparator)
+// 构造一个新映射，该映射所包含的映射关系与给定映射包含的映射关系相同，并按照键的自然顺序进行排序。
+ConcurrentSkipListMap(Map&lt;? extends K,? extends V&gt; m)
+// 构造一个新映射，该映射所包含的映射关系与指定的有序映射包含的映射关系相同，使用的顺序也相同。
+ConcurrentSkipListMap(SortedMap&lt;K,? extends V&gt; m)
+
+// 返回与大于等于给定键的最小键关联的键-值映射关系；如果不存在这样的条目，则返回 null。
+Map.Entry&lt;K,V&gt; ceilingEntry(K key)
+// 返回大于等于给定键的最小键；如果不存在这样的键，则返回 null。
+K ceilingKey(K key)
+// 从此映射中移除所有映射关系。
+void clear()
+// 返回此 ConcurrentSkipListMap 实例的浅表副本。
+ConcurrentSkipListMap&lt;K,V&gt; clone()
+// 返回对此映射中的键进行排序的比较器；如果此映射使用键的自然顺序，则返回 null。
+Comparator&lt;? super K&gt; comparator()
+// 如果此映射包含指定键的映射关系，则返回 true。
+boolean containsKey(Object key)
+// 如果此映射为指定值映射一个或多个键，则返回 true。
+boolean containsValue(Object value)
+// 返回此映射中所包含键的逆序 NavigableSet 视图。
+NavigableSet&lt;K&gt; descendingKeySet()
+// 返回此映射中所包含映射关系的逆序视图。
+ConcurrentNavigableMap&lt;K,V&gt; descendingMap()
+// 返回此映射中所包含的映射关系的 Set 视图。
+Set&lt;Map.Entry&lt;K,V&gt;&gt; entrySet()
+// 比较指定对象与此映射的相等性。
+boolean equals(Object o)
+// 返回与此映射中的最小键关联的键-值映射关系；如果该映射为空，则返回 null。
+Map.Entry&lt;K,V&gt; firstEntry()
+// 返回此映射中当前第一个（最低）键。
+K firstKey()
+// 返回与小于等于给定键的最大键关联的键-值映射关系；如果不存在这样的键，则返回 null。
+Map.Entry&lt;K,V&gt; floorEntry(K key)
+// 返回小于等于给定键的最大键；如果不存在这样的键，则返回 null。
+K floorKey(K key)
+// 返回指定键所映射到的值；如果此映射不包含该键的映射关系，则返回 null。
+V get(Object key)
+// 返回此映射的部分视图，其键值严格小于 toKey。
+ConcurrentNavigableMap&lt;K,V&gt; headMap(K toKey)
+// 返回此映射的部分视图，其键小于（或等于，如果 inclusive 为 true）toKey。
+ConcurrentNavigableMap&lt;K,V&gt; headMap(K toKey, boolean inclusive)
+// 返回与严格大于给定键的最小键关联的键-值映射关系；如果不存在这样的键，则返回 null。
+Map.Entry&lt;K,V&gt; higherEntry(K key)
+// 返回严格大于给定键的最小键；如果不存在这样的键，则返回 null。
+K higherKey(K key)
+// 如果此映射未包含键-值映射关系，则返回 true。
+boolean isEmpty()
+// 返回此映射中所包含键的 NavigableSet 视图。
+NavigableSet&lt;K&gt; keySet()
+// 返回与此映射中的最大键关联的键-值映射关系；如果该映射为空，则返回 null。
+Map.Entry&lt;K,V&gt; lastEntry()
+// 返回映射中当前最后一个（最高）键。
+K lastKey()
+// 返回与严格小于给定键的最大键关联的键-值映射关系；如果不存在这样的键，则返回 null。
+Map.Entry&lt;K,V&gt; lowerEntry(K key)
+// 返回严格小于给定键的最大键；如果不存在这样的键，则返回 null。
+K lowerKey(K key)
+// 返回此映射中所包含键的 NavigableSet 视图。
+NavigableSet&lt;K&gt; navigableKeySet()
+// 移除并返回与此映射中的最小键关联的键-值映射关系；如果该映射为空，则返回 null。
+Map.Entry&lt;K,V&gt; pollFirstEntry()
+// 移除并返回与此映射中的最大键关联的键-值映射关系；如果该映射为空，则返回 null。
+Map.Entry&lt;K,V&gt; pollLastEntry()
+// 将指定值与此映射中的指定键关联。
+V put(K key, V value)
+// 如果指定键已经不再与某个值相关联，则将它与给定值关联。
+V putIfAbsent(K key, V value)
+// 从此映射中移除指定键的映射关系（如果存在）。
+V remove(Object key)
+// 只有目前将键的条目映射到给定值时，才移除该键的条目。
+boolean remove(Object key, Object value)
+// 只有目前将键的条目映射到某一值时，才替换该键的条目。
+V replace(K key, V value)
+// 只有目前将键的条目映射到给定值时，才替换该键的条目。
+boolean replace(K key, V oldValue, V newValue)
+// 返回此映射中的键-值映射关系数。
+int size()
+// 返回此映射的部分视图，其键的范围从 fromKey 到 toKey。
+ConcurrentNavigableMap&lt;K,V&gt; subMap(K fromKey, boolean fromInclusive, K toKey, boolean toInclusive)
+// 返回此映射的部分视图，其键值的范围从 fromKey（包括）到 toKey（不包括）。
+ConcurrentNavigableMap&lt;K,V&gt; subMap(K fromKey, K toKey)
+// 返回此映射的部分视图，其键大于等于 fromKey。
+ConcurrentNavigableMap&lt;K,V&gt; tailMap(K fromKey)
+// 返回此映射的部分视图，其键大于（或等于，如果 inclusive 为 true）fromKey。
+ConcurrentNavigableMap&lt;K,V&gt; tailMap(K fromKey, boolean inclusive)
+// 返回此映射中所包含值的 Collection 视图。
+Collection&lt;V&gt; values()
+</code></pre><p><a name="anchor4"></a></p>
+<h1 id="4-ConcurrentSkipListMap源码分析-JDK1-7-0-40版本"><a href="#4-ConcurrentSkipListMap源码分析-JDK1-7-0-40版本" class="headerlink" title="4. ConcurrentSkipListMap源码分析(JDK1.7.0_40版本)"></a>4. ConcurrentSkipListMap源码分析(JDK1.7.0_40版本)</h1><p>ConcurrentSkipListMap.java的完整源码如下：</p>
+<pre><code>package java.util.concurrent;
+import java.util.*;
+import java.util.concurrent.atomic.*;
+
+/**
+ * A scalable concurrent {@link ConcurrentNavigableMap} implementation.
+ * The map is sorted according to the {@linkplain Comparable natural
+ * ordering} of its keys, or by a {@link Comparator} provided at map
+ * creation time, depending on which constructor is used.
+ *
+ * &lt;p&gt;This class implements a concurrent variant of &lt;a
+ * href=&quot;http://en.wikipedia.org/wiki/Skip_list&quot; target=&quot;_top&quot;&gt;SkipLists&lt;/a&gt;
+ * providing expected average &lt;i&gt;log(n)&lt;/i&gt; time cost for the
+ * &lt;tt&gt;containsKey&lt;/tt&gt;, &lt;tt&gt;get&lt;/tt&gt;, &lt;tt&gt;put&lt;/tt&gt; and
+ * &lt;tt&gt;remove&lt;/tt&gt; operations and their variants.  Insertion, removal,
+ * update, and access operations safely execute concurrently by
+ * multiple threads.  Iterators are &lt;i&gt;weakly consistent&lt;/i&gt;, returning
+ * elements reflecting the state of the map at some point at or since
+ * the creation of the iterator.  They do &lt;em&gt;not&lt;/em&gt; throw {@link
+ * ConcurrentModificationException}, and may proceed concurrently with
+ * other operations. Ascending key ordered views and their iterators
+ * are faster than descending ones.
+ *
+ * &lt;p&gt;All &lt;tt&gt;Map.Entry&lt;/tt&gt; pairs returned by methods in this class
+ * and its views represent snapshots of mappings at the time they were
+ * produced. They do &lt;em&gt;not&lt;/em&gt; support the &lt;tt&gt;Entry.setValue&lt;/tt&gt;
+ * method. (Note however that it is possible to change mappings in the
+ * associated map using &lt;tt&gt;put&lt;/tt&gt;, &lt;tt&gt;putIfAbsent&lt;/tt&gt;, or
+ * &lt;tt&gt;replace&lt;/tt&gt;, depending on exactly which effect you need.)
+ *
+ * &lt;p&gt;Beware that, unlike in most collections, the &lt;tt&gt;size&lt;/tt&gt;
+ * method is &lt;em&gt;not&lt;/em&gt; a constant-time operation. Because of the
+ * asynchronous nature of these maps, determining the current number
+ * of elements requires a traversal of the elements, and so may report
+ * inaccurate results if this collection is modified during traversal.
+ * Additionally, the bulk operations &lt;tt&gt;putAll&lt;/tt&gt;, &lt;tt&gt;equals&lt;/tt&gt;,
+ * &lt;tt&gt;toArray&lt;/tt&gt;, &lt;tt&gt;containsValue&lt;/tt&gt;, and &lt;tt&gt;clear&lt;/tt&gt; are
+ * &lt;em&gt;not&lt;/em&gt; guaranteed to be performed atomically. For example, an
+ * iterator operating concurrently with a &lt;tt&gt;putAll&lt;/tt&gt; operation
+ * might view only some of the added elements.
+ *
+ * &lt;p&gt;This class and its views and iterators implement all of the
+ * &lt;em&gt;optional&lt;/em&gt; methods of the {@link Map} and {@link Iterator}
+ * interfaces. Like most other concurrent collections, this class does
+ * &lt;em&gt;not&lt;/em&gt; permit the use of &lt;tt&gt;null&lt;/tt&gt; keys or values because some
+ * null return values cannot be reliably distinguished from the absence of
+ * elements.
+ *
+ * &lt;p&gt;This class is a member of the
+ * &lt;a href=&quot;{@docRoot}/../technotes/guides/collections/index.html&quot;&gt;
+ * Java Collections Framework&lt;/a&gt;.
+ *
+ * @author Doug Lea
+ * @param &lt;K&gt; the type of keys maintained by this map
+ * @param &lt;V&gt; the type of mapped values
+ * @since 1.6
+ */
+public class ConcurrentSkipListMap&lt;K,V&gt; extends AbstractMap&lt;K,V&gt;
+    implements ConcurrentNavigableMap&lt;K,V&gt;,
+               Cloneable,
+               java.io.Serializable {
+    /*
+     * This class implements a tree-like two-dimensionally linked skip
+     * list in which the index levels are represented in separate
+     * nodes from the base nodes holding data.  There are two reasons
+     * for taking this approach instead of the usual array-based
+     * structure: 1) Array based implementations seem to encounter
+     * more complexity and overhead 2) We can use cheaper algorithms
+     * for the heavily-traversed index lists than can be used for the
+     * base lists.  Here&apos;s a picture of some of the basics for a
+     * possible list with 2 levels of index:
+     *
+     * Head nodes          Index nodes
+     * +-+    right        +-+                      +-+
+     * |2|----------------&gt;| |---------------------&gt;| |-&gt;null
+     * +-+                 +-+                      +-+
+     *  | down              |                        |
+     *  v                   v                        v
+     * +-+            +-+  +-+       +-+            +-+       +-+
+     * |1|-----------&gt;| |-&gt;| |------&gt;| |-----------&gt;| |------&gt;| |-&gt;null
+     * +-+            +-+  +-+       +-+            +-+       +-+
+     *  v              |    |         |              |         |
+     * Nodes  next     v    v         v              v         v
+     * +-+  +-+  +-+  +-+  +-+  +-+  +-+  +-+  +-+  +-+  +-+  +-+
+     * | |-&gt;|A|-&gt;|B|-&gt;|C|-&gt;|D|-&gt;|E|-&gt;|F|-&gt;|G|-&gt;|H|-&gt;|I|-&gt;|J|-&gt;|K|-&gt;null
+     * +-+  +-+  +-+  +-+  +-+  +-+  +-+  +-+  +-+  +-+  +-+  +-+
+     *
+     * The base lists use a variant of the HM linked ordered set
+     * algorithm. See Tim Harris, &quot;A pragmatic implementation of
+     * non-blocking linked lists&quot;
+     * http://www.cl.cam.ac.uk/~tlh20/publications.html and Maged
+     * Michael &quot;High Performance Dynamic Lock-Free Hash Tables and
+     * List-Based Sets&quot;
+     * http://www.research.ibm.com/people/m/michael/pubs.htm.  The
+     * basic idea in these lists is to mark the &quot;next&quot; pointers of
+     * deleted nodes when deleting to avoid conflicts with concurrent
+     * insertions, and when traversing to keep track of triples
+     * (predecessor, node, successor) in order to detect when and how
+     * to unlink these deleted nodes.
+     *
+     * Rather than using mark-bits to mark list deletions (which can
+     * be slow and space-intensive using AtomicMarkedReference), nodes
+     * use direct CAS&apos;able next pointers.  On deletion, instead of
+     * marking a pointer, they splice in another node that can be
+     * thought of as standing for a marked pointer (indicating this by
+     * using otherwise impossible field values).  Using plain nodes
+     * acts roughly like &quot;boxed&quot; implementations of marked pointers,
+     * but uses new nodes only when nodes are deleted, not for every
+     * link.  This requires less space and supports faster
+     * traversal. Even if marked references were better supported by
+     * JVMs, traversal using this technique might still be faster
+     * because any search need only read ahead one more node than
+     * otherwise required (to check for trailing marker) rather than
+     * unmasking mark bits or whatever on each read.
+     *
+     * This approach maintains the essential property needed in the HM
+     * algorithm of changing the next-pointer of a deleted node so
+     * that any other CAS of it will fail, but implements the idea by
+     * changing the pointer to point to a different node, not by
+     * marking it.  While it would be possible to further squeeze
+     * space by defining marker nodes not to have key/value fields, it
+     * isn&apos;t worth the extra type-testing overhead.  The deletion
+     * markers are rarely encountered during traversal and are
+     * normally quickly garbage collected. (Note that this technique
+     * would not work well in systems without garbage collection.)
+     *
+     * In addition to using deletion markers, the lists also use
+     * nullness of value fields to indicate deletion, in a style
+     * similar to typical lazy-deletion schemes.  If a node&apos;s value is
+     * null, then it is considered logically deleted and ignored even
+     * though it is still reachable. This maintains proper control of
+     * concurrent replace vs delete operations -- an attempted replace
+     * must fail if a delete beat it by nulling field, and a delete
+     * must return the last non-null value held in the field. (Note:
+     * Null, rather than some special marker, is used for value fields
+     * here because it just so happens to mesh with the Map API
+     * requirement that method get returns null if there is no
+     * mapping, which allows nodes to remain concurrently readable
+     * even when deleted. Using any other marker value here would be
+     * messy at best.)
+     *
+     * Here&apos;s the sequence of events for a deletion of node n with
+     * predecessor b and successor f, initially:
+     *
+     *        +------+       +------+      +------+
+     *   ...  |   b  |------&gt;|   n  |-----&gt;|   f  | ...
+     *        +------+       +------+      +------+
+     *
+     * 1. CAS n&apos;s value field from non-null to null.
+     *    From this point on, no public operations encountering
+     *    the node consider this mapping to exist. However, other
+     *    ongoing insertions and deletions might still modify
+     *    n&apos;s next pointer.
+     *
+     * 2. CAS n&apos;s next pointer to point to a new marker node.
+     *    From this point on, no other nodes can be appended to n.
+     *    which avoids deletion errors in CAS-based linked lists.
+     *
+     *        +------+       +------+      +------+       +------+
+     *   ...  |   b  |------&gt;|   n  |-----&gt;|marker|------&gt;|   f  | ...
+     *        +------+       +------+      +------+       +------+
+     *
+     * 3. CAS b&apos;s next pointer over both n and its marker.
+     *    From this point on, no new traversals will encounter n,
+     *    and it can eventually be GCed.
+     *        +------+                                    +------+
+     *   ...  |   b  |-----------------------------------&gt;|   f  | ...
+     *        +------+                                    +------+
+     *
+     * A failure at step 1 leads to simple retry due to a lost race
+     * with another operation. Steps 2-3 can fail because some other
+     * thread noticed during a traversal a node with null value and
+     * helped out by marking and/or unlinking.  This helping-out
+     * ensures that no thread can become stuck waiting for progress of
+     * the deleting thread.  The use of marker nodes slightly
+     * complicates helping-out code because traversals must track
+     * consistent reads of up to four nodes (b, n, marker, f), not
+     * just (b, n, f), although the next field of a marker is
+     * immutable, and once a next field is CAS&apos;ed to point to a
+     * marker, it never again changes, so this requires less care.
+     *
+     * Skip lists add indexing to this scheme, so that the base-level
+     * traversals start close to the locations being found, inserted
+     * or deleted -- usually base level traversals only traverse a few
+     * nodes. This doesn&apos;t change the basic algorithm except for the
+     * need to make sure base traversals start at predecessors (here,
+     * b) that are not (structurally) deleted, otherwise retrying
+     * after processing the deletion.
+     *
+     * Index levels are maintained as lists with volatile next fields,
+     * using CAS to link and unlink.  Races are allowed in index-list
+     * operations that can (rarely) fail to link in a new index node
+     * or delete one. (We can&apos;t do this of course for data nodes.)
+     * However, even when this happens, the index lists remain sorted,
+     * so correctly serve as indices.  This can impact performance,
+     * but since skip lists are probabilistic anyway, the net result
+     * is that under contention, the effective &quot;p&quot; value may be lower
+     * than its nominal value. And race windows are kept small enough
+     * that in practice these failures are rare, even under a lot of
+     * contention.
+     *
+     * The fact that retries (for both base and index lists) are
+     * relatively cheap due to indexing allows some minor
+     * simplifications of retry logic. Traversal restarts are
+     * performed after most &quot;helping-out&quot; CASes. This isn&apos;t always
+     * strictly necessary, but the implicit backoffs tend to help
+     * reduce other downstream failed CAS&apos;s enough to outweigh restart
+     * cost.  This worsens the worst case, but seems to improve even
+     * highly contended cases.
+     *
+     * Unlike most skip-list implementations, index insertion and
+     * deletion here require a separate traversal pass occuring after
+     * the base-level action, to add or remove index nodes.  This adds
+     * to single-threaded overhead, but improves contended
+     * multithreaded performance by narrowing interference windows,
+     * and allows deletion to ensure that all index nodes will be made
+     * unreachable upon return from a public remove operation, thus
+     * avoiding unwanted garbage retention. This is more important
+     * here than in some other data structures because we cannot null
+     * out node fields referencing user keys since they might still be
+     * read by other ongoing traversals.
+     *
+     * Indexing uses skip list parameters that maintain good search
+     * performance while using sparser-than-usual indices: The
+     * hardwired parameters k=1, p=0.5 (see method randomLevel) mean
+     * that about one-quarter of the nodes have indices. Of those that
+     * do, half have one level, a quarter have two, and so on (see
+     * Pugh&apos;s Skip List Cookbook, sec 3.4).  The expected total space
+     * requirement for a map is slightly less than for the current
+     * implementation of java.util.TreeMap.
+     *
+     * Changing the level of the index (i.e, the height of the
+     * tree-like structure) also uses CAS. The head index has initial
+     * level/height of one. Creation of an index with height greater
+     * than the current level adds a level to the head index by
+     * CAS&apos;ing on a new top-most head. To maintain good performance
+     * after a lot of removals, deletion methods heuristically try to
+     * reduce the height if the topmost levels appear to be empty.
+     * This may encounter races in which it possible (but rare) to
+     * reduce and &quot;lose&quot; a level just as it is about to contain an
+     * index (that will then never be encountered). This does no
+     * structural harm, and in practice appears to be a better option
+     * than allowing unrestrained growth of levels.
+     *
+     * The code for all this is more verbose than you&apos;d like. Most
+     * operations entail locating an element (or position to insert an
+     * element). The code to do this can&apos;t be nicely factored out
+     * because subsequent uses require a snapshot of predecessor
+     * and/or successor and/or value fields which can&apos;t be returned
+     * all at once, at least not without creating yet another object
+     * to hold them -- creating such little objects is an especially
+     * bad idea for basic internal search operations because it adds
+     * to GC overhead.  (This is one of the few times I&apos;ve wished Java
+     * had macros.) Instead, some traversal code is interleaved within
+     * insertion and removal operations.  The control logic to handle
+     * all the retry conditions is sometimes twisty. Most search is
+     * broken into 2 parts. findPredecessor() searches index nodes
+     * only, returning a base-level predecessor of the key. findNode()
+     * finishes out the base-level search. Even with this factoring,
+     * there is a fair amount of near-duplication of code to handle
+     * variants.
+     *
+     * For explanation of algorithms sharing at least a couple of
+     * features with this one, see Mikhail Fomitchev&apos;s thesis
+     * (http://www.cs.yorku.ca/~mikhail/), Keir Fraser&apos;s thesis
+     * (http://www.cl.cam.ac.uk/users/kaf24/), and Hakan Sundell&apos;s
+     * thesis (http://www.cs.chalmers.se/~phs/).
+     *
+     * Given the use of tree-like index nodes, you might wonder why
+     * this doesn&apos;t use some kind of search tree instead, which would
+     * support somewhat faster search operations. The reason is that
+     * there are no known efficient lock-free insertion and deletion
+     * algorithms for search trees. The immutability of the &quot;down&quot;
+     * links of index nodes (as opposed to mutable &quot;left&quot; fields in
+     * true trees) makes this tractable using only CAS operations.
+     *
+     * Notation guide for local variables
+     * Node:         b, n, f    for  predecessor, node, successor
+     * Index:        q, r, d    for index node, right, down.
+     *               t          for another index node
+     * Head:         h
+     * Levels:       j
+     * Keys:         k, key
+     * Values:       v, value
+     * Comparisons:  c
+     */
+
+    private static final long serialVersionUID = -8627078645895051609L;
+
+    /**
+     * Generates the initial random seed for the cheaper per-instance
+     * random number generators used in randomLevel.
+     */
+    private static final Random seedGenerator = new Random();
+
+    /**
+     * Special value used to identify base-level header
+     */
+    private static final Object BASE_HEADER = new Object();
+
+    /**
+     * The topmost head index of the skiplist.
+     */
+    private transient volatile HeadIndex&lt;K,V&gt; head;
+
+    /**
+     * The comparator used to maintain order in this map, or null
+     * if using natural ordering.
+     * @serial
+     */
+    private final Comparator&lt;? super K&gt; comparator;
+
+    /**
+     * Seed for simple random number generator.  Not volatile since it
+     * doesn&apos;t matter too much if different threads don&apos;t see updates.
+     */
+    private transient int randomSeed;
+
+    /** Lazily initialized key set */
+    private transient KeySet keySet;
+    /** Lazily initialized entry set */
+    private transient EntrySet entrySet;
+    /** Lazily initialized values collection */
+    private transient Values values;
+    /** Lazily initialized descending key set */
+    private transient ConcurrentNavigableMap&lt;K,V&gt; descendingMap;
+
+    /**
+     * Initializes or resets state. Needed by constructors, clone,
+     * clear, readObject. and ConcurrentSkipListSet.clone.
+     * (Note that comparator must be separately initialized.)
+     */
+    final void initialize() {
+        keySet = null;
+        entrySet = null;
+        values = null;
+        descendingMap = null;
+        randomSeed = seedGenerator.nextInt() | 0x0100; // ensure nonzero
+        head = new HeadIndex&lt;K,V&gt;(new Node&lt;K,V&gt;(null, BASE_HEADER, null),
+                                  null, null, 1);
+    }
+
+    /**
+     * compareAndSet head node
+     */
+    private boolean casHead(HeadIndex&lt;K,V&gt; cmp, HeadIndex&lt;K,V&gt; val) {
+        return UNSAFE.compareAndSwapObject(this, headOffset, cmp, val);
+    }
+
+    /* ---------------- Nodes -------------- */
+
+    /**
+     * Nodes hold keys and values, and are singly linked in sorted
+     * order, possibly with some intervening marker nodes. The list is
+     * headed by a dummy node accessible as head.node. The value field
+     * is declared only as Object because it takes special non-V
+     * values for marker and header nodes.
+     */
+    static final class Node&lt;K,V&gt; {
+        final K key;
+        volatile Object value;
+        volatile Node&lt;K,V&gt; next;
+
+        /**
+         * Creates a new regular node.
+         */
+        Node(K key, Object value, Node&lt;K,V&gt; next) {
+            this.key = key;
+            this.value = value;
+            this.next = next;
+        }
+
+        /**
+         * Creates a new marker node. A marker is distinguished by
+         * having its value field point to itself.  Marker nodes also
+         * have null keys, a fact that is exploited in a few places,
+         * but this doesn&apos;t distinguish markers from the base-level
+         * header node (head.node), which also has a null key.
+         */
+        Node(Node&lt;K,V&gt; next) {
+            this.key = null;
+            this.value = this;
+            this.next = next;
+        }
+
+        /**
+         * compareAndSet value field
+         */
+        boolean casValue(Object cmp, Object val) {
+            return UNSAFE.compareAndSwapObject(this, valueOffset, cmp, val);
+        }
+
+        /**
+         * compareAndSet next field
+         */
+        boolean casNext(Node&lt;K,V&gt; cmp, Node&lt;K,V&gt; val) {
+            return UNSAFE.compareAndSwapObject(this, nextOffset, cmp, val);
+        }
+
+        /**
+         * Returns true if this node is a marker. This method isn&apos;t
+         * actually called in any current code checking for markers
+         * because callers will have already read value field and need
+         * to use that read (not another done here) and so directly
+         * test if value points to node.
+         * @param n a possibly null reference to a node
+         * @return true if this node is a marker node
+         */
+        boolean isMarker() {
+            return value == this;
+        }
+
+        /**
+         * Returns true if this node is the header of base-level list.
+         * @return true if this node is header node
+         */
+        boolean isBaseHeader() {
+            return value == BASE_HEADER;
+        }
+
+        /**
+         * Tries to append a deletion marker to this node.
+         * @param f the assumed current successor of this node
+         * @return true if successful
+         */
+        boolean appendMarker(Node&lt;K,V&gt; f) {
+            return casNext(f, new Node&lt;K,V&gt;(f));
+        }
+
+        /**
+         * Helps out a deletion by appending marker or unlinking from
+         * predecessor. This is called during traversals when value
+         * field seen to be null.
+         * @param b predecessor
+         * @param f successor
+         */
+        void helpDelete(Node&lt;K,V&gt; b, Node&lt;K,V&gt; f) {
+            /*
+             * Rechecking links and then doing only one of the
+             * help-out stages per call tends to minimize CAS
+             * interference among helping threads.
+             */
+            if (f == next &amp;&amp; this == b.next) {
+                if (f == null || f.value != f) // not already marked
+                    appendMarker(f);
+                else
+                    b.casNext(this, f.next);
+            }
+        }
+
+        /**
+         * Returns value if this node contains a valid key-value pair,
+         * else null.
+         * @return this node&apos;s value if it isn&apos;t a marker or header or
+         * is deleted, else null.
+         */
+        V getValidValue() {
+            Object v = value;
+            if (v == this || v == BASE_HEADER)
+                return null;
+            return (V)v;
+        }
+
+        /**
+         * Creates and returns a new SimpleImmutableEntry holding current
+         * mapping if this node holds a valid value, else null.
+         * @return new entry or null
+         */
+        AbstractMap.SimpleImmutableEntry&lt;K,V&gt; createSnapshot() {
+            V v = getValidValue();
+            if (v == null)
+                return null;
+            return new AbstractMap.SimpleImmutableEntry&lt;K,V&gt;(key, v);
+        }
+
+        // UNSAFE mechanics
+
+        private static final sun.misc.Unsafe UNSAFE;
+        private static final long valueOffset;
+        private static final long nextOffset;
+
+        static {
+            try {
+                UNSAFE = sun.misc.Unsafe.getUnsafe();
+                Class k = Node.class;
+                valueOffset = UNSAFE.objectFieldOffset
+                    (k.getDeclaredField(&quot;value&quot;));
+                nextOffset = UNSAFE.objectFieldOffset
+                    (k.getDeclaredField(&quot;next&quot;));
+            } catch (Exception e) {
+                throw new Error(e);
+            }
+        }
+    }
+
+    /* ---------------- Indexing -------------- */
+
+    /**
+     * Index nodes represent the levels of the skip list.  Note that
+     * even though both Nodes and Indexes have forward-pointing
+     * fields, they have different types and are handled in different
+     * ways, that can&apos;t nicely be captured by placing field in a
+     * shared abstract class.
+     */
+    static class Index&lt;K,V&gt; {
+        final Node&lt;K,V&gt; node;
+        final Index&lt;K,V&gt; down;
+        volatile Index&lt;K,V&gt; right;
+
+        /**
+         * Creates index node with given values.
+         */
+        Index(Node&lt;K,V&gt; node, Index&lt;K,V&gt; down, Index&lt;K,V&gt; right) {
+            this.node = node;
+            this.down = down;
+            this.right = right;
+        }
+
+        /**
+         * compareAndSet right field
+         */
+        final boolean casRight(Index&lt;K,V&gt; cmp, Index&lt;K,V&gt; val) {
+            return UNSAFE.compareAndSwapObject(this, rightOffset, cmp, val);
+        }
+
+        /**
+         * Returns true if the node this indexes has been deleted.
+         * @return true if indexed node is known to be deleted
+         */
+        final boolean indexesDeletedNode() {
+            return node.value == null;
+        }
+
+        /**
+         * Tries to CAS newSucc as successor.  To minimize races with
+         * unlink that may lose this index node, if the node being
+         * indexed is known to be deleted, it doesn&apos;t try to link in.
+         * @param succ the expected current successor
+         * @param newSucc the new successor
+         * @return true if successful
+         */
+        final boolean link(Index&lt;K,V&gt; succ, Index&lt;K,V&gt; newSucc) {
+            Node&lt;K,V&gt; n = node;
+            newSucc.right = succ;
+            return n.value != null &amp;&amp; casRight(succ, newSucc);
+        }
+
+        /**
+         * Tries to CAS right field to skip over apparent successor
+         * succ.  Fails (forcing a retraversal by caller) if this node
+         * is known to be deleted.
+         * @param succ the expected current successor
+         * @return true if successful
+         */
+        final boolean unlink(Index&lt;K,V&gt; succ) {
+            return !indexesDeletedNode() &amp;&amp; casRight(succ, succ.right);
+        }
+
+        // Unsafe mechanics
+        private static final sun.misc.Unsafe UNSAFE;
+        private static final long rightOffset;
+        static {
+            try {
+                UNSAFE = sun.misc.Unsafe.getUnsafe();
+                Class k = Index.class;
+                rightOffset = UNSAFE.objectFieldOffset
+                    (k.getDeclaredField(&quot;right&quot;));
+            } catch (Exception e) {
+                throw new Error(e);
+            }
+        }
+    }
+
+    /* ---------------- Head nodes -------------- */
+
+    /**
+     * Nodes heading each level keep track of their level.
+     */
+    static final class HeadIndex&lt;K,V&gt; extends Index&lt;K,V&gt; {
+        final int level;
+        HeadIndex(Node&lt;K,V&gt; node, Index&lt;K,V&gt; down, Index&lt;K,V&gt; right, int level) {
+            super(node, down, right);
+            this.level = level;
+        }
+    }
+
+    /* ---------------- Comparison utilities -------------- */
+
+    /**
+     * Represents a key with a comparator as a Comparable.
+     *
+     * Because most sorted collections seem to use natural ordering on
+     * Comparables (Strings, Integers, etc), most internal methods are
+     * geared to use them. This is generally faster than checking
+     * per-comparison whether to use comparator or comparable because
+     * it doesn&apos;t require a (Comparable) cast for each comparison.
+     * (Optimizers can only sometimes remove such redundant checks
+     * themselves.) When Comparators are used,
+     * ComparableUsingComparators are created so that they act in the
+     * same way as natural orderings. This penalizes use of
+     * Comparators vs Comparables, which seems like the right
+     * tradeoff.
+     */
+    static final class ComparableUsingComparator&lt;K&gt; implements Comparable&lt;K&gt; {
+        final K actualKey;
+        final Comparator&lt;? super K&gt; cmp;
+        ComparableUsingComparator(K key, Comparator&lt;? super K&gt; cmp) {
+            this.actualKey = key;
+            this.cmp = cmp;
+        }
+        public int compareTo(K k2) {
+            return cmp.compare(actualKey, k2);
+        }
+    }
+
+    /**
+     * If using comparator, return a ComparableUsingComparator, else
+     * cast key as Comparable, which may cause ClassCastException,
+     * which is propagated back to caller.
+     */
+    private Comparable&lt;? super K&gt; comparable(Object key)
+            throws ClassCastException {
+        if (key == null)
+            throw new NullPointerException();
+        if (comparator != null)
+            return new ComparableUsingComparator&lt;K&gt;((K)key, comparator);
+        else
+            return (Comparable&lt;? super K&gt;)key;
+    }
+
+    /**
+     * Compares using comparator or natural ordering. Used when the
+     * ComparableUsingComparator approach doesn&apos;t apply.
+     */
+    int compare(K k1, K k2) throws ClassCastException {
+        Comparator&lt;? super K&gt; cmp = comparator;
+        if (cmp != null)
+            return cmp.compare(k1, k2);
+        else
+            return ((Comparable&lt;? super K&gt;)k1).compareTo(k2);
+    }
+
+    /**
+     * Returns true if given key greater than or equal to least and
+     * strictly less than fence, bypassing either test if least or
+     * fence are null. Needed mainly in submap operations.
+     */
+    boolean inHalfOpenRange(K key, K least, K fence) {
+        if (key == null)
+            throw new NullPointerException();
+        return ((least == null || compare(key, least) &gt;= 0) &amp;&amp;
+                (fence == null || compare(key, fence) &lt;  0));
+    }
+
+    /**
+     * Returns true if given key greater than or equal to least and less
+     * or equal to fence. Needed mainly in submap operations.
+     */
+    boolean inOpenRange(K key, K least, K fence) {
+        if (key == null)
+            throw new NullPointerException();
+        return ((least == null || compare(key, least) &gt;= 0) &amp;&amp;
+                (fence == null || compare(key, fence) &lt;= 0));
+    }
+
+    /* ---------------- Traversal -------------- */
+
+    /**
+     * Returns a base-level node with key strictly less than given key,
+     * or the base-level header if there is no such node.  Also
+     * unlinks indexes to deleted nodes found along the way.  Callers
+     * rely on this side-effect of clearing indices to deleted nodes.
+     * @param key the key
+     * @return a predecessor of key
+     */
+    private Node&lt;K,V&gt; findPredecessor(Comparable&lt;? super K&gt; key) {
+        if (key == null)
+            throw new NullPointerException(); // don&apos;t postpone errors
+        for (;;) {
+            Index&lt;K,V&gt; q = head;
+            Index&lt;K,V&gt; r = q.right;
+            for (;;) {
+                if (r != null) {
+                    Node&lt;K,V&gt; n = r.node;
+                    K k = n.key;
+                    if (n.value == null) {
+                        if (!q.unlink(r))
+                            break;           // restart
+                        r = q.right;         // reread r
+                        continue;
+                    }
+                    if (key.compareTo(k) &gt; 0) {
+                        q = r;
+                        r = r.right;
+                        continue;
+                    }
+                }
+                Index&lt;K,V&gt; d = q.down;
+                if (d != null) {
+                    q = d;
+                    r = d.right;
+                } else
+                    return q.node;
+            }
+        }
+    }
+
+    /**
+     * Returns node holding key or null if no such, clearing out any
+     * deleted nodes seen along the way.  Repeatedly traverses at
+     * base-level looking for key starting at predecessor returned
+     * from findPredecessor, processing base-level deletions as
+     * encountered. Some callers rely on this side-effect of clearing
+     * deleted nodes.
+     *
+     * Restarts occur, at traversal step centered on node n, if:
+     *
+     *   (1) After reading n&apos;s next field, n is no longer assumed
+     *       predecessor b&apos;s current successor, which means that
+     *       we don&apos;t have a consistent 3-node snapshot and so cannot
+     *       unlink any subsequent deleted nodes encountered.
+     *
+     *   (2) n&apos;s value field is null, indicating n is deleted, in
+     *       which case we help out an ongoing structural deletion
+     *       before retrying.  Even though there are cases where such
+     *       unlinking doesn&apos;t require restart, they aren&apos;t sorted out
+     *       here because doing so would not usually outweigh cost of
+     *       restarting.
+     *
+     *   (3) n is a marker or n&apos;s predecessor&apos;s value field is null,
+     *       indicating (among other possibilities) that
+     *       findPredecessor returned a deleted node. We can&apos;t unlink
+     *       the node because we don&apos;t know its predecessor, so rely
+     *       on another call to findPredecessor to notice and return
+     *       some earlier predecessor, which it will do. This check is
+     *       only strictly needed at beginning of loop, (and the
+     *       b.value check isn&apos;t strictly needed at all) but is done
+     *       each iteration to help avoid contention with other
+     *       threads by callers that will fail to be able to change
+     *       links, and so will retry anyway.
+     *
+     * The traversal loops in doPut, doRemove, and findNear all
+     * include the same three kinds of checks. And specialized
+     * versions appear in findFirst, and findLast and their
+     * variants. They can&apos;t easily share code because each uses the
+     * reads of fields held in locals occurring in the orders they
+     * were performed.
+     *
+     * @param key the key
+     * @return node holding key, or null if no such
+     */
+    private Node&lt;K,V&gt; findNode(Comparable&lt;? super K&gt; key) {
+        for (;;) {
+            Node&lt;K,V&gt; b = findPredecessor(key);
+            Node&lt;K,V&gt; n = b.next;
+            for (;;) {
+                if (n == null)
+                    return null;
+                Node&lt;K,V&gt; f = n.next;
+                if (n != b.next)                // inconsistent read
+                    break;
+                Object v = n.value;
+                if (v == null) {                // n is deleted
+                    n.helpDelete(b, f);
+                    break;
+                }
+                if (v == n || b.value == null)  // b is deleted
+                    break;
+                int c = key.compareTo(n.key);
+                if (c == 0)
+                    return n;
+                if (c &lt; 0)
+                    return null;
+                b = n;
+                n = f;
+            }
+        }
+    }
+
+    /**
+     * Gets value for key using findNode.
+     * @param okey the key
+     * @return the value, or null if absent
+     */
+    private V doGet(Object okey) {
+        Comparable&lt;? super K&gt; key = comparable(okey);
+        /*
+         * Loop needed here and elsewhere in case value field goes
+         * null just as it is about to be returned, in which case we
+         * lost a race with a deletion, so must retry.
+         */
+        for (;;) {
+            Node&lt;K,V&gt; n = findNode(key);
+            if (n == null)
+                return null;
+            Object v = n.value;
+            if (v != null)
+                return (V)v;
+        }
+    }
+
+    /* ---------------- Insertion -------------- */
+
+    /**
+     * Main insertion method.  Adds element if not present, or
+     * replaces value if present and onlyIfAbsent is false.
+     * @param kkey the key
+     * @param value  the value that must be associated with key
+     * @param onlyIfAbsent if should not insert if already present
+     * @return the old value, or null if newly inserted
+     */
+    private V doPut(K kkey, V value, boolean onlyIfAbsent) {
+        Comparable&lt;? super K&gt; key = comparable(kkey);
+        for (;;) {
+            Node&lt;K,V&gt; b = findPredecessor(key);
+            Node&lt;K,V&gt; n = b.next;
+            for (;;) {
+                if (n != null) {
+                    Node&lt;K,V&gt; f = n.next;
+                    if (n != b.next)               // inconsistent read
+                        break;
+                    Object v = n.value;
+                    if (v == null) {               // n is deleted
+                        n.helpDelete(b, f);
+                        break;
+                    }
+                    if (v == n || b.value == null) // b is deleted
+                        break;
+                    int c = key.compareTo(n.key);
+                    if (c &gt; 0) {
+                        b = n;
+                        n = f;
+                        continue;
+                    }
+                    if (c == 0) {
+                        if (onlyIfAbsent || n.casValue(v, value))
+                            return (V)v;
+                        else
+                            break; // restart if lost race to replace value
+                    }
+                    // else c &lt; 0; fall through
+                }
+
+                Node&lt;K,V&gt; z = new Node&lt;K,V&gt;(kkey, value, n);
+                if (!b.casNext(n, z))
+                    break;         // restart if lost race to append to b
+                int level = randomLevel();
+                if (level &gt; 0)
+                    insertIndex(z, level);
+                return null;
+            }
+        }
+    }
+
+    /**
+     * Returns a random level for inserting a new node.
+     * Hardwired to k=1, p=0.5, max 31 (see above and
+     * Pugh&apos;s &quot;Skip List Cookbook&quot;, sec 3.4).
+     *
+     * This uses the simplest of the generators described in George
+     * Marsaglia&apos;s &quot;Xorshift RNGs&quot; paper.  This is not a high-quality
+     * generator but is acceptable here.
+     */
+    private int randomLevel() {
+        int x = randomSeed;
+        x ^= x &lt;&lt; 13;
+        x ^= x &gt;&gt;&gt; 17;
+        randomSeed = x ^= x &lt;&lt; 5;
+        if ((x &amp; 0x80000001) != 0) // test highest and lowest bits
+            return 0;
+        int level = 1;
+        while (((x &gt;&gt;&gt;= 1) &amp; 1) != 0) ++level;
+        return level;
+    }
+
+    /**
+     * Creates and adds index nodes for the given node.
+     * @param z the node
+     * @param level the level of the index
+     */
+    private void insertIndex(Node&lt;K,V&gt; z, int level) {
+        HeadIndex&lt;K,V&gt; h = head;
+        int max = h.level;
+
+        if (level &lt;= max) {
+            Index&lt;K,V&gt; idx = null;
+            for (int i = 1; i &lt;= level; ++i)
+                idx = new Index&lt;K,V&gt;(z, idx, null);
+            addIndex(idx, h, level);
+
+        } else { // Add a new level
+            /*
+             * To reduce interference by other threads checking for
+             * empty levels in tryReduceLevel, new levels are added
+             * with initialized right pointers. Which in turn requires
+             * keeping levels in an array to access them while
+             * creating new head index nodes from the opposite
+             * direction.
+             */
+            level = max + 1;
+            Index&lt;K,V&gt;[] idxs = (Index&lt;K,V&gt;[])new Index[level+1];
+            Index&lt;K,V&gt; idx = null;
+            for (int i = 1; i &lt;= level; ++i)
+                idxs[i] = idx = new Index&lt;K,V&gt;(z, idx, null);
+
+            HeadIndex&lt;K,V&gt; oldh;
+            int k;
+            for (;;) {
+                oldh = head;
+                int oldLevel = oldh.level;
+                if (level &lt;= oldLevel) { // lost race to add level
+                    k = level;
+                    break;
+                }
+                HeadIndex&lt;K,V&gt; newh = oldh;
+                Node&lt;K,V&gt; oldbase = oldh.node;
+                for (int j = oldLevel+1; j &lt;= level; ++j)
+                    newh = new HeadIndex&lt;K,V&gt;(oldbase, newh, idxs[j], j);
+                if (casHead(oldh, newh)) {
+                    k = oldLevel;
+                    break;
+                }
+            }
+            addIndex(idxs[k], oldh, k);
+        }
+    }
+
+    /**
+     * Adds given index nodes from given level down to 1.
+     * @param idx the topmost index node being inserted
+     * @param h the value of head to use to insert. This must be
+     * snapshotted by callers to provide correct insertion level
+     * @param indexLevel the level of the index
+     */
+    private void addIndex(Index&lt;K,V&gt; idx, HeadIndex&lt;K,V&gt; h, int indexLevel) {
+        // Track next level to insert in case of retries
+        int insertionLevel = indexLevel;
+        Comparable&lt;? super K&gt; key = comparable(idx.node.key);
+        if (key == null) throw new NullPointerException();
+
+        // Similar to findPredecessor, but adding index nodes along
+        // path to key.
+        for (;;) {
+            int j = h.level;
+            Index&lt;K,V&gt; q = h;
+            Index&lt;K,V&gt; r = q.right;
+            Index&lt;K,V&gt; t = idx;
+            for (;;) {
+                if (r != null) {
+                    Node&lt;K,V&gt; n = r.node;
+                    // compare before deletion check avoids needing recheck
+                    int c = key.compareTo(n.key);
+                    if (n.value == null) {
+                        if (!q.unlink(r))
+                            break;
+                        r = q.right;
+                        continue;
+                    }
+                    if (c &gt; 0) {
+                        q = r;
+                        r = r.right;
+                        continue;
+                    }
+                }
+
+                if (j == insertionLevel) {
+                    // Don&apos;t insert index if node already deleted
+                    if (t.indexesDeletedNode()) {
+                        findNode(key); // cleans up
+                        return;
+                    }
+                    if (!q.link(r, t))
+                        break; // restart
+                    if (--insertionLevel == 0) {
+                        // need final deletion check before return
+                        if (t.indexesDeletedNode())
+                            findNode(key);
+                        return;
+                    }
+                }
+
+                if (--j &gt;= insertionLevel &amp;&amp; j &lt; indexLevel)
+                    t = t.down;
+                q = q.down;
+                r = q.right;
+            }
+        }
+    }
+
+    /* ---------------- Deletion -------------- */
+
+    /**
+     * Main deletion method. Locates node, nulls value, appends a
+     * deletion marker, unlinks predecessor, removes associated index
+     * nodes, and possibly reduces head index level.
+     *
+     * Index nodes are cleared out simply by calling findPredecessor.
+     * which unlinks indexes to deleted nodes found along path to key,
+     * which will include the indexes to this node.  This is done
+     * unconditionally. We can&apos;t check beforehand whether there are
+     * index nodes because it might be the case that some or all
+     * indexes hadn&apos;t been inserted yet for this node during initial
+     * search for it, and we&apos;d like to ensure lack of garbage
+     * retention, so must call to be sure.
+     *
+     * @param okey the key
+     * @param value if non-null, the value that must be
+     * associated with key
+     * @return the node, or null if not found
+     */
+    final V doRemove(Object okey, Object value) {
+        Comparable&lt;? super K&gt; key = comparable(okey);
+        for (;;) {
+            Node&lt;K,V&gt; b = findPredecessor(key);
+            Node&lt;K,V&gt; n = b.next;
+            for (;;) {
+                if (n == null)
+                    return null;
+                Node&lt;K,V&gt; f = n.next;
+                if (n != b.next)                    // inconsistent read
+                    break;
+                Object v = n.value;
+                if (v == null) {                    // n is deleted
+                    n.helpDelete(b, f);
+                    break;
+                }
+                if (v == n || b.value == null)      // b is deleted
+                    break;
+                int c = key.compareTo(n.key);
+                if (c &lt; 0)
+                    return null;
+                if (c &gt; 0) {
+                    b = n;
+                    n = f;
+                    continue;
+                }
+                if (value != null &amp;&amp; !value.equals(v))
+                    return null;
+                if (!n.casValue(v, null))
+                    break;
+                if (!n.appendMarker(f) || !b.casNext(n, f))
+                    findNode(key);                  // Retry via findNode
+                else {
+                    findPredecessor(key);           // Clean index
+                    if (head.right == null)
+                        tryReduceLevel();
+                }
+                return (V)v;
+            }
+        }
+    }
+
+    /**
+     * Possibly reduce head level if it has no nodes.  This method can
+     * (rarely) make mistakes, in which case levels can disappear even
+     * though they are about to contain index nodes. This impacts
+     * performance, not correctness.  To minimize mistakes as well as
+     * to reduce hysteresis, the level is reduced by one only if the
+     * topmost three levels look empty. Also, if the removed level
+     * looks non-empty after CAS, we try to change it back quick
+     * before anyone notices our mistake! (This trick works pretty
+     * well because this method will practically never make mistakes
+     * unless current thread stalls immediately before first CAS, in
+     * which case it is very unlikely to stall again immediately
+     * afterwards, so will recover.)
+     *
+     * We put up with all this rather than just let levels grow
+     * because otherwise, even a small map that has undergone a large
+     * number of insertions and removals will have a lot of levels,
+     * slowing down access more than would an occasional unwanted
+     * reduction.
+     */
+    private void tryReduceLevel() {
+        HeadIndex&lt;K,V&gt; h = head;
+        HeadIndex&lt;K,V&gt; d;
+        HeadIndex&lt;K,V&gt; e;
+        if (h.level &gt; 3 &amp;&amp;
+            (d = (HeadIndex&lt;K,V&gt;)h.down) != null &amp;&amp;
+            (e = (HeadIndex&lt;K,V&gt;)d.down) != null &amp;&amp;
+            e.right == null &amp;&amp;
+            d.right == null &amp;&amp;
+            h.right == null &amp;&amp;
+            casHead(h, d) &amp;&amp; // try to set
+            h.right != null) // recheck
+            casHead(d, h);   // try to backout
+    }
+
+    /* ---------------- Finding and removing first element -------------- */
+
+    /**
+     * Specialized variant of findNode to get first valid node.
+     * @return first node or null if empty
+     */
+    Node&lt;K,V&gt; findFirst() {
+        for (;;) {
+            Node&lt;K,V&gt; b = head.node;
+            Node&lt;K,V&gt; n = b.next;
+            if (n == null)
+                return null;
+            if (n.value != null)
+                return n;
+            n.helpDelete(b, n.next);
+        }
+    }
+
+    /**
+     * Removes first entry; returns its snapshot.
+     * @return null if empty, else snapshot of first entry
+     */
+    Map.Entry&lt;K,V&gt; doRemoveFirstEntry() {
+        for (;;) {
+            Node&lt;K,V&gt; b = head.node;
+            Node&lt;K,V&gt; n = b.next;
+            if (n == null)
+                return null;
+            Node&lt;K,V&gt; f = n.next;
+            if (n != b.next)
+                continue;
+            Object v = n.value;
+            if (v == null) {
+                n.helpDelete(b, f);
+                continue;
+            }
+            if (!n.casValue(v, null))
+                continue;
+            if (!n.appendMarker(f) || !b.casNext(n, f))
+                findFirst(); // retry
+            clearIndexToFirst();
+            return new AbstractMap.SimpleImmutableEntry&lt;K,V&gt;(n.key, (V)v);
+        }
+    }
+
+    /**
+     * Clears out index nodes associated with deleted first entry.
+     */
+    private void clearIndexToFirst() {
+        for (;;) {
+            Index&lt;K,V&gt; q = head;
+            for (;;) {
+                Index&lt;K,V&gt; r = q.right;
+                if (r != null &amp;&amp; r.indexesDeletedNode() &amp;&amp; !q.unlink(r))
+                    break;
+                if ((q = q.down) == null) {
+                    if (head.right == null)
+                        tryReduceLevel();
+                    return;
+                }
+            }
+        }
+    }
+
+
+    /* ---------------- Finding and removing last element -------------- */
+
+    /**
+     * Specialized version of find to get last valid node.
+     * @return last node or null if empty
+     */
+    Node&lt;K,V&gt; findLast() {
+        /*
+         * findPredecessor can&apos;t be used to traverse index level
+         * because this doesn&apos;t use comparisons.  So traversals of
+         * both levels are folded together.
+         */
+        Index&lt;K,V&gt; q = head;
+        for (;;) {
+            Index&lt;K,V&gt; d, r;
+            if ((r = q.right) != null) {
+                if (r.indexesDeletedNode()) {
+                    q.unlink(r);
+                    q = head; // restart
+                }
+                else
+                    q = r;
+            } else if ((d = q.down) != null) {
+                q = d;
+            } else {
+                Node&lt;K,V&gt; b = q.node;
+                Node&lt;K,V&gt; n = b.next;
+                for (;;) {
+                    if (n == null)
+                        return b.isBaseHeader() ? null : b;
+                    Node&lt;K,V&gt; f = n.next;            // inconsistent read
+                    if (n != b.next)
+                        break;
+                    Object v = n.value;
+                    if (v == null) {                 // n is deleted
+                        n.helpDelete(b, f);
+                        break;
+                    }
+                    if (v == n || b.value == null)   // b is deleted
+                        break;
+                    b = n;
+                    n = f;
+                }
+                q = head; // restart
+            }
+        }
+    }
+
+    /**
+     * Specialized variant of findPredecessor to get predecessor of last
+     * valid node.  Needed when removing the last entry.  It is possible
+     * that all successors of returned node will have been deleted upon
+     * return, in which case this method can be retried.
+     * @return likely predecessor of last node
+     */
+    private Node&lt;K,V&gt; findPredecessorOfLast() {
+        for (;;) {
+            Index&lt;K,V&gt; q = head;
+            for (;;) {
+                Index&lt;K,V&gt; d, r;
+                if ((r = q.right) != null) {
+                    if (r.indexesDeletedNode()) {
+                        q.unlink(r);
+                        break;    // must restart
+                    }
+                    // proceed as far across as possible without overshooting
+                    if (r.node.next != null) {
+                        q = r;
+                        continue;
+                    }
+                }
+                if ((d = q.down) != null)
+                    q = d;
+                else
+                    return q.node;
+            }
+        }
+    }
+
+    /**
+     * Removes last entry; returns its snapshot.
+     * Specialized variant of doRemove.
+     * @return null if empty, else snapshot of last entry
+     */
+    Map.Entry&lt;K,V&gt; doRemoveLastEntry() {
+        for (;;) {
+            Node&lt;K,V&gt; b = findPredecessorOfLast();
+            Node&lt;K,V&gt; n = b.next;
+            if (n == null) {
+                if (b.isBaseHeader())               // empty
+                    return null;
+                else
+                    continue; // all b&apos;s successors are deleted; retry
+            }
+            for (;;) {
+                Node&lt;K,V&gt; f = n.next;
+                if (n != b.next)                    // inconsistent read
+                    break;
+                Object v = n.value;
+                if (v == null) {                    // n is deleted
+                    n.helpDelete(b, f);
+                    break;
+                }
+                if (v == n || b.value == null)      // b is deleted
+                    break;
+                if (f != null) {
+                    b = n;
+                    n = f;
+                    continue;
+                }
+                if (!n.casValue(v, null))
+                    break;
+                K key = n.key;
+                Comparable&lt;? super K&gt; ck = comparable(key);
+                if (!n.appendMarker(f) || !b.casNext(n, f))
+                    findNode(ck);                  // Retry via findNode
+                else {
+                    findPredecessor(ck);           // Clean index
+                    if (head.right == null)
+                        tryReduceLevel();
+                }
+                return new AbstractMap.SimpleImmutableEntry&lt;K,V&gt;(key, (V)v);
+            }
+        }
+    }
+
+    /* ---------------- Relational operations -------------- */
+
+    // Control values OR&apos;ed as arguments to findNear
+
+    private static final int EQ = 1;
+    private static final int LT = 2;
+    private static final int GT = 0; // Actually checked as !LT
+
+    /**
+     * Utility for ceiling, floor, lower, higher methods.
+     * @param kkey the key
+     * @param rel the relation -- OR&apos;ed combination of EQ, LT, GT
+     * @return nearest node fitting relation, or null if no such
+     */
+    Node&lt;K,V&gt; findNear(K kkey, int rel) {
+        Comparable&lt;? super K&gt; key = comparable(kkey);
+        for (;;) {
+            Node&lt;K,V&gt; b = findPredecessor(key);
+            Node&lt;K,V&gt; n = b.next;
+            for (;;) {
+                if (n == null)
+                    return ((rel &amp; LT) == 0 || b.isBaseHeader()) ? null : b;
+                Node&lt;K,V&gt; f = n.next;
+                if (n != b.next)                  // inconsistent read
+                    break;
+                Object v = n.value;
+                if (v == null) {                  // n is deleted
+                    n.helpDelete(b, f);
+                    break;
+                }
+                if (v == n || b.value == null)    // b is deleted
+                    break;
+                int c = key.compareTo(n.key);
+                if ((c == 0 &amp;&amp; (rel &amp; EQ) != 0) ||
+                    (c &lt;  0 &amp;&amp; (rel &amp; LT) == 0))
+                    return n;
+                if ( c &lt;= 0 &amp;&amp; (rel &amp; LT) != 0)
+                    return b.isBaseHeader() ? null : b;
+                b = n;
+                n = f;
+            }
+        }
+    }
+
+    /**
+     * Returns SimpleImmutableEntry for results of findNear.
+     * @param key the key
+     * @param rel the relation -- OR&apos;ed combination of EQ, LT, GT
+     * @return Entry fitting relation, or null if no such
+     */
+    AbstractMap.SimpleImmutableEntry&lt;K,V&gt; getNear(K key, int rel) {
+        for (;;) {
+            Node&lt;K,V&gt; n = findNear(key, rel);
+            if (n == null)
+                return null;
+            AbstractMap.SimpleImmutableEntry&lt;K,V&gt; e = n.createSnapshot();
+            if (e != null)
+                return e;
+        }
+    }
+
+
+    /* ---------------- Constructors -------------- */
+
+    /**
+     * Constructs a new, empty map, sorted according to the
+     * {@linkplain Comparable natural ordering} of the keys.
+     */
+    public ConcurrentSkipListMap() {
+        this.comparator = null;
+        initialize();
+    }
+
+    /**
+     * Constructs a new, empty map, sorted according to the specified
+     * comparator.
+     *
+     * @param comparator the comparator that will be used to order this map.
+     *        If &lt;tt&gt;null&lt;/tt&gt;, the {@linkplain Comparable natural
+     *        ordering} of the keys will be used.
+     */
+    public ConcurrentSkipListMap(Comparator&lt;? super K&gt; comparator) {
+        this.comparator = comparator;
+        initialize();
+    }
+
+    /**
+     * Constructs a new map containing the same mappings as the given map,
+     * sorted according to the {@linkplain Comparable natural ordering} of
+     * the keys.
+     *
+     * @param  m the map whose mappings are to be placed in this map
+     * @throws ClassCastException if the keys in &lt;tt&gt;m&lt;/tt&gt; are not
+     *         {@link Comparable}, or are not mutually comparable
+     * @throws NullPointerException if the specified map or any of its keys
+     *         or values are null
+     */
+    public ConcurrentSkipListMap(Map&lt;? extends K, ? extends V&gt; m) {
+        this.comparator = null;
+        initialize();
+        putAll(m);
+    }
+
+    /**
+     * Constructs a new map containing the same mappings and using the
+     * same ordering as the specified sorted map.
+     *
+     * @param m the sorted map whose mappings are to be placed in this
+     *        map, and whose comparator is to be used to sort this map
+     * @throws NullPointerException if the specified sorted map or any of
+     *         its keys or values are null
+     */
+    public ConcurrentSkipListMap(SortedMap&lt;K, ? extends V&gt; m) {
+        this.comparator = m.comparator();
+        initialize();
+        buildFromSorted(m);
+    }
+
+    /**
+     * Returns a shallow copy of this &lt;tt&gt;ConcurrentSkipListMap&lt;/tt&gt;
+     * instance. (The keys and values themselves are not cloned.)
+     *
+     * @return a shallow copy of this map
+     */
+    public ConcurrentSkipListMap&lt;K,V&gt; clone() {
+        ConcurrentSkipListMap&lt;K,V&gt; clone = null;
+        try {
+            clone = (ConcurrentSkipListMap&lt;K,V&gt;) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new InternalError();
+        }
+
+        clone.initialize();
+        clone.buildFromSorted(this);
+        return clone;
+    }
+
+    /**
+     * Streamlined bulk insertion to initialize from elements of
+     * given sorted map.  Call only from constructor or clone
+     * method.
+     */
+    private void buildFromSorted(SortedMap&lt;K, ? extends V&gt; map) {
+        if (map == null)
+            throw new NullPointerException();
+
+        HeadIndex&lt;K,V&gt; h = head;
+        Node&lt;K,V&gt; basepred = h.node;
+
+        // Track the current rightmost node at each level. Uses an
+        // ArrayList to avoid committing to initial or maximum level.
+        ArrayList&lt;Index&lt;K,V&gt;&gt; preds = new ArrayList&lt;Index&lt;K,V&gt;&gt;();
+
+        // initialize
+        for (int i = 0; i &lt;= h.level; ++i)
+            preds.add(null);
+        Index&lt;K,V&gt; q = h;
+        for (int i = h.level; i &gt; 0; --i) {
+            preds.set(i, q);
+            q = q.down;
+        }
+
+        Iterator&lt;? extends Map.Entry&lt;? extends K, ? extends V&gt;&gt; it =
+            map.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry&lt;? extends K, ? extends V&gt; e = it.next();
+            int j = randomLevel();
+            if (j &gt; h.level) j = h.level + 1;
+            K k = e.getKey();
+            V v = e.getValue();
+            if (k == null || v == null)
+                throw new NullPointerException();
+            Node&lt;K,V&gt; z = new Node&lt;K,V&gt;(k, v, null);
+            basepred.next = z;
+            basepred = z;
+            if (j &gt; 0) {
+                Index&lt;K,V&gt; idx = null;
+                for (int i = 1; i &lt;= j; ++i) {
+                    idx = new Index&lt;K,V&gt;(z, idx, null);
+                    if (i &gt; h.level)
+                        h = new HeadIndex&lt;K,V&gt;(h.node, h, idx, i);
+
+                    if (i &lt; preds.size()) {
+                        preds.get(i).right = idx;
+                        preds.set(i, idx);
+                    } else
+                        preds.add(idx);
+                }
+            }
+        }
+        head = h;
+    }
+
+    /* ---------------- Serialization -------------- */
+
+    /**
+     * Save the state of this map to a stream.
+     *
+     * @serialData The key (Object) and value (Object) for each
+     * key-value mapping represented by the map, followed by
+     * &lt;tt&gt;null&lt;/tt&gt;. The key-value mappings are emitted in key-order
+     * (as determined by the Comparator, or by the keys&apos; natural
+     * ordering if no Comparator).
+     */
+    private void writeObject(java.io.ObjectOutputStream s)
+        throws java.io.IOException {
+        // Write out the Comparator and any hidden stuff
+        s.defaultWriteObject();
+
+        // Write out keys and values (alternating)
+        for (Node&lt;K,V&gt; n = findFirst(); n != null; n = n.next) {
+            V v = n.getValidValue();
+            if (v != null) {
+                s.writeObject(n.key);
+                s.writeObject(v);
+            }
+        }
+        s.writeObject(null);
+    }
+
+    /**
+     * Reconstitute the map from a stream.
+     */
+    private void readObject(final java.io.ObjectInputStream s)
+        throws java.io.IOException, ClassNotFoundException {
+        // Read in the Comparator and any hidden stuff
+        s.defaultReadObject();
+        // Reset transients
+        initialize();
+
+        /*
+         * This is nearly identical to buildFromSorted, but is
+         * distinct because readObject calls can&apos;t be nicely adapted
+         * as the kind of iterator needed by buildFromSorted. (They
+         * can be, but doing so requires type cheats and/or creation
+         * of adaptor classes.) It is simpler to just adapt the code.
+         */
+
+        HeadIndex&lt;K,V&gt; h = head;
+        Node&lt;K,V&gt; basepred = h.node;
+        ArrayList&lt;Index&lt;K,V&gt;&gt; preds = new ArrayList&lt;Index&lt;K,V&gt;&gt;();
+        for (int i = 0; i &lt;= h.level; ++i)
+            preds.add(null);
+        Index&lt;K,V&gt; q = h;
+        for (int i = h.level; i &gt; 0; --i) {
+            preds.set(i, q);
+            q = q.down;
+        }
+
+        for (;;) {
+            Object k = s.readObject();
+            if (k == null)
+                break;
+            Object v = s.readObject();
+            if (v == null)
+                throw new NullPointerException();
+            K key = (K) k;
+            V val = (V) v;
+            int j = randomLevel();
+            if (j &gt; h.level) j = h.level + 1;
+            Node&lt;K,V&gt; z = new Node&lt;K,V&gt;(key, val, null);
+            basepred.next = z;
+            basepred = z;
+            if (j &gt; 0) {
+                Index&lt;K,V&gt; idx = null;
+                for (int i = 1; i &lt;= j; ++i) {
+                    idx = new Index&lt;K,V&gt;(z, idx, null);
+                    if (i &gt; h.level)
+                        h = new HeadIndex&lt;K,V&gt;(h.node, h, idx, i);
+
+                    if (i &lt; preds.size()) {
+                        preds.get(i).right = idx;
+                        preds.set(i, idx);
+                    } else
+                        preds.add(idx);
+                }
+            }
+        }
+        head = h;
+    }
+
+    /* ------ Map API methods ------ */
+
+    /**
+     * Returns &lt;tt&gt;true&lt;/tt&gt; if this map contains a mapping for the specified
+     * key.
+     *
+     * @param key key whose presence in this map is to be tested
+     * @return &lt;tt&gt;true&lt;/tt&gt; if this map contains a mapping for the specified key
+     * @throws ClassCastException if the specified key cannot be compared
+     *         with the keys currently in the map
+     * @throws NullPointerException if the specified key is null
+     */
+    public boolean containsKey(Object key) {
+        return doGet(key) != null;
+    }
+
+    /**
+     * Returns the value to which the specified key is mapped,
+     * or {@code null} if this map contains no mapping for the key.
+     *
+     * &lt;p&gt;More formally, if this map contains a mapping from a key
+     * {@code k} to a value {@code v} such that {@code key} compares
+     * equal to {@code k} according to the map&apos;s ordering, then this
+     * method returns {@code v}; otherwise it returns {@code null}.
+     * (There can be at most one such mapping.)
+     *
+     * @throws ClassCastException if the specified key cannot be compared
+     *         with the keys currently in the map
+     * @throws NullPointerException if the specified key is null
+     */
+    public V get(Object key) {
+        return doGet(key);
+    }
+
+    /**
+     * Associates the specified value with the specified key in this map.
+     * If the map previously contained a mapping for the key, the old
+     * value is replaced.
+     *
+     * @param key key with which the specified value is to be associated
+     * @param value value to be associated with the specified key
+     * @return the previous value associated with the specified key, or
+     *         &lt;tt&gt;null&lt;/tt&gt; if there was no mapping for the key
+     * @throws ClassCastException if the specified key cannot be compared
+     *         with the keys currently in the map
+     * @throws NullPointerException if the specified key or value is null
+     */
+    public V put(K key, V value) {
+        if (value == null)
+            throw new NullPointerException();
+        return doPut(key, value, false);
+    }
+
+    /**
+     * Removes the mapping for the specified key from this map if present.
+     *
+     * @param  key key for which mapping should be removed
+     * @return the previous value associated with the specified key, or
+     *         &lt;tt&gt;null&lt;/tt&gt; if there was no mapping for the key
+     * @throws ClassCastException if the specified key cannot be compared
+     *         with the keys currently in the map
+     * @throws NullPointerException if the specified key is null
+     */
+    public V remove(Object key) {
+        return doRemove(key, null);
+    }
+
+    /**
+     * Returns &lt;tt&gt;true&lt;/tt&gt; if this map maps one or more keys to the
+     * specified value.  This operation requires time linear in the
+     * map size. Additionally, it is possible for the map to change
+     * during execution of this method, in which case the returned
+     * result may be inaccurate.
+     *
+     * @param value value whose presence in this map is to be tested
+     * @return &lt;tt&gt;true&lt;/tt&gt; if a mapping to &lt;tt&gt;value&lt;/tt&gt; exists;
+     *         &lt;tt&gt;false&lt;/tt&gt; otherwise
+     * @throws NullPointerException if the specified value is null
+     */
+    public boolean containsValue(Object value) {
+        if (value == null)
+            throw new NullPointerException();
+        for (Node&lt;K,V&gt; n = findFirst(); n != null; n = n.next) {
+            V v = n.getValidValue();
+            if (v != null &amp;&amp; value.equals(v))
+                return true;
+        }
+        return false;
+    }
+
+    /**
+     * Returns the number of key-value mappings in this map.  If this map
+     * contains more than &lt;tt&gt;Integer.MAX_VALUE&lt;/tt&gt; elements, it
+     * returns &lt;tt&gt;Integer.MAX_VALUE&lt;/tt&gt;.
+     *
+     * &lt;p&gt;Beware that, unlike in most collections, this method is
+     * &lt;em&gt;NOT&lt;/em&gt; a constant-time operation. Because of the
+     * asynchronous nature of these maps, determining the current
+     * number of elements requires traversing them all to count them.
+     * Additionally, it is possible for the size to change during
+     * execution of this method, in which case the returned result
+     * will be inaccurate. Thus, this method is typically not very
+     * useful in concurrent applications.
+     *
+     * @return the number of elements in this map
+     */
+    public int size() {
+        long count = 0;
+        for (Node&lt;K,V&gt; n = findFirst(); n != null; n = n.next) {
+            if (n.getValidValue() != null)
+                ++count;
+        }
+        return (count &gt;= Integer.MAX_VALUE) ? Integer.MAX_VALUE : (int) count;
+    }
+
+    /**
+     * Returns &lt;tt&gt;true&lt;/tt&gt; if this map contains no key-value mappings.
+     * @return &lt;tt&gt;true&lt;/tt&gt; if this map contains no key-value mappings
+     */
+    public boolean isEmpty() {
+        return findFirst() == null;
+    }
+
+    /**
+     * Removes all of the mappings from this map.
+     */
+    public void clear() {
+        initialize();
+    }
+
+    /* ---------------- View methods -------------- */
+
+    /*
+     * Note: Lazy initialization works for views because view classes
+     * are stateless/immutable so it doesn&apos;t matter wrt correctness if
+     * more than one is created (which will only rarely happen).  Even
+     * so, the following idiom conservatively ensures that the method
+     * returns the one it created if it does so, not one created by
+     * another racing thread.
+     */
+
+    /**
+     * Returns a {@link NavigableSet} view of the keys contained in this map.
+     * The set&apos;s iterator returns the keys in ascending order.
+     * The set is backed by the map, so changes to the map are
+     * reflected in the set, and vice-versa.  The set supports element
+     * removal, which removes the corresponding mapping from the map,
+     * via the {@code Iterator.remove}, {@code Set.remove},
+     * {@code removeAll}, {@code retainAll}, and {@code clear}
+     * operations.  It does not support the {@code add} or {@code addAll}
+     * operations.
+     *
+     * &lt;p&gt;The view&apos;s {@code iterator} is a &quot;weakly consistent&quot; iterator
+     * that will never throw {@link ConcurrentModificationException},
+     * and guarantees to traverse elements as they existed upon
+     * construction of the iterator, and may (but is not guaranteed to)
+     * reflect any modifications subsequent to construction.
+     *
+     * &lt;p&gt;This method is equivalent to method {@code navigableKeySet}.
+     *
+     * @return a navigable set view of the keys in this map
+     */
+    public NavigableSet&lt;K&gt; keySet() {
+        KeySet ks = keySet;
+        return (ks != null) ? ks : (keySet = new KeySet(this));
+    }
+
+    public NavigableSet&lt;K&gt; navigableKeySet() {
+        KeySet ks = keySet;
+        return (ks != null) ? ks : (keySet = new KeySet(this));
+    }
+
+    /**
+     * Returns a {@link Collection} view of the values contained in this map.
+     * The collection&apos;s iterator returns the values in ascending order
+     * of the corresponding keys.
+     * The collection is backed by the map, so changes to the map are
+     * reflected in the collection, and vice-versa.  The collection
+     * supports element removal, which removes the corresponding
+     * mapping from the map, via the &lt;tt&gt;Iterator.remove&lt;/tt&gt;,
+     * &lt;tt&gt;Collection.remove&lt;/tt&gt;, &lt;tt&gt;removeAll&lt;/tt&gt;,
+     * &lt;tt&gt;retainAll&lt;/tt&gt; and &lt;tt&gt;clear&lt;/tt&gt; operations.  It does not
+     * support the &lt;tt&gt;add&lt;/tt&gt; or &lt;tt&gt;addAll&lt;/tt&gt; operations.
+     *
+     * &lt;p&gt;The view&apos;s &lt;tt&gt;iterator&lt;/tt&gt; is a &quot;weakly consistent&quot; iterator
+     * that will never throw {@link ConcurrentModificationException},
+     * and guarantees to traverse elements as they existed upon
+     * construction of the iterator, and may (but is not guaranteed to)
+     * reflect any modifications subsequent to construction.
+     */
+    public Collection&lt;V&gt; values() {
+        Values vs = values;
+        return (vs != null) ? vs : (values = new Values(this));
+    }
+
+    /**
+     * Returns a {@link Set} view of the mappings contained in this map.
+     * The set&apos;s iterator returns the entries in ascending key order.
+     * The set is backed by the map, so changes to the map are
+     * reflected in the set, and vice-versa.  The set supports element
+     * removal, which removes the corresponding mapping from the map,
+     * via the &lt;tt&gt;Iterator.remove&lt;/tt&gt;, &lt;tt&gt;Set.remove&lt;/tt&gt;,
+     * &lt;tt&gt;removeAll&lt;/tt&gt;, &lt;tt&gt;retainAll&lt;/tt&gt; and &lt;tt&gt;clear&lt;/tt&gt;
+     * operations.  It does not support the &lt;tt&gt;add&lt;/tt&gt; or
+     * &lt;tt&gt;addAll&lt;/tt&gt; operations.
+     *
+     * &lt;p&gt;The view&apos;s &lt;tt&gt;iterator&lt;/tt&gt; is a &quot;weakly consistent&quot; iterator
+     * that will never throw {@link ConcurrentModificationException},
+     * and guarantees to traverse elements as they existed upon
+     * construction of the iterator, and may (but is not guaranteed to)
+     * reflect any modifications subsequent to construction.
+     *
+     * &lt;p&gt;The &lt;tt&gt;Map.Entry&lt;/tt&gt; elements returned by
+     * &lt;tt&gt;iterator.next()&lt;/tt&gt; do &lt;em&gt;not&lt;/em&gt; support the
+     * &lt;tt&gt;setValue&lt;/tt&gt; operation.
+     *
+     * @return a set view of the mappings contained in this map,
+     *         sorted in ascending key order
+     */
+    public Set&lt;Map.Entry&lt;K,V&gt;&gt; entrySet() {
+        EntrySet es = entrySet;
+        return (es != null) ? es : (entrySet = new EntrySet(this));
+    }
+
+    public ConcurrentNavigableMap&lt;K,V&gt; descendingMap() {
+        ConcurrentNavigableMap&lt;K,V&gt; dm = descendingMap;
+        return (dm != null) ? dm : (descendingMap = new SubMap&lt;K,V&gt;
+                                    (this, null, false, null, false, true));
+    }
+
+    public NavigableSet&lt;K&gt; descendingKeySet() {
+        return descendingMap().navigableKeySet();
+    }
+
+    /* ---------------- AbstractMap Overrides -------------- */
+
+    /**
+     * Compares the specified object with this map for equality.
+     * Returns &lt;tt&gt;true&lt;/tt&gt; if the given object is also a map and the
+     * two maps represent the same mappings.  More formally, two maps
+     * &lt;tt&gt;m1&lt;/tt&gt; and &lt;tt&gt;m2&lt;/tt&gt; represent the same mappings if
+     * &lt;tt&gt;m1.entrySet().equals(m2.entrySet())&lt;/tt&gt;.  This
+     * operation may return misleading results if either map is
+     * concurrently modified during execution of this method.
+     *
+     * @param o object to be compared for equality with this map
+     * @return &lt;tt&gt;true&lt;/tt&gt; if the specified object is equal to this map
+     */
+    public boolean equals(Object o) {
+        if (o == this)
+            return true;
+        if (!(o instanceof Map))
+            return false;
+        Map&lt;?,?&gt; m = (Map&lt;?,?&gt;) o;
+        try {
+            for (Map.Entry&lt;K,V&gt; e : this.entrySet())
+                if (! e.getValue().equals(m.get(e.getKey())))
+                    return false;
+            for (Map.Entry&lt;?,?&gt; e : m.entrySet()) {
+                Object k = e.getKey();
+                Object v = e.getValue();
+                if (k == null || v == null || !v.equals(get(k)))
+                    return false;
+            }
+            return true;
+        } catch (ClassCastException unused) {
+            return false;
+        } catch (NullPointerException unused) {
+            return false;
+        }
+    }
+
+    /* ------ ConcurrentMap API methods ------ */
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return the previous value associated with the specified key,
+     *         or &lt;tt&gt;null&lt;/tt&gt; if there was no mapping for the key
+     * @throws ClassCastException if the specified key cannot be compared
+     *         with the keys currently in the map
+     * @throws NullPointerException if the specified key or value is null
+     */
+    public V putIfAbsent(K key, V value) {
+        if (value == null)
+            throw new NullPointerException();
+        return doPut(key, value, true);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws ClassCastException if the specified key cannot be compared
+     *         with the keys currently in the map
+     * @throws NullPointerException if the specified key is null
+     */
+    public boolean remove(Object key, Object value) {
+        if (key == null)
+            throw new NullPointerException();
+        if (value == null)
+            return false;
+        return doRemove(key, value) != null;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws ClassCastException if the specified key cannot be compared
+     *         with the keys currently in the map
+     * @throws NullPointerException if any of the arguments are null
+     */
+    public boolean replace(K key, V oldValue, V newValue) {
+        if (oldValue == null || newValue == null)
+            throw new NullPointerException();
+        Comparable&lt;? super K&gt; k = comparable(key);
+        for (;;) {
+            Node&lt;K,V&gt; n = findNode(k);
+            if (n == null)
+                return false;
+            Object v = n.value;
+            if (v != null) {
+                if (!oldValue.equals(v))
+                    return false;
+                if (n.casValue(v, newValue))
+                    return true;
+            }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return the previous value associated with the specified key,
+     *         or &lt;tt&gt;null&lt;/tt&gt; if there was no mapping for the key
+     * @throws ClassCastException if the specified key cannot be compared
+     *         with the keys currently in the map
+     * @throws NullPointerException if the specified key or value is null
+     */
+    public V replace(K key, V value) {
+        if (value == null)
+            throw new NullPointerException();
+        Comparable&lt;? super K&gt; k = comparable(key);
+        for (;;) {
+            Node&lt;K,V&gt; n = findNode(k);
+            if (n == null)
+                return null;
+            Object v = n.value;
+            if (v != null &amp;&amp; n.casValue(v, value))
+                return (V)v;
+        }
+    }
+
+    /* ------ SortedMap API methods ------ */
+
+    public Comparator&lt;? super K&gt; comparator() {
+        return comparator;
+    }
+
+    /**
+     * @throws NoSuchElementException {@inheritDoc}
+     */
+    public K firstKey() {
+        Node&lt;K,V&gt; n = findFirst();
+        if (n == null)
+            throw new NoSuchElementException();
+        return n.key;
+    }
+
+    /**
+     * @throws NoSuchElementException {@inheritDoc}
+     */
+    public K lastKey() {
+        Node&lt;K,V&gt; n = findLast();
+        if (n == null)
+            throw new NoSuchElementException();
+        return n.key;
+    }
+
+    /**
+     * @throws ClassCastException {@inheritDoc}
+     * @throws NullPointerException if {@code fromKey} or {@code toKey} is null
+     * @throws IllegalArgumentException {@inheritDoc}
+     */
+    public ConcurrentNavigableMap&lt;K,V&gt; subMap(K fromKey,
+                                              boolean fromInclusive,
+                                              K toKey,
+                                              boolean toInclusive) {
+        if (fromKey == null || toKey == null)
+            throw new NullPointerException();
+        return new SubMap&lt;K,V&gt;
+            (this, fromKey, fromInclusive, toKey, toInclusive, false);
+    }
+
+    /**
+     * @throws ClassCastException {@inheritDoc}
+     * @throws NullPointerException if {@code toKey} is null
+     * @throws IllegalArgumentException {@inheritDoc}
+     */
+    public ConcurrentNavigableMap&lt;K,V&gt; headMap(K toKey,
+                                               boolean inclusive) {
+        if (toKey == null)
+            throw new NullPointerException();
+        return new SubMap&lt;K,V&gt;
+            (this, null, false, toKey, inclusive, false);
+    }
+
+    /**
+     * @throws ClassCastException {@inheritDoc}
+     * @throws NullPointerException if {@code fromKey} is null
+     * @throws IllegalArgumentException {@inheritDoc}
+     */
+    public ConcurrentNavigableMap&lt;K,V&gt; tailMap(K fromKey,
+                                               boolean inclusive) {
+        if (fromKey == null)
+            throw new NullPointerException();
+        return new SubMap&lt;K,V&gt;
+            (this, fromKey, inclusive, null, false, false);
+    }
+
+    /**
+     * @throws ClassCastException {@inheritDoc}
+     * @throws NullPointerException if {@code fromKey} or {@code toKey} is null
+     * @throws IllegalArgumentException {@inheritDoc}
+     */
+    public ConcurrentNavigableMap&lt;K,V&gt; subMap(K fromKey, K toKey) {
+        return subMap(fromKey, true, toKey, false);
+    }
+
+    /**
+     * @throws ClassCastException {@inheritDoc}
+     * @throws NullPointerException if {@code toKey} is null
+     * @throws IllegalArgumentException {@inheritDoc}
+     */
+    public ConcurrentNavigableMap&lt;K,V&gt; headMap(K toKey) {
+        return headMap(toKey, false);
+    }
+
+    /**
+     * @throws ClassCastException {@inheritDoc}
+     * @throws NullPointerException if {@code fromKey} is null
+     * @throws IllegalArgumentException {@inheritDoc}
+     */
+    public ConcurrentNavigableMap&lt;K,V&gt; tailMap(K fromKey) {
+        return tailMap(fromKey, true);
+    }
+
+    /* ---------------- Relational operations -------------- */
+
+    /**
+     * Returns a key-value mapping associated with the greatest key
+     * strictly less than the given key, or &lt;tt&gt;null&lt;/tt&gt; if there is
+     * no such key. The returned entry does &lt;em&gt;not&lt;/em&gt; support the
+     * &lt;tt&gt;Entry.setValue&lt;/tt&gt; method.
+     *
+     * @throws ClassCastException {@inheritDoc}
+     * @throws NullPointerException if the specified key is null
+     */
+    public Map.Entry&lt;K,V&gt; lowerEntry(K key) {
+        return getNear(key, LT);
+    }
+
+    /**
+     * @throws ClassCastException {@inheritDoc}
+     * @throws NullPointerException if the specified key is null
+     */
+    public K lowerKey(K key) {
+        Node&lt;K,V&gt; n = findNear(key, LT);
+        return (n == null) ? null : n.key;
+    }
+
+    /**
+     * Returns a key-value mapping associated with the greatest key
+     * less than or equal to the given key, or &lt;tt&gt;null&lt;/tt&gt; if there
+     * is no such key. The returned entry does &lt;em&gt;not&lt;/em&gt; support
+     * the &lt;tt&gt;Entry.setValue&lt;/tt&gt; method.
+     *
+     * @param key the key
+     * @throws ClassCastException {@inheritDoc}
+     * @throws NullPointerException if the specified key is null
+     */
+    public Map.Entry&lt;K,V&gt; floorEntry(K key) {
+        return getNear(key, LT|EQ);
+    }
+
+    /**
+     * @param key the key
+     * @throws ClassCastException {@inheritDoc}
+     * @throws NullPointerException if the specified key is null
+     */
+    public K floorKey(K key) {
+        Node&lt;K,V&gt; n = findNear(key, LT|EQ);
+        return (n == null) ? null : n.key;
+    }
+
+    /**
+     * Returns a key-value mapping associated with the least key
+     * greater than or equal to the given key, or &lt;tt&gt;null&lt;/tt&gt; if
+     * there is no such entry. The returned entry does &lt;em&gt;not&lt;/em&gt;
+     * support the &lt;tt&gt;Entry.setValue&lt;/tt&gt; method.
+     *
+     * @throws ClassCastException {@inheritDoc}
+     * @throws NullPointerException if the specified key is null
+     */
+    public Map.Entry&lt;K,V&gt; ceilingEntry(K key) {
+        return getNear(key, GT|EQ);
+    }
+
+    /**
+     * @throws ClassCastException {@inheritDoc}
+     * @throws NullPointerException if the specified key is null
+     */
+    public K ceilingKey(K key) {
+        Node&lt;K,V&gt; n = findNear(key, GT|EQ);
+        return (n == null) ? null : n.key;
+    }
+
+    /**
+     * Returns a key-value mapping associated with the least key
+     * strictly greater than the given key, or &lt;tt&gt;null&lt;/tt&gt; if there
+     * is no such key. The returned entry does &lt;em&gt;not&lt;/em&gt; support
+     * the &lt;tt&gt;Entry.setValue&lt;/tt&gt; method.
+     *
+     * @param key the key
+     * @throws ClassCastException {@inheritDoc}
+     * @throws NullPointerException if the specified key is null
+     */
+    public Map.Entry&lt;K,V&gt; higherEntry(K key) {
+        return getNear(key, GT);
+    }
+
+    /**
+     * @param key the key
+     * @throws ClassCastException {@inheritDoc}
+     * @throws NullPointerException if the specified key is null
+     */
+    public K higherKey(K key) {
+        Node&lt;K,V&gt; n = findNear(key, GT);
+        return (n == null) ? null : n.key;
+    }
+
+    /**
+     * Returns a key-value mapping associated with the least
+     * key in this map, or &lt;tt&gt;null&lt;/tt&gt; if the map is empty.
+     * The returned entry does &lt;em&gt;not&lt;/em&gt; support
+     * the &lt;tt&gt;Entry.setValue&lt;/tt&gt; method.
+     */
+    public Map.Entry&lt;K,V&gt; firstEntry() {
+        for (;;) {
+            Node&lt;K,V&gt; n = findFirst();
+            if (n == null)
+                return null;
+            AbstractMap.SimpleImmutableEntry&lt;K,V&gt; e = n.createSnapshot();
+            if (e != null)
+                return e;
+        }
+    }
+
+    /**
+     * Returns a key-value mapping associated with the greatest
+     * key in this map, or &lt;tt&gt;null&lt;/tt&gt; if the map is empty.
+     * The returned entry does &lt;em&gt;not&lt;/em&gt; support
+     * the &lt;tt&gt;Entry.setValue&lt;/tt&gt; method.
+     */
+    public Map.Entry&lt;K,V&gt; lastEntry() {
+        for (;;) {
+            Node&lt;K,V&gt; n = findLast();
+            if (n == null)
+                return null;
+            AbstractMap.SimpleImmutableEntry&lt;K,V&gt; e = n.createSnapshot();
+            if (e != null)
+                return e;
+        }
+    }
+
+    /**
+     * Removes and returns a key-value mapping associated with
+     * the least key in this map, or &lt;tt&gt;null&lt;/tt&gt; if the map is empty.
+     * The returned entry does &lt;em&gt;not&lt;/em&gt; support
+     * the &lt;tt&gt;Entry.setValue&lt;/tt&gt; method.
+     */
+    public Map.Entry&lt;K,V&gt; pollFirstEntry() {
+        return doRemoveFirstEntry();
+    }
+
+    /**
+     * Removes and returns a key-value mapping associated with
+     * the greatest key in this map, or &lt;tt&gt;null&lt;/tt&gt; if the map is empty.
+     * The returned entry does &lt;em&gt;not&lt;/em&gt; support
+     * the &lt;tt&gt;Entry.setValue&lt;/tt&gt; method.
+     */
+    public Map.Entry&lt;K,V&gt; pollLastEntry() {
+        return doRemoveLastEntry();
+    }
+
+
+    /* ---------------- Iterators -------------- */
+
+    /**
+     * Base of iterator classes:
+     */
+    abstract class Iter&lt;T&gt; implements Iterator&lt;T&gt; {
+        /** the last node returned by next() */
+        Node&lt;K,V&gt; lastReturned;
+        /** the next node to return from next(); */
+        Node&lt;K,V&gt; next;
+        /** Cache of next value field to maintain weak consistency */
+        V nextValue;
+
+        /** Initializes ascending iterator for entire range. */
+        Iter() {
+            for (;;) {
+                next = findFirst();
+                if (next == null)
+                    break;
+                Object x = next.value;
+                if (x != null &amp;&amp; x != next) {
+                    nextValue = (V) x;
+                    break;
+                }
+            }
+        }
+
+        public final boolean hasNext() {
+            return next != null;
+        }
+
+        /** Advances next to higher entry. */
+        final void advance() {
+            if (next == null)
+                throw new NoSuchElementException();
+            lastReturned = next;
+            for (;;) {
+                next = next.next;
+                if (next == null)
+                    break;
+                Object x = next.value;
+                if (x != null &amp;&amp; x != next) {
+                    nextValue = (V) x;
+                    break;
+                }
+            }
+        }
+
+        public void remove() {
+            Node&lt;K,V&gt; l = lastReturned;
+            if (l == null)
+                throw new IllegalStateException();
+            // It would not be worth all of the overhead to directly
+            // unlink from here. Using remove is fast enough.
+            ConcurrentSkipListMap.this.remove(l.key);
+            lastReturned = null;
+        }
+
+    }
+
+    final class ValueIterator extends Iter&lt;V&gt; {
+        public V next() {
+            V v = nextValue;
+            advance();
+            return v;
+        }
+    }
+
+    final class KeyIterator extends Iter&lt;K&gt; {
+        public K next() {
+            Node&lt;K,V&gt; n = next;
+            advance();
+            return n.key;
+        }
+    }
+
+    final class EntryIterator extends Iter&lt;Map.Entry&lt;K,V&gt;&gt; {
+        public Map.Entry&lt;K,V&gt; next() {
+            Node&lt;K,V&gt; n = next;
+            V v = nextValue;
+            advance();
+            return new AbstractMap.SimpleImmutableEntry&lt;K,V&gt;(n.key, v);
+        }
+    }
+
+    // Factory methods for iterators needed by ConcurrentSkipListSet etc
+
+    Iterator&lt;K&gt; keyIterator() {
+        return new KeyIterator();
+    }
+
+    Iterator&lt;V&gt; valueIterator() {
+        return new ValueIterator();
+    }
+
+    Iterator&lt;Map.Entry&lt;K,V&gt;&gt; entryIterator() {
+        return new EntryIterator();
+    }
+
+    /* ---------------- View Classes -------------- */
+
+    /*
+     * View classes are static, delegating to a ConcurrentNavigableMap
+     * to allow use by SubMaps, which outweighs the ugliness of
+     * needing type-tests for Iterator methods.
+     */
+
+    static final &lt;E&gt; List&lt;E&gt; toList(Collection&lt;E&gt; c) {
+        // Using size() here would be a pessimization.
+        List&lt;E&gt; list = new ArrayList&lt;E&gt;();
+        for (E e : c)
+            list.add(e);
+        return list;
+    }
+
+    static final class KeySet&lt;E&gt;
+            extends AbstractSet&lt;E&gt; implements NavigableSet&lt;E&gt; {
+        private final ConcurrentNavigableMap&lt;E,Object&gt; m;
+        KeySet(ConcurrentNavigableMap&lt;E,Object&gt; map) { m = map; }
+        public int size() { return m.size(); }
+        public boolean isEmpty() { return m.isEmpty(); }
+        public boolean contains(Object o) { return m.containsKey(o); }
+        public boolean remove(Object o) { return m.remove(o) != null; }
+        public void clear() { m.clear(); }
+        public E lower(E e) { return m.lowerKey(e); }
+        public E floor(E e) { return m.floorKey(e); }
+        public E ceiling(E e) { return m.ceilingKey(e); }
+        public E higher(E e) { return m.higherKey(e); }
+        public Comparator&lt;? super E&gt; comparator() { return m.comparator(); }
+        public E first() { return m.firstKey(); }
+        public E last() { return m.lastKey(); }
+        public E pollFirst() {
+            Map.Entry&lt;E,Object&gt; e = m.pollFirstEntry();
+            return (e == null) ? null : e.getKey();
+        }
+        public E pollLast() {
+            Map.Entry&lt;E,Object&gt; e = m.pollLastEntry();
+            return (e == null) ? null : e.getKey();
+        }
+        public Iterator&lt;E&gt; iterator() {
+            if (m instanceof ConcurrentSkipListMap)
+                return ((ConcurrentSkipListMap&lt;E,Object&gt;)m).keyIterator();
+            else
+                return ((ConcurrentSkipListMap.SubMap&lt;E,Object&gt;)m).keyIterator();
+        }
+        public boolean equals(Object o) {
+            if (o == this)
+                return true;
+            if (!(o instanceof Set))
+                return false;
+            Collection&lt;?&gt; c = (Collection&lt;?&gt;) o;
+            try {
+                return containsAll(c) &amp;&amp; c.containsAll(this);
+            } catch (ClassCastException unused)   {
+                return false;
+            } catch (NullPointerException unused) {
+                return false;
+            }
+        }
+        public Object[] toArray()     { return toList(this).toArray();  }
+        public &lt;T&gt; T[] toArray(T[] a) { return toList(this).toArray(a); }
+        public Iterator&lt;E&gt; descendingIterator() {
+            return descendingSet().iterator();
+        }
+        public NavigableSet&lt;E&gt; subSet(E fromElement,
+                                      boolean fromInclusive,
+                                      E toElement,
+                                      boolean toInclusive) {
+            return new KeySet&lt;E&gt;(m.subMap(fromElement, fromInclusive,
+                                          toElement,   toInclusive));
+        }
+        public NavigableSet&lt;E&gt; headSet(E toElement, boolean inclusive) {
+            return new KeySet&lt;E&gt;(m.headMap(toElement, inclusive));
+        }
+        public NavigableSet&lt;E&gt; tailSet(E fromElement, boolean inclusive) {
+            return new KeySet&lt;E&gt;(m.tailMap(fromElement, inclusive));
+        }
+        public NavigableSet&lt;E&gt; subSet(E fromElement, E toElement) {
+            return subSet(fromElement, true, toElement, false);
+        }
+        public NavigableSet&lt;E&gt; headSet(E toElement) {
+            return headSet(toElement, false);
+        }
+        public NavigableSet&lt;E&gt; tailSet(E fromElement) {
+            return tailSet(fromElement, true);
+        }
+        public NavigableSet&lt;E&gt; descendingSet() {
+            return new KeySet(m.descendingMap());
+        }
+    }
+
+    static final class Values&lt;E&gt; extends AbstractCollection&lt;E&gt; {
+        private final ConcurrentNavigableMap&lt;Object, E&gt; m;
+        Values(ConcurrentNavigableMap&lt;Object, E&gt; map) {
+            m = map;
+        }
+        public Iterator&lt;E&gt; iterator() {
+            if (m instanceof ConcurrentSkipListMap)
+                return ((ConcurrentSkipListMap&lt;Object,E&gt;)m).valueIterator();
+            else
+                return ((SubMap&lt;Object,E&gt;)m).valueIterator();
+        }
+        public boolean isEmpty() {
+            return m.isEmpty();
+        }
+        public int size() {
+            return m.size();
+        }
+        public boolean contains(Object o) {
+            return m.containsValue(o);
+        }
+        public void clear() {
+            m.clear();
+        }
+        public Object[] toArray()     { return toList(this).toArray();  }
+        public &lt;T&gt; T[] toArray(T[] a) { return toList(this).toArray(a); }
+    }
+
+    static final class EntrySet&lt;K1,V1&gt; extends AbstractSet&lt;Map.Entry&lt;K1,V1&gt;&gt; {
+        private final ConcurrentNavigableMap&lt;K1, V1&gt; m;
+        EntrySet(ConcurrentNavigableMap&lt;K1, V1&gt; map) {
+            m = map;
+        }
+
+        public Iterator&lt;Map.Entry&lt;K1,V1&gt;&gt; iterator() {
+            if (m instanceof ConcurrentSkipListMap)
+                return ((ConcurrentSkipListMap&lt;K1,V1&gt;)m).entryIterator();
+            else
+                return ((SubMap&lt;K1,V1&gt;)m).entryIterator();
+        }
+
+        public boolean contains(Object o) {
+            if (!(o instanceof Map.Entry))
+                return false;
+            Map.Entry&lt;K1,V1&gt; e = (Map.Entry&lt;K1,V1&gt;)o;
+            V1 v = m.get(e.getKey());
+            return v != null &amp;&amp; v.equals(e.getValue());
+        }
+        public boolean remove(Object o) {
+            if (!(o instanceof Map.Entry))
+                return false;
+            Map.Entry&lt;K1,V1&gt; e = (Map.Entry&lt;K1,V1&gt;)o;
+            return m.remove(e.getKey(),
+                            e.getValue());
+        }
+        public boolean isEmpty() {
+            return m.isEmpty();
+        }
+        public int size() {
+            return m.size();
+        }
+        public void clear() {
+            m.clear();
+        }
+        public boolean equals(Object o) {
+            if (o == this)
+                return true;
+            if (!(o instanceof Set))
+                return false;
+            Collection&lt;?&gt; c = (Collection&lt;?&gt;) o;
+            try {
+                return containsAll(c) &amp;&amp; c.containsAll(this);
+            } catch (ClassCastException unused)   {
+                return false;
+            } catch (NullPointerException unused) {
+                return false;
+            }
+        }
+        public Object[] toArray()     { return toList(this).toArray();  }
+        public &lt;T&gt; T[] toArray(T[] a) { return toList(this).toArray(a); }
+    }
+
+    /**
+     * Submaps returned by {@link ConcurrentSkipListMap} submap operations
+     * represent a subrange of mappings of their underlying
+     * maps. Instances of this class support all methods of their
+     * underlying maps, differing in that mappings outside their range are
+     * ignored, and attempts to add mappings outside their ranges result
+     * in {@link IllegalArgumentException}.  Instances of this class are
+     * constructed only using the &lt;tt&gt;subMap&lt;/tt&gt;, &lt;tt&gt;headMap&lt;/tt&gt;, and
+     * &lt;tt&gt;tailMap&lt;/tt&gt; methods of their underlying maps.
+     *
+     * @serial include
+     */
+    static final class SubMap&lt;K,V&gt; extends AbstractMap&lt;K,V&gt;
+        implements ConcurrentNavigableMap&lt;K,V&gt;, Cloneable,
+                   java.io.Serializable {
+        private static final long serialVersionUID = -7647078645895051609L;
+
+        /** Underlying map */
+        private final ConcurrentSkipListMap&lt;K,V&gt; m;
+        /** lower bound key, or null if from start */
+        private final K lo;
+        /** upper bound key, or null if to end */
+        private final K hi;
+        /** inclusion flag for lo */
+        private final boolean loInclusive;
+        /** inclusion flag for hi */
+        private final boolean hiInclusive;
+        /** direction */
+        private final boolean isDescending;
+
+        // Lazily initialized view holders
+        private transient KeySet&lt;K&gt; keySetView;
+        private transient Set&lt;Map.Entry&lt;K,V&gt;&gt; entrySetView;
+        private transient Collection&lt;V&gt; valuesView;
+
+        /**
+         * Creates a new submap, initializing all fields
+         */
+        SubMap(ConcurrentSkipListMap&lt;K,V&gt; map,
+               K fromKey, boolean fromInclusive,
+               K toKey, boolean toInclusive,
+               boolean isDescending) {
+            if (fromKey != null &amp;&amp; toKey != null &amp;&amp;
+                map.compare(fromKey, toKey) &gt; 0)
+                throw new IllegalArgumentException(&quot;inconsistent range&quot;);
+            this.m = map;
+            this.lo = fromKey;
+            this.hi = toKey;
+            this.loInclusive = fromInclusive;
+            this.hiInclusive = toInclusive;
+            this.isDescending = isDescending;
+        }
+
+        /* ----------------  Utilities -------------- */
+
+        private boolean tooLow(K key) {
+            if (lo != null) {
+                int c = m.compare(key, lo);
+                if (c &lt; 0 || (c == 0 &amp;&amp; !loInclusive))
+                    return true;
+            }
+            return false;
+        }
+
+        private boolean tooHigh(K key) {
+            if (hi != null) {
+                int c = m.compare(key, hi);
+                if (c &gt; 0 || (c == 0 &amp;&amp; !hiInclusive))
+                    return true;
+            }
+            return false;
+        }
+
+        private boolean inBounds(K key) {
+            return !tooLow(key) &amp;&amp; !tooHigh(key);
+        }
+
+        private void checkKeyBounds(K key) throws IllegalArgumentException {
+            if (key == null)
+                throw new NullPointerException();
+            if (!inBounds(key))
+                throw new IllegalArgumentException(&quot;key out of range&quot;);
+        }
+
+        /**
+         * Returns true if node key is less than upper bound of range
+         */
+        private boolean isBeforeEnd(ConcurrentSkipListMap.Node&lt;K,V&gt; n) {
+            if (n == null)
+                return false;
+            if (hi == null)
+                return true;
+            K k = n.key;
+            if (k == null) // pass by markers and headers
+                return true;
+            int c = m.compare(k, hi);
+            if (c &gt; 0 || (c == 0 &amp;&amp; !hiInclusive))
+                return false;
+            return true;
+        }
+
+        /**
+         * Returns lowest node. This node might not be in range, so
+         * most usages need to check bounds
+         */
+        private ConcurrentSkipListMap.Node&lt;K,V&gt; loNode() {
+            if (lo == null)
+                return m.findFirst();
+            else if (loInclusive)
+                return m.findNear(lo, m.GT|m.EQ);
+            else
+                return m.findNear(lo, m.GT);
+        }
+
+        /**
+         * Returns highest node. This node might not be in range, so
+         * most usages need to check bounds
+         */
+        private ConcurrentSkipListMap.Node&lt;K,V&gt; hiNode() {
+            if (hi == null)
+                return m.findLast();
+            else if (hiInclusive)
+                return m.findNear(hi, m.LT|m.EQ);
+            else
+                return m.findNear(hi, m.LT);
+        }
+
+        /**
+         * Returns lowest absolute key (ignoring directonality)
+         */
+        private K lowestKey() {
+            ConcurrentSkipListMap.Node&lt;K,V&gt; n = loNode();
+            if (isBeforeEnd(n))
+                return n.key;
+            else
+                throw new NoSuchElementException();
+        }
+
+        /**
+         * Returns highest absolute key (ignoring directonality)
+         */
+        private K highestKey() {
+            ConcurrentSkipListMap.Node&lt;K,V&gt; n = hiNode();
+            if (n != null) {
+                K last = n.key;
+                if (inBounds(last))
+                    return last;
+            }
+            throw new NoSuchElementException();
+        }
+
+        private Map.Entry&lt;K,V&gt; lowestEntry() {
+            for (;;) {
+                ConcurrentSkipListMap.Node&lt;K,V&gt; n = loNode();
+                if (!isBeforeEnd(n))
+                    return null;
+                Map.Entry&lt;K,V&gt; e = n.createSnapshot();
+                if (e != null)
+                    return e;
+            }
+        }
+
+        private Map.Entry&lt;K,V&gt; highestEntry() {
+            for (;;) {
+                ConcurrentSkipListMap.Node&lt;K,V&gt; n = hiNode();
+                if (n == null || !inBounds(n.key))
+                    return null;
+                Map.Entry&lt;K,V&gt; e = n.createSnapshot();
+                if (e != null)
+                    return e;
+            }
+        }
+
+        private Map.Entry&lt;K,V&gt; removeLowest() {
+            for (;;) {
+                Node&lt;K,V&gt; n = loNode();
+                if (n == null)
+                    return null;
+                K k = n.key;
+                if (!inBounds(k))
+                    return null;
+                V v = m.doRemove(k, null);
+                if (v != null)
+                    return new AbstractMap.SimpleImmutableEntry&lt;K,V&gt;(k, v);
+            }
+        }
+
+        private Map.Entry&lt;K,V&gt; removeHighest() {
+            for (;;) {
+                Node&lt;K,V&gt; n = hiNode();
+                if (n == null)
+                    return null;
+                K k = n.key;
+                if (!inBounds(k))
+                    return null;
+                V v = m.doRemove(k, null);
+                if (v != null)
+                    return new AbstractMap.SimpleImmutableEntry&lt;K,V&gt;(k, v);
+            }
+        }
+
+        /**
+         * Submap version of ConcurrentSkipListMap.getNearEntry
+         */
+        private Map.Entry&lt;K,V&gt; getNearEntry(K key, int rel) {
+            if (isDescending) { // adjust relation for direction
+                if ((rel &amp; m.LT) == 0)
+                    rel |= m.LT;
+                else
+                    rel &amp;= ~m.LT;
+            }
+            if (tooLow(key))
+                return ((rel &amp; m.LT) != 0) ? null : lowestEntry();
+            if (tooHigh(key))
+                return ((rel &amp; m.LT) != 0) ? highestEntry() : null;
+            for (;;) {
+                Node&lt;K,V&gt; n = m.findNear(key, rel);
+                if (n == null || !inBounds(n.key))
+                    return null;
+                K k = n.key;
+                V v = n.getValidValue();
+                if (v != null)
+                    return new AbstractMap.SimpleImmutableEntry&lt;K,V&gt;(k, v);
+            }
+        }
+
+        // Almost the same as getNearEntry, except for keys
+        private K getNearKey(K key, int rel) {
+            if (isDescending) { // adjust relation for direction
+                if ((rel &amp; m.LT) == 0)
+                    rel |= m.LT;
+                else
+                    rel &amp;= ~m.LT;
+            }
+            if (tooLow(key)) {
+                if ((rel &amp; m.LT) == 0) {
+                    ConcurrentSkipListMap.Node&lt;K,V&gt; n = loNode();
+                    if (isBeforeEnd(n))
+                        return n.key;
+                }
+                return null;
+            }
+            if (tooHigh(key)) {
+                if ((rel &amp; m.LT) != 0) {
+                    ConcurrentSkipListMap.Node&lt;K,V&gt; n = hiNode();
+                    if (n != null) {
+                        K last = n.key;
+                        if (inBounds(last))
+                            return last;
+                    }
+                }
+                return null;
+            }
+            for (;;) {
+                Node&lt;K,V&gt; n = m.findNear(key, rel);
+                if (n == null || !inBounds(n.key))
+                    return null;
+                K k = n.key;
+                V v = n.getValidValue();
+                if (v != null)
+                    return k;
+            }
+        }
+
+        /* ----------------  Map API methods -------------- */
+
+        public boolean containsKey(Object key) {
+            if (key == null) throw new NullPointerException();
+            K k = (K)key;
+            return inBounds(k) &amp;&amp; m.containsKey(k);
+        }
+
+        public V get(Object key) {
+            if (key == null) throw new NullPointerException();
+            K k = (K)key;
+            return ((!inBounds(k)) ? null : m.get(k));
+        }
+
+        public V put(K key, V value) {
+            checkKeyBounds(key);
+            return m.put(key, value);
+        }
+
+        public V remove(Object key) {
+            K k = (K)key;
+            return (!inBounds(k)) ? null : m.remove(k);
+        }
+
+        public int size() {
+            long count = 0;
+            for (ConcurrentSkipListMap.Node&lt;K,V&gt; n = loNode();
+                 isBeforeEnd(n);
+                 n = n.next) {
+                if (n.getValidValue() != null)
+                    ++count;
+            }
+            return count &gt;= Integer.MAX_VALUE ? Integer.MAX_VALUE : (int)count;
+        }
+
+        public boolean isEmpty() {
+            return !isBeforeEnd(loNode());
+        }
+
+        public boolean containsValue(Object value) {
+            if (value == null)
+                throw new NullPointerException();
+            for (ConcurrentSkipListMap.Node&lt;K,V&gt; n = loNode();
+                 isBeforeEnd(n);
+                 n = n.next) {
+                V v = n.getValidValue();
+                if (v != null &amp;&amp; value.equals(v))
+                    return true;
+            }
+            return false;
+        }
+
+        public void clear() {
+            for (ConcurrentSkipListMap.Node&lt;K,V&gt; n = loNode();
+                 isBeforeEnd(n);
+                 n = n.next) {
+                if (n.getValidValue() != null)
+                    m.remove(n.key);
+            }
+        }
+
+        /* ----------------  ConcurrentMap API methods -------------- */
+
+        public V putIfAbsent(K key, V value) {
+            checkKeyBounds(key);
+            return m.putIfAbsent(key, value);
+        }
+
+        public boolean remove(Object key, Object value) {
+            K k = (K)key;
+            return inBounds(k) &amp;&amp; m.remove(k, value);
+        }
+
+        public boolean replace(K key, V oldValue, V newValue) {
+            checkKeyBounds(key);
+            return m.replace(key, oldValue, newValue);
+        }
+
+        public V replace(K key, V value) {
+            checkKeyBounds(key);
+            return m.replace(key, value);
+        }
+
+        /* ----------------  SortedMap API methods -------------- */
+
+        public Comparator&lt;? super K&gt; comparator() {
+            Comparator&lt;? super K&gt; cmp = m.comparator();
+            if (isDescending)
+                return Collections.reverseOrder(cmp);
+            else
+                return cmp;
+        }
+
+        /**
+         * Utility to create submaps, where given bounds override
+         * unbounded(null) ones and/or are checked against bounded ones.
+         */
+        private SubMap&lt;K,V&gt; newSubMap(K fromKey,
+                                      boolean fromInclusive,
+                                      K toKey,
+                                      boolean toInclusive) {
+            if (isDescending) { // flip senses
+                K tk = fromKey;
+                fromKey = toKey;
+                toKey = tk;
+                boolean ti = fromInclusive;
+                fromInclusive = toInclusive;
+                toInclusive = ti;
+            }
+            if (lo != null) {
+                if (fromKey == null) {
+                    fromKey = lo;
+                    fromInclusive = loInclusive;
+                }
+                else {
+                    int c = m.compare(fromKey, lo);
+                    if (c &lt; 0 || (c == 0 &amp;&amp; !loInclusive &amp;&amp; fromInclusive))
+                        throw new IllegalArgumentException(&quot;key out of range&quot;);
+                }
+            }
+            if (hi != null) {
+                if (toKey == null) {
+                    toKey = hi;
+                    toInclusive = hiInclusive;
+                }
+                else {
+                    int c = m.compare(toKey, hi);
+                    if (c &gt; 0 || (c == 0 &amp;&amp; !hiInclusive &amp;&amp; toInclusive))
+                        throw new IllegalArgumentException(&quot;key out of range&quot;);
+                }
+            }
+            return new SubMap&lt;K,V&gt;(m, fromKey, fromInclusive,
+                                   toKey, toInclusive, isDescending);
+        }
+
+        public SubMap&lt;K,V&gt; subMap(K fromKey,
+                                  boolean fromInclusive,
+                                  K toKey,
+                                  boolean toInclusive) {
+            if (fromKey == null || toKey == null)
+                throw new NullPointerException();
+            return newSubMap(fromKey, fromInclusive, toKey, toInclusive);
+        }
+
+        public SubMap&lt;K,V&gt; headMap(K toKey,
+                                   boolean inclusive) {
+            if (toKey == null)
+                throw new NullPointerException();
+            return newSubMap(null, false, toKey, inclusive);
+        }
+
+        public SubMap&lt;K,V&gt; tailMap(K fromKey,
+                                   boolean inclusive) {
+            if (fromKey == null)
+                throw new NullPointerException();
+            return newSubMap(fromKey, inclusive, null, false);
+        }
+
+        public SubMap&lt;K,V&gt; subMap(K fromKey, K toKey) {
+            return subMap(fromKey, true, toKey, false);
+        }
+
+        public SubMap&lt;K,V&gt; headMap(K toKey) {
+            return headMap(toKey, false);
+        }
+
+        public SubMap&lt;K,V&gt; tailMap(K fromKey) {
+            return tailMap(fromKey, true);
+        }
+
+        public SubMap&lt;K,V&gt; descendingMap() {
+            return new SubMap&lt;K,V&gt;(m, lo, loInclusive,
+                                   hi, hiInclusive, !isDescending);
+        }
+
+        /* ----------------  Relational methods -------------- */
+
+        public Map.Entry&lt;K,V&gt; ceilingEntry(K key) {
+            return getNearEntry(key, (m.GT|m.EQ));
+        }
+
+        public K ceilingKey(K key) {
+            return getNearKey(key, (m.GT|m.EQ));
+        }
+
+        public Map.Entry&lt;K,V&gt; lowerEntry(K key) {
+            return getNearEntry(key, (m.LT));
+        }
+
+        public K lowerKey(K key) {
+            return getNearKey(key, (m.LT));
+        }
+
+        public Map.Entry&lt;K,V&gt; floorEntry(K key) {
+            return getNearEntry(key, (m.LT|m.EQ));
+        }
+
+        public K floorKey(K key) {
+            return getNearKey(key, (m.LT|m.EQ));
+        }
+
+        public Map.Entry&lt;K,V&gt; higherEntry(K key) {
+            return getNearEntry(key, (m.GT));
+        }
+
+        public K higherKey(K key) {
+            return getNearKey(key, (m.GT));
+        }
+
+        public K firstKey() {
+            return isDescending ? highestKey() : lowestKey();
+        }
+
+        public K lastKey() {
+            return isDescending ? lowestKey() : highestKey();
+        }
+
+        public Map.Entry&lt;K,V&gt; firstEntry() {
+            return isDescending ? highestEntry() : lowestEntry();
+        }
+
+        public Map.Entry&lt;K,V&gt; lastEntry() {
+            return isDescending ? lowestEntry() : highestEntry();
+        }
+
+        public Map.Entry&lt;K,V&gt; pollFirstEntry() {
+            return isDescending ? removeHighest() : removeLowest();
+        }
+
+        public Map.Entry&lt;K,V&gt; pollLastEntry() {
+            return isDescending ? removeLowest() : removeHighest();
+        }
+
+        /* ---------------- Submap Views -------------- */
+
+        public NavigableSet&lt;K&gt; keySet() {
+            KeySet&lt;K&gt; ks = keySetView;
+            return (ks != null) ? ks : (keySetView = new KeySet(this));
+        }
+
+        public NavigableSet&lt;K&gt; navigableKeySet() {
+            KeySet&lt;K&gt; ks = keySetView;
+            return (ks != null) ? ks : (keySetView = new KeySet(this));
+        }
+
+        public Collection&lt;V&gt; values() {
+            Collection&lt;V&gt; vs = valuesView;
+            return (vs != null) ? vs : (valuesView = new Values(this));
+        }
+
+        public Set&lt;Map.Entry&lt;K,V&gt;&gt; entrySet() {
+            Set&lt;Map.Entry&lt;K,V&gt;&gt; es = entrySetView;
+            return (es != null) ? es : (entrySetView = new EntrySet(this));
+        }
+
+        public NavigableSet&lt;K&gt; descendingKeySet() {
+            return descendingMap().navigableKeySet();
+        }
+
+        Iterator&lt;K&gt; keyIterator() {
+            return new SubMapKeyIterator();
+        }
+
+        Iterator&lt;V&gt; valueIterator() {
+            return new SubMapValueIterator();
+        }
+
+        Iterator&lt;Map.Entry&lt;K,V&gt;&gt; entryIterator() {
+            return new SubMapEntryIterator();
+        }
+
+        /**
+         * Variant of main Iter class to traverse through submaps.
+         */
+        abstract class SubMapIter&lt;T&gt; implements Iterator&lt;T&gt; {
+            /** the last node returned by next() */
+            Node&lt;K,V&gt; lastReturned;
+            /** the next node to return from next(); */
+            Node&lt;K,V&gt; next;
+            /** Cache of next value field to maintain weak consistency */
+            V nextValue;
+
+            SubMapIter() {
+                for (;;) {
+                    next = isDescending ? hiNode() : loNode();
+                    if (next == null)
+                        break;
+                    Object x = next.value;
+                    if (x != null &amp;&amp; x != next) {
+                        if (! inBounds(next.key))
+                            next = null;
+                        else
+                            nextValue = (V) x;
+                        break;
+                    }
+                }
+            }
+
+            public final boolean hasNext() {
+                return next != null;
+            }
+
+            final void advance() {
+                if (next == null)
+                    throw new NoSuchElementException();
+                lastReturned = next;
+                if (isDescending)
+                    descend();
+                else
+                    ascend();
+            }
+
+            private void ascend() {
+                for (;;) {
+                    next = next.next;
+                    if (next == null)
+                        break;
+                    Object x = next.value;
+                    if (x != null &amp;&amp; x != next) {
+                        if (tooHigh(next.key))
+                            next = null;
+                        else
+                            nextValue = (V) x;
+                        break;
+                    }
+                }
+            }
+
+            private void descend() {
+                for (;;) {
+                    next = m.findNear(lastReturned.key, LT);
+                    if (next == null)
+                        break;
+                    Object x = next.value;
+                    if (x != null &amp;&amp; x != next) {
+                        if (tooLow(next.key))
+                            next = null;
+                        else
+                            nextValue = (V) x;
+                        break;
+                    }
+                }
+            }
+
+            public void remove() {
+                Node&lt;K,V&gt; l = lastReturned;
+                if (l == null)
+                    throw new IllegalStateException();
+                m.remove(l.key);
+                lastReturned = null;
+            }
+
+        }
+
+        final class SubMapValueIterator extends SubMapIter&lt;V&gt; {
+            public V next() {
+                V v = nextValue;
+                advance();
+                return v;
+            }
+        }
+
+        final class SubMapKeyIterator extends SubMapIter&lt;K&gt; {
+            public K next() {
+                Node&lt;K,V&gt; n = next;
+                advance();
+                return n.key;
+            }
+        }
+
+        final class SubMapEntryIterator extends SubMapIter&lt;Map.Entry&lt;K,V&gt;&gt; {
+            public Map.Entry&lt;K,V&gt; next() {
+                Node&lt;K,V&gt; n = next;
+                V v = nextValue;
+                advance();
+                return new AbstractMap.SimpleImmutableEntry&lt;K,V&gt;(n.key, v);
+            }
+        }
+    }
+
+    // Unsafe mechanics
+    private static final sun.misc.Unsafe UNSAFE;
+    private static final long headOffset;
+    static {
+        try {
+            UNSAFE = sun.misc.Unsafe.getUnsafe();
+            Class k = ConcurrentSkipListMap.class;
+            headOffset = UNSAFE.objectFieldOffset
+                (k.getDeclaredField(&quot;head&quot;));
+        } catch (Exception e) {
+            throw new Error(e);
+        }
+    }
+}
+</code></pre><p>下面从ConcurrentSkipListMap的添加，删除，获取这3个方面对它进行分析。</p>
+<p><a name="anchor4_1"></a></p>
+<h2 id="4-1-添加"><a href="#4-1-添加" class="headerlink" title="4.1 添加"></a>4.1 添加</h2><p>下面以put(K key, V value)为例，对ConcurrentSkipListMap的添加方法进行说明。</p>
+<pre><code>public V put(K key, V value) {
+    if (value == null)
+        throw new NullPointerException();
+    return doPut(key, value, false);
+}
+</code></pre><p>实际上，put()是通过doPut()将key-value键值对添加到ConcurrentSkipListMap中的。</p>
+<p>doPut()的源码如下：</p>
+<pre><code>private V doPut(K kkey, V value, boolean onlyIfAbsent) {
+    Comparable&lt;? super K&gt; key = comparable(kkey);
+    for (;;) {
+        // 找到key的前继节点
+        Node&lt;K,V&gt; b = findPredecessor(key);
+        // 设置n为“key的前继节点的后继节点”，即n应该是“插入节点”的“后继节点”
+        Node&lt;K,V&gt; n = b.next;
+        for (;;) {
+            if (n != null) {
+                Node&lt;K,V&gt; f = n.next;
+                // 如果两次获得的b.next不是相同的Node，就跳转到”外层for循环“，重新获得b和n后再遍历。
+                if (n != b.next)
+                    break;
+                // v是“n的值”
+                Object v = n.value;
+                // 当n的值为null(意味着其它线程删除了n)；此时删除b的下一个节点，然后跳转到”外层for循环“，重新获得b和n后再遍历。
+                if (v == null) {               // n is deleted
+                    n.helpDelete(b, f);
+                    break;
+                }
+                // 如果其它线程删除了b；则跳转到”外层for循环“，重新获得b和n后再遍历。
+                if (v == n || b.value == null) // b is deleted
+                    break;
+                // 比较key和n.key
+                int c = key.compareTo(n.key);
+                if (c &gt; 0) {
+                    b = n;
+                    n = f;
+                    continue;
+                }
+                if (c == 0) {
+                    if (onlyIfAbsent || n.casValue(v, value))
+                        return (V)v;
+                    else
+                        break; // restart if lost race to replace value
+                }
+                // else c &lt; 0; fall through
+            }
+
+            // 新建节点(对应是“要插入的键值对”)
+            Node&lt;K,V&gt; z = new Node&lt;K,V&gt;(kkey, value, n);
+            // 设置“b的后继节点”为z
+            if (!b.casNext(n, z))
+                break;         // 多线程情况下，break才可能发生(其它线程对b进行了操作)
+            // 随机获取一个level
+            // 然后在“第1层”到“第level层”的链表中都插入新建节点
+            int level = randomLevel();
+            if (level &gt; 0)
+                insertIndex(z, level);
+            return null;
+        }
+    }
+}
+</code></pre><p>说明：doPut() 的作用就是将键值对添加到“跳表”中。<br>要想搞清doPut()，首先要弄清楚它的主干部分 —— 我们先单纯的只考虑“单线程的情况下，将key-value添加到跳表中”，即忽略“多线程相关的内容”。它的流程如下：</p>
+<p>第1步：找到“插入位置”。<br>&nbsp;&nbsp;&nbsp;&nbsp; 即，找到“key的前继节点(b)”和“key的后继节点(n)”；key是要插入节点的键。<br>第2步：新建并插入节点。<br>&nbsp;&nbsp;&nbsp;&nbsp; 即，新建节点z(key对应的节点)，并将新节点z插入到“跳表”中(设置“b的后继节点为z”，“z的后继节点为n”)。<br>第3步：更新跳表。<br>&nbsp;&nbsp;&nbsp;&nbsp; 即，随机获取一个level，然后在“跳表”的第1层～第level层之间，每一层都插入节点z；在第level层之上就不再插入节点了。若level数值大于“跳表的层次”，则新建一层。</p>
+<p>主干部分“对应的精简后的doPut()的代码”如下(仅供参考)：</p>
+<pre><code>private V doPut(K kkey, V value, boolean onlyIfAbsent) {
+    Comparable&lt;? super K&gt; key = comparable(kkey);
+    for (;;) {
+        // 找到key的前继节点
+        Node&lt;K,V&gt; b = findPredecessor(key);
+        // 设置n为key的后继节点
+        Node&lt;K,V&gt; n = b.next;
+        for (;;) {
+
+            // 新建节点(对应是“要被插入的键值对”)
+            Node&lt;K,V&gt; z = new Node&lt;K,V&gt;(kkey, value, n);
+            // 设置“b的后继节点”为z
+            b.casNext(n, z);
+
+            // 随机获取一个level
+            // 然后在“第1层”到“第level层”的链表中都插入新建节点
+            int level = randomLevel();
+            if (level &gt; 0)
+                insertIndex(z, level);
+            return null;
+        }
+    }
+}
+</code></pre><p>理清主干之后，剩余的工作就相对简单了。主要是上面几步的对应算法的具体实现，以及多线程相关情况的处理！</p>
+<p><a name="anchor4_2"></a></p>
+<h1 id="4-2-删除"><a href="#4-2-删除" class="headerlink" title="4.2 删除"></a>4.2 删除</h1><p>下面以remove(Object key)为例，对ConcurrentSkipListMap的删除方法进行说明。</p>
+<pre><code>public V remove(Object key) {
+    return doRemove(key, null);
+}
+</code></pre><p>实际上，remove()是通过doRemove()将ConcurrentSkipListMap中的key对应的键值对删除的。</p>
+<p>doRemove()的源码如下：</p>
+<pre><code>final V doRemove(Object okey, Object value) {
+    Comparable&lt;? super K&gt; key = comparable(okey);
+    for (;;) {
+        // 找到“key的前继节点”
+        Node&lt;K,V&gt; b = findPredecessor(key);
+        // 设置n为“b的后继节点”(即若key存在于“跳表中”，n就是key对应的节点)
+        Node&lt;K,V&gt; n = b.next;
+        for (;;) {
+            if (n == null)
+                return null;
+            // f是“当前节点n的后继节点”
+            Node&lt;K,V&gt; f = n.next;
+            // 如果两次读取到的“b的后继节点”不同(其它线程操作了该跳表)，则返回到“外层for循环”重新遍历。
+            if (n != b.next)                    // inconsistent read
+                break;
+            // 如果“当前节点n的值”变为null(其它线程操作了该跳表)，则返回到“外层for循环”重新遍历。
+            Object v = n.value;
+            if (v == null) {                    // n is deleted
+                n.helpDelete(b, f);
+                break;
+            }
+            // 如果“前继节点b”被删除(其它线程操作了该跳表)，则返回到“外层for循环”重新遍历。
+            if (v == n || b.value == null)      // b is deleted
+                break;
+            int c = key.compareTo(n.key);
+            if (c &lt; 0)
+                return null;
+            if (c &gt; 0) {
+                b = n;
+                n = f;
+                continue;
+            }
+
+            // 以下是c=0的情况
+            if (value != null &amp;&amp; !value.equals(v))
+                return null;
+            // 设置“当前节点n”的值为null
+            if (!n.casValue(v, null))
+                break;
+            // 设置“b的后继节点”为f
+            if (!n.appendMarker(f) || !b.casNext(n, f))
+                findNode(key);                  // Retry via findNode
+            else {
+                // 清除“跳表”中每一层的key节点
+                findPredecessor(key);           // Clean index
+                // 如果“表头的右索引为空”，则将“跳表的层次”-1。
+                if (head.right == null)
+                    tryReduceLevel();
+            }
+            return (V)v;
+        }
+    }
+}
+</code></pre><p>说明：doRemove()的作用是删除跳表中的节点。<br>和doPut()一样，我们重点看doRemove()的主干部分，了解主干部分之后，其余部分就非常容易理解了。下面是“单线程的情况下，删除跳表中键值对的步骤”：</p>
+<p>第1步：找到“被删除节点的位置”。<br>&nbsp;&nbsp;&nbsp;&nbsp; 即，找到“key的前继节点(b)”，“key所对应的节点(n)”，“n的后继节点f”；key是要删除节点的键。<br>第2步：删除节点。<br>&nbsp;&nbsp;&nbsp;&nbsp; 即，将“key所对应的节点n”从跳表中移除 – 将“b的后继节点”设为“f”！<br>第3步：更新跳表。<br>&nbsp;&nbsp;&nbsp;&nbsp; 即，遍历跳表，删除每一层的“key节点”(如果存在的话)。如果删除“key节点”之后，跳表的层次需要-1；则执行相应的操作！</p>
+<p>主干部分“对应的精简后的doRemove()的代码”如下(仅供参考)：</p>
+<pre><code>final V doRemove(Object okey, Object value) {
+    Comparable&lt;? super K&gt; key = comparable(okey);
+    for (;;) {
+        // 找到“key的前继节点”
+        Node&lt;K,V&gt; b = findPredecessor(key);
+        // 设置n为“b的后继节点”(即若key存在于“跳表中”，n就是key对应的节点)
+        Node&lt;K,V&gt; n = b.next;
+        for (;;) {
+            // f是“当前节点n的后继节点”
+            Node&lt;K,V&gt; f = n.next;
+
+            // 设置“当前节点n”的值为null
+            n.casValue(v, null);
+
+            // 设置“b的后继节点”为f
+            b.casNext(n, f);
+            // 清除“跳表”中每一层的key节点
+            findPredecessor(key);
+            // 如果“表头的右索引为空”，则将“跳表的层次”-1。
+            if (head.right == null)
+                tryReduceLevel();
+            return (V)v;
+        }
+    }
+}
+</code></pre><p><a name="anchor4_3"></a></p>
+<h2 id="4-3-获取"><a href="#4-3-获取" class="headerlink" title="4.3 获取"></a>4.3 获取</h2><p>下面以get(Object key)为例，对ConcurrentSkipListMap的获取方法进行说明。</p>
+<pre><code>public V get(Object key) {
+    return doGet(key);
+}
+</code></pre><p>doGet的源码如下：</p>
+<pre><code>private V doGet(Object okey) {
+    Comparable&lt;? super K&gt; key = comparable(okey);
+    for (;;) {
+        // 找到“key对应的节点”
+        Node&lt;K,V&gt; n = findNode(key);
+        if (n == null)
+            return null;
+        Object v = n.value;
+        if (v != null)
+            return (V)v;
+    }
+}
+</code></pre><p>说明：doGet()是通过findNode()找到并返回节点的。</p>
+<pre><code>private Node&lt;K,V&gt; findNode(Comparable&lt;? super K&gt; key) {
+    for (;;) {
+        // 找到key的前继节点
+        Node&lt;K,V&gt; b = findPredecessor(key);
+        // 设置n为“b的后继节点”(即若key存在于“跳表中”，n就是key对应的节点)
+        Node&lt;K,V&gt; n = b.next;
+        for (;;) {
+            // 如果“n为null”，则跳转中不存在key对应的节点，直接返回null。
+            if (n == null)
+                return null;
+            Node&lt;K,V&gt; f = n.next;
+            // 如果两次读取到的“b的后继节点”不同(其它线程操作了该跳表)，则返回到“外层for循环”重新遍历。
+            if (n != b.next)                // inconsistent read
+                break;
+            Object v = n.value;
+            // 如果“当前节点n的值”变为null(其它线程操作了该跳表)，则返回到“外层for循环”重新遍历。
+            if (v == null) {                // n is deleted
+                n.helpDelete(b, f);
+                break;
+            }
+            if (v == n || b.value == null)  // b is deleted
+                break;
+            // 若n是当前节点，则返回n。
+            int c = key.compareTo(n.key);
+            if (c == 0)
+                return n;
+            // 若“节点n的key”小于“key”，则说明跳表中不存在key对应的节点，返回null
+            if (c &lt; 0)
+                return null;
+            // 若“节点n的key”大于“key”，则更新b和n，继续查找。
+            b = n;
+            n = f;
+        }
+    }
+}
+</code></pre><p>说明：findNode(key)的作用是在返回跳表中key对应的节点；存在则返回节点，不存在则返回null。<br>先弄清函数的主干部分，即抛开“多线程相关内容”，单纯的考虑单线程情况下，从跳表获取节点的算法。</p>
+<p>第1步：找到“被删除节点的位置”。<br>&nbsp;&nbsp;&nbsp;&nbsp; 根据findPredecessor()定位key所在的层次以及找到key的前继节点(b)，然后找到b的后继节点n。<br>第2步：根据“key的前继节点(b)”和“key的前继节点的后继节点(n)”来定位“key对应的节点”。<br>&nbsp;&nbsp;&nbsp;&nbsp; 具体是通过比较“n的键值”和“key”的大小。如果相等，则n就是所要查找的键。</p>
+<p><a name="anchor5"></a></p>
+<h1 id="5-ConcurrentSkipListMap示例"><a href="#5-ConcurrentSkipListMap示例" class="headerlink" title="5. ConcurrentSkipListMap示例"></a>5. ConcurrentSkipListMap示例</h1><pre><code>import java.util.*;
+import java.util.concurrent.*;
+
+/*
+ *   ConcurrentSkipListMap是“线程安全”的哈希表，而TreeMap是非线程安全的。
+ *
+ *   下面是“多个线程同时操作并且遍历map”的示例
+ *   (01) 当map是ConcurrentSkipListMap对象时，程序能正常运行。
+ *   (02) 当map是TreeMap对象时，程序会产生ConcurrentModificationException异常。
+ *
+ * @author skywang
+ */
+public class ConcurrentSkipListMapDemo1 {
+
+    // TODO: map是TreeMap对象时，程序会出错。
+    //private static Map&lt;String, String&gt; map = new TreeMap&lt;String, String&gt;();
+    private static Map&lt;String, String&gt; map = new ConcurrentSkipListMap&lt;String, String&gt;();
+    public static void main(String[] args) {
+
+        // 同时启动两个线程对map进行操作！
+        new MyThread(&quot;a&quot;).start();
+        new MyThread(&quot;b&quot;).start();
+    }
+
+    private static void printAll() {
+        String key, value;
+        Iterator iter = map.entrySet().iterator();
+        while(iter.hasNext()) {
+            Map.Entry entry = (Map.Entry)iter.next();
+            key = (String)entry.getKey();
+            value = (String)entry.getValue();
+            System.out.print(&quot;(&quot;+key+&quot;, &quot;+value+&quot;), &quot;);
+        }
+        System.out.println();
+    }
+
+    private static class MyThread extends Thread {
+        MyThread(String name) {
+            super(name);
+        }
+        @Override
+        public void run() {
+                int i = 0;
+            while (i++ &lt; 6) {
+                // “线程名” + &quot;序号&quot;
+                String val = Thread.currentThread().getName()+i;
+                map.put(val, &quot;0&quot;);
+                // 通过“Iterator”遍历map。
+                printAll();
+            }
+        }
+    }
+}
+</code></pre><p>(某一次)运行结果：</p>
+<pre><code>(a1, 0), (a1, 0), (b1, 0), (b1, 0),
+
+(a1, 0), (b1, 0), (b2, 0), 
+(a1, 0), (a1, 0), (a2, 0), (a2, 0), (b1, 0), (b1, 0), (b2, 0), (b2, 0), (b3, 0), 
+(b3, 0), (a1, 0), 
+(a2, 0), (a3, 0), (a1, 0), (b1, 0), (a2, 0), (b2, 0), (a3, 0), (b3, 0), (b1, 0), (b4, 0), 
+(b2, 0), (a1, 0), (b3, 0), (a2, 0), (b4, 0), 
+(a3, 0), (a1, 0), (a4, 0), (a2, 0), (b1, 0), (a3, 0), (b2, 0), (a4, 0), (b3, 0), (b1, 0), (b4, 0), (b2, 0), (b5, 0), 
+(b3, 0), (a1, 0), (b4, 0), (a2, 0), (b5, 0), 
+(a3, 0), (a1, 0), (a4, 0), (a2, 0), (a5, 0), (a3, 0), (b1, 0), (a4, 0), (b2, 0), (a5, 0), (b3, 0), (b1, 0), (b4, 0), (b2, 0), (b5, 0), (b3, 0), (b6, 0), 
+(b4, 0), (a1, 0), (b5, 0), (a2, 0), (b6, 0), 
+(a3, 0), (a4, 0), (a5, 0), (a6, 0), (b1, 0), (b2, 0), (b3, 0), (b4, 0), (b5, 0), (b6, 0), 
+</code></pre><p>结果说明：<br>示例程序中，启动两个线程(线程a和线程b)分别对ConcurrentSkipListMap进行操作。以线程a而言，它会先获取“线程名”+“序号”，然后将该字符串作为key，将“0”作为value，插入到ConcurrentSkipListMap中；接着，遍历并输出ConcurrentSkipListMap中的全部元素。 线程b的操作和线程a一样，只不过线程b的名字和线程a的名字不同。<br>当map是ConcurrentSkipListMap对象时，程序能正常运行。如果将map改为TreeMap时，程序会产生ConcurrentModificationException异常。</p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2018-06-27T09:39:57.949Z" itemprop="dateUpdated">2018-06-27 17:39:57</time>
+</span><br>
+
+
+        
+        本文固定链接：<a href="/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”05之 ConcurrentSkipListMap/" target="_blank" rel="external">https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”05之 ConcurrentSkipListMap/</a>
+        
+    </div>
+    <footer>
+        <a href="https://smuwjs.github.io">
+            <img src="/img/head.png" alt="Jeeson">
+            Jeeson
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JUC集合/">JUC集合</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java多线程系列/">Java多线程系列</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java源码分析/">Java源码分析</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”05之 ConcurrentSkipListMap/&title=《Java多线程系列--“JUC集合”05之 ConcurrentSkipListMap》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”05之 ConcurrentSkipListMap/&title=《Java多线程系列--“JUC集合”05之 ConcurrentSkipListMap》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”05之 ConcurrentSkipListMap/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Java多线程系列--“JUC集合”05之 ConcurrentSkipListMap》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”05之 ConcurrentSkipListMap/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”05之 ConcurrentSkipListMap/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”06之 ConcurrentSkipListSet/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">Java多线程系列--“JUC集合”06之 ConcurrentSkipListSet</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”04之 ConcurrentHashMap/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Java多线程系列--“JUC集合”04之 ConcurrentHashMap</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”05之 ConcurrentSkipListMap" data-title="Java多线程系列--“JUC集合”05之 ConcurrentSkipListMap" data-url="https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”05之 ConcurrentSkipListMap/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'smuwjs', theme: 'none'};
+lazyScripts.push('//unpkg.com/hexo-theme-material-indigo@latest/js/embed.min.js');
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循<a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>Jeeson &copy; 2015 - 2018</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”05之 ConcurrentSkipListMap/&title=《Java多线程系列--“JUC集合”05之 ConcurrentSkipListMap》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”05之 ConcurrentSkipListMap/&title=《Java多线程系列--“JUC集合”05之 ConcurrentSkipListMap》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”05之 ConcurrentSkipListMap/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Java多线程系列--“JUC集合”05之 ConcurrentSkipListMap》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”05之 ConcurrentSkipListMap/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”05之 ConcurrentSkipListMap/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”05之 ConcurrentSkipListMap/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

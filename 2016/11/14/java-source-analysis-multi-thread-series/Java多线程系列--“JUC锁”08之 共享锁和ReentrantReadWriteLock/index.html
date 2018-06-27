@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>Java多线程系列--“JUC锁”08之 共享锁和ReentrantReadWriteLock | Jeeson&#39;s Blog | Write the code. Change the world.</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="Java源码分析,Java多线程系列,JUC锁">
+    <meta name="description" content="Java的JUC(java.util.concurrent)包中的锁包括”独占锁”和”共享锁”。在“Java多线程系列–“JUC锁”02之 互斥锁ReentrantLock ”中，对Java的独占锁进行了说明。本章对Java的“共享锁”进行介绍，JUC中的共享锁有CountDownLatch, CyclicBarrier, Semaphore, ReentrantReadWriteLock等；本">
+<meta name="keywords" content="Java源码分析,Java多线程系列,JUC锁">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java多线程系列--“JUC锁”08之 共享锁和ReentrantReadWriteLock">
+<meta property="og:url" content="https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”08之 共享锁和ReentrantReadWriteLock/index.html">
+<meta property="og:site_name" content="Jeeson&#39;s Blog">
+<meta property="og:description" content="Java的JUC(java.util.concurrent)包中的锁包括”独占锁”和”共享锁”。在“Java多线程系列–“JUC锁”02之 互斥锁ReentrantLock ”中，对Java的独占锁进行了说明。本章对Java的“共享锁”进行介绍，JUC中的共享锁有CountDownLatch, CyclicBarrier, Semaphore, ReentrantReadWriteLock等；本">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://wangkuiwu.github.io/media/pic/java/threads/juc-lock08-01.jpg">
+<meta property="og:updated_time" content="2018-06-27T09:39:57.945Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java多线程系列--“JUC锁”08之 共享锁和ReentrantReadWriteLock">
+<meta name="twitter:description" content="Java的JUC(java.util.concurrent)包中的锁包括”独占锁”和”共享锁”。在“Java多线程系列–“JUC锁”02之 互斥锁ReentrantLock ”中，对Java的独占锁进行了说明。本章对Java的“共享锁”进行介绍，JUC中的共享锁有CountDownLatch, CyclicBarrier, Semaphore, ReentrantReadWriteLock等；本">
+<meta name="twitter:image" content="http://wangkuiwu.github.io/media/pic/java/threads/juc-lock08-01.jpg">
+    
+        <link rel="alternate" type="application/atom+xml" title="Jeeson&#39;s Blog" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/head.png">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Jeeson</h5>
+          <a href="mailto:smuwjs@163.com" title="smuwjs@163.com" class="mail">smuwjs@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/smuwjs" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Java多线程系列--“JUC锁”08之 共享锁和ReentrantReadWriteLock</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Java多线程系列--“JUC锁”08之 共享锁和ReentrantReadWriteLock</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2016-11-14T00:00:00.000Z" itemprop="datePublished" class="page-time">
+  2016-11-14
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#1-ReadWriteLock-和-ReentrantReadWriteLock介绍"><span class="post-toc-number">1.</span> <span class="post-toc-text">1. ReadWriteLock 和 ReentrantReadWriteLock介绍</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#2-参考代码-基于JDK1-7-0-40"><span class="post-toc-number">2.</span> <span class="post-toc-text">2. 参考代码(基于JDK1.7.0_40)</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#3-获取共享锁"><span class="post-toc-number">3.</span> <span class="post-toc-text">3. 获取共享锁</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#3-1-lock"><span class="post-toc-number">3.1.</span> <span class="post-toc-text">3.1 lock()</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#3-2-acquireShared"><span class="post-toc-number">3.2.</span> <span class="post-toc-text">3.2 acquireShared()</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#3-3-tryAcquireShared"><span class="post-toc-number">3.3.</span> <span class="post-toc-text">3.3 tryAcquireShared()</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#3-4-fullTryAcquireShared"><span class="post-toc-number">3.4.</span> <span class="post-toc-text">3.4 fullTryAcquireShared()</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#3-5-doAcquireShared"><span class="post-toc-number">3.5.</span> <span class="post-toc-text">3.5 doAcquireShared()</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#4-释放共享锁"><span class="post-toc-number">4.</span> <span class="post-toc-text">4. 释放共享锁</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#4-1-unlock"><span class="post-toc-number">4.1.</span> <span class="post-toc-text">4.1 unlock()</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#4-2-releaseShared"><span class="post-toc-number">4.2.</span> <span class="post-toc-text">4.2 releaseShared()</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#4-3-tryReleaseShared"><span class="post-toc-number">4.3.</span> <span class="post-toc-text">4.3 tryReleaseShared()</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#4-4-doReleaseShared"><span class="post-toc-number">4.4.</span> <span class="post-toc-text">4.4 doReleaseShared()</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#5-公平共享锁和非公平共享锁"><span class="post-toc-number">5.</span> <span class="post-toc-text">5. 公平共享锁和非公平共享锁</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#6-ReentrantReadWriteLock示例"><span class="post-toc-number">6.</span> <span class="post-toc-text">6. ReentrantReadWriteLock示例</span></a></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”08之 共享锁和ReentrantReadWriteLock"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Java多线程系列--“JUC锁”08之 共享锁和ReentrantReadWriteLock</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2016-11-14 08:00:00" datetime="2016-11-14T00:00:00.000Z"  itemprop="datePublished">2016-11-14</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <blockquote>
+<p>Java的JUC(java.util.concurrent)包中的锁包括”独占锁”和”共享锁”。在“Java多线程系列–“JUC锁”02之 互斥锁ReentrantLock ”中，对Java的独占锁进行了说明。本章对Java的“共享锁”进行介绍，JUC中的共享锁有CountDownLatch, CyclicBarrier, Semaphore, ReentrantReadWriteLock等；本章会以ReentrantReadWriteLock为蓝本对共享锁进行说明。</p>
+</blockquote>
+<blockquote>
+<p><strong>目录</strong><br><a href="#anchor1">1. ReadWriteLock 和 ReentrantReadWriteLock介绍</a><br><a href="#anchor2">2. 参考代码(基于JDK1.7.0_40)</a><br><a href="#anchor3">3. 获取共享锁</a><br><a href="#anchor4">4. 释放共享锁</a><br><a href="#anchor5">5. 公平共享锁和非公平共享锁</a><br><a href="#anchor6">6. ReentrantReadWriteLock示例</a>  </p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="1-ReadWriteLock-和-ReentrantReadWriteLock介绍"><a href="#1-ReadWriteLock-和-ReentrantReadWriteLock介绍" class="headerlink" title="1. ReadWriteLock 和 ReentrantReadWriteLock介绍"></a>1. ReadWriteLock 和 ReentrantReadWriteLock介绍</h1><p>ReadWriteLock，顾名思义，是读写锁。它维护了一对相关的锁 — — “读取锁”和“写入锁”，一个用于读取操作，另一个用于写入操作。<br>&nbsp;&nbsp;&nbsp;&nbsp; “读取锁”用于只读操作，它是“共享锁”，能同时被多个线程获取。<br>&nbsp;&nbsp;&nbsp;&nbsp; “写入锁”用于写入操作，它是“独占锁”，写入锁只能被一个线程锁获取。<br>注意：不能同时存在读取锁和写入锁！</p>
+<p>ReadWriteLock是一个接口。ReentrantReadWriteLock是它的实现类，ReentrantReadWriteLock包括子类ReadLock和WriteLock。</p>
+<p><strong>ReadWriteLock函数列表</strong></p>
+<pre><code>// 返回用于读取操作的锁。
+Lock readLock()
+// 返回用于写入操作的锁。
+Lock writeLock()
+</code></pre><p><strong>ReentrantReadWriteLock函数列表</strong></p>
+<pre><code>// 创建一个新的 ReentrantReadWriteLock，默认是采用“非公平策略”。
+ReentrantReadWriteLock()
+// 创建一个新的 ReentrantReadWriteLock，fair是“公平策略”。fair为true，意味着公平策略；否则，意味着非公平策略。
+ReentrantReadWriteLock(boolean fair)
+
+// 返回当前拥有写入锁的线程，如果没有这样的线程，则返回 null。
+protected Thread getOwner()
+// 返回一个 collection，它包含可能正在等待获取读取锁的线程。
+protected Collection&lt;Thread&gt; getQueuedReaderThreads()
+// 返回一个 collection，它包含可能正在等待获取读取或写入锁的线程。
+protected Collection&lt;Thread&gt; getQueuedThreads()
+// 返回一个 collection，它包含可能正在等待获取写入锁的线程。
+protected Collection&lt;Thread&gt; getQueuedWriterThreads()
+// 返回等待获取读取或写入锁的线程估计数目。
+int getQueueLength()
+// 查询当前线程在此锁上保持的重入读取锁数量。
+int getReadHoldCount()
+// 查询为此锁保持的读取锁数量。
+int getReadLockCount()
+// 返回一个 collection，它包含可能正在等待与写入锁相关的给定条件的那些线程。
+protected Collection&lt;Thread&gt; getWaitingThreads(Condition condition)
+// 返回正等待与写入锁相关的给定条件的线程估计数目。
+int getWaitQueueLength(Condition condition)
+// 查询当前线程在此锁上保持的重入写入锁数量。
+int getWriteHoldCount()
+// 查询是否给定线程正在等待获取读取或写入锁。
+boolean hasQueuedThread(Thread thread)
+// 查询是否所有的线程正在等待获取读取或写入锁。
+boolean hasQueuedThreads()
+// 查询是否有些线程正在等待与写入锁有关的给定条件。
+boolean hasWaiters(Condition condition)
+// 如果此锁将公平性设置为 ture，则返回 true。
+boolean isFair()
+// 查询是否某个线程保持了写入锁。
+boolean isWriteLocked()
+// 查询当前线程是否保持了写入锁。
+boolean isWriteLockedByCurrentThread()
+// 返回用于读取操作的锁。
+ReentrantReadWriteLock.ReadLock readLock()
+// 返回用于写入操作的锁。
+ReentrantReadWriteLock.WriteLock writeLock()
+</code></pre><p>ReentrantReadWriteLock数据结构</p>
+<p>ReentrantReadWriteLock的UML类图如下：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://wangkuiwu.github.io/media/pic/java/threads/juc-lock08-01.jpg" alt="img" title="">
+                </div>
+                <div class="image-caption">img</div>
+            </figure>
+<p>从中可以看出：<br>(01) ReentrantReadWriteLock实现了ReadWriteLock接口。ReadWriteLock是一个读写锁的接口，提供了”获取读锁的readLock()函数” 和 “获取写锁的writeLock()函数”。<br>(02) ReentrantReadWriteLock中包含：sync对象，读锁readerLock和写锁writerLock。读锁ReadLock和写锁WriteLock都实现了Lock接口。读锁ReadLock和写锁WriteLock中也都分别包含了”Sync对象”，它们的Sync对象和ReentrantReadWriteLock的Sync对象 是一样的，就是通过sync，读锁和写锁实现了对同一个对象的访问。<br>(03) 和”ReentrantLock”一样，sync是Sync类型；而且，Sync也是一个继承于AQS的抽象类。Sync也包括”公平锁”FairSync和”非公平锁”NonfairSync。sync对象是”FairSync”和”NonfairSync”中的一个，默认是”NonfairSync”。</p>
+<p><a name="anchor2"></a></p>
+<h1 id="2-参考代码-基于JDK1-7-0-40"><a href="#2-参考代码-基于JDK1-7-0-40" class="headerlink" title="2. 参考代码(基于JDK1.7.0_40)"></a>2. 参考代码(基于JDK1.7.0_40)</h1><p>共享锁源码相关的代码如下：</p>
+<pre><code>public static class ReadLock implements Lock, java.io.Serializable {
+    private static final long serialVersionUID = -5992448646407690164L;
+    // ReentrantReadWriteLock的AQS对象
+    private final Sync sync;
+
+    protected ReadLock(ReentrantReadWriteLock lock) {
+        sync = lock.sync;
+    }
+
+    // 获取“共享锁”
+    public void lock() {
+        sync.acquireShared(1);
+    }
+
+    // 如果线程是中断状态，则抛出一场，否则尝试获取共享锁。
+    public void lockInterruptibly() throws InterruptedException {
+        sync.acquireSharedInterruptibly(1);
+    }
+
+    // 尝试获取“共享锁”
+    public  boolean tryLock() {
+        return sync.tryReadLock();
+    }
+
+    // 在指定时间内，尝试获取“共享锁”
+    public boolean tryLock(long timeout, TimeUnit unit)
+            throws InterruptedException {
+        return sync.tryAcquireSharedNanos(1, unit.toNanos(timeout));
+    }
+
+    // 释放“共享锁”
+    public  void unlock() {
+        sync.releaseShared(1);
+    }
+
+    // 新建条件
+    public Condition newCondition() {
+        throw new UnsupportedOperationException();
+    }
+
+    public String toString() {
+        int r = sync.getReadLockCount();
+        return super.toString() +
+            &quot;[Read locks = &quot; + r + &quot;]&quot;;
+    }
+}
+</code></pre><p>说明：<br>ReadLock中的sync是一个Sync对象，Sync继承于AQS类，即Sync就是一个锁。ReentrantReadWriteLock中也有一个Sync对象，而且ReadLock中的sync和ReentrantReadWriteLock中的sync是对应关系。即ReentrantReadWriteLock和ReadLock共享同一个AQS对象，共享同一把锁。</p>
+<p>ReentrantReadWriteLock中Sync的定义如下：</p>
+<pre><code>final Sync sync;
+</code></pre><p>下面，分别从“获取共享锁”和“释放共享锁”两个方面对共享锁进行说明。</p>
+<p><a name="anchor3"></a></p>
+<h1 id="3-获取共享锁"><a href="#3-获取共享锁" class="headerlink" title="3. 获取共享锁"></a>3. 获取共享锁</h1><p>获取共享锁的思想(即lock函数的步骤)，是先通过tryAcquireShared()尝试获取共享锁。尝试成功的话，则直接返回；尝试失败的话，则通过doAcquireShared()不断的循环并尝试获取锁，若有需要，则阻塞等待。doAcquireShared()在循环中每次尝试获取锁时，都是通过tryAcquireShared()来进行尝试的。下面看看“获取共享锁”的详细流程。</p>
+<h2 id="3-1-lock"><a href="#3-1-lock" class="headerlink" title="3.1 lock()"></a>3.1 lock()</h2><p>lock()在ReadLock中，源码如下：</p>
+<pre><code>public void lock() {
+    sync.acquireShared(1);
+}
+</code></pre><h2 id="3-2-acquireShared"><a href="#3-2-acquireShared" class="headerlink" title="3.2 acquireShared()"></a>3.2 acquireShared()</h2><p>Sync继承于AQS，acquireShared()定义在AQS中。源码如下：</p>
+<pre><code>public final void acquireShared(int arg) {
+    if (tryAcquireShared(arg) &lt; 0)
+        doAcquireShared(arg);
+}
+</code></pre><p>说明：acquireShared()首先会通过tryAcquireShared()来尝试获取锁。<br>尝试成功的话，则不再做任何动作(因为已经成功获取到锁了)。<br>尝试失败的话，则通过doAcquireShared()来获取锁。doAcquireShared()会获取到锁了才返回。</p>
+<h2 id="3-3-tryAcquireShared"><a href="#3-3-tryAcquireShared" class="headerlink" title="3.3 tryAcquireShared()"></a>3.3 tryAcquireShared()</h2><p>tryAcquireShared()定义在ReentrantReadWriteLock.java的Sync中，源码如下：</p>
+<pre><code>protected final int tryAcquireShared(int unused) {
+    Thread current = Thread.currentThread();
+    // 获取“锁”的状态
+    int c = getState();
+    // 如果“锁”是“互斥锁”，并且获取锁的线程不是current线程；则返回-1。
+    if (exclusiveCount(c) != 0 &amp;&amp;
+        getExclusiveOwnerThread() != current)
+        return -1;
+    // 获取“读取锁”的共享计数
+    int r = sharedCount(c);
+    // 如果“不需要阻塞等待”，并且“读取锁”的共享计数小于MAX_COUNT；
+    // 则通过CAS函数更新“锁的状态”，将“读取锁”的共享计数+1。
+    if (!readerShouldBlock() &amp;&amp;
+        r &lt; MAX_COUNT &amp;&amp;
+        compareAndSetState(c, c + SHARED_UNIT)) {
+        // 第1次获取“读取锁”。
+        if (r == 0) { 
+            firstReader = current;
+            firstReaderHoldCount = 1;
+        // 如果想要获取锁的线程(current)是第1个获取锁(firstReader)的线程
+        } else if (firstReader == current) { 
+            firstReaderHoldCount++;
+        } else {
+            // HoldCounter是用来统计该线程获取“读取锁”的次数。
+            HoldCounter rh = cachedHoldCounter;
+            if (rh == null || rh.tid != current.getId())
+                cachedHoldCounter = rh = readHolds.get();
+            else if (rh.count == 0)
+                readHolds.set(rh);
+            // 将该线程获取“读取锁”的次数+1。
+            rh.count++;
+        }
+        return 1;
+    }
+    return fullTryAcquireShared(current);
+}
+</code></pre><p>说明：tryAcquireShared()的作用是尝试获取“共享锁”。<br>如果在尝试获取锁时，“不需要阻塞等待”并且“读取锁的共享计数小于MAX_COUNT”，则直接通过CAS函数更新“读取锁的共享计数”，以及将“当前线程获取读取锁的次数+1”。<br>否则，通过fullTryAcquireShared()获取读取锁。</p>
+<h2 id="3-4-fullTryAcquireShared"><a href="#3-4-fullTryAcquireShared" class="headerlink" title="3.4 fullTryAcquireShared()"></a>3.4 fullTryAcquireShared()</h2><p>fullTryAcquireShared()在ReentrantReadWriteLock中定义，源码如下：</p>
+<pre><code>final int fullTryAcquireShared(Thread current) {
+    HoldCounter rh = null;
+    for (;;) {
+        // 获取“锁”的状态
+        int c = getState();
+        // 如果“锁”是“互斥锁”，并且获取锁的线程不是current线程；则返回-1。
+        if (exclusiveCount(c) != 0) {
+            if (getExclusiveOwnerThread() != current)
+                return -1;
+        // 如果“需要阻塞等待”。
+        // (01) 当“需要阻塞等待”的线程是第1个获取锁的线程的话，则继续往下执行。
+        // (02) 当“需要阻塞等待”的线程获取锁的次数=0时，则返回-1。
+        } else if (readerShouldBlock()) {
+            // 如果想要获取锁的线程(current)是第1个获取锁(firstReader)的线程
+            if (firstReader == current) {
+            } else {
+                if (rh == null) {
+                    rh = cachedHoldCounter;
+                    if (rh == null || rh.tid != current.getId()) {
+                        rh = readHolds.get();
+                        if (rh.count == 0)
+                            readHolds.remove();
+                    }
+                }
+                // 如果当前线程获取锁的计数=0,则返回-1。
+                if (rh.count == 0)
+                    return -1;
+            }
+        }
+        // 如果“不需要阻塞等待”，则获取“读取锁”的共享统计数；
+        // 如果共享统计数超过MAX_COUNT，则抛出异常。
+        if (sharedCount(c) == MAX_COUNT)
+            throw new Error(&quot;Maximum lock count exceeded&quot;);
+        // 将线程获取“读取锁”的次数+1。
+        if (compareAndSetState(c, c + SHARED_UNIT)) {
+            // 如果是第1次获取“读取锁”，则更新firstReader和firstReaderHoldCount。
+            if (sharedCount(c) == 0) {
+                firstReader = current;
+                firstReaderHoldCount = 1;
+            // 如果想要获取锁的线程(current)是第1个获取锁(firstReader)的线程，
+            // 则将firstReaderHoldCount+1。
+            } else if (firstReader == current) {
+                firstReaderHoldCount++;
+            } else {
+                if (rh == null)
+                    rh = cachedHoldCounter;
+                if (rh == null || rh.tid != current.getId())
+                    rh = readHolds.get();
+                else if (rh.count == 0)
+                    readHolds.set(rh);
+                // 更新线程的获取“读取锁”的共享计数
+                rh.count++;
+                cachedHoldCounter = rh; // cache for release
+            }
+            return 1;
+        }
+    }
+}
+</code></pre><p>说明：fullTryAcquireShared()会根据“是否需要阻塞等待”，“读取锁的共享计数是否超过限制”等等进行处理。如果不需要阻塞等待，并且锁的共享计数没有超过限制，则通过CAS尝试获取锁，并返回1。</p>
+<h2 id="3-5-doAcquireShared"><a href="#3-5-doAcquireShared" class="headerlink" title="3.5 doAcquireShared()"></a>3.5 doAcquireShared()</h2><p>doAcquireShared()定义在AQS函数中，源码如下：</p>
+<pre><code>private void doAcquireShared(int arg) {
+    // addWaiter(Node.SHARED)的作用是，创建“当前线程”对应的节点，并将该线程添加到CLH队列中。
+    final Node node = addWaiter(Node.SHARED);
+    boolean failed = true;
+    try {
+        boolean interrupted = false;
+        for (;;) {
+            // 获取“node”的前一节点
+            final Node p = node.predecessor();
+            // 如果“当前线程”是CLH队列的表头，则尝试获取共享锁。
+            if (p == head) {
+                int r = tryAcquireShared(arg);
+                if (r &gt;= 0) {
+                    setHeadAndPropagate(node, r);
+                    p.next = null; // help GC
+                    if (interrupted)
+                        selfInterrupt();
+                    failed = false;
+                    return;
+                }
+            }
+            // 如果“当前线程”不是CLH队列的表头，则通过shouldParkAfterFailedAcquire()判断是否需要等待，
+            // 需要的话，则通过parkAndCheckInterrupt()进行阻塞等待。若阻塞等待过程中，线程被中断过，则设置interrupted为true。
+            if (shouldParkAfterFailedAcquire(p, node) &amp;&amp;
+                parkAndCheckInterrupt())
+                interrupted = true;
+        }
+    } finally {
+        if (failed)
+            cancelAcquire(node);
+    }
+}
+</code></pre><p>说明：doAcquireShared()的作用是获取共享锁。<br>它会首先创建线程对应的CLH队列的节点，然后将该节点添加到CLH队列中。CLH队列是管理获取锁的等待线程的队列。<br>如果“当前线程”是CLH队列的表头，则尝试获取共享锁；否则，则需要通过shouldParkAfterFailedAcquire()判断是否阻塞等待，需要的话，则通过parkAndCheckInterrupt()进行阻塞等待。<br>doAcquireShared()会通过for循环，不断的进行上面的操作；目的就是获取共享锁。需要注意的是：doAcquireShared()在每一次尝试获取锁时，是通过tryAcquireShared()来执行的！</p>
+<p>shouldParkAfterFailedAcquire(), parkAndCheckInterrupt()等函数已经在“Java多线程系列–“JUC锁”03之 公平锁(一) ”中详细介绍过，这里就不再重复说明了。</p>
+<p><a name="anchor4"></a></p>
+<h1 id="4-释放共享锁"><a href="#4-释放共享锁" class="headerlink" title="4. 释放共享锁"></a>4. 释放共享锁</h1><p>释放共享锁的思想，是先通过tryReleaseShared()尝试释放共享锁。尝试成功的话，则通过doReleaseShared()唤醒“其他等待获取共享锁的线程”，并返回true；否则的话，返回flase。</p>
+<h2 id="4-1-unlock"><a href="#4-1-unlock" class="headerlink" title="4.1 unlock()"></a>4.1 unlock()</h2><pre><code>public  void unlock() {
+    sync.releaseShared(1);
+}
+</code></pre><p>说明：该函数实际上调用releaseShared(1)释放共享锁。</p>
+<h2 id="4-2-releaseShared"><a href="#4-2-releaseShared" class="headerlink" title="4.2 releaseShared()"></a>4.2 releaseShared()</h2><p>releaseShared()在AQS中实现，源码如下：</p>
+<pre><code>public final boolean releaseShared(int arg) {
+    if (tryReleaseShared(arg)) {
+        doReleaseShared();
+        return true;
+    }
+    return false;
+}
+</code></pre><p>说明：releaseShared()的目的是让当前线程释放它所持有的共享锁。<br>它首先会通过tryReleaseShared()去尝试释放共享锁。尝试成功，则直接返回；尝试失败，则通过doReleaseShared()去释放共享锁。</p>
+<h2 id="4-3-tryReleaseShared"><a href="#4-3-tryReleaseShared" class="headerlink" title="4.3 tryReleaseShared()"></a>4.3 tryReleaseShared()</h2><p>tryReleaseShared()定义在ReentrantReadWriteLock中，源码如下：</p>
+<pre><code>protected final boolean tryReleaseShared(int unused) {
+    // 获取当前线程，即释放共享锁的线程。
+    Thread current = Thread.currentThread();
+    // 如果想要释放锁的线程(current)是第1个获取锁(firstReader)的线程，
+    // 并且“第1个获取锁的线程获取锁的次数”=1，则设置firstReader为null；
+    // 否则，将“第1个获取锁的线程的获取次数”-1。
+    if (firstReader == current) {
+        // assert firstReaderHoldCount &gt; 0;
+        if (firstReaderHoldCount == 1)
+            firstReader = null;
+        else
+            firstReaderHoldCount--;
+    // 获取rh对象，并更新“当前线程获取锁的信息”。
+    } else {
+
+        HoldCounter rh = cachedHoldCounter;
+        if (rh == null || rh.tid != current.getId())
+            rh = readHolds.get();
+        int count = rh.count;
+        if (count &lt;= 1) {
+            readHolds.remove();
+            if (count &lt;= 0)
+                throw unmatchedUnlockException();
+        }
+        --rh.count;
+    }
+    for (;;) {
+        // 获取锁的状态
+        int c = getState();
+        // 将锁的获取次数-1。
+        int nextc = c - SHARED_UNIT;
+        // 通过CAS更新锁的状态。
+        if (compareAndSetState(c, nextc))
+            return nextc == 0;
+    }
+}
+</code></pre><p>说明：tryReleaseShared()的作用是尝试释放共享锁。</p>
+<h2 id="4-4-doReleaseShared"><a href="#4-4-doReleaseShared" class="headerlink" title="4.4 doReleaseShared()"></a>4.4 doReleaseShared()</h2><p>doReleaseShared()定义在AQS中，源码如下：</p>
+<pre><code>private void doReleaseShared() {
+    for (;;) {
+        // 获取CLH队列的头节点
+        Node h = head;
+        // 如果头节点不为null，并且头节点不等于tail节点。
+        if (h != null &amp;&amp; h != tail) {
+            // 获取头节点对应的线程的状态
+            int ws = h.waitStatus;
+            // 如果头节点对应的线程是SIGNAL状态，则意味着“头节点的下一个节点所对应的线程”需要被unpark唤醒。
+            if (ws == Node.SIGNAL) {
+                // 设置“头节点对应的线程状态”为空状态。失败的话，则继续循环。
+                if (!compareAndSetWaitStatus(h, Node.SIGNAL, 0))
+                    continue;
+                // 唤醒“头节点的下一个节点所对应的线程”。
+                unparkSuccessor(h);
+            }
+            // 如果头节点对应的线程是空状态，则设置“文件点对应的线程所拥有的共享锁”为其它线程获取锁的空状态。
+            else if (ws == 0 &amp;&amp;
+                     !compareAndSetWaitStatus(h, 0, Node.PROPAGATE))
+                continue;                // loop on failed CAS
+        }
+        // 如果头节点发生变化，则继续循环。否则，退出循环。
+        if (h == head)                   // loop if head changed
+            break;
+    }
+}
+</code></pre><p>说明：doReleaseShared()会释放“共享锁”。它会从前往后的遍历CLH队列，依次“唤醒”然后“执行”队列中每个节点对应的线程；最终的目的是让这些线程释放它们所持有的锁。</p>
+<p><a name="anchor5"></a></p>
+<h1 id="5-公平共享锁和非公平共享锁"><a href="#5-公平共享锁和非公平共享锁" class="headerlink" title="5. 公平共享锁和非公平共享锁"></a>5. 公平共享锁和非公平共享锁</h1><p>和互斥锁ReentrantLock一样，ReadLock也分为公平锁和非公平锁。</p>
+<p>公平锁和非公平锁的区别，体现在判断是否需要阻塞的函数readerShouldBlock()是不同的。<br>公平锁的readerShouldBlock()的源码如下：</p>
+<pre><code>final boolean readerShouldBlock() {
+    return hasQueuedPredecessors();
+}
+</code></pre><p>在公平共享锁中，如果在当前线程的前面有其他线程在等待获取共享锁，则返回true；否则，返回false。<br>非公平锁的readerShouldBlock()的源码如下：</p>
+<pre><code>final boolean readerShouldBlock() {
+    return apparentlyFirstQueuedIsExclusive();
+}
+</code></pre><p>在非公平共享锁中，它会无视当前线程的前面是否有其他线程在等待获取共享锁。只要该非公平共享锁对应的线程不为null，则返回true。</p>
+<p><a name="anchor6"></a></p>
+<h1 id="6-ReentrantReadWriteLock示例"><a href="#6-ReentrantReadWriteLock示例" class="headerlink" title="6. ReentrantReadWriteLock示例"></a>6. ReentrantReadWriteLock示例</h1><pre><code>import java.util.concurrent.locks.ReadWriteLock; 
+import java.util.concurrent.locks.ReentrantReadWriteLock; 
+
+public class ReadWriteLockTest1 { 
+
+    public static void main(String[] args) { 
+        // 创建账户
+        MyCount myCount = new MyCount(&quot;4238920615242830&quot;, 10000); 
+        // 创建用户，并指定账户
+        User user = new User(&quot;Tommy&quot;, myCount); 
+
+        // 分别启动3个“读取账户金钱”的线程 和 3个“设置账户金钱”的线程
+        for (int i=0; i&lt;3; i++) {
+            user.getCash();
+            user.setCash((i+1)*1000);
+        }
+    } 
+} 
+
+class User {
+    private String name;            //用户名 
+    private MyCount myCount;        //所要操作的账户 
+    private ReadWriteLock myLock;   //执行操作所需的锁对象 
+
+    User(String name, MyCount myCount) {
+        this.name = name; 
+        this.myCount = myCount; 
+        this.myLock = new ReentrantReadWriteLock();
+    }
+
+    public void getCash() {
+        new Thread() {
+            public void run() {
+                myLock.readLock().lock(); 
+                try {
+                    System.out.println(Thread.currentThread().getName() +&quot; getCash start&quot;); 
+                    myCount.getCash();
+                    Thread.sleep(1);
+                    System.out.println(Thread.currentThread().getName() +&quot; getCash end&quot;); 
+                } catch (InterruptedException e) {
+                } finally {
+                    myLock.readLock().unlock(); 
+                }
+            }
+        }.start();
+    }
+
+    public void setCash(final int cash) {
+        new Thread() {
+            public void run() {
+                myLock.writeLock().lock(); 
+                try {
+                    System.out.println(Thread.currentThread().getName() +&quot; setCash start&quot;); 
+                    myCount.setCash(cash);
+                    Thread.sleep(1);
+                    System.out.println(Thread.currentThread().getName() +&quot; setCash end&quot;); 
+                } catch (InterruptedException e) {
+                } finally {
+                    myLock.writeLock().unlock(); 
+                }
+            }
+        }.start();
+    }
+}
+
+class MyCount {
+    private String id;         //账号 
+    private int    cash;       //账户余额 
+
+    MyCount(String id, int cash) { 
+        this.id = id; 
+        this.cash = cash; 
+    } 
+
+    public String getId() { 
+        return id; 
+    } 
+
+    public void setId(String id) { 
+        this.id = id; 
+    } 
+
+    public int getCash() { 
+        System.out.println(Thread.currentThread().getName() +&quot; getCash cash=&quot;+ cash); 
+        return cash; 
+    } 
+
+    public void setCash(int cash) { 
+        System.out.println(Thread.currentThread().getName() +&quot; setCash cash=&quot;+ cash); 
+        this.cash = cash; 
+    } 
+}
+</code></pre><p>运行结果：</p>
+<pre><code>Thread-0 getCash start
+Thread-2 getCash start
+Thread-0 getCash cash=10000
+Thread-2 getCash cash=10000
+Thread-0 getCash end
+Thread-2 getCash end
+Thread-1 setCash start
+Thread-1 setCash cash=1000
+Thread-1 setCash end
+Thread-3 setCash start
+Thread-3 setCash cash=2000
+Thread-3 setCash end
+Thread-4 getCash start
+Thread-4 getCash cash=2000
+Thread-4 getCash end
+Thread-5 setCash start
+Thread-5 setCash cash=3000
+Thread-5 setCash end
+</code></pre><p>结果说明：<br>(01) 观察Thread0和Thread-2的运行结果，我们发现，Thread-0启动并获取到“读取锁”，在它还没运行完毕的时候，Thread-2也启动了并且也成功获取到“读取锁”。<br>&nbsp;&nbsp;&nbsp;&nbsp; 因此，“读取锁”支持被多个线程同时获取。<br>(02) 观察Thread-1,Thread-3,Thread-5这三个“写入锁”的线程。只要“写入锁”被某线程获取，则该线程运行完毕了，才释放该锁。<br>&nbsp;&nbsp;&nbsp;&nbsp; 因此，“写入锁”不支持被多个线程同时获取。</p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2018-06-27T09:39:57.945Z" itemprop="dateUpdated">2018-06-27 17:39:57</time>
+</span><br>
+
+
+        
+        本文固定链接：<a href="/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”08之 共享锁和ReentrantReadWriteLock/" target="_blank" rel="external">https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”08之 共享锁和ReentrantReadWriteLock/</a>
+        
+    </div>
+    <footer>
+        <a href="https://smuwjs.github.io">
+            <img src="/img/head.png" alt="Jeeson">
+            Jeeson
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JUC锁/">JUC锁</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java多线程系列/">Java多线程系列</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java源码分析/">Java源码分析</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”08之 共享锁和ReentrantReadWriteLock/&title=《Java多线程系列--“JUC锁”08之 共享锁和ReentrantReadWriteLock》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”08之 共享锁和ReentrantReadWriteLock/&title=《Java多线程系列--“JUC锁”08之 共享锁和ReentrantReadWriteLock》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”08之 共享锁和ReentrantReadWriteLock/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Java多线程系列--“JUC锁”08之 共享锁和ReentrantReadWriteLock》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”08之 共享锁和ReentrantReadWriteLock/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”08之 共享锁和ReentrantReadWriteLock/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”09之 CountDownLatch原理和示例/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">Java多线程系列--“JUC锁”09之 CountDownLatch原理和示例</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”07之 LockSupport/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Java多线程系列--“JUC锁”07之 LockSupport</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”08之 共享锁和ReentrantReadWriteLock" data-title="Java多线程系列--“JUC锁”08之 共享锁和ReentrantReadWriteLock" data-url="https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”08之 共享锁和ReentrantReadWriteLock/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'smuwjs', theme: 'none'};
+lazyScripts.push('//unpkg.com/hexo-theme-material-indigo@latest/js/embed.min.js');
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循<a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>Jeeson &copy; 2015 - 2018</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”08之 共享锁和ReentrantReadWriteLock/&title=《Java多线程系列--“JUC锁”08之 共享锁和ReentrantReadWriteLock》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”08之 共享锁和ReentrantReadWriteLock/&title=《Java多线程系列--“JUC锁”08之 共享锁和ReentrantReadWriteLock》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”08之 共享锁和ReentrantReadWriteLock/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Java多线程系列--“JUC锁”08之 共享锁和ReentrantReadWriteLock》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”08之 共享锁和ReentrantReadWriteLock/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”08之 共享锁和ReentrantReadWriteLock/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”08之 共享锁和ReentrantReadWriteLock/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

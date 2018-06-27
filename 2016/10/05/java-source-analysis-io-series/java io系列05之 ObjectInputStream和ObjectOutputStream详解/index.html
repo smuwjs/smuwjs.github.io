@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>java io系列05之 ObjectInputStream和ObjectOutputStream详解 | Jeeson&#39;s Blog | Write the code. Change the world.</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="Java源码分析,Java IO系列">
+    <meta name="description" content="本章，我们学习ObjectInputStream 和 ObjectOutputStream   目录1. ObjectInputStream 和 ObjectOutputStream 介绍2. 演示程序      1. ObjectInputStream 和 ObjectOutputStream 介绍ObjectInputStream 和 ObjectOutputStream 的作用是，对基本数">
+<meta name="keywords" content="Java源码分析,Java IO系列">
+<meta property="og:type" content="article">
+<meta property="og:title" content="java io系列05之 ObjectInputStream和ObjectOutputStream详解">
+<meta property="og:url" content="https://smuwjs.github.io/2016/10/05/java-source-analysis-io-series/java io系列05之 ObjectInputStream和ObjectOutputStream详解/index.html">
+<meta property="og:site_name" content="Jeeson&#39;s Blog">
+<meta property="og:description" content="本章，我们学习ObjectInputStream 和 ObjectOutputStream   目录1. ObjectInputStream 和 ObjectOutputStream 介绍2. 演示程序      1. ObjectInputStream 和 ObjectOutputStream 介绍ObjectInputStream 和 ObjectOutputStream 的作用是，对基本数">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-06-27T09:39:57.941Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="java io系列05之 ObjectInputStream和ObjectOutputStream详解">
+<meta name="twitter:description" content="本章，我们学习ObjectInputStream 和 ObjectOutputStream   目录1. ObjectInputStream 和 ObjectOutputStream 介绍2. 演示程序      1. ObjectInputStream 和 ObjectOutputStream 介绍ObjectInputStream 和 ObjectOutputStream 的作用是，对基本数">
+    
+        <link rel="alternate" type="application/atom+xml" title="Jeeson&#39;s Blog" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/head.png">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Jeeson</h5>
+          <a href="mailto:smuwjs@163.com" title="smuwjs@163.com" class="mail">smuwjs@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/smuwjs" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">java io系列05之 ObjectInputStream和ObjectOutputStream详解</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">java io系列05之 ObjectInputStream和ObjectOutputStream详解</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2016-10-04T16:00:00.000Z" itemprop="datePublished" class="page-time">
+  2016-10-05
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#1-ObjectInputStream-和-ObjectOutputStream-介绍"><span class="post-toc-number">1.</span> <span class="post-toc-text">1. ObjectInputStream 和 ObjectOutputStream 介绍</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#2-演示程序"><span class="post-toc-number">2.</span> <span class="post-toc-text">2. 演示程序</span></a></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-java-source-analysis-io-series/java io系列05之 ObjectInputStream和ObjectOutputStream详解"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">java io系列05之 ObjectInputStream和ObjectOutputStream详解</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2016-10-05 00:00:00" datetime="2016-10-04T16:00:00.000Z"  itemprop="datePublished">2016-10-05</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <blockquote>
+<p>本章，我们学习ObjectInputStream 和 ObjectOutputStream</p>
+</blockquote>
+<blockquote>
+<p><strong>目录</strong><br><a href="#anchor1">1. ObjectInputStream 和 ObjectOutputStream 介绍</a><br><a href="#anchor2">2. 演示程序</a>   </p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="1-ObjectInputStream-和-ObjectOutputStream-介绍"><a href="#1-ObjectInputStream-和-ObjectOutputStream-介绍" class="headerlink" title="1. ObjectInputStream 和 ObjectOutputStream 介绍"></a>1. ObjectInputStream 和 ObjectOutputStream 介绍</h1><p>ObjectInputStream 和 ObjectOutputStream 的作用是，对基本数据和对象进行序列化操作支持。</p>
+<p>创建“文件输出流”对应的ObjectOutputStream对象，该ObjectOutputStream对象能提供对“基本数据或对象”的持久存储；当我们需要读取这些存储的“基本数据或对象”时，可以创建“文件输入流”对应的ObjectInputStream，进而读取出这些“基本数据或对象”。</p>
+<p>注意： 只有支持 java.io.Serializable 或 java.io.Externalizable 接口的对象才能被ObjectInputStream/ObjectOutputStream所操作！</p>
+<p>ObjectOutputStream 函数列表</p>
+<pre><code>// 构造函数
+ObjectOutputStream(OutputStream output)
+// public函数
+void     close()
+void     defaultWriteObject()
+void     flush()
+ObjectOutputStream.PutField     putFields()
+void     reset()
+void     useProtocolVersion(int version)
+void     write(int value)
+void     write(byte[] buffer, int offset, int length)
+void     writeBoolean(boolean value)
+void     writeByte(int value)
+void     writeBytes(String value)
+void     writeChar(int value)
+void     writeChars(String value)
+void     writeDouble(double value)
+void     writeFields()
+void     writeFloat(float value)
+void     writeInt(int value)
+void     writeLong(long value)
+final void     writeObject(Object object)
+void     writeShort(int value)
+void     writeUTF(String value)
+void     writeUnshared(Object object)
+</code></pre><p>ObjectInputStream 函数列表</p>
+<pre><code>// 构造函数
+ObjectInputStream(InputStream input)
+
+int     available()
+void     close()
+void     defaultReadObject()
+int     read(byte[] buffer, int offset, int length)
+int     read()
+boolean     readBoolean()
+byte     readByte()
+char     readChar()
+double     readDouble()
+ObjectInputStream.GetField     readFields()
+float     readFloat()
+void     readFully(byte[] dst)
+void     readFully(byte[] dst, int offset, int byteCount)
+int     readInt()
+String     readLine()
+long     readLong()
+final Object     readObject()
+short     readShort()
+String     readUTF()
+Object     readUnshared()
+int     readUnsignedByte()
+int     readUnsignedShort()
+synchronized void     registerValidation(ObjectInputValidation object, int priority)
+int     skipBytes(int length)
+</code></pre><p><a name="anchor2"></a></p>
+<h1 id="2-演示程序"><a href="#2-演示程序" class="headerlink" title="2. 演示程序"></a>2. 演示程序</h1><p>源码如下(ObjectStreamTest.java)： </p>
+<pre><code>/**
+ * ObjectInputStream 和 ObjectOutputStream 测试程序
+ *
+ * 注意：通过ObjectInputStream, ObjectOutputStream操作的对象，必须是实现了Serializable或Externalizable序列化接口的类的实例。
+ *
+ * @author skywang
+ */
+
+import java.io.FileInputStream;   
+import java.io.FileOutputStream;   
+import java.io.ObjectInputStream;   
+import java.io.ObjectOutputStream;   
+import java.io.Serializable;   
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Iterator;
+
+public class ObjectStreamTest { 
+    private static final String TMP_FILE = &quot;box.tmp&quot;;
+
+    public static void main(String[] args) {   
+        testWrite();
+        testRead();
+    }
+
+
+    /**
+     * ObjectOutputStream 测试函数
+     */
+    private static void testWrite() {   
+        try {
+            ObjectOutputStream out = new ObjectOutputStream(
+                    new FileOutputStream(TMP_FILE));
+            out.writeBoolean(true);
+            out.writeByte((byte)65);
+            out.writeChar(&apos;a&apos;);
+            out.writeInt(20131015);
+            out.writeFloat(3.14F);
+            out.writeDouble(1.414D);
+            // 写入HashMap对象
+            HashMap map = new HashMap();
+            map.put(&quot;one&quot;, &quot;red&quot;);
+            map.put(&quot;two&quot;, &quot;green&quot;);
+            map.put(&quot;three&quot;, &quot;blue&quot;);
+            out.writeObject(map);
+            // 写入自定义的Box对象，Box实现了Serializable接口
+            Box box = new Box(&quot;desk&quot;, 80, 48);
+            out.writeObject(box);
+
+            out.close();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    /**
+     * ObjectInputStream 测试函数
+     */
+    private static void testRead() {
+        try {
+            ObjectInputStream in = new ObjectInputStream(
+                    new FileInputStream(TMP_FILE));
+            System.out.printf(&quot;boolean:%b\n&quot; , in.readBoolean());
+            System.out.printf(&quot;byte:%d\n&quot; , (in.readByte()&amp;0xff));
+            System.out.printf(&quot;char:%c\n&quot; , in.readChar());
+            System.out.printf(&quot;int:%d\n&quot; , in.readInt());
+            System.out.printf(&quot;float:%f\n&quot; , in.readFloat());
+            System.out.printf(&quot;double:%f\n&quot; , in.readDouble());
+            // 读取HashMap对象
+            HashMap map = (HashMap) in.readObject();
+            Iterator iter = map.entrySet().iterator();
+            while (iter.hasNext()) {
+                Map.Entry entry = (Map.Entry)iter.next();
+                System.out.printf(&quot;%-6s -- %s\n&quot; , entry.getKey(), entry.getValue());
+            }
+            // 读取Box对象，Box实现了Serializable接口
+            Box box = (Box) in.readObject();
+            System.out.println(&quot;box: &quot; + box);
+
+            in.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+
+class Box implements Serializable {
+    private int width;   
+    private int height; 
+    private String name;   
+
+    public Box(String name, int width, int height) {
+        this.name = name;
+        this.width = width;
+        this.height = height;
+    }
+
+    @Override
+    public String toString() {
+        return &quot;[&quot;+name+&quot;: (&quot;+width+&quot;, &quot;+height+&quot;) ]&quot;;
+    }
+}
+</code></pre><p>运行结果：</p>
+<pre><code>boolean:true
+byte:65
+char:a
+int:20131015
+float:3.140000
+double:1.414000
+two    -- green
+one    -- red
+three  -- blue
+box: [desk: (80, 48) ]
+</code></pre>
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2018-06-27T09:39:57.941Z" itemprop="dateUpdated">2018-06-27 17:39:57</time>
+</span><br>
+
+
+        
+        本文固定链接：<a href="/2016/10/05/java-source-analysis-io-series/java io系列05之 ObjectInputStream和ObjectOutputStream详解/" target="_blank" rel="external">https://smuwjs.github.io/2016/10/05/java-source-analysis-io-series/java io系列05之 ObjectInputStream和ObjectOutputStream详解/</a>
+        
+    </div>
+    <footer>
+        <a href="https://smuwjs.github.io">
+            <img src="/img/head.png" alt="Jeeson">
+            Jeeson
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java-IO系列/">Java IO系列</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java源码分析/">Java源码分析</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/10/05/java-source-analysis-io-series/java io系列05之 ObjectInputStream和ObjectOutputStream详解/&title=《java io系列05之 ObjectInputStream和ObjectOutputStream详解》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/10/05/java-source-analysis-io-series/java io系列05之 ObjectInputStream和ObjectOutputStream详解/&title=《java io系列05之 ObjectInputStream和ObjectOutputStream详解》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/10/05/java-source-analysis-io-series/java io系列05之 ObjectInputStream和ObjectOutputStream详解/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《java io系列05之 ObjectInputStream和ObjectOutputStream详解》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/10/05/java-source-analysis-io-series/java io系列05之 ObjectInputStream和ObjectOutputStream详解/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/10/05/java-source-analysis-io-series/java io系列05之 ObjectInputStream和ObjectOutputStream详解/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2016/10/06/java-source-analysis-io-series/java io系列06之 序列化(Serializable和Externalizable)详解/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">java io系列06之 序列化(Serializable和Externalizable)详解</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2016/10/04/java-source-analysis-io-series/java io系列04之 管道(PipedOutputStream和PipedInputStream)详解/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">java io系列04之 管道(PipedOutputStream和PipedInputStream)详解</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="java-source-analysis-io-series/java io系列05之 ObjectInputStream和ObjectOutputStream详解" data-title="java io系列05之 ObjectInputStream和ObjectOutputStream详解" data-url="https://smuwjs.github.io/2016/10/05/java-source-analysis-io-series/java io系列05之 ObjectInputStream和ObjectOutputStream详解/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'smuwjs', theme: 'none'};
+lazyScripts.push('//unpkg.com/hexo-theme-material-indigo@latest/js/embed.min.js');
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循<a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>Jeeson &copy; 2015 - 2018</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/10/05/java-source-analysis-io-series/java io系列05之 ObjectInputStream和ObjectOutputStream详解/&title=《java io系列05之 ObjectInputStream和ObjectOutputStream详解》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/10/05/java-source-analysis-io-series/java io系列05之 ObjectInputStream和ObjectOutputStream详解/&title=《java io系列05之 ObjectInputStream和ObjectOutputStream详解》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/10/05/java-source-analysis-io-series/java io系列05之 ObjectInputStream和ObjectOutputStream详解/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《java io系列05之 ObjectInputStream和ObjectOutputStream详解》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/10/05/java-source-analysis-io-series/java io系列05之 ObjectInputStream和ObjectOutputStream详解/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/10/05/java-source-analysis-io-series/java io系列05之 ObjectInputStream和ObjectOutputStream详解/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://smuwjs.github.io/2016/10/05/java-source-analysis-io-series/java io系列05之 ObjectInputStream和ObjectOutputStream详解/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,2642 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>Java 字符串系列01 String和CharSequence详解 | Jeeson&#39;s Blog | Write the code. Change the world.</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="Java源码分析,Java 字符串系列">
+    <meta name="description" content="本章主要介绍String和CharSequence的区别，以及它们的API详细使用方法。   目录1. String 简介2. CharSequence和String源码3. String的API测试代码4. String 完整示例      1. String 简介String 是java中的字符串，它继承于CharSequence。String类所包含的API接口非常多。为了便于今后的使用，">
+<meta name="keywords" content="Java源码分析,Java 字符串系列">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java 字符串系列01 String和CharSequence详解">
+<meta property="og:url" content="https://smuwjs.github.io/2017/04/01/java-source-analysis-charsequence-series/Java 字符串系列01 String和CharSequence详解/index.html">
+<meta property="og:site_name" content="Jeeson&#39;s Blog">
+<meta property="og:description" content="本章主要介绍String和CharSequence的区别，以及它们的API详细使用方法。   目录1. String 简介2. CharSequence和String源码3. String的API测试代码4. String 完整示例      1. String 简介String 是java中的字符串，它继承于CharSequence。String类所包含的API接口非常多。为了便于今后的使用，">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://wangkuiwu.github.io/media/pic/java/charsequence/charsequence-01.jpg">
+<meta property="og:updated_time" content="2018-06-27T09:39:57.937Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java 字符串系列01 String和CharSequence详解">
+<meta name="twitter:description" content="本章主要介绍String和CharSequence的区别，以及它们的API详细使用方法。   目录1. String 简介2. CharSequence和String源码3. String的API测试代码4. String 完整示例      1. String 简介String 是java中的字符串，它继承于CharSequence。String类所包含的API接口非常多。为了便于今后的使用，">
+<meta name="twitter:image" content="http://wangkuiwu.github.io/media/pic/java/charsequence/charsequence-01.jpg">
+    
+        <link rel="alternate" type="application/atom+xml" title="Jeeson&#39;s Blog" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/head.png">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Jeeson</h5>
+          <a href="mailto:smuwjs@163.com" title="smuwjs@163.com" class="mail">smuwjs@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/smuwjs" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Java 字符串系列01 String和CharSequence详解</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Java 字符串系列01 String和CharSequence详解</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2017-03-31T16:00:00.000Z" itemprop="datePublished" class="page-time">
+  2017-04-01
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#1-String-简介"><span class="post-toc-number">1.</span> <span class="post-toc-text">1. String 简介</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#2-CharSequence和String源码"><span class="post-toc-number">2.</span> <span class="post-toc-text">2. CharSequence和String源码</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#2-1-CharSequence源码-基于jdk1-7-40"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">2.1 CharSequence源码(基于jdk1.7.40)</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#2-2-String-java源码-基于jdk1-7-40"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">2.2 String.java源码(基于jdk1.7.40)</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#3-String的API测试代码"><span class="post-toc-number">3.</span> <span class="post-toc-text">3. String的API测试代码</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#3-1-CharSequence"><span class="post-toc-number">3.1.</span> <span class="post-toc-text">3.1 CharSequence</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#3-2-String-构造函数"><span class="post-toc-number">3.2.</span> <span class="post-toc-text">3.2 String 构造函数</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#3-3-String-将各种对象转换成String的API"><span class="post-toc-number">3.3.</span> <span class="post-toc-text">3.3 String 将各种对象转换成String的API</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#3-4-String-中index相关的API"><span class="post-toc-number">3.4.</span> <span class="post-toc-text">3.4 String 中index相关的API</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#3-5-String-“比较”操作的API"><span class="post-toc-number">3.5.</span> <span class="post-toc-text">3.5 String “比较”操作的API</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#3-6-String-“修改-追加-替换-截取-分割-”操作的API"><span class="post-toc-number">3.6.</span> <span class="post-toc-text">3.6 String “修改(追加/替换/截取/分割)”操作的API</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#3-7-String-操作Unicode的API"><span class="post-toc-number">3.7.</span> <span class="post-toc-text">3.7 String 操作Unicode的API</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#3-8-String-剩余的API"><span class="post-toc-number">3.8.</span> <span class="post-toc-text">3.8 String 剩余的API</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#4-String-完整示例"><span class="post-toc-number">4.</span> <span class="post-toc-text">4. String 完整示例</span></a></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-java-source-analysis-charsequence-series/Java 字符串系列01 String和CharSequence详解"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Java 字符串系列01 String和CharSequence详解</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2017-04-01 00:00:00" datetime="2017-03-31T16:00:00.000Z"  itemprop="datePublished">2017-04-01</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <blockquote>
+<p>本章主要介绍String和CharSequence的区别，以及它们的API详细使用方法。</p>
+</blockquote>
+<blockquote>
+<p><strong>目录</strong><br><a href="#anchor1">1. String 简介</a><br><a href="#anchor2">2. CharSequence和String源码</a><br><a href="#anchor3">3. String的API测试代码</a><br><a href="#anchor4">4. String 完整示例</a>   </p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="1-String-简介"><a href="#1-String-简介" class="headerlink" title="1. String 简介"></a>1. String 简介</h1><p>String 是java中的字符串，它继承于CharSequence。<br>String类所包含的API接口非常多。为了便于今后的使用，我对String的API进行了分类，并都给出的演示程序。</p>
+<p><strong>String 和 CharSequence 关系</strong></p>
+<p>String 继承于CharSequence，也就是说String也是CharSequence类型。<br>CharSequence是一个接口，它只包括length(), charAt(int index), subSequence(int start, int end)这几个API接口。除了String实现了CharSequence之外，StringBuffer和StringBuilder也实现了CharSequence接口。<br>需要说明的是，CharSequence就是字符序列，String, StringBuilder和StringBuffer本质上都是通过字符数组实现的！</p>
+<p><br><br><strong>StringBuilder 和 StringBuffer 的区别</strong></p>
+<p>StringBuilder 和 StringBuffer都是可变的字符序列。它们都继承于AbstractStringBuilder，实现了CharSequence接口。<br>但是，StringBuilder是非线程安全的，而StringBuffer是线程安全的。</p>
+<p>它们之间的关系图如下：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://wangkuiwu.github.io/media/pic/java/charsequence/charsequence-01.jpg" alt="img" title="">
+                </div>
+                <div class="image-caption">img</div>
+            </figure>
+<p><strong>String 函数列表</strong></p>
+<pre><code>public    String()
+public    String(String original)
+public    String(char[] value)
+public    String(char[] value, int offset, int count)
+public    String(byte[] bytes)
+public    String(byte[] bytes, int offset, int length)
+public    String(byte[] ascii, int hibyte)
+public    String(byte[] ascii, int hibyte, int offset, int count)
+public    String(byte[] bytes, String charsetName)
+public    String(byte[] bytes, int offset, int length, String charsetName)
+public    String(byte[] bytes, Charset charset)
+public    String(byte[] bytes, int offset, int length, Charset charset)
+public    String(int[] codePoints, int offset, int count)
+public    String(StringBuffer buffer)
+public    String(StringBuilder builder)
+
+public char    charAt(int index)
+public int    codePointAt(int index)
+public int    codePointBefore(int index)
+public int    codePointCount(int beginIndex, int endIndex)
+public int    compareTo(String anotherString)
+public int    compareToIgnoreCase(String str)
+public String    concat(String str)
+public boolean    contains(CharSequence s)
+public boolean    contentEquals(StringBuffer sb)
+public boolean    contentEquals(CharSequence cs)
+public static String    copyValueOf(char[] data, int offset, int count)
+public static String    copyValueOf(char[] data)
+public boolean    endsWith(String suffix)
+public boolean    equals(Object anObject)
+public boolean    equalsIgnoreCase(String anotherString)
+public static String    format(String format, Object[] args)
+public static String    format(Locale l, String format, Object[] args)
+public int    hashCode()
+public int    indexOf(int ch)
+public int    indexOf(int ch, int fromIndex)
+public int    indexOf(String str)
+public int    indexOf(String str, int fromIndex)
+public String    intern()
+public int    lastIndexOf(int ch)
+public int    lastIndexOf(int ch, int fromIndex)
+public int    lastIndexOf(String str)
+public int    lastIndexOf(String str, int fromIndex)
+public int    length()
+public boolean    matches(String regex)
+public int    offsetByCodePoints(int index, int codePointOffset)
+public boolean    regionMatches(int toffset, String other, int ooffset, int len)
+public boolean    regionMatches(boolean ignoreCase, int toffset, String other, int ooffset, int len)
+public String    replace(char oldChar, char newChar)
+public String    replace(CharSequence target, CharSequence replacement)
+public String    replaceAll(String regex, String replacement)
+public String    replaceFirst(String regex, String replacement)
+public String[]    split(String regex, int limit)
+public String[]    split(String regex)
+public boolean    startsWith(String prefix, int toffset)
+public boolean    startsWith(String prefix)
+public CharSequence    subSequence(int beginIndex, int endIndex)
+public String    substring(int beginIndex)
+public String    substring(int beginIndex, int endIndex)
+public char[]    toCharArray()
+public String    toLowerCase(Locale locale)
+public String    toLowerCase()
+public String    toString()
+public String    toUpperCase(Locale locale)
+public String    toUpperCase()
+public String    trim()
+public static String    valueOf(Object obj)
+public static String    valueOf(char[] data)
+public static String    valueOf(char[] data, int offset, int count)
+public static String    valueOf(boolean b)
+public static String    valueOf(char c)
+public static String    valueOf(int i)
+public static String    valueOf(long l)
+public static String    valueOf(float f)
+public static String    valueOf(double d)
+public void    getBytes(int srcBegin, int srcEnd, byte[] dst, int dstBegin)
+public byte[]    getBytes(String charsetName)
+public byte[]    getBytes(Charset charset)
+public byte[]    getBytes()
+public void    getChars(int srcBegin, int srcEnd, char[] dst, int dstBegin)
+public boolean    isEmpty()
+</code></pre><p><a name="anchor2"></a></p>
+<h1 id="2-CharSequence和String源码"><a href="#2-CharSequence和String源码" class="headerlink" title="2. CharSequence和String源码"></a>2. CharSequence和String源码</h1><h2 id="2-1-CharSequence源码-基于jdk1-7-40"><a href="#2-1-CharSequence源码-基于jdk1-7-40" class="headerlink" title="2.1 CharSequence源码(基于jdk1.7.40)"></a>2.1 CharSequence源码(基于jdk1.7.40)</h2><pre><code>package java.lang;
+
+public interface CharSequence {
+
+    int length();
+
+    char charAt(int index);
+
+    CharSequence subSequence(int start, int end);
+
+    public String toString();
+}
+</code></pre><h2 id="2-2-String-java源码-基于jdk1-7-40"><a href="#2-2-String-java源码-基于jdk1-7-40" class="headerlink" title="2.2 String.java源码(基于jdk1.7.40)"></a>2.2 String.java源码(基于jdk1.7.40)</h2><pre><code>package java.lang;
+
+import java.io.ObjectStreamField;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Formatter;
+import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+
+public final class String
+    implements java.io.Serializable, Comparable&lt;String&gt;, CharSequence {
+    private final char value[];
+
+    private int hash;
+
+    private static final long serialVersionUID = -6849794470754667710L;
+
+    private static final ObjectStreamField[] serialPersistentFields =
+            new ObjectStreamField[0];
+
+    public String() {
+        this.value = new char[0];
+    }
+
+    public String(String original) {
+        this.value = original.value;
+        this.hash = original.hash;
+    }
+
+    public String(char value[]) {
+        this.value = Arrays.copyOf(value, value.length);
+    }
+
+    public String(char value[], int offset, int count) {
+        if (offset &lt; 0) {
+            throw new StringIndexOutOfBoundsException(offset);
+        }
+        if (count &lt; 0) {
+            throw new StringIndexOutOfBoundsException(count);
+        }
+        // Note: offset or count might be near -1&gt;&gt;&gt;1.
+        if (offset &gt; value.length - count) {
+            throw new StringIndexOutOfBoundsException(offset + count);
+        }
+        this.value = Arrays.copyOfRange(value, offset, offset+count);
+    }
+
+    public String(int[] codePoints, int offset, int count) {
+        if (offset &lt; 0) {
+            throw new StringIndexOutOfBoundsException(offset);
+        }
+        if (count &lt; 0) {
+            throw new StringIndexOutOfBoundsException(count);
+        }
+        // Note: offset or count might be near -1&gt;&gt;&gt;1.
+        if (offset &gt; codePoints.length - count) {
+            throw new StringIndexOutOfBoundsException(offset + count);
+        }
+
+        final int end = offset + count;
+
+        // Pass 1: Compute precise size of char[]
+        int n = count;
+        for (int i = offset; i &lt; end; i++) {
+            int c = codePoints[i];
+            if (Character.isBmpCodePoint(c))
+                continue;
+            else if (Character.isValidCodePoint(c))
+                n++;
+            else throw new IllegalArgumentException(Integer.toString(c));
+        }
+
+        // Pass 2: Allocate and fill in char[]
+        final char[] v = new char[n];
+
+        for (int i = offset, j = 0; i &lt; end; i++, j++) {
+            int c = codePoints[i];
+            if (Character.isBmpCodePoint(c))
+                v[j] = (char)c;
+            else
+                Character.toSurrogates(c, v, j++);
+        }
+
+        this.value = v;
+    }
+
+    @Deprecated
+    public String(byte ascii[], int hibyte, int offset, int count) {
+        checkBounds(ascii, offset, count);
+        char value[] = new char[count];
+
+        if (hibyte == 0) {
+            for (int i = count; i-- &gt; 0;) {
+                value[i] = (char)(ascii[i + offset] &amp; 0xff);
+            }
+        } else {
+            hibyte &lt;&lt;= 8;
+            for (int i = count; i-- &gt; 0;) {
+                value[i] = (char)(hibyte | (ascii[i + offset] &amp; 0xff));
+            }
+        }
+        this.value = value;
+    }
+
+    @Deprecated
+    public String(byte ascii[], int hibyte) {
+        this(ascii, hibyte, 0, ascii.length);
+    }
+
+     private static void checkBounds(byte[] bytes, int offset, int length) {
+        if (length &lt; 0)
+            throw new StringIndexOutOfBoundsException(length);
+        if (offset &lt; 0)
+            throw new StringIndexOutOfBoundsException(offset);
+        if (offset &gt; bytes.length - length)
+            throw new StringIndexOutOfBoundsException(offset + length);
+    }
+
+    public String(byte bytes[], int offset, int length, String charsetName)
+            throws UnsupportedEncodingException {
+        if (charsetName == null)
+            throw new NullPointerException(&quot;charsetName&quot;);
+        checkBounds(bytes, offset, length);
+        this.value = StringCoding.decode(charsetName, bytes, offset, length);
+    }
+
+    public String(byte bytes[], int offset, int length, Charset charset) {
+        if (charset == null)
+            throw new NullPointerException(&quot;charset&quot;);
+        checkBounds(bytes, offset, length);
+        this.value =  StringCoding.decode(charset, bytes, offset, length);
+    }
+
+    public String(byte bytes[], String charsetName)
+            throws UnsupportedEncodingException {
+        this(bytes, 0, bytes.length, charsetName);
+    }
+
+    public String(byte bytes[], Charset charset) {
+        this(bytes, 0, bytes.length, charset);
+    }
+
+    public String(byte bytes[], int offset, int length) {
+        checkBounds(bytes, offset, length);
+        this.value = StringCoding.decode(bytes, offset, length);
+    }
+
+    public String(byte bytes[]) {
+        this(bytes, 0, bytes.length);
+    }
+
+    public String(StringBuffer buffer) {
+        synchronized(buffer) {
+            this.value = Arrays.copyOf(buffer.getValue(), buffer.length());
+        }
+    }
+
+    public String(StringBuilder builder) {
+        this.value = Arrays.copyOf(builder.getValue(), builder.length());
+    }
+
+    String(char[] value, boolean share) {
+        // assert share : &quot;unshared not supported&quot;;
+        this.value = value;
+    }
+
+    @Deprecated
+    String(int offset, int count, char[] value) {
+        this(value, offset, count);
+    }
+
+    public int length() {
+        return value.length;
+    }
+
+    public boolean isEmpty() {
+        return value.length == 0;
+    }
+
+    public char charAt(int index) {
+        if ((index &lt; 0) || (index &gt;= value.length)) {
+            throw new StringIndexOutOfBoundsException(index);
+        }
+        return value[index];
+    }
+
+    public int codePointAt(int index) {
+        if ((index &lt; 0) || (index &gt;= value.length)) {
+            throw new StringIndexOutOfBoundsException(index);
+        }
+        return Character.codePointAtImpl(value, index, value.length);
+    }
+
+    public int codePointBefore(int index) {
+        int i = index - 1;
+        if ((i &lt; 0) || (i &gt;= value.length)) {
+            throw new StringIndexOutOfBoundsException(index);
+        }
+        return Character.codePointBeforeImpl(value, index, 0);
+    }
+
+    public int codePointCount(int beginIndex, int endIndex) {
+        if (beginIndex &lt; 0 || endIndex &gt; value.length || beginIndex &gt; endIndex) {
+            throw new IndexOutOfBoundsException();
+        }
+        return Character.codePointCountImpl(value, beginIndex, endIndex - beginIndex);
+    }
+
+    public int offsetByCodePoints(int index, int codePointOffset) {
+        if (index &lt; 0 || index &gt; value.length) {
+            throw new IndexOutOfBoundsException();
+        }
+        return Character.offsetByCodePointsImpl(value, 0, value.length,
+                index, codePointOffset);
+    }
+
+    void getChars(char dst[], int dstBegin) {
+        System.arraycopy(value, 0, dst, dstBegin, value.length);
+    }
+
+    public void getChars(int srcBegin, int srcEnd, char dst[], int dstBegin) {
+        if (srcBegin &lt; 0) {
+            throw new StringIndexOutOfBoundsException(srcBegin);
+        }
+        if (srcEnd &gt; value.length) {
+            throw new StringIndexOutOfBoundsException(srcEnd);
+        }
+        if (srcBegin &gt; srcEnd) {
+            throw new StringIndexOutOfBoundsException(srcEnd - srcBegin);
+        }
+        System.arraycopy(value, srcBegin, dst, dstBegin, srcEnd - srcBegin);
+    }
+
+    @Deprecated
+    public void getBytes(int srcBegin, int srcEnd, byte dst[], int dstBegin) {
+        if (srcBegin &lt; 0) {
+            throw new StringIndexOutOfBoundsException(srcBegin);
+        }
+        if (srcEnd &gt; value.length) {
+            throw new StringIndexOutOfBoundsException(srcEnd);
+        }
+        if (srcBegin &gt; srcEnd) {
+            throw new StringIndexOutOfBoundsException(srcEnd - srcBegin);
+        }
+        int j = dstBegin;
+        int n = srcEnd;
+        int i = srcBegin;
+        char[] val = value;   /* avoid getfield opcode */
+
+        while (i &lt; n) {
+            dst[j++] = (byte)val[i++];
+        }
+    }
+
+    public byte[] getBytes(String charsetName)
+            throws UnsupportedEncodingException {
+        if (charsetName == null) throw new NullPointerException();
+        return StringCoding.encode(charsetName, value, 0, value.length);
+    }
+
+    public byte[] getBytes(Charset charset) {
+        if (charset == null) throw new NullPointerException();
+        return StringCoding.encode(charset, value, 0, value.length);
+    }
+
+    public byte[] getBytes() {
+        return StringCoding.encode(value, 0, value.length);
+    }
+
+    public boolean equals(Object anObject) {
+        if (this == anObject) {
+            return true;
+        }
+        if (anObject instanceof String) {
+            String anotherString = (String) anObject;
+            int n = value.length;
+            if (n == anotherString.value.length) {
+                char v1[] = value;
+                char v2[] = anotherString.value;
+                int i = 0;
+                while (n-- != 0) {
+                    if (v1[i] != v2[i])
+                            return false;
+                    i++;
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean contentEquals(StringBuffer sb) {
+        synchronized (sb) {
+            return contentEquals((CharSequence) sb);
+        }
+    }
+
+    public boolean contentEquals(CharSequence cs) {
+        if (value.length != cs.length())
+            return false;
+        // Argument is a StringBuffer, StringBuilder
+        if (cs instanceof AbstractStringBuilder) {
+            char v1[] = value;
+            char v2[] = ((AbstractStringBuilder) cs).getValue();
+            int i = 0;
+            int n = value.length;
+            while (n-- != 0) {
+                if (v1[i] != v2[i])
+                    return false;
+                i++;
+            }
+            return true;
+        }
+        // Argument is a String
+        if (cs.equals(this))
+            return true;
+        // Argument is a generic CharSequence
+        char v1[] = value;
+        int i = 0;
+        int n = value.length;
+        while (n-- != 0) {
+            if (v1[i] != cs.charAt(i))
+                return false;
+            i++;
+        }
+        return true;
+    }
+
+    public boolean equalsIgnoreCase(String anotherString) {
+        return (this == anotherString) ? true
+                : (anotherString != null)
+                &amp;&amp; (anotherString.value.length == value.length)
+                &amp;&amp; regionMatches(true, 0, anotherString, 0, value.length);
+    }
+
+    public int compareTo(String anotherString) {
+        int len1 = value.length;
+        int len2 = anotherString.value.length;
+        int lim = Math.min(len1, len2);
+        char v1[] = value;
+        char v2[] = anotherString.value;
+
+        int k = 0;
+        while (k &lt; lim) {
+            char c1 = v1[k];
+            char c2 = v2[k];
+            if (c1 != c2) {
+                return c1 - c2;
+            }
+            k++;
+        }
+        return len1 - len2;
+    }
+
+    public static final Comparator&lt;String&gt; CASE_INSENSITIVE_ORDER
+                                         = new CaseInsensitiveComparator();
+    private static class CaseInsensitiveComparator
+            implements Comparator&lt;String&gt;, java.io.Serializable {
+        // use serialVersionUID from JDK 1.2.2 for interoperability
+        private static final long serialVersionUID = 8575799808933029326L;
+
+        public int compare(String s1, String s2) {
+            int n1 = s1.length();
+            int n2 = s2.length();
+            int min = Math.min(n1, n2);
+            for (int i = 0; i &lt; min; i++) {
+                char c1 = s1.charAt(i);
+                char c2 = s2.charAt(i);
+                if (c1 != c2) {
+                    c1 = Character.toUpperCase(c1);
+                    c2 = Character.toUpperCase(c2);
+                    if (c1 != c2) {
+                        c1 = Character.toLowerCase(c1);
+                        c2 = Character.toLowerCase(c2);
+                        if (c1 != c2) {
+                            // No overflow because of numeric promotion
+                            return c1 - c2;
+                        }
+                    }
+                }
+            }
+            return n1 - n2;
+        }
+    }
+
+    public int compareToIgnoreCase(String str) {
+        return CASE_INSENSITIVE_ORDER.compare(this, str);
+    }
+
+    public boolean regionMatches(int toffset, String other, int ooffset,
+            int len) {
+        char ta[] = value;
+        int to = toffset;
+        char pa[] = other.value;
+        int po = ooffset;
+        // Note: toffset, ooffset, or len might be near -1&gt;&gt;&gt;1.
+        if ((ooffset &lt; 0) || (toffset &lt; 0)
+                || (toffset &gt; (long)value.length - len)
+                || (ooffset &gt; (long)other.value.length - len)) {
+            return false;
+        }
+        while (len-- &gt; 0) {
+            if (ta[to++] != pa[po++]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean regionMatches(boolean ignoreCase, int toffset,
+            String other, int ooffset, int len) {
+        char ta[] = value;
+        int to = toffset;
+        char pa[] = other.value;
+        int po = ooffset;
+        // Note: toffset, ooffset, or len might be near -1&gt;&gt;&gt;1.
+        if ((ooffset &lt; 0) || (toffset &lt; 0)
+                || (toffset &gt; (long)value.length - len)
+                || (ooffset &gt; (long)other.value.length - len)) {
+            return false;
+        }
+        while (len-- &gt; 0) {
+            char c1 = ta[to++];
+            char c2 = pa[po++];
+            if (c1 == c2) {
+                continue;
+            }
+            if (ignoreCase) {
+                // If characters don&apos;t match but case may be ignored,
+                // try converting both characters to uppercase.
+                // If the results match, then the comparison scan should
+                // continue.
+                char u1 = Character.toUpperCase(c1);
+                char u2 = Character.toUpperCase(c2);
+                if (u1 == u2) {
+                    continue;
+                }
+                // Unfortunately, conversion to uppercase does not work properly
+                // for the Georgian alphabet, which has strange rules about case
+                // conversion.  So we need to make one last check before
+                // exiting.
+                if (Character.toLowerCase(u1) == Character.toLowerCase(u2)) {
+                    continue;
+                }
+            }
+            return false;
+        }
+        return true;
+    }
+
+    public boolean startsWith(String prefix, int toffset) {
+        char ta[] = value;
+        int to = toffset;
+        char pa[] = prefix.value;
+        int po = 0;
+        int pc = prefix.value.length;
+        // Note: toffset might be near -1&gt;&gt;&gt;1.
+        if ((toffset &lt; 0) || (toffset &gt; value.length - pc)) {
+            return false;
+        }
+        while (--pc &gt;= 0) {
+            if (ta[to++] != pa[po++]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean startsWith(String prefix) {
+        return startsWith(prefix, 0);
+    }
+
+    public boolean endsWith(String suffix) {
+        return startsWith(suffix, value.length - suffix.value.length);
+    }
+
+    public int hashCode() {
+        int h = hash;
+        if (h == 0 &amp;&amp; value.length &gt; 0) {
+            char val[] = value;
+
+            for (int i = 0; i &lt; value.length; i++) {
+                h = 31 * h + val[i];
+            }
+            hash = h;
+        }
+        return h;
+    }
+
+    public int indexOf(int ch) {
+        return indexOf(ch, 0);
+    }
+
+    public int indexOf(int ch, int fromIndex) {
+        final int max = value.length;
+        if (fromIndex &lt; 0) {
+            fromIndex = 0;
+        } else if (fromIndex &gt;= max) {
+            // Note: fromIndex might be near -1&gt;&gt;&gt;1.
+            return -1;
+        }
+
+        if (ch &lt; Character.MIN_SUPPLEMENTARY_CODE_POINT) {
+            // handle most cases here (ch is a BMP code point or a
+            // negative value (invalid code point))
+            final char[] value = this.value;
+            for (int i = fromIndex; i &lt; max; i++) {
+                if (value[i] == ch) {
+                    return i;
+                }
+            }
+            return -1;
+        } else {
+            return indexOfSupplementary(ch, fromIndex);
+        }
+    }
+
+    private int indexOfSupplementary(int ch, int fromIndex) {
+        if (Character.isValidCodePoint(ch)) {
+            final char[] value = this.value;
+            final char hi = Character.highSurrogate(ch);
+            final char lo = Character.lowSurrogate(ch);
+            final int max = value.length - 1;
+            for (int i = fromIndex; i &lt; max; i++) {
+                if (value[i] == hi &amp;&amp; value[i + 1] == lo) {
+                    return i;
+                }
+            }
+        }
+        return -1;
+    }
+
+    public int lastIndexOf(int ch) {
+        return lastIndexOf(ch, value.length - 1);
+    }
+
+    public int lastIndexOf(int ch, int fromIndex) {
+        if (ch &lt; Character.MIN_SUPPLEMENTARY_CODE_POINT) {
+            // handle most cases here (ch is a BMP code point or a
+            // negative value (invalid code point))
+            final char[] value = this.value;
+            int i = Math.min(fromIndex, value.length - 1);
+            for (; i &gt;= 0; i--) {
+                if (value[i] == ch) {
+                    return i;
+                }
+            }
+            return -1;
+        } else {
+            return lastIndexOfSupplementary(ch, fromIndex);
+        }
+    }
+
+    private int lastIndexOfSupplementary(int ch, int fromIndex) {
+        if (Character.isValidCodePoint(ch)) {
+            final char[] value = this.value;
+            char hi = Character.highSurrogate(ch);
+            char lo = Character.lowSurrogate(ch);
+            int i = Math.min(fromIndex, value.length - 2);
+            for (; i &gt;= 0; i--) {
+                if (value[i] == hi &amp;&amp; value[i + 1] == lo) {
+                    return i;
+                }
+            }
+        }
+        return -1;
+    }
+
+    public int indexOf(String str) {
+        return indexOf(str, 0);
+    }
+
+    public int indexOf(String str, int fromIndex) {
+        return indexOf(value, 0, value.length,
+                str.value, 0, str.value.length, fromIndex);
+    }
+
+    static int indexOf(char[] source, int sourceOffset, int sourceCount,
+            char[] target, int targetOffset, int targetCount,
+            int fromIndex) {
+        if (fromIndex &gt;= sourceCount) {
+            return (targetCount == 0 ? sourceCount : -1);
+        }
+        if (fromIndex &lt; 0) {
+            fromIndex = 0;
+        }
+        if (targetCount == 0) {
+            return fromIndex;
+        }
+
+        char first = target[targetOffset];
+        int max = sourceOffset + (sourceCount - targetCount);
+
+        for (int i = sourceOffset + fromIndex; i &lt;= max; i++) {
+            /* Look for first character. */
+            if (source[i] != first) {
+                while (++i &lt;= max &amp;&amp; source[i] != first);
+            }
+
+            /* Found first character, now look at the rest of v2 */
+            if (i &lt;= max) {
+                int j = i + 1;
+                int end = j + targetCount - 1;
+                for (int k = targetOffset + 1; j &lt; end &amp;&amp; source[j]
+                        == target[k]; j++, k++);
+
+                if (j == end) {
+                    /* Found whole string. */
+                    return i - sourceOffset;
+                }
+            }
+        }
+        return -1;
+    }
+
+    public int lastIndexOf(String str) {
+        return lastIndexOf(str, value.length);
+    }
+
+    public int lastIndexOf(String str, int fromIndex) {
+        return lastIndexOf(value, 0, value.length,
+                str.value, 0, str.value.length, fromIndex);
+    }
+
+    static int lastIndexOf(char[] source, int sourceOffset, int sourceCount,
+            char[] target, int targetOffset, int targetCount,
+            int fromIndex) {
+        /*
+         * Check arguments; return immediately where possible. For
+         * consistency, don&apos;t check for null str.
+         */
+        int rightIndex = sourceCount - targetCount;
+        if (fromIndex &lt; 0) {
+            return -1;
+        }
+        if (fromIndex &gt; rightIndex) {
+            fromIndex = rightIndex;
+        }
+        /* Empty string always matches. */
+        if (targetCount == 0) {
+            return fromIndex;
+        }
+
+        int strLastIndex = targetOffset + targetCount - 1;
+        char strLastChar = target[strLastIndex];
+        int min = sourceOffset + targetCount - 1;
+        int i = min + fromIndex;
+
+        startSearchForLastChar:
+        while (true) {
+            while (i &gt;= min &amp;&amp; source[i] != strLastChar) {
+                i--;
+            }
+            if (i &lt; min) {
+                return -1;
+            }
+            int j = i - 1;
+            int start = j - (targetCount - 1);
+            int k = strLastIndex - 1;
+
+            while (j &gt; start) {
+                if (source[j--] != target[k--]) {
+                    i--;
+                    continue startSearchForLastChar;
+                }
+            }
+            return start - sourceOffset + 1;
+        }
+    }
+
+    public String substring(int beginIndex) {
+        if (beginIndex &lt; 0) {
+            throw new StringIndexOutOfBoundsException(beginIndex);
+        }
+        int subLen = value.length - beginIndex;
+        if (subLen &lt; 0) {
+            throw new StringIndexOutOfBoundsException(subLen);
+        }
+        return (beginIndex == 0) ? this : new String(value, beginIndex, subLen);
+    }
+
+    public String substring(int beginIndex, int endIndex) {
+        if (beginIndex &lt; 0) {
+            throw new StringIndexOutOfBoundsException(beginIndex);
+        }
+        if (endIndex &gt; value.length) {
+            throw new StringIndexOutOfBoundsException(endIndex);
+        }
+        int subLen = endIndex - beginIndex;
+        if (subLen &lt; 0) {
+            throw new StringIndexOutOfBoundsException(subLen);
+        }
+        return ((beginIndex == 0) &amp;&amp; (endIndex == value.length)) ? this
+                : new String(value, beginIndex, subLen);
+    }
+
+    public CharSequence subSequence(int beginIndex, int endIndex) {
+        return this.substring(beginIndex, endIndex);
+    }
+
+    public String concat(String str) {
+        int otherLen = str.length();
+        if (otherLen == 0) {
+            return this;
+        }
+        int len = value.length;
+        char buf[] = Arrays.copyOf(value, len + otherLen);
+        str.getChars(buf, len);
+        return new String(buf, true);
+    }
+
+    public String replace(char oldChar, char newChar) {
+        if (oldChar != newChar) {
+            int len = value.length;
+            int i = -1;
+            char[] val = value; /* avoid getfield opcode */
+
+            while (++i &lt; len) {
+                if (val[i] == oldChar) {
+                    break;
+                }
+            }
+            if (i &lt; len) {
+                char buf[] = new char[len];
+                for (int j = 0; j &lt; i; j++) {
+                    buf[j] = val[j];
+                }
+                while (i &lt; len) {
+                    char c = val[i];
+                    buf[i] = (c == oldChar) ? newChar : c;
+                    i++;
+                }
+                return new String(buf, true);
+            }
+        }
+        return this;
+    }
+
+    public boolean matches(String regex) {
+        return Pattern.matches(regex, this);
+    }
+
+    public boolean contains(CharSequence s) {
+        return indexOf(s.toString()) &gt; -1;
+    }
+
+    public String replaceFirst(String regex, String replacement) {
+        return Pattern.compile(regex).matcher(this).replaceFirst(replacement);
+    }
+
+    public String replaceAll(String regex, String replacement) {
+        return Pattern.compile(regex).matcher(this).replaceAll(replacement);
+    }
+
+    public String replace(CharSequence target, CharSequence replacement) {
+        return Pattern.compile(target.toString(), Pattern.LITERAL).matcher(
+                this).replaceAll(Matcher.quoteReplacement(replacement.toString()));
+    }
+
+    public String[] split(String regex, int limit) {
+        /* fastpath if the regex is a
+         (1)one-char String and this character is not one of the
+            RegEx&apos;s meta characters &quot;.$|()[{^?*+\\&quot;, or
+         (2)two-char String and the first char is the backslash and
+            the second is not the ascii digit or ascii letter.
+         */
+        char ch = 0;
+        if (((regex.value.length == 1 &amp;&amp;
+             &quot;.$|()[{^?*+\\&quot;.indexOf(ch = regex.charAt(0)) == -1) ||
+             (regex.length() == 2 &amp;&amp;
+              regex.charAt(0) == &apos;\\&apos; &amp;&amp;
+              (((ch = regex.charAt(1))-&apos;0&apos;)|(&apos;9&apos;-ch)) &lt; 0 &amp;&amp;
+              ((ch-&apos;a&apos;)|(&apos;z&apos;-ch)) &lt; 0 &amp;&amp;
+              ((ch-&apos;A&apos;)|(&apos;Z&apos;-ch)) &lt; 0)) &amp;&amp;
+            (ch &lt; Character.MIN_HIGH_SURROGATE ||
+             ch &gt; Character.MAX_LOW_SURROGATE))
+        {
+            int off = 0;
+            int next = 0;
+            boolean limited = limit &gt; 0;
+            ArrayList&lt;String&gt; list = new ArrayList&lt;&gt;();
+            while ((next = indexOf(ch, off)) != -1) {
+                if (!limited || list.size() &lt; limit - 1) {
+                    list.add(substring(off, next));
+                    off = next + 1;
+                } else {    // last one
+                    //assert (list.size() == limit - 1);
+                    list.add(substring(off, value.length));
+                    off = value.length;
+                    break;
+                }
+            }
+            // If no match was found, return this
+            if (off == 0)
+                return new String[]{this};
+
+            // Add remaining segment
+            if (!limited || list.size() &lt; limit)
+                list.add(substring(off, value.length));
+
+            // Construct result
+            int resultSize = list.size();
+            if (limit == 0)
+                while (resultSize &gt; 0 &amp;&amp; list.get(resultSize - 1).length() == 0)
+                    resultSize--;
+            String[] result = new String[resultSize];
+            return list.subList(0, resultSize).toArray(result);
+        }
+        return Pattern.compile(regex).split(this, limit);
+    }
+
+    public String[] split(String regex) {
+        return split(regex, 0);
+    }
+
+    public String toLowerCase(Locale locale) {
+        if (locale == null) {
+            throw new NullPointerException();
+        }
+
+        int firstUpper;
+        final int len = value.length;
+
+        /* Now check if there are any characters that need to be changed. */
+        scan: {
+            for (firstUpper = 0 ; firstUpper &lt; len; ) {
+                char c = value[firstUpper];
+                if ((c &gt;= Character.MIN_HIGH_SURROGATE)
+                        &amp;&amp; (c &lt;= Character.MAX_HIGH_SURROGATE)) {
+                    int supplChar = codePointAt(firstUpper);
+                    if (supplChar != Character.toLowerCase(supplChar)) {
+                        break scan;
+                    }
+                    firstUpper += Character.charCount(supplChar);
+                } else {
+                    if (c != Character.toLowerCase(c)) {
+                        break scan;
+                    }
+                    firstUpper++;
+                }
+            }
+            return this;
+        }
+
+        char[] result = new char[len];
+        int resultOffset = 0;  /* result may grow, so i+resultOffset
+                                * is the write location in result */
+
+        /* Just copy the first few lowerCase characters. */
+        System.arraycopy(value, 0, result, 0, firstUpper);
+
+        String lang = locale.getLanguage();
+        boolean localeDependent =
+                (lang == &quot;tr&quot; || lang == &quot;az&quot; || lang == &quot;lt&quot;);
+        char[] lowerCharArray;
+        int lowerChar;
+        int srcChar;
+        int srcCount;
+        for (int i = firstUpper; i &lt; len; i += srcCount) {
+            srcChar = (int)value[i];
+            if ((char)srcChar &gt;= Character.MIN_HIGH_SURROGATE
+                    &amp;&amp; (char)srcChar &lt;= Character.MAX_HIGH_SURROGATE) {
+                srcChar = codePointAt(i);
+                srcCount = Character.charCount(srcChar);
+            } else {
+                srcCount = 1;
+            }
+            if (localeDependent || srcChar == &apos;\u03A3&apos;) { // GREEK CAPITAL LETTER SIGMA
+                lowerChar = ConditionalSpecialCasing.toLowerCaseEx(this, i, locale);
+            } else if (srcChar == &apos;\u0130&apos;) { // LATIN CAPITAL LETTER I DOT
+                lowerChar = Character.ERROR;
+            } else {
+                lowerChar = Character.toLowerCase(srcChar);
+            }
+            if ((lowerChar == Character.ERROR)
+                    || (lowerChar &gt;= Character.MIN_SUPPLEMENTARY_CODE_POINT)) {
+                if (lowerChar == Character.ERROR) {
+                    if (!localeDependent &amp;&amp; srcChar == &apos;\u0130&apos;) {
+                        lowerCharArray =
+                                ConditionalSpecialCasing.toLowerCaseCharArray(this, i, Locale.ENGLISH);
+                    } else {
+                        lowerCharArray =
+                                ConditionalSpecialCasing.toLowerCaseCharArray(this, i, locale);
+                    }
+                } else if (srcCount == 2) {
+                    resultOffset += Character.toChars(lowerChar, result, i + resultOffset) - srcCount;
+                    continue;
+                } else {
+                    lowerCharArray = Character.toChars(lowerChar);
+                }
+
+                /* Grow result if needed */
+                int mapLen = lowerCharArray.length;
+                if (mapLen &gt; srcCount) {
+                    char[] result2 = new char[result.length + mapLen - srcCount];
+                    System.arraycopy(result, 0, result2, 0, i + resultOffset);
+                    result = result2;
+                }
+                for (int x = 0; x &lt; mapLen; ++x) {
+                    result[i + resultOffset + x] = lowerCharArray[x];
+                }
+                resultOffset += (mapLen - srcCount);
+            } else {
+                result[i + resultOffset] = (char)lowerChar;
+            }
+        }
+        return new String(result, 0, len + resultOffset);
+    }
+
+    public String toLowerCase() {
+        return toLowerCase(Locale.getDefault());
+    }
+
+    public String toUpperCase(Locale locale) {
+        if (locale == null) {
+            throw new NullPointerException();
+        }
+
+        int firstLower;
+        final int len = value.length;
+
+        /* Now check if there are any characters that need to be changed. */
+        scan: {
+           for (firstLower = 0 ; firstLower &lt; len; ) {
+                int c = (int)value[firstLower];
+                int srcCount;
+                if ((c &gt;= Character.MIN_HIGH_SURROGATE)
+                        &amp;&amp; (c &lt;= Character.MAX_HIGH_SURROGATE)) {
+                    c = codePointAt(firstLower);
+                    srcCount = Character.charCount(c);
+                } else {
+                    srcCount = 1;
+                }
+                int upperCaseChar = Character.toUpperCaseEx(c);
+                if ((upperCaseChar == Character.ERROR)
+                        || (c != upperCaseChar)) {
+                    break scan;
+                }
+                firstLower += srcCount;
+            }
+            return this;
+        }
+
+        char[] result = new char[len]; /* may grow */
+        int resultOffset = 0;  /* result may grow, so i+resultOffset
+         * is the write location in result */
+
+        /* Just copy the first few upperCase characters. */
+        System.arraycopy(value, 0, result, 0, firstLower);
+
+        String lang = locale.getLanguage();
+        boolean localeDependent =
+                (lang == &quot;tr&quot; || lang == &quot;az&quot; || lang == &quot;lt&quot;);
+        char[] upperCharArray;
+        int upperChar;
+        int srcChar;
+        int srcCount;
+        for (int i = firstLower; i &lt; len; i += srcCount) {
+            srcChar = (int)value[i];
+            if ((char)srcChar &gt;= Character.MIN_HIGH_SURROGATE &amp;&amp;
+                (char)srcChar &lt;= Character.MAX_HIGH_SURROGATE) {
+                srcChar = codePointAt(i);
+                srcCount = Character.charCount(srcChar);
+            } else {
+                srcCount = 1;
+            }
+            if (localeDependent) {
+                upperChar = ConditionalSpecialCasing.toUpperCaseEx(this, i, locale);
+            } else {
+                upperChar = Character.toUpperCaseEx(srcChar);
+            }
+            if ((upperChar == Character.ERROR)
+                    || (upperChar &gt;= Character.MIN_SUPPLEMENTARY_CODE_POINT)) {
+                if (upperChar == Character.ERROR) {
+                    if (localeDependent) {
+                        upperCharArray =
+                                ConditionalSpecialCasing.toUpperCaseCharArray(this, i, locale);
+                    } else {
+                        upperCharArray = Character.toUpperCaseCharArray(srcChar);
+                    }
+                } else if (srcCount == 2) {
+                    resultOffset += Character.toChars(upperChar, result, i + resultOffset) - srcCount;
+                    continue;
+                } else {
+                    upperCharArray = Character.toChars(upperChar);
+                }
+
+                /* Grow result if needed */
+                int mapLen = upperCharArray.length;
+                if (mapLen &gt; srcCount) {
+                    char[] result2 = new char[result.length + mapLen - srcCount];
+                    System.arraycopy(result, 0, result2, 0, i + resultOffset);
+                    result = result2;
+                }
+                for (int x = 0; x &lt; mapLen; ++x) {
+                    result[i + resultOffset + x] = upperCharArray[x];
+                }
+                resultOffset += (mapLen - srcCount);
+            } else {
+                result[i + resultOffset] = (char)upperChar;
+            }
+        }
+        return new String(result, 0, len + resultOffset);
+    }
+
+    public String toUpperCase() {
+        return toUpperCase(Locale.getDefault());
+    }
+
+    public String trim() {
+        int len = value.length;
+        int st = 0;
+        char[] val = value;    /* avoid getfield opcode */
+
+        while ((st &lt; len) &amp;&amp; (val[st] &lt;= &apos; &apos;)) {
+            st++;
+        }
+        while ((st &lt; len) &amp;&amp; (val[len - 1] &lt;= &apos; &apos;)) {
+            len--;
+        }
+        return ((st &gt; 0) || (len &lt; value.length)) ? substring(st, len) : this;
+    }
+
+    public String toString() {
+        return this;
+    }
+
+    public char[] toCharArray() {
+        // Cannot use Arrays.copyOf because of class initialization order issues
+        char result[] = new char[value.length];
+        System.arraycopy(value, 0, result, 0, value.length);
+        return result;
+    }
+
+    public static String format(String format, Object... args) {
+        return new Formatter().format(format, args).toString();
+    }
+
+    public static String format(Locale l, String format, Object... args) {
+        return new Formatter(l).format(format, args).toString();
+    }
+
+    public static String valueOf(Object obj) {
+        return (obj == null) ? &quot;null&quot; : obj.toString();
+    }
+
+    public static String valueOf(char data[]) {
+        return new String(data);
+    }
+
+    public static String valueOf(char data[], int offset, int count) {
+        return new String(data, offset, count);
+    }
+
+    public static String copyValueOf(char data[], int offset, int count) {
+        // All public String constructors now copy the data.
+        return new String(data, offset, count);
+    }
+
+    public static String copyValueOf(char data[]) {
+        return new String(data);
+    }
+
+    public static String valueOf(boolean b) {
+        return b ? &quot;true&quot; : &quot;false&quot;;
+    }
+
+    public static String valueOf(char c) {
+        char data[] = {c};
+        return new String(data, true);
+    }
+
+    public static String valueOf(int i) {
+        return Integer.toString(i);
+    }
+
+    public static String valueOf(long l) {
+        return Long.toString(l);
+    }
+
+    public static String valueOf(float f) {
+        return Float.toString(f);
+    }
+
+    public static String valueOf(double d) {
+        return Double.toString(d);
+    }
+
+    public native String intern();
+
+    private static final int HASHING_SEED;
+
+    static {
+        long nanos = System.nanoTime();
+        long now = System.currentTimeMillis();
+        int SEED_MATERIAL[] = {
+                System.identityHashCode(String.class),
+                System.identityHashCode(System.class),
+                (int) (nanos &gt;&gt;&gt; 32),
+                (int) nanos,
+                (int) (now &gt;&gt;&gt; 32),
+                (int) now,
+                (int) (System.nanoTime() &gt;&gt;&gt; 2)
+        };
+
+        // Use murmur3 to scramble the seeding material.
+        // Inline implementation to avoid loading classes
+        int h1 = 0;
+
+        // body
+        for (int k1 : SEED_MATERIAL) {
+            k1 *= 0xcc9e2d51;
+            k1 = (k1 &lt;&lt; 15) | (k1 &gt;&gt;&gt; 17);
+            k1 *= 0x1b873593;
+
+            h1 ^= k1;
+            h1 = (h1 &lt;&lt; 13) | (h1 &gt;&gt;&gt; 19);
+            h1 = h1 * 5 + 0xe6546b64;
+        }
+
+        // tail (always empty, as body is always 32-bit chunks)
+
+        // finalization
+
+        h1 ^= SEED_MATERIAL.length * 4;
+
+        // finalization mix force all bits of a hash block to avalanche
+        h1 ^= h1 &gt;&gt;&gt; 16;
+        h1 *= 0x85ebca6b;
+        h1 ^= h1 &gt;&gt;&gt; 13;
+        h1 *= 0xc2b2ae35;
+        h1 ^= h1 &gt;&gt;&gt; 16;
+
+        HASHING_SEED = h1;
+    }
+
+    private transient int hash32 = 0;
+
+
+    int hash32() {
+        int h = hash32;
+        if (0 == h) {
+           // harmless data race on hash32 here.
+           h = sun.misc.Hashing.murmur3_32(HASHING_SEED, value, 0, value.length);
+
+           // ensure result is not zero to avoid recalcing
+           h = (0 != h) ? h : 1;
+
+           hash32 = h;
+        }
+
+        return h;
+    }
+}
+</code></pre><p>说明：String的本质是字符序列，它是通过字符数组实现的！</p>
+<p><a name="anchor3"></a></p>
+<h1 id="3-String的API测试代码"><a href="#3-String的API测试代码" class="headerlink" title="3. String的API测试代码"></a>3. String的API测试代码</h1><h2 id="3-1-CharSequence"><a href="#3-1-CharSequence" class="headerlink" title="3.1 CharSequence"></a>3.1 CharSequence</h2><p>下面通过示例，演示CharSequence的使用方法！<br>源码如下(CharSequenceTest.java):</p>
+<pre><code>/**
+ * CharSequence 演示程序
+ *
+ * @author skywang
+ */
+import java.nio.charset.Charset;
+import java.io.UnsupportedEncodingException;
+
+public class CharSequenceTest {
+
+    public static void main(String[] args) {
+        testCharSequence();
+    }
+
+    /**
+     * CharSequence 测试程序
+     */
+    private static void testCharSequence() {
+        System.out.println(&quot;-------------------------------- testCharSequence -----------------------------&quot;);
+
+        // 1. CharSequence的子类String
+        String str = &quot;abcdefghijklmnopqrstuvwxyz&quot;;
+        System.out.println(&quot;1. String&quot;);
+        System.out.printf(&quot;   %-30s=%d\n&quot;, &quot;str.length()&quot;, str.length());
+        System.out.printf(&quot;   %-30s=%c\n&quot;, &quot;str.charAt(5)&quot;, str.charAt(5));
+        String substr = (String)str.subSequence(0,5);
+        System.out.printf(&quot;   %-30s=%s\n&quot;, &quot;str.subSequence(0,5)&quot;, substr.toString());
+
+        // 2. CharSequence的子类StringBuilder
+        StringBuilder strbuilder = new StringBuilder(&quot;abcdefghijklmnopqrstuvwxyz&quot;);
+        System.out.println(&quot;2. StringBuilder&quot;);
+        System.out.printf(&quot;   %-30s=%d\n&quot;, &quot;strbuilder.length()&quot;, strbuilder.length());
+        System.out.printf(&quot;   %-30s=%c\n&quot;, &quot;strbuilder.charAt(5)&quot;, strbuilder.charAt(5));
+        // 注意：StringBuilder的subSequence()返回的是，实际上是一个String对象！
+        String substrbuilder = (String)strbuilder.subSequence(0,5);
+        System.out.printf(&quot;   %-30s=%s\n&quot;, &quot;strbuilder.subSequence(0,5)&quot;, substrbuilder.toString());
+
+        // 3. CharSequence的子类StringBuffer
+        StringBuffer strbuffer = new StringBuffer(&quot;abcdefghijklmnopqrstuvwxyz&quot;);
+        System.out.println(&quot;3. StringBuffer&quot;);
+        System.out.printf(&quot;   %-30s=%d\n&quot;, &quot;strbuffer.length()&quot;, strbuffer.length());
+        System.out.printf(&quot;   %-30s=%c\n&quot;, &quot;strbuffer.charAt(5)&quot;, strbuffer.charAt(5));
+        // 注意：StringBuffer的subSequence()返回的是，实际上是一个String对象！
+        String substrbuffer = (String)strbuffer.subSequence(0,5);
+        System.out.printf(&quot;   %-30s=%s\n&quot;, &quot;strbuffer.subSequence(0,5)&quot;, substrbuffer.toString());
+
+        System.out.println();
+    }
+}
+</code></pre><p>运行结果：</p>
+<pre><code>-------------------------------- testCharSequence -----------------------------
+1. String
+   str.length()                  =26
+   str.charAt(5)                 =f
+   str.subSequence(0,5)          =abcde
+2. StringBuilder
+   strbuilder.length()           =26
+   strbuilder.charAt(5)          =f
+   strbuilder.subSequence(0,5)   =abcde
+3. StringBuffer
+   strbuffer.length()            =26
+   strbuffer.charAt(5)           =f
+   strbuffer.subSequence(0,5)    =abcde
+</code></pre><h2 id="3-2-String-构造函数"><a href="#3-2-String-构造函数" class="headerlink" title="3.2 String 构造函数"></a>3.2 String 构造函数</h2><p>下面通过示例，演示String的各种构造函数的使用方法！<br>源码如下(StringContructorTest.java):</p>
+<pre><code>/**
+ * String 构造函数演示程序
+ *
+ * @author skywang
+ */
+import java.nio.charset.Charset;
+import java.io.UnsupportedEncodingException;
+
+public class StringContructorTest {
+
+    public static void main(String[] args) {
+        testStringConstructors() ;
+    }
+
+    /**
+     * String 构造函数测试程序
+     */
+    private static void testStringConstructors() {
+        try {
+            System.out.println(&quot;-------------------------------- testStringConstructors -----------------------&quot;);
+
+            String str01 = new String();
+            String str02 = new String(&quot;String02&quot;);
+            String str03 = new String(new char[]{&apos;s&apos;,&apos;t&apos;,&apos;r&apos;,&apos;0&apos;,&apos;3&apos;});
+            String str04 = new String(new char[]{&apos;s&apos;,&apos;t&apos;,&apos;r&apos;,&apos;0&apos;,&apos;4&apos;}, 1, 3);          // 1表示起始位置，3表示个数
+            String str05 = new String(new byte[]{0x61, 0x62, 0x63, 0x64, 0x65});       // 0x61在ASC表中，对应字符&quot;a&quot;; 1表示起始位置，3表示长度
+            String str06 = new String(new byte[]{0x61, 0x62, 0x63, 0x64, 0x65}, 1, 3); // 0x61在ASC表中，对应字符&quot;a&quot;; 1表示起始位置，3表示长度
+            String str07 = new String(new byte[]{0x61, 0x62, 0x63, 0x64, 0x65}, 0);       // 0x61在ASC表中，对应字符&quot;a&quot;;0，表示“高字节”
+            String str08 = new String(new byte[]{0x61, 0x62, 0x63, 0x64, 0x65}, 0, 1, 3); // 0x61在ASC表中，对应字符&quot;a&quot;; 0，表示“高字节”；1表示起始位置，3表示长度
+            String str09 = new String(new byte[]{(byte)0xe5, (byte)0xad, (byte)0x97, /* 字-对应的utf-8编码 */ 
+                                                 (byte)0xe7, (byte)0xac, (byte)0xa6, /* 符-对应的utf-8编码 */ 
+                                                 (byte)0xe7, (byte)0xbc, (byte)0x96, /* 编-对应的utf-8编码 */ 
+                                                 (byte)0xe7, (byte)0xa0, (byte)0x81, /* 码-对应的utf-8编码 */ }, 
+                                      0, 12, &quot;utf-8&quot;);  // 0表示起始位置，12表示长度。
+            String str10 = new String(new byte[]{(byte)0x5b, (byte)0x57, /* 字-对应的utf-16编码 */ 
+                                                 (byte)0x7b, (byte)0x26, /* 符-对应的utf-16编码 */ 
+                                                 (byte)0x7f, (byte)0x16, /* 编-对应的utf-16编码 */ 
+                                                 (byte)0x78, (byte)0x01, /* 码-对应的utf-16编码 */ }, 
+                                      0, 8, &quot;utf-16&quot;);  // 0表示起始位置，8表示长度。
+            String str11 = new String(new byte[]{(byte)0xd7, (byte)0xd6, /* 字-对应的gb2312编码  */ 
+                                                 (byte)0xb7, (byte)0xfb, /* 符-对应的gb2312编码 */ 
+                                                 (byte)0xb1, (byte)0xe0, /* 编-对应的gb2312编码 */ 
+                                                 (byte)0xc2, (byte)0xeb, /* 码-对应的gb2312编码 */ }, 
+                                      Charset.forName(&quot;gb2312&quot;)); 
+            String str12 = new String(new byte[]{(byte)0xd7, (byte)0xd6, /* 字-对应的gbk编码 */ 
+                                                 (byte)0xb7, (byte)0xfb, /* 符-对应的gbk编码 */ 
+                                                 (byte)0xb1, (byte)0xe0, /* 编-对应的gbk编码 */ 
+                                                 (byte)0xc2, (byte)0xeb, /* 码-对应的gbk编码 */ }, 
+                                      0, 8, Charset.forName(&quot;gbk&quot;)); 
+            String str13 = new String(new int[] {0x5b57, 0x7b26, 0x7f16, 0x7801}, 0, 4);  // &quot;字符编码&quot;(\u5b57是‘字’的unicode编码)。0表示起始位置，4表示长度。
+            String str14 = new String(new StringBuffer(&quot;StringBuffer&quot;));
+            String str15 = new String(new StringBuilder(&quot;StringBuilder&quot;));
+
+            System.out.printf(&quot; str01=%s \n str02=%s \n str03=%s \n str04=%s \n str05=%s \n str06=%s \n str07=%s \n str08=%s\n str09=%s\n str10=%s\n str11=%s\n str12=%s\n str13=%s\n str14=%s\n str15=%s\n&quot;,
+                    str01, str02, str03, str04, str05, str06, str07, str08, str09, str10, str11, str12, str13, str14, str15);
+
+
+            System.out.println();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+    }
+}
+</code></pre><p>运行结果：</p>
+<pre><code>-------------------------------- testStringConstructors -----------------------
+ str01= 
+ str02=String02 
+ str03=str03 
+ str04=tr0 
+ str05=abcde 
+ str06=bcd 
+ str07=abcde 
+ str08=bcd
+ str09=字符编码
+ str10=字符编码
+ str11=字符编码
+ str12=字符编码
+ str13=字符编码
+ str14=StringBuffer
+ str15=StringBuilder
+</code></pre><h2 id="3-3-String-将各种对象转换成String的API"><a href="#3-3-String-将各种对象转换成String的API" class="headerlink" title="3.3 String 将各种对象转换成String的API"></a>3.3 String 将各种对象转换成String的API</h2><p>源码如下(StringValueTest.java):</p>
+<pre><code>/**
+ * String value相关示例
+ *
+ * @author skywang
+ */
+import java.util.HashMap;
+
+public class StringValueTest {
+
+    public static void main(String[] args) {
+        testValueAPIs() ;
+    }
+
+    /**
+     * String 的valueOf()演示程序
+     */
+    private static void testValueAPIs() {
+        System.out.println(&quot;-------------------------------- testValueAPIs --------------------------------&quot;);
+        // 1. String    valueOf(Object obj)
+        //  实际上，返回的是obj.toString();
+        HashMap map = new HashMap();
+        map.put(&quot;1&quot;, &quot;one&quot;);
+        map.put(&quot;2&quot;, &quot;two&quot;);
+        map.put(&quot;3&quot;, &quot;three&quot;);
+        System.out.printf(&quot;%-50s = %s\n&quot;, &quot;String.valueOf(map)&quot;, String.valueOf(map));
+
+        // 2.String    valueOf(boolean b)
+        System.out.printf(&quot;%-50s = %s\n&quot;, &quot;String.valueOf(true)&quot;, String.valueOf(true));
+
+        // 3.String    valueOf(char c)
+        System.out.printf(&quot;%-50s = %s\n&quot;, &quot;String.valueOf(&apos;m&apos;)&quot;, String.valueOf(&apos;m&apos;));
+
+        // 4.String    valueOf(int i)
+        System.out.printf(&quot;%-50s = %s\n&quot;, &quot;String.valueOf(96)&quot;, String.valueOf(96));
+
+        // 5.String    valueOf(long l)
+        System.out.printf(&quot;%-50s = %s\n&quot;, &quot;String.valueOf(12345L)&quot;, String.valueOf(12345L));
+
+        // 6.String    valueOf(float f)
+        System.out.printf(&quot;%-50s = %s\n&quot;, &quot;String.valueOf(1.414f)&quot;, String.valueOf(1.414f));
+
+        // 7.String    valueOf(double d)
+        System.out.printf(&quot;%-50s = %s\n&quot;, &quot;String.valueOf(3.14159d)&quot;, String.valueOf(3.14159d));
+
+        // 8.String    valueOf(char[] data)
+        System.out.printf(&quot;%-50s = %s\n&quot;, &quot;String.valueOf(new char[]{&apos;s&apos;,&apos;k&apos;,&apos;y&apos;})&quot;, String.valueOf(new char[]{&apos;s&apos;,&apos;k&apos;,&apos;y&apos;}));
+
+        // 9.String    valueOf(char[] data, int offset, int count)
+        System.out.printf(&quot;%-50s = %s\n&quot;, &quot;String.valueOf(new char[]{&apos;s&apos;,&apos;k&apos;,&apos;y&apos;}, 0, 2)&quot;, String.valueOf(new char[]{&apos;s&apos;,&apos;k&apos;,&apos;y&apos;}, 0, 2));
+
+        System.out.println();
+    }
+}
+</code></pre><p>运行结果：</p>
+<pre><code>-------------------------------- testValueAPIs --------------------------------
+String.valueOf(map)                                = {3=three, 2=two, 1=one}
+String.valueOf(true)                               = true
+String.valueOf(&apos;m&apos;)                                = m
+String.valueOf(96)                                 = 96
+String.valueOf(12345L)                             = 12345
+String.valueOf(1.414f)                             = 1.414
+String.valueOf(3.14159d)                           = 3.14159
+String.valueOf(new char[]{&apos;s&apos;,&apos;k&apos;,&apos;y&apos;})            = sky
+String.valueOf(new char[]{&apos;s&apos;,&apos;k&apos;,&apos;y&apos;}, 0, 2)      = sk
+</code></pre><h2 id="3-4-String-中index相关的API"><a href="#3-4-String-中index相关的API" class="headerlink" title="3.4 String 中index相关的API"></a>3.4 String 中index相关的API</h2><p>源码如下(StringIndexTest.java):</p>
+<pre><code>/**
+ * String 中index相关API演示
+ *
+ * @author skywang
+ */
+
+public class StringIndexTest {
+
+    public static void main(String[] args) {
+        testIndexAPIs() ;
+    }
+
+    /**
+     * String 中index相关API演示
+     */
+    private static void testIndexAPIs() {
+        System.out.println(&quot;-------------------------------- testIndexAPIs --------------------------------&quot;);
+
+        String istr = &quot;abcAbcABCabCaBcAbCaBCabc&quot;;
+        System.out.printf(&quot;istr=%s\n&quot;, istr);
+
+        // 1. 从前往后，找出‘a’第一次出现的位置
+        System.out.printf(&quot;%-30s = %d\n&quot;, &quot;istr.indexOf((int)&apos;a&apos;)&quot;, istr.indexOf((int)&apos;a&apos;));
+
+        // 2. 从位置5开始，从前往后，找出‘a’第一次出现的位置
+        System.out.printf(&quot;%-30s = %d\n&quot;, &quot;istr.indexOf((int)&apos;a&apos;, 5)&quot;, istr.indexOf((int)&apos;a&apos;, 5));
+
+        // 3. 从后往前，找出‘a’第一次出现的位置
+        System.out.printf(&quot;%-30s = %d\n&quot;, &quot;istr.lastIndexOf((int)&apos;a&apos;)&quot;, istr.lastIndexOf((int)&apos;a&apos;));
+
+        // 4. 从位置10开始，从后往前，找出‘a’第一次出现的位置
+        System.out.printf(&quot;%-30s = %d\n&quot;, &quot;istr.lastIndexOf((int)&apos;a&apos;, 10)&quot;, istr.lastIndexOf((int)&apos;a&apos;, 10));
+
+
+        // 5. 从前往后，找出&quot;bc&quot;第一次出现的位置
+        System.out.printf(&quot;%-30s = %d\n&quot;, &quot;istr.indexOf(\&quot;bc\&quot;)&quot;, istr.indexOf(&quot;bc&quot;));
+
+        // 6. 从位置5开始，从前往后，找出&quot;bc&quot;第一次出现的位置
+        System.out.printf(&quot;%-30s = %d\n&quot;, &quot;istr.indexOf(\&quot;bc\&quot;, 5)&quot;, istr.indexOf(&quot;bc&quot;, 5));
+
+        // 7. 从后往前，找出&quot;bc&quot;第一次出现的位置
+        System.out.printf(&quot;%-30s = %d\n&quot;, &quot;istr.lastIndexOf(\&quot;bc\&quot;)&quot;, istr.lastIndexOf(&quot;bc&quot;));
+
+        // 8. 从位置4开始，从后往前，找出&quot;bc&quot;第一次出现的位置
+        System.out.printf(&quot;%-30s = %d\n&quot;, &quot;istr.lastIndexOf(\&quot;bc\&quot;, 4)&quot;, istr.lastIndexOf(&quot;bc&quot;, 4));
+
+        System.out.println();
+    }
+}
+</code></pre><p>运行结果：</p>
+<pre><code>-------------------------------- testIndexAPIs --------------------------------
+istr=abcAbcABCabCaBcAbCaBCabc
+istr.indexOf((int)&apos;a&apos;)         = 0
+istr.indexOf((int)&apos;a&apos;, 5)      = 9
+istr.lastIndexOf((int)&apos;a&apos;)     = 21
+istr.lastIndexOf((int)&apos;a&apos;, 10) = 9
+istr.indexOf(&quot;bc&quot;)             = 1
+istr.indexOf(&quot;bc&quot;, 5)          = 22
+istr.lastIndexOf(&quot;bc&quot;)         = 22
+istr.lastIndexOf(&quot;bc&quot;, 4)      = 4
+</code></pre><h2 id="3-5-String-“比较”操作的API"><a href="#3-5-String-“比较”操作的API" class="headerlink" title="3.5 String “比较”操作的API"></a>3.5 String “比较”操作的API</h2><p>源码如下(StringCompareTest.java):</p>
+<pre><code>/**
+ * String 中比较相关API演示
+ *
+ * @author skywang
+ */
+
+public class StringCompareTest {
+
+    public static void main(String[] args) {
+        testCompareAPIs() ;
+    }
+
+    /**
+     * String 中比较相关API演示
+     */
+    private static void testCompareAPIs() {
+        System.out.println(&quot;-------------------------------- testCompareAPIs ------------------------------&quot;);
+
+        //String str = &quot;abcdefghijklmnopqrstuvwxyz&quot;;
+        String str = &quot;abcAbcABCabCAbCabc&quot;;
+        System.out.printf(&quot;str=%s\n&quot;, str);
+
+        // 1. 比较“2个String是否相等”
+        System.out.printf(&quot;%-50s = %b\n&quot;, 
+                &quot;str.equals(\&quot;abcAbcABCabCAbCabc\&quot;)&quot;, 
+                str.equals(&quot;abcAbcABCabCAbCabc&quot;));
+
+        // 2. 比较“2个String是否相等(忽略大小写)”
+        System.out.printf(&quot;%-50s = %b\n&quot;, 
+                &quot;str.equalsIgnoreCase(\&quot;ABCABCABCABCABCABC\&quot;)&quot;, 
+                str.equalsIgnoreCase(&quot;ABCABCABCABCABCABC&quot;));
+
+        // 3. 比较“2个String的大小”
+        System.out.printf(&quot;%-40s = %d\n&quot;, &quot;str.compareTo(\&quot;abce\&quot;)&quot;, str.compareTo(&quot;abce&quot;));
+
+        // 4. 比较“2个String的大小(忽略大小写)”
+        System.out.printf(&quot;%-40s = %d\n&quot;, &quot;str.compareToIgnoreCase(\&quot;ABC\&quot;)&quot;, str.compareToIgnoreCase(&quot;ABC&quot;));
+
+        // 5. 字符串的开头是不是&quot;ab&quot;
+        System.out.printf(&quot;%-40s = %b\n&quot;, &quot;str.startsWith(\&quot;ab\&quot;)&quot;, str.startsWith(&quot;ab&quot;));
+
+        // 6. 字符串的从位置3开头是不是&quot;ab&quot;
+        System.out.printf(&quot;%-40s = %b\n&quot;, &quot;str.startsWith(\&quot;Ab\&quot;)&quot;, str.startsWith(&quot;Ab&quot;, 3));
+
+        // 7. 字符串的结尾是不是&quot;bc&quot;
+        System.out.printf(&quot;%-40s = %b\n&quot;, &quot;str.endsWith(\&quot;bc\&quot;)&quot;, str.endsWith(&quot;bc&quot;));
+
+        // 8. 字符串的是不是包含&quot;ABC&quot;
+        System.out.printf(&quot;%-40s = %b\n&quot;, &quot;str.contains(\&quot;ABC\&quot;)&quot;, str.contains(&quot;ABC&quot;));
+
+        // 9. 比较2个字符串的部分内容
+        String region1 = str.substring(2, str.length());    // 获取str位置3(包括)到末尾(不包括)的子字符串
+        // 将“str中从位置2开始的字符串”和“region1中位置0开始的字符串”进行比较，比较长度是5。
+        System.out.printf(&quot;regionMatches(%s) = %b\n&quot;, region1, 
+                str.regionMatches(2, region1, 0, 5));
+
+        // 10. 比较2个字符串的部分内容(忽略大小写)
+        String region2 = region1.toUpperCase();    // 将region1转换为大写
+        String region3 = region1.toLowerCase();    // 将region1转换为小写
+        System.out.printf(&quot;regionMatches(%s) = %b\n&quot;, region2, 
+                str.regionMatches(2, region2, 0, 5));
+        System.out.printf(&quot;regionMatches(%s) = %b\n&quot;, region3, 
+                str.regionMatches(2, region3, 0, 5));
+
+        // 11. 比较“String”和“StringBuffer”的内容是否相等
+        System.out.printf(&quot;%-60s = %b\n&quot;, 
+                &quot;str.contentEquals(new StringBuffer(\&quot;abcAbcABCabCAbCabc\&quot;))&quot;, 
+                str.contentEquals(new StringBuffer(&quot;abcAbcABCabCAbCabc&quot;)));
+
+        // 12. 比较“String”和“StringBuilder”的内容是否相等
+        System.out.printf(&quot;%-60s = %b\n&quot;, 
+                &quot;str.contentEquals(new StringBuilder(\&quot;abcAbcABCabCAbCabc\&quot;))&quot;, 
+                str.contentEquals(new StringBuilder(&quot;abcAbcABCabCAbCabc&quot;)));
+
+        // 13. match()测试程序
+        // 正则表达式 xxx.xxx.xxx.xxx，其中xxx中x的取值可以是0～9，xxx中有1～3位。
+        String reg_ipv4 = &quot;[0-9]{3}(\\.[0-9]{1,3}){3}&quot;;    
+
+        String ipv4addr1 = &quot;192.168.1.102&quot;;
+        String ipv4addr2 = &quot;192.168&quot;;
+        System.out.printf(&quot;%-40s = %b\n&quot;, &quot;ipv4addr1.matches()&quot;, ipv4addr1.matches(reg_ipv4));
+        System.out.printf(&quot;%-40s = %b\n&quot;, &quot;ipv4addr2.matches()&quot;, ipv4addr2.matches(reg_ipv4));
+
+        System.out.println();
+    }
+}
+</code></pre><p>运行结果：</p>
+<pre><code>-------------------------------- testCompareAPIs ------------------------------
+str=abcAbcABCabCAbCabc
+str.equals(&quot;abcAbcABCabCAbCabc&quot;)                   = true
+str.equalsIgnoreCase(&quot;ABCABCABCABCABCABC&quot;)         = true
+str.compareTo(&quot;abce&quot;)                    = -36
+str.compareToIgnoreCase(&quot;ABC&quot;)           = 15
+str.startsWith(&quot;ab&quot;)                     = true
+str.startsWith(&quot;Ab&quot;)                     = true
+str.endsWith(&quot;bc&quot;)                       = true
+str.contains(&quot;ABC&quot;)                      = true
+regionMatches(cAbcABCabCAbCabc) = true
+regionMatches(CABCABCABCABCABC) = false
+regionMatches(cabcabcabcabcabc) = false
+str.contentEquals(new StringBuffer(&quot;abcAbcABCabCAbCabc&quot;))    = true
+str.contentEquals(new StringBuilder(&quot;abcAbcABCabCAbCabc&quot;))   = true
+ipv4addr1.matches()                      = true
+ipv4addr2.matches()                      = false
+</code></pre><h2 id="3-6-String-“修改-追加-替换-截取-分割-”操作的API"><a href="#3-6-String-“修改-追加-替换-截取-分割-”操作的API" class="headerlink" title="3.6 String “修改(追加/替换/截取/分割)”操作的API"></a>3.6 String “修改(追加/替换/截取/分割)”操作的API</h2><p>源码如下(StringModifyTest.java):</p>
+<pre><code>/**
+ * String 中 修改(追加/替换/截取/分割)字符串的相关API演示
+ *
+ * @author skywang
+ */
+
+public class StringModifyTest {
+
+    public static void main(String[] args) {
+        testModifyAPIs() ;
+    }
+
+    /**
+     * String 中 修改(追加/替换/截取/分割)字符串的相关API演示
+     */
+    private static void testModifyAPIs() {
+        System.out.println(&quot;-------------------------------- testModifyAPIs -------------------------------&quot;);
+
+        String str = &quot; abcAbcABCabCAbCabc &quot;;
+        System.out.printf(&quot;str=%s, len=%d\n&quot;, str, str.length());
+
+        // 1.追加
+        // 将&quot;123&quot;追加到str之后
+        System.out.printf(&quot;%-30s = %s\n&quot;, &quot;str.concat(\&quot;123\&quot;)&quot;, 
+                str.concat(&quot;123&quot;));
+
+        // 2.截取
+        // 截取str中从位置7(包括)开始的元素。
+        System.out.printf(&quot;%-30s = %s\n&quot;, &quot;str.substring(7)&quot;, str.substring(7));
+        // 截取str中从位置7(包括)到位置10(不包括)之间的元素。
+        System.out.printf(&quot;%-30s = %s\n&quot;, &quot;str.substring(7, 10)&quot;, str.substring(7, 10));
+        // 删除str中首位的空格，并返回。
+        System.out.printf(&quot;%-30s = %s, len=%d\n&quot;, &quot;str.trim()&quot;, str.trim(), str.trim().length());
+
+        // 3.替换
+        // 将str中的 “字符‘a’” 全部替换为 “字符‘_’”
+        System.out.printf(&quot;%-30s = %s\n&quot;, &quot;str.replace(&apos;a&apos;, &apos;M&apos;)&quot;, str.replace(&apos;a&apos;, &apos;_&apos;));
+        // 将str中的第一次出现的“字符串“a”” 替换为 “字符串“###””
+        System.out.printf(&quot;%-30s = %s\n&quot;, &quot;str.replaceFirst(\&quot;a\&quot;, \&quot;###\&quot;)&quot;, str.replaceFirst(&quot;a&quot;, &quot;###&quot;));
+        // 将str中的 “字符串“a”” 全部替换为 “字符串“$$$””
+        System.out.printf(&quot;%-30s = %s\n&quot;, &quot;str.replace(\&quot;a\&quot;, \&quot;$$$\&quot;)&quot;, str.replace(&quot;a&quot;, &quot;$$$&quot;));
+
+        // 4.分割
+        // 以“b”作为分隔符，对str进行分割
+        String[] splits = str.split(&quot;b&quot;);
+        for (int i=0; i&lt;splits.length; i++) {
+            System.out.printf(&quot;splits[%d]=%s\n&quot;, i, splits[i]);
+        }
+
+        System.out.println();
+    }
+}
+</code></pre><p>运行结果：</p>
+<pre><code>-------------------------------- testModifyAPIs -------------------------------
+str= abcAbcABCabCAbCabc , len=20
+str.concat(&quot;123&quot;)              =  abcAbcABCabCAbCabc 123
+str.substring(7)               = ABCabCAbCabc 
+str.substring(7, 10)           = ABC
+str.trim()                     = abcAbcABCabCAbCabc, len=18
+str.replace(&apos;a&apos;, &apos;M&apos;)          =  _bcAbcABC_bCAbC_bc 
+str.replaceFirst(&quot;a&quot;, &quot;###&quot;)   =  ###bcAbcABCabCAbCabc 
+str.replace(&quot;a&quot;, &quot;$$$&quot;)        =  $$$bcAbcABC$$$bCAbC$$$bc 
+splits[0]= a
+splits[1]=cA
+splits[2]=cABCa
+splits[3]=CA
+splits[4]=Ca
+splits[5]=c 
+</code></pre><h2 id="3-7-String-操作Unicode的API"><a href="#3-7-String-操作Unicode的API" class="headerlink" title="3.7 String 操作Unicode的API"></a>3.7 String 操作Unicode的API</h2><p>源码如下(StringUnicodeTest.java):</p>
+<pre><code>/**
+ * String 中与unicode相关的API
+ *
+ * @author skywang
+ */
+
+public class StringUnicodeTest {
+
+    public static void main(String[] args) {
+        testUnicodeAPIs() ;
+    }
+
+    /**
+     * String 中与unicode相关的API
+     */
+    private static void testUnicodeAPIs() {
+        System.out.println(&quot;-------------------------------- testUnicodeAPIs ------------------------------&quot;);
+
+        String ustr = new String(new int[] {0x5b57, 0x7b26, 0x7f16, 0x7801}, 0, 4);  // &quot;字符编码&quot;(\u5b57是‘字’的unicode编码)。0表示起始位置，4表示长度。
+        System.out.printf(&quot;ustr=%s\n&quot;, ustr);
+
+        //  获取位置0的元素对应的unciode编码
+        System.out.printf(&quot;%-30s = 0x%x\n&quot;, &quot;ustr.codePointAt(0)&quot;, ustr.codePointAt(0));
+
+        // 获取位置2之前的元素对应的unciode编码
+        System.out.printf(&quot;%-30s = 0x%x\n&quot;, &quot;ustr.codePointBefore(2)&quot;, ustr.codePointBefore(2));
+
+        // 获取位置1开始偏移2个代码点的索引
+        System.out.printf(&quot;%-30s = %d\n&quot;, &quot;ustr.offsetByCodePoints(1, 2)&quot;, ustr.offsetByCodePoints(1, 2));
+
+        // 获取第0~3个元素之间的unciode编码的个数
+        System.out.printf(&quot;%-30s = %d\n&quot;, &quot;ustr.codePointCount(0, 3)&quot;, ustr.codePointCount(0, 3));
+
+        System.out.println();
+    }
+}
+</code></pre><p>运行结果：</p>
+<pre><code>-------------------------------- testUnicodeAPIs ------------------------------
+ustr=字符编码
+ustr.codePointAt(0)            = 0x5b57
+ustr.codePointBefore(2)        = 0x7b26
+ustr.offsetByCodePoints(1, 2)  = 3
+ustr.codePointCount(0, 3)      = 3
+</code></pre><h2 id="3-8-String-剩余的API"><a href="#3-8-String-剩余的API" class="headerlink" title="3.8 String 剩余的API"></a>3.8 String 剩余的API</h2><p>源码如下(StringOtherTest.java):</p>
+<pre><code>/**
+ * String 中其它的API
+ *
+ * @author skywang
+ */
+
+public class StringOtherTest {
+
+    public static void main(String[] args) {
+        testOtherAPIs() ;
+    }
+
+    /**
+     * String 中其它的API
+     */
+    private static void testOtherAPIs() {
+        System.out.println(&quot;-------------------------------- testOtherAPIs --------------------------------&quot;);
+
+        String str = &quot;0123456789&quot;;
+        System.out.printf(&quot;str=%s\n&quot;, str);
+
+        // 1. 字符串长度
+        System.out.printf(&quot;%s = %d\n&quot;, &quot;str.length()&quot;, str.length());
+
+        // 2. 字符串是否为空
+        System.out.printf(&quot;%s = %b\n&quot;, &quot;str.isEmpty()&quot;, str.isEmpty());
+
+        // 3. [字节] 获取字符串对应的字节数组
+        byte[] barr = str.getBytes();
+        for (int i=0; i&lt;barr.length; i++) {
+               System.out.printf(&quot;barr[%d]=0x%x &quot;, i, barr[i]);
+        }
+        System.out.println();
+
+        // 4. [字符] 获取字符串位置4的字符
+        System.out.printf(&quot;%s = %c\n&quot;, &quot;str.charAt(4)&quot;, str.charAt(4));
+
+        // 5. [字符] 获取字符串对应的字符数组
+        char[] carr = str.toCharArray();
+        for (int i=0; i&lt;carr.length; i++) {
+               System.out.printf(&quot;carr[%d]=%c &quot;, i, carr[i]);
+        }
+        System.out.println();
+
+        // 6. [字符] 获取字符串中部分元素对应的字符数组
+        char[] carr2 = new char[3];
+        str.getChars(6, 9, carr2, 0);
+        for (int i=0; i&lt;carr2.length; i++) {
+               System.out.printf(&quot;carr2[%d]=%c &quot;, i, carr2[i]);
+        }
+        System.out.println();
+
+        // 7. [字符] 获取字符数组对应的字符串
+        System.out.printf(&quot;%s = %s\n&quot;, 
+                &quot;str.copyValueOf(new char[]{&apos;a&apos;,&apos;b&apos;,&apos;c&apos;,&apos;d&apos;,&apos;e&apos;})&quot;, 
+                String.copyValueOf(new char[]{&apos;a&apos;,&apos;b&apos;,&apos;c&apos;,&apos;d&apos;,&apos;e&apos;}));
+
+        // 8. [字符] 获取字符数组中部分元素对应的字符串
+        System.out.printf(&quot;%s = %s\n&quot;, 
+                &quot;str.copyValueOf(new char[]{&apos;a&apos;,&apos;b&apos;,&apos;c&apos;,&apos;d&apos;,&apos;e&apos;}, 1, 4)&quot;, 
+                String.copyValueOf(new char[]{&apos;a&apos;,&apos;b&apos;,&apos;c&apos;,&apos;d&apos;,&apos;e&apos;}, 1, 4));
+
+        // 9. format()示例，将对象数组按指定格式转换为字符串
+        System.out.printf(&quot;%s = %s\n&quot;, 
+                &quot;str.format()&quot;, 
+                String.format(&quot;%s-%d-%b&quot;, &quot;abc&quot;, 3, true));
+
+        System.out.println();
+    }
+}
+</code></pre><p>运行结果：</p>
+<pre><code>-------------------------------- testOtherAPIs --------------------------------
+str=0123456789
+str.length() = 10
+str.isEmpty() = false
+barr[0]=0x30 barr[1]=0x31 barr[2]=0x32 barr[3]=0x33 barr[4]=0x34 barr[5]=0x35 barr[6]=0x36 barr[7]=0x37 barr[8]=0x38 barr[9]=0x39 
+str.charAt(4) = 4
+carr[0]=0 carr[1]=1 carr[2]=2 carr[3]=3 carr[4]=4 carr[5]=5 carr[6]=6 carr[7]=7 carr[8]=8 carr[9]=9 
+carr2[0]=6 carr2[1]=7 carr2[2]=8 
+str.copyValueOf(new char[]{&apos;a&apos;,&apos;b&apos;,&apos;c&apos;,&apos;d&apos;,&apos;e&apos;}) = abcde
+str.copyValueOf(new char[]{&apos;a&apos;,&apos;b&apos;,&apos;c&apos;,&apos;d&apos;,&apos;e&apos;}, 1, 4) = bcde
+str.format() = abc-3-true
+</code></pre><p><a name="anchor4"></a></p>
+<h1 id="4-String-完整示例"><a href="#4-String-完整示例" class="headerlink" title="4. String 完整示例"></a>4. String 完整示例</h1><p>下面的示例是整合上面的几个示例的完整的String演示程序，源码如下(StringAPITest.java):</p>
+<pre><code>/**
+ * String 演示程序
+ *
+ * @author skywang
+ */
+import java.util.HashMap;
+import java.nio.charset.Charset;
+import java.io.UnsupportedEncodingException;
+
+public class StringAPITest {
+
+    public static void main(String[] args) {
+        testStringConstructors() ; // String 构造函数测试程序
+        testValueAPIs() ;          // String 的valueOf()演示程序
+        testIndexAPIs() ;          // String 中index相关API演示
+        testCompareAPIs() ;        // String 中比较相关API演示
+        testModifyAPIs() ;         // String 中 修改(追加/替换/截取/分割)字符串的相关API演示
+        testUnicodeAPIs() ;        // String 中与unicode相关的API
+        testOtherAPIs() ;          // String 中其它的API
+    }
+
+    /**
+     * String 构造函数测试程序
+     */
+    private static void testStringConstructors() {
+        try {
+            System.out.println(&quot;-------------------------------- testStringConstructors -----------------------&quot;);
+
+            String str01 = new String();
+            String str02 = new String(&quot;String02&quot;);
+            String str03 = new String(new char[]{&apos;s&apos;,&apos;t&apos;,&apos;r&apos;,&apos;0&apos;,&apos;3&apos;});
+            String str04 = new String(new char[]{&apos;s&apos;,&apos;t&apos;,&apos;r&apos;,&apos;0&apos;,&apos;4&apos;}, 1, 3);          // 1表示起始位置，3表示个数
+            String str05 = new String(new byte[]{0x61, 0x62, 0x63, 0x64, 0x65});       // 0x61在ASC表中，对应字符&quot;a&quot;; 1表示起始位置，3表示长度
+            String str06 = new String(new byte[]{0x61, 0x62, 0x63, 0x64, 0x65}, 1, 3); // 0x61在ASC表中，对应字符&quot;a&quot;; 1表示起始位置，3表示长度
+            String str07 = new String(new byte[]{0x61, 0x62, 0x63, 0x64, 0x65}, 0);       // 0x61在ASC表中，对应字符&quot;a&quot;;0，表示“高字节”
+            String str08 = new String(new byte[]{0x61, 0x62, 0x63, 0x64, 0x65}, 0, 1, 3); // 0x61在ASC表中，对应字符&quot;a&quot;; 0，表示“高字节”；1表示起始位置，3表示长度
+            String str09 = new String(new byte[]{(byte)0xe5, (byte)0xad, (byte)0x97, /* 字-对应的utf-8编码 */ 
+                                                 (byte)0xe7, (byte)0xac, (byte)0xa6, /* 符-对应的utf-8编码 */ 
+                                                 (byte)0xe7, (byte)0xbc, (byte)0x96, /* 编-对应的utf-8编码 */ 
+                                                 (byte)0xe7, (byte)0xa0, (byte)0x81, /* 码-对应的utf-8编码 */ }, 
+                                      0, 12, &quot;utf-8&quot;);  // 0表示起始位置，12表示长度。
+            String str10 = new String(new byte[]{(byte)0x5b, (byte)0x57, /* 字-对应的utf-16编码 */ 
+                                                 (byte)0x7b, (byte)0x26, /* 符-对应的utf-16编码 */ 
+                                                 (byte)0x7f, (byte)0x16, /* 编-对应的utf-16编码 */ 
+                                                 (byte)0x78, (byte)0x01, /* 码-对应的utf-16编码 */ }, 
+                                      0, 8, &quot;utf-16&quot;);  // 0表示起始位置，8表示长度。
+            String str11 = new String(new byte[]{(byte)0xd7, (byte)0xd6, /* 字-对应的gb2312编码  */ 
+                                                 (byte)0xb7, (byte)0xfb, /* 符-对应的gb2312编码 */ 
+                                                 (byte)0xb1, (byte)0xe0, /* 编-对应的gb2312编码 */ 
+                                                 (byte)0xc2, (byte)0xeb, /* 码-对应的gb2312编码 */ }, 
+                                      Charset.forName(&quot;gb2312&quot;)); 
+            String str12 = new String(new byte[]{(byte)0xd7, (byte)0xd6, /* 字-对应的gbk编码 */ 
+                                                 (byte)0xb7, (byte)0xfb, /* 符-对应的gbk编码 */ 
+                                                 (byte)0xb1, (byte)0xe0, /* 编-对应的gbk编码 */ 
+                                                 (byte)0xc2, (byte)0xeb, /* 码-对应的gbk编码 */ }, 
+                                      0, 8, Charset.forName(&quot;gbk&quot;)); 
+            String str13 = new String(new int[] {0x5b57, 0x7b26, 0x7f16, 0x7801}, 0, 4);  // &quot;字符编码&quot;(\u5b57是‘字’的unicode编码)。0表示起始位置，4表示长度。
+            String str14 = new String(new StringBuffer(&quot;StringBuffer&quot;));
+            String str15 = new String(new StringBuilder(&quot;StringBuilder&quot;));
+
+            System.out.printf(&quot; str01=%s \n str02=%s \n str03=%s \n str04=%s \n str05=%s \n str06=%s \n str07=%s \n str08=%s\n str09=%s\n str10=%s\n str11=%s\n str12=%s\n str13=%s\n str14=%s\n str15=%s\n&quot;,
+                    str01, str02, str03, str04, str05, str06, str07, str08, str09, str10, str11, str12, str13, str14, str15);
+
+
+            System.out.println();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * String 中其它的API
+     */
+    private static void testOtherAPIs() {
+        System.out.println(&quot;-------------------------------- testOtherAPIs --------------------------------&quot;);
+
+        String str = &quot;0123456789&quot;;
+        System.out.printf(&quot;str=%s\n&quot;, str);
+
+        // 1. 字符串长度
+        System.out.printf(&quot;%s = %d\n&quot;, &quot;str.length()&quot;, str.length());
+
+        // 2. 字符串是否为空
+        System.out.printf(&quot;%s = %b\n&quot;, &quot;str.isEmpty()&quot;, str.isEmpty());
+
+        // 3. [字节] 获取字符串对应的字节数组
+        byte[] barr = str.getBytes();
+        for (int i=0; i&lt;barr.length; i++) {
+               System.out.printf(&quot;barr[%d]=0x%x &quot;, i, barr[i]);
+        }
+        System.out.println();
+
+        // 4. [字符] 获取字符串位置4的字符
+        System.out.printf(&quot;%s = %c\n&quot;, &quot;str.charAt(4)&quot;, str.charAt(4));
+
+        // 5. [字符] 获取字符串对应的字符数组
+        char[] carr = str.toCharArray();
+        for (int i=0; i&lt;carr.length; i++) {
+               System.out.printf(&quot;carr[%d]=%c &quot;, i, carr[i]);
+        }
+        System.out.println();
+
+        // 6. [字符] 获取字符串中部分元素对应的字符数组
+        char[] carr2 = new char[3];
+        str.getChars(6, 9, carr2, 0);
+        for (int i=0; i&lt;carr2.length; i++) {
+               System.out.printf(&quot;carr2[%d]=%c &quot;, i, carr2[i]);
+        }
+        System.out.println();
+
+        // 7. [字符] 获取字符数组对应的字符串
+        System.out.printf(&quot;%s = %s\n&quot;, 
+                &quot;str.copyValueOf(new char[]{&apos;a&apos;,&apos;b&apos;,&apos;c&apos;,&apos;d&apos;,&apos;e&apos;})&quot;, 
+                String.copyValueOf(new char[]{&apos;a&apos;,&apos;b&apos;,&apos;c&apos;,&apos;d&apos;,&apos;e&apos;}));
+
+        // 8. [字符] 获取字符数组中部分元素对应的字符串
+        System.out.printf(&quot;%s = %s\n&quot;, 
+                &quot;str.copyValueOf(new char[]{&apos;a&apos;,&apos;b&apos;,&apos;c&apos;,&apos;d&apos;,&apos;e&apos;}, 1, 4)&quot;, 
+                String.copyValueOf(new char[]{&apos;a&apos;,&apos;b&apos;,&apos;c&apos;,&apos;d&apos;,&apos;e&apos;}, 1, 4));
+
+        // 9. format()示例，将对象数组按指定格式转换为字符串
+        System.out.printf(&quot;%s = %s\n&quot;, 
+                &quot;str.format()&quot;, 
+                String.format(&quot;%s-%d-%b&quot;, &quot;abc&quot;, 3, true));
+
+        System.out.println();
+    }
+
+    /**
+     * String 中 修改(追加/替换/截取/分割)字符串的相关API演示
+     */
+    private static void testModifyAPIs() {
+        System.out.println(&quot;-------------------------------- testModifyAPIs -------------------------------&quot;);
+
+        String str = &quot; abcAbcABCabCAbCabc &quot;;
+        System.out.printf(&quot;%s, len=%d\n&quot;, str, str.length());
+
+        // 1.追加
+        // 将&quot;123&quot;追加到str之后
+        System.out.printf(&quot;%-30s = %s\n&quot;, &quot;str.concat(\&quot;123\&quot;)&quot;, 
+                str.concat(&quot;123&quot;));
+
+        // 2.截取
+        // 截取str中从位置7(包括)开始的元素。
+        System.out.printf(&quot;%-30s = %s\n&quot;, &quot;str.substring(7)&quot;, str.substring(7));
+        // 截取str中从位置7(包括)到位置10(不包括)之间的元素。
+        System.out.printf(&quot;%-30s = %s\n&quot;, &quot;str.substring(7, 10)&quot;, str.substring(7, 10));
+        // 删除str中首位的空格，并返回。
+        System.out.printf(&quot;%-30s = %s, len=%d\n&quot;, &quot;str.trim()&quot;, str.trim(), str.trim().length());
+
+        // 3.替换
+        // 将str中的 “字符‘a’” 全部替换为 “字符‘_’”
+        System.out.printf(&quot;%-30s = %s\n&quot;, &quot;str.replace(&apos;a&apos;, &apos;M&apos;)&quot;, str.replace(&apos;a&apos;, &apos;_&apos;));
+        // 将str中的第一次出现的“字符串“a”” 替换为 “字符串“###””
+        System.out.printf(&quot;%-30s = %s\n&quot;, &quot;str.replaceFirst(\&quot;a\&quot;, \&quot;###\&quot;)&quot;, str.replaceFirst(&quot;a&quot;, &quot;###&quot;));
+        // 将str中的 “字符串“a”” 全部替换为 “字符串“$$$””
+        System.out.printf(&quot;%-30s = %s\n&quot;, &quot;str.replace(\&quot;a\&quot;, \&quot;$$$\&quot;)&quot;, str.replace(&quot;a&quot;, &quot;$$$&quot;));
+
+        // 4.分割
+        // 以“b”作为分隔符，对str进行分割
+        String[] splits = str.split(&quot;b&quot;);
+        for (int i=0; i&lt;splits.length; i++) {
+            System.out.printf(&quot;splits[%d]=%s\n&quot;, i, splits[i]);
+        }
+
+        System.out.println();
+    }
+
+
+    /**
+     * String 中比较相关API演示
+     */
+    private static void testCompareAPIs() {
+        System.out.println(&quot;-------------------------------- testCompareAPIs ------------------------------&quot;);
+
+        //String str = &quot;abcdefghijklmnopqrstuvwxyz&quot;;
+        String str = &quot;abcAbcABCabCAbCabc&quot;;
+        System.out.printf(&quot;%s\n&quot;, str);
+
+        // 1. 比较“2个String是否相等”
+        System.out.printf(&quot;%-50s = %b\n&quot;, 
+                &quot;str.equals(\&quot;abcAbcABCabCAbCabc\&quot;)&quot;, 
+                str.equals(&quot;abcAbcABCabCAbCabc&quot;));
+
+        // 2. 比较“2个String是否相等(忽略大小写)”
+        System.out.printf(&quot;%-50s = %b\n&quot;, 
+                &quot;str.equalsIgnoreCase(\&quot;ABCABCABCABCABCABC\&quot;)&quot;, 
+                str.equalsIgnoreCase(&quot;ABCABCABCABCABCABC&quot;));
+
+        // 3. 比较“2个String的大小”
+        System.out.printf(&quot;%-40s = %d\n&quot;, &quot;str.compareTo(\&quot;abce\&quot;)&quot;, str.compareTo(&quot;abce&quot;));
+
+        // 4. 比较“2个String的大小(忽略大小写)”
+        System.out.printf(&quot;%-40s = %d\n&quot;, &quot;str.compareToIgnoreCase(\&quot;ABC\&quot;)&quot;, str.compareToIgnoreCase(&quot;ABC&quot;));
+
+        // 5. 字符串的开头是不是&quot;ab&quot;
+        System.out.printf(&quot;%-40s = %b\n&quot;, &quot;str.startsWith(\&quot;ab\&quot;)&quot;, str.startsWith(&quot;ab&quot;));
+
+        // 6. 字符串的从位置3开头是不是&quot;ab&quot;
+        System.out.printf(&quot;%-40s = %b\n&quot;, &quot;str.startsWith(\&quot;Ab\&quot;)&quot;, str.startsWith(&quot;Ab&quot;, 3));
+
+        // 7. 字符串的结尾是不是&quot;bc&quot;
+        System.out.printf(&quot;%-40s = %b\n&quot;, &quot;str.endsWith(\&quot;bc\&quot;)&quot;, str.endsWith(&quot;bc&quot;));
+
+        // 8. 字符串的是不是包含&quot;ABC&quot;
+        System.out.printf(&quot;%-40s = %b\n&quot;, &quot;str.contains(\&quot;ABC\&quot;)&quot;, str.contains(&quot;ABC&quot;));
+
+        // 9. 比较2个字符串的部分内容
+        String region1 = str.substring(2, str.length());    // 获取str位置3(包括)到末尾(不包括)的子字符串
+        // 将“str中从位置2开始的字符串”和“region1中位置0开始的字符串”进行比较，比较长度是5。
+        System.out.printf(&quot;regionMatches(%s) = %b\n&quot;, region1, 
+                str.regionMatches(2, region1, 0, 5));
+
+        // 10. 比较2个字符串的部分内容(忽略大小写)
+        String region2 = region1.toUpperCase();    // 将region1转换为大写
+        String region3 = region1.toLowerCase();    // 将region1转换为小写
+        System.out.printf(&quot;regionMatches(%s) = %b\n&quot;, region2, 
+                str.regionMatches(2, region2, 0, 5));
+        System.out.printf(&quot;regionMatches(%s) = %b\n&quot;, region3, 
+                str.regionMatches(2, region3, 0, 5));
+
+        // 11. 比较“String”和“StringBuffer”的内容是否相等
+        System.out.printf(&quot;%-60s = %b\n&quot;, 
+                &quot;str.contentEquals(new StringBuffer(\&quot;abcAbcABCabCAbCabc\&quot;))&quot;, 
+                str.contentEquals(new StringBuffer(&quot;abcAbcABCabCAbCabc&quot;)));
+
+        // 12. 比较“String”和“StringBuilder”的内容是否相等
+        System.out.printf(&quot;%-60s = %b\n&quot;, 
+                &quot;str.contentEquals(new StringBuilder(\&quot;abcAbcABCabCAbCabc\&quot;))&quot;, 
+                str.contentEquals(new StringBuilder(&quot;abcAbcABCabCAbCabc&quot;)));
+
+        // 13. match()测试程序
+        // 正则表达式 xxx.xxx.xxx.xxx，其中xxx中x的取值可以是0～9，xxx中有1～3位。
+        String reg_ipv4 = &quot;[0-9]{3}(\\.[0-9]{1,3}){3}&quot;;    
+
+        String ipv4addr1 = &quot;192.168.1.102&quot;;
+        String ipv4addr2 = &quot;192.168&quot;;
+        System.out.printf(&quot;%-40s = %b\n&quot;, &quot;ipv4addr1.matches()&quot;, ipv4addr1.matches(reg_ipv4));
+        System.out.printf(&quot;%-40s = %b\n&quot;, &quot;ipv4addr2.matches()&quot;, ipv4addr2.matches(reg_ipv4));
+
+        System.out.println();
+    }
+
+    /**
+     * String 的valueOf()演示程序
+     */
+    private static void testValueAPIs() {
+        System.out.println(&quot;-------------------------------- testValueAPIs --------------------------------&quot;);
+        // 1. String    valueOf(Object obj)
+        //  实际上，返回的是obj.toString();
+        HashMap map = new HashMap();
+        map.put(&quot;1&quot;, &quot;one&quot;);
+        map.put(&quot;2&quot;, &quot;two&quot;);
+        map.put(&quot;3&quot;, &quot;three&quot;);
+        System.out.printf(&quot;%-50s = %s\n&quot;, &quot;String.valueOf(map)&quot;, String.valueOf(map));
+
+        // 2.String    valueOf(boolean b)
+        System.out.printf(&quot;%-50s = %s\n&quot;, &quot;String.valueOf(true)&quot;, String.valueOf(true));
+
+        // 3.String    valueOf(char c)
+        System.out.printf(&quot;%-50s = %s\n&quot;, &quot;String.valueOf(&apos;m&apos;)&quot;, String.valueOf(&apos;m&apos;));
+
+        // 4.String    valueOf(int i)
+        System.out.printf(&quot;%-50s = %s\n&quot;, &quot;String.valueOf(96)&quot;, String.valueOf(96));
+
+        // 5.String    valueOf(long l)
+        System.out.printf(&quot;%-50s = %s\n&quot;, &quot;String.valueOf(12345L)&quot;, String.valueOf(12345L));
+
+        // 6.String    valueOf(float f)
+        System.out.printf(&quot;%-50s = %s\n&quot;, &quot;String.valueOf(1.414f)&quot;, String.valueOf(1.414f));
+
+        // 7.String    valueOf(double d)
+        System.out.printf(&quot;%-50s = %s\n&quot;, &quot;String.valueOf(3.14159d)&quot;, String.valueOf(3.14159d));
+
+        // 8.String    valueOf(char[] data)
+        System.out.printf(&quot;%-50s = %s\n&quot;, &quot;String.valueOf(new char[]{&apos;s&apos;,&apos;k&apos;,&apos;y&apos;})&quot;, String.valueOf(new char[]{&apos;s&apos;,&apos;k&apos;,&apos;y&apos;}));
+
+        // 9.String    valueOf(char[] data, int offset, int count)
+        System.out.printf(&quot;%-50s = %s\n&quot;, &quot;String.valueOf(new char[]{&apos;s&apos;,&apos;k&apos;,&apos;y&apos;}, 0, 2)&quot;, String.valueOf(new char[]{&apos;s&apos;,&apos;k&apos;,&apos;y&apos;}, 0, 2));
+
+        System.out.println();
+    }
+
+    /**
+     * String 中index相关API演示
+     */
+    private static void testIndexAPIs() {
+        System.out.println(&quot;-------------------------------- testIndexAPIs --------------------------------&quot;);
+
+        String istr = &quot;abcAbcABCabCaBcAbCaBCabc&quot;;
+        System.out.printf(&quot;istr=%s\n&quot;, istr);
+
+        // 1. 从前往后，找出‘a’第一次出现的位置
+        System.out.printf(&quot;%-30s = %d\n&quot;, &quot;istr.indexOf((int)&apos;a&apos;)&quot;, istr.indexOf((int)&apos;a&apos;));
+
+        // 2. 从位置5开始，从前往后，找出‘a’第一次出现的位置
+        System.out.printf(&quot;%-30s = %d\n&quot;, &quot;istr.indexOf((int)&apos;a&apos;, 5)&quot;, istr.indexOf((int)&apos;a&apos;, 5));
+
+        // 3. 从后往前，找出‘a’第一次出现的位置
+        System.out.printf(&quot;%-30s = %d\n&quot;, &quot;istr.lastIndexOf((int)&apos;a&apos;)&quot;, istr.lastIndexOf((int)&apos;a&apos;));
+
+        // 4. 从位置10开始，从后往前，找出‘a’第一次出现的位置
+        System.out.printf(&quot;%-30s = %d\n&quot;, &quot;istr.lastIndexOf((int)&apos;a&apos;, 10)&quot;, istr.lastIndexOf((int)&apos;a&apos;, 10));
+
+
+        // 5. 从前往后，找出&quot;bc&quot;第一次出现的位置
+        System.out.printf(&quot;%-30s = %d\n&quot;, &quot;istr.indexOf(\&quot;bc\&quot;)&quot;, istr.indexOf(&quot;bc&quot;));
+
+        // 6. 从位置5开始，从前往后，找出&quot;bc&quot;第一次出现的位置
+        System.out.printf(&quot;%-30s = %d\n&quot;, &quot;istr.indexOf(\&quot;bc\&quot;, 5)&quot;, istr.indexOf(&quot;bc&quot;, 5));
+
+        // 7. 从后往前，找出&quot;bc&quot;第一次出现的位置
+        System.out.printf(&quot;%-30s = %d\n&quot;, &quot;istr.lastIndexOf(\&quot;bc\&quot;)&quot;, istr.lastIndexOf(&quot;bc&quot;));
+
+        // 8. 从位置4开始，从后往前，找出&quot;bc&quot;第一次出现的位置
+        System.out.printf(&quot;%-30s = %d\n&quot;, &quot;istr.lastIndexOf(\&quot;bc\&quot;, 4)&quot;, istr.lastIndexOf(&quot;bc&quot;, 4));
+
+        System.out.println();
+    }
+
+    /**
+     * String 中与unicode相关的API
+     */
+    private static void testUnicodeAPIs() {
+        System.out.println(&quot;-------------------------------- testUnicodeAPIs ------------------------------&quot;);
+
+        String ustr = new String(new int[] {0x5b57, 0x7b26, 0x7f16, 0x7801}, 0, 4);  // &quot;字符编码&quot;(\u5b57是‘字’的unicode编码)。0表示起始位置，4表示长度。
+        System.out.printf(&quot;ustr=%s\n&quot;, ustr);
+
+        //  获取位置0的元素对应的unciode编码
+        System.out.printf(&quot;%-30s = 0x%x\n&quot;, &quot;ustr.codePointAt(0)&quot;, ustr.codePointAt(0));
+
+        // 获取位置2之前的元素对应的unciode编码
+        System.out.printf(&quot;%-30s = 0x%x\n&quot;, &quot;ustr.codePointBefore(2)&quot;, ustr.codePointBefore(2));
+
+        // 获取位置1开始的元素对应的unciode编码
+        System.out.printf(&quot;%-30s = %d\n&quot;, &quot;ustr.offsetByCodePoints(1, 2)&quot;, ustr.offsetByCodePoints(1, 2));
+
+        // 获取第0~3个元素之间的unciode编码的个数
+        System.out.printf(&quot;%-30s = %d\n&quot;, &quot;ustr.codePointCount(0, 3)&quot;, ustr.codePointCount(0, 3));
+
+        System.out.println();
+    }
+}
+</code></pre>
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2018-06-27T09:39:57.937Z" itemprop="dateUpdated">2018-06-27 17:39:57</time>
+</span><br>
+
+
+        
+        本文固定链接：<a href="/2017/04/01/java-source-analysis-charsequence-series/Java 字符串系列01 String和CharSequence详解/" target="_blank" rel="external">https://smuwjs.github.io/2017/04/01/java-source-analysis-charsequence-series/Java 字符串系列01 String和CharSequence详解/</a>
+        
+    </div>
+    <footer>
+        <a href="https://smuwjs.github.io">
+            <img src="/img/head.png" alt="Jeeson">
+            Jeeson
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java-字符串系列/">Java 字符串系列</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java源码分析/">Java源码分析</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2017/04/01/java-source-analysis-charsequence-series/Java 字符串系列01 String和CharSequence详解/&title=《Java 字符串系列01 String和CharSequence详解》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2017/04/01/java-source-analysis-charsequence-series/Java 字符串系列01 String和CharSequence详解/&title=《Java 字符串系列01 String和CharSequence详解》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2017/04/01/java-source-analysis-charsequence-series/Java 字符串系列01 String和CharSequence详解/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Java 字符串系列01 String和CharSequence详解》 — Jeeson's Blog&url=https://smuwjs.github.io/2017/04/01/java-source-analysis-charsequence-series/Java 字符串系列01 String和CharSequence详解/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2017/04/01/java-source-analysis-charsequence-series/Java 字符串系列01 String和CharSequence详解/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2017/04/02/java-source-analysis-charsequence-series/Java 字符串系列02 StringBuilder详解/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">Java 字符串系列02 StringBuilder详解</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2017/03/03/java-source-analysis-exception-series/Java异常(三) 《Java Puzzles》中关于异常的几个谜题/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Java异常(三) 《Java Puzzles》中关于异常的几个谜题</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="java-source-analysis-charsequence-series/Java 字符串系列01 String和CharSequence详解" data-title="Java 字符串系列01 String和CharSequence详解" data-url="https://smuwjs.github.io/2017/04/01/java-source-analysis-charsequence-series/Java 字符串系列01 String和CharSequence详解/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'smuwjs', theme: 'none'};
+lazyScripts.push('//unpkg.com/hexo-theme-material-indigo@latest/js/embed.min.js');
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循<a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>Jeeson &copy; 2015 - 2018</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2017/04/01/java-source-analysis-charsequence-series/Java 字符串系列01 String和CharSequence详解/&title=《Java 字符串系列01 String和CharSequence详解》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2017/04/01/java-source-analysis-charsequence-series/Java 字符串系列01 String和CharSequence详解/&title=《Java 字符串系列01 String和CharSequence详解》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2017/04/01/java-source-analysis-charsequence-series/Java 字符串系列01 String和CharSequence详解/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Java 字符串系列01 String和CharSequence详解》 — Jeeson's Blog&url=https://smuwjs.github.io/2017/04/01/java-source-analysis-charsequence-series/Java 字符串系列01 String和CharSequence详解/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2017/04/01/java-source-analysis-charsequence-series/Java 字符串系列01 String和CharSequence详解/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://smuwjs.github.io/2017/04/01/java-source-analysis-charsequence-series/Java 字符串系列01 String和CharSequence详解/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>Java 时间相关内容07 TimeZone | Jeeson&#39;s Blog | Write the code. Change the world.</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="Java源码分析,Java 时间相关内容">
+    <meta name="description" content="本章介绍TimeZone。   目录1. TimeZone 简介2. TimeZone示例      1. TimeZone 简介TimeZone 表示时区偏移量，也可以计算夏令时。在操作 Date, Calendar等表示日期/时间的对象时，经常会用到TimeZone；因为不同的时区，时间不同。 下面说说TimeZone对象的 2种常用创建方式。 (01) 获取默认的TimeZone对象 使用">
+<meta name="keywords" content="Java源码分析,Java 时间相关内容">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java 时间相关内容07 TimeZone">
+<meta property="og:url" content="https://smuwjs.github.io/2017/02/07/java-source-analysis-time-series/Java 时间相关内容07 TimeZone/index.html">
+<meta property="og:site_name" content="Jeeson&#39;s Blog">
+<meta property="og:description" content="本章介绍TimeZone。   目录1. TimeZone 简介2. TimeZone示例      1. TimeZone 简介TimeZone 表示时区偏移量，也可以计算夏令时。在操作 Date, Calendar等表示日期/时间的对象时，经常会用到TimeZone；因为不同的时区，时间不同。 下面说说TimeZone对象的 2种常用创建方式。 (01) 获取默认的TimeZone对象 使用">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-06-27T09:39:57.953Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java 时间相关内容07 TimeZone">
+<meta name="twitter:description" content="本章介绍TimeZone。   目录1. TimeZone 简介2. TimeZone示例      1. TimeZone 简介TimeZone 表示时区偏移量，也可以计算夏令时。在操作 Date, Calendar等表示日期/时间的对象时，经常会用到TimeZone；因为不同的时区，时间不同。 下面说说TimeZone对象的 2种常用创建方式。 (01) 获取默认的TimeZone对象 使用">
+    
+        <link rel="alternate" type="application/atom+xml" title="Jeeson&#39;s Blog" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/head.png">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Jeeson</h5>
+          <a href="mailto:smuwjs@163.com" title="smuwjs@163.com" class="mail">smuwjs@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/smuwjs" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Java 时间相关内容07 TimeZone</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Java 时间相关内容07 TimeZone</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2017-02-06T16:00:00.000Z" itemprop="datePublished" class="page-time">
+  2017-02-07
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#1-TimeZone-简介"><span class="post-toc-number">1.</span> <span class="post-toc-text">1. TimeZone 简介</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#2-TimeZone示例"><span class="post-toc-number">2.</span> <span class="post-toc-text">2. TimeZone示例</span></a></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-java-source-analysis-time-series/Java 时间相关内容07 TimeZone"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Java 时间相关内容07 TimeZone</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2017-02-07 00:00:00" datetime="2017-02-06T16:00:00.000Z"  itemprop="datePublished">2017-02-07</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <blockquote>
+<p>本章介绍TimeZone。</p>
+</blockquote>
+<blockquote>
+<p><strong>目录</strong><br><a href="#anchor1">1. TimeZone 简介</a><br><a href="#anchor2">2. TimeZone示例</a>   </p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="1-TimeZone-简介"><a href="#1-TimeZone-简介" class="headerlink" title="1. TimeZone 简介"></a>1. TimeZone 简介</h1><p>TimeZone 表示时区偏移量，也可以计算夏令时。<br>在操作 Date, Calendar等表示日期/时间的对象时，经常会用到TimeZone；因为不同的时区，时间不同。</p>
+<p>下面说说TimeZone对象的 2种常用创建方式。</p>
+<p>(01) 获取默认的TimeZone对象</p>
+<p>使用方法：</p>
+<pre><code>TimeZone tz = TimeZone.getDefault()
+</code></pre><p>(02) 使用 getTimeZone(String id) 方法获取TimeZone对象</p>
+<p>使用方法：</p>
+<pre><code>// 获取 “GMT+08:00”对应的时区
+TimeZone china = TimeZone.getTimeZone(&quot;GMT+:08:00&quot;);
+// 获取 “中国/重庆”对应的时区
+TimeZone chongqing = TimeZone.getTimeZone(&quot;Asia/Chongqing&quot;);
+</code></pre><p>关于 getTimeZone(String id) 这种方式支持的全部id参数的取值，可以通过以下方式查找：</p>
+<pre><code>String[] ids = TimeZone.getAvailableIDs();
+for (String id:ids) 
+    System.out.printf(id+&quot;, &quot;);
+</code></pre><p>输出结果：</p>
+<pre><code>Etc/GMT+12, Etc/GMT+11, Pacific/Midway, Pacific/Niue, Pacific/Pago_Pago, Pacific/Samoa, US/Samoa, America/Adak, America/Atka, Etc/GMT+10, HST, Pacific/Honolulu, Pacific/Johnston, Pacific/Rarotonga, Pacific/Tahiti, SystemV/HST10, US/Aleutian, US/Hawaii, Pacific/Marquesas, AST, America/Anchorage, America/Juneau, America/Nome, America/Sitka, America/Yakutat, Etc/GMT+9, Pacific/Gambier, SystemV/YST9, SystemV/YST9YDT, US/Alaska, America/Dawson, America/Ensenada, America/Los_Angeles, America/Metlakatla, America/Santa_Isabel, America/Tijuana, America/Vancouver, America/Whitehorse, Canada/Pacific, Canada/Yukon, Etc/GMT+8, Mexico/BajaNorte, PST, PST8PDT, Pacific/Pitcairn, SystemV/PST8, SystemV/PST8PDT, US/Pacific, US/Pacific-New, America/Boise, America/Cambridge_Bay, America/Chihuahua, America/Creston, America/Dawson_Creek, America/Denver, America/Edmonton, America/Hermosillo, America/Inuvik, America/Mazatlan, America/Ojinaga, America/Phoenix, America/Shiprock, America/Yellowknife, Canada/Mountain, Etc/GMT+7, MST, MST7MDT, Mexico/BajaSur, Navajo, PNT, SystemV/MST7, SystemV/MST7MDT, US/Arizona, US/Mountain, America/Bahia_Banderas, America/Belize, America/Cancun, America/Chicago, America/Costa_Rica, America/El_Salvador, America/Guatemala, America/Indiana/Knox, America/Indiana/Tell_City, America/Knox_IN, America/Managua, America/Matamoros, America/Menominee, America/Merida, America/Mexico_City, America/Monterrey, America/North_Dakota/Beulah, America/North_Dakota/Center, America/North_Dakota/New_Salem, America/Rainy_River, America/Rankin_Inlet, America/Regina, America/Resolute, America/Swift_Current, America/Tegucigalpa, America/Winnipeg, CST, CST6CDT, Canada/Central, Canada/East-Saskatchewan, Canada/Saskatchewan, Chile/EasterIsland, Etc/GMT+6, Mexico/General, Pacific/Easter, Pacific/Galapagos, SystemV/CST6, SystemV/CST6CDT, US/Central, US/Indiana-Starke, America/Atikokan, America/Bogota, America/Cayman, America/Coral_Harbour, America/Detroit, America/Fort_Wayne, America/Grand_Turk, America/Guayaquil, America/Havana, America/Indiana/Indianapolis, America/Indiana/Marengo, America/Indiana/Petersburg, America/Indiana/Vevay, America/Indiana/Vincennes, America/Indiana/Winamac, America/Indianapolis, America/Iqaluit, America/Jamaica, America/Kentucky/Louisville, America/Kentucky/Monticello, America/Lima, America/Louisville, America/Montreal, America/Nassau, America/New_York, America/Nipigon, America/Panama, America/Pangnirtung, America/Port-au-Prince, America/Thunder_Bay, America/Toronto, Canada/Eastern, Cuba, EST, EST5EDT, Etc/GMT+5, IET, Jamaica, SystemV/EST5, SystemV/EST5EDT, US/East-Indiana, US/Eastern, US/Michigan, America/Caracas, America/Anguilla, America/Antigua, America/Argentina/San_Luis, America/Aruba, America/Asuncion, America/Barbados, America/Blanc-Sablon, America/Boa_Vista, America/Campo_Grande, America/Cuiaba, America/Curacao, America/Dominica, America/Eirunepe, America/Glace_Bay, America/Goose_Bay, America/Grenada, America/Guadeloupe, America/Guyana, America/Halifax, America/Kralendijk, America/La_Paz, America/Lower_Princes, America/Manaus, America/Marigot, America/Martinique, America/Moncton, America/Montserrat, America/Port_of_Spain, America/Porto_Acre, America/Porto_Velho, America/Puerto_Rico, America/Rio_Branco, America/Santiago, America/Santo_Domingo, America/St_Barthelemy, America/St_Kitts, America/St_Lucia, America/St_Thomas, America/St_Vincent, America/Thule, America/Tortola, America/Virgin, Antarctica/Palmer, Atlantic/Bermuda, Brazil/Acre, Brazil/West, Canada/Atlantic, Chile/Continental, Etc/GMT+4, PRT, SystemV/AST4, SystemV/AST4ADT, America/St_Johns, CNT, Canada/Newfoundland, AGT, America/Araguaina, America/Argentina/Buenos_Aires, America/Argentina/Catamarca, America/Argentina/ComodRivadavia, America/Argentina/Cordoba, America/Argentina/Jujuy, America/Argentina/La_Rioja, America/Argentina/Mendoza, America/Argentina/Rio_Gallegos, America/Argentina/Salta, America/Argentina/San_Juan, America/Argentina/Tucuman, America/Argentina/Ushuaia, America/Bahia, America/Belem, America/Buenos_Aires, America/Catamarca, America/Cayenne, America/Cordoba, America/Fortaleza, America/Godthab, America/Jujuy, America/Maceio, America/Mendoza, America/Miquelon, America/Montevideo, America/Paramaribo, America/Recife, America/Rosario, America/Santarem, America/Sao_Paulo, Antarctica/Rothera, Atlantic/Stanley, BET, Brazil/East, Etc/GMT+3, America/Noronha, Atlantic/South_Georgia, Brazil/DeNoronha, Etc/GMT+2, America/Scoresbysund, Atlantic/Azores, Atlantic/Cape_Verde, Etc/GMT+1, Africa/Abidjan, Africa/Accra, Africa/Bamako, Africa/Banjul, Africa/Bissau, Africa/Casablanca, Africa/Conakry, Africa/Dakar, Africa/El_Aaiun, Africa/Freetown, Africa/Lome, Africa/Monrovia, Africa/Nouakchott, Africa/Ouagadougou, Africa/Sao_Tome, Africa/Timbuktu, America/Danmarkshavn, Atlantic/Canary, Atlantic/Faeroe, Atlantic/Faroe, Atlantic/Madeira, Atlantic/Reykjavik, Atlantic/St_Helena, Eire, Etc/GMT, Etc/GMT+0, Etc/GMT-0, Etc/GMT0, Etc/Greenwich, Etc/UCT, Etc/UTC, Etc/Universal, Etc/Zulu, Europe/Belfast, Europe/Dublin, Europe/Guernsey, Europe/Isle_of_Man, Europe/Jersey, Europe/Lisbon, Europe/London, GB, GB-Eire, GMT, GMT0, Greenwich, Iceland, Portugal, UCT, UTC, Universal, WET, Zulu, Africa/Algiers, Africa/Bangui, Africa/Brazzaville, Africa/Ceuta, Africa/Douala, Africa/Kinshasa, Africa/Lagos, Africa/Libreville, Africa/Luanda, Africa/Malabo, Africa/Ndjamena, Africa/Niamey, Africa/Porto-Novo, Africa/Tunis, Africa/Windhoek, Arctic/Longyearbyen, Atlantic/Jan_Mayen, CET, ECT, Etc/GMT-1, Europe/Amsterdam, Europe/Andorra, Europe/Belgrade, Europe/Berlin, Europe/Bratislava, Europe/Brussels, Europe/Budapest, Europe/Copenhagen, Europe/Gibraltar, Europe/Ljubljana, Europe/Luxembourg, Europe/Madrid, Europe/Malta, Europe/Monaco, Europe/Oslo, Europe/Paris, Europe/Podgorica, Europe/Prague, Europe/Rome, Europe/San_Marino, Europe/Sarajevo, Europe/Skopje, Europe/Stockholm, Europe/Tirane, Europe/Vaduz, Europe/Vatican, Europe/Vienna, Europe/Warsaw, Europe/Zagreb, Europe/Zurich, MET, Poland, ART, Africa/Blantyre, Africa/Bujumbura, Africa/Cairo, Africa/Gaborone, Africa/Harare, Africa/Johannesburg, Africa/Kigali, Africa/Lubumbashi, Africa/Lusaka, Africa/Maputo, Africa/Maseru, Africa/Mbabane, Africa/Tripoli, Asia/Amman, Asia/Beirut, Asia/Damascus, Asia/Gaza, Asia/Hebron, Asia/Istanbul, Asia/Jerusalem, Asia/Nicosia, Asia/Tel_Aviv, CAT, EET, Egypt, Etc/GMT-2, Europe/Athens, Europe/Bucharest, Europe/Chisinau, Europe/Helsinki, Europe/Istanbul, Europe/Kiev, Europe/Mariehamn, Europe/Nicosia, Europe/Riga, Europe/Simferopol, Europe/Sofia, Europe/Tallinn, Europe/Tiraspol, Europe/Uzhgorod, Europe/Vilnius, Europe/Zaporozhye, Israel, Libya, Turkey, Africa/Addis_Ababa, Africa/Asmara, Africa/Asmera, Africa/Dar_es_Salaam, Africa/Djibouti, Africa/Juba, Africa/Kampala, Africa/Khartoum, Africa/Mogadishu, Africa/Nairobi, Antarctica/Syowa, Asia/Aden, Asia/Baghdad, Asia/Bahrain, Asia/Kuwait, Asia/Qatar, Asia/Riyadh, EAT, Etc/GMT-3, Europe/Kaliningrad, Europe/Minsk, Indian/Antananarivo, Indian/Comoro, Indian/Mayotte, Asia/Riyadh87, Asia/Riyadh88, Asia/Riyadh89, Mideast/Riyadh87, Mideast/Riyadh88, Mideast/Riyadh89, Asia/Tehran, Iran, Asia/Baku, Asia/Dubai, Asia/Muscat, Asia/Tbilisi, Asia/Yerevan, Etc/GMT-4, Europe/Moscow, Europe/Samara, Europe/Volgograd, Indian/Mahe, Indian/Mauritius, Indian/Reunion, NET, W-SU, Asia/Kabul, Antarctica/Mawson, Asia/Aqtau, Asia/Aqtobe, Asia/Ashgabat, Asia/Ashkhabad, Asia/Dushanbe, Asia/Karachi, Asia/Oral, Asia/Samarkand, Asia/Tashkent, Etc/GMT-5, Indian/Kerguelen, Indian/Maldives, PLT, Asia/Calcutta, Asia/Colombo, Asia/Kolkata, IST, Asia/Kathmandu, Asia/Katmandu, Antarctica/Vostok, Asia/Almaty, Asia/Bishkek, Asia/Dacca, Asia/Dhaka, Asia/Qyzylorda, Asia/Thimbu, Asia/Thimphu, Asia/Yekaterinburg, BST, Etc/GMT-6, Indian/Chagos, Asia/Rangoon, Indian/Cocos, Antarctica/Davis, Asia/Bangkok, Asia/Ho_Chi_Minh, Asia/Hovd, Asia/Jakarta, Asia/Novokuznetsk, Asia/Novosibirsk, Asia/Omsk, Asia/Phnom_Penh, Asia/Pontianak, Asia/Saigon, Asia/Vientiane, Etc/GMT-7, Indian/Christmas, VST, Antarctica/Casey, Asia/Brunei, Asia/Choibalsan, Asia/Chongqing, Asia/Chungking, Asia/Harbin, Asia/Hong_Kong, Asia/Kashgar, Asia/Krasnoyarsk, Asia/Kuala_Lumpur, Asia/Kuching, Asia/Macao, Asia/Macau, Asia/Makassar, Asia/Manila, Asia/Shanghai, Asia/Singapore, Asia/Taipei, Asia/Ujung_Pandang, Asia/Ulaanbaatar, Asia/Ulan_Bator, Asia/Urumqi, Australia/Perth, Australia/West, CTT, Etc/GMT-8, Hongkong, PRC, Singapore, Australia/Eucla, Asia/Dili, Asia/Irkutsk, Asia/Jayapura, Asia/Pyongyang, Asia/Seoul, Asia/Tokyo, Etc/GMT-9, JST, Japan, Pacific/Palau, ROK, ACT, Australia/Adelaide, Australia/Broken_Hill, Australia/Darwin, Australia/North, Australia/South, Australia/Yancowinna, AET, Antarctica/DumontDUrville, Asia/Yakutsk, Australia/ACT, Australia/Brisbane, Australia/Canberra, Australia/Currie, Australia/Hobart, Australia/Lindeman, Australia/Melbourne, Australia/NSW, Australia/Queensland, Australia/Sydney, Australia/Tasmania, Australia/Victoria, Etc/GMT-10, Pacific/Chuuk, Pacific/Guam, Pacific/Port_Moresby, Pacific/Saipan, Pacific/Truk, Pacific/Yap, Australia/LHI, Australia/Lord_Howe, Antarctica/Macquarie, Asia/Sakhalin, Asia/Vladivostok, Etc/GMT-11, Pacific/Efate, Pacific/Guadalcanal, Pacific/Kosrae, Pacific/Noumea, Pacific/Pohnpei, Pacific/Ponape, SST, Pacific/Norfolk, Antarctica/McMurdo, Antarctica/South_Pole, Asia/Anadyr, Asia/Kamchatka, Asia/Magadan, Etc/GMT-12, Kwajalein, NST, NZ, Pacific/Auckland, Pacific/Fiji, Pacific/Funafuti, Pacific/Kwajalein, Pacific/Majuro, Pacific/Nauru, Pacific/Tarawa, Pacific/Wake, Pacific/Wallis, NZ-CHAT, Pacific/Chatham, Etc/GMT-13, MIT, Pacific/Apia, Pacific/Enderbury, Pacific/Fakaofo, Pacific/Tongatapu, Etc/GMT-14, Pacific/Kiritimati
+</code></pre><p>例如，创建上面第2个打印值“Etc/GMT+11”对应的TimeZone。方法如下：</p>
+<pre><code>TimeZone tz = TimeZone.getTimeZone(&quot;Etc/GMT+11&quot;);
+</code></pre><p><strong>TimeZone的函数接口</strong></p>
+<pre><code>// 构造函数
+TimeZone()
+
+Object                           clone()
+synchronized static String[]     getAvailableIDs()
+synchronized static String[]     getAvailableIDs(int offsetMillis)
+int                              getDSTSavings()
+synchronized static TimeZone     getDefault()
+final String                     getDisplayName(Locale locale)
+String                           getDisplayName(boolean daylightTime, int style, Locale locale)
+final String                     getDisplayName()
+final String                     getDisplayName(boolean daylightTime, int style)
+String                           getID()
+abstract int                     getOffset(int era, int year, int month, int day, int dayOfWeek, int timeOfDayMillis)
+int                              getOffset(long time)
+abstract int                     getRawOffset()
+synchronized static TimeZone     getTimeZone(String id)
+boolean                          hasSameRules(TimeZone timeZone)
+abstract boolean                 inDaylightTime(Date time)
+synchronized static void         setDefault(TimeZone timeZone)
+void                             setID(String id)
+abstract void                    setRawOffset(int offsetMillis)
+abstract boolean                 useDaylightTime()
+</code></pre><p><a name="anchor2"></a></p>
+<h1 id="2-TimeZone示例"><a href="#2-TimeZone示例" class="headerlink" title="2. TimeZone示例"></a>2. TimeZone示例</h1><p>下面通过示例演示在Date中使用TimeZone。</p>
+<p>参考代码如下(TimeZoneTest.java)：</p>
+<pre><code>import java.text.DateFormat;
+import java.util.Date;
+import java.util.TimeZone;
+
+/**
+ * TimeZone的测试程序
+ *
+ * @author skywang
+ * @email kuiwu-wang@163.com
+ */
+public class TimeZoneTest {
+
+    public static void main(String[] args) {
+
+        // 测试创建TimeZone对象的3种方法
+        showUsageOfTimeZones() ;
+
+        // 测试TimeZone的其它API
+        testOtherAPIs() ;
+
+        // 打印getTimeZone(String id)支持的所有id
+        //printAllTimeZones() ;
+    }
+
+
+    /**
+     * 测试创建TimeZone对象的3种方法
+     */
+    public static void showUsageOfTimeZones() {
+        TimeZone tz;
+
+        // (01) 默认时区
+        tz = TimeZone.getDefault();
+        printDateIn(tz) ;
+
+        // (02) 设置时区为&quot;GMT+08:00&quot;
+        tz = TimeZone.getTimeZone(&quot;GMT+08:00&quot;);
+        printDateIn(tz) ;
+
+        // (03) 设置时区为&quot;&quot;
+        tz = TimeZone.getTimeZone(&quot;Asia/Chongqing&quot;);
+        printDateIn(tz) ;
+    }
+
+    /**
+     * 打印 tz对应的日期/时间
+     */
+    private static void printDateIn(TimeZone tz) {
+        // date为2013-09-19 14:22:30
+        Date date = new Date(113, 8, 19, 14, 22, 30);
+        // 获取默认的DateFormat，用于格式化Date
+        DateFormat df = DateFormat.getInstance();
+        // 设置时区为tz
+        df.setTimeZone(tz);
+        // 获取格式化后的字符串
+        String str = df.format(date);
+
+        System.out.println(tz.getID()+&quot; :&quot;+str);
+    }
+
+    /**
+     * 测试TimeZone的其它API
+     */
+    public static void testOtherAPIs() {
+        // 默认时区
+        TimeZone tz = TimeZone.getDefault();
+
+        // 获取“id”
+        String id = tz.getID();
+
+        // 获取“显示名称”
+        String name = tz.getDisplayName();
+
+        // 获取“时间偏移”。相对于“本初子午线”的偏移，单位是ms。
+        int offset = tz.getRawOffset();
+        // 获取“时间偏移” 对应的小时
+        int gmt = offset/(3600*1000);
+
+        System.out.printf(&quot;id=%s, name=%s, offset=%s(ms), gmt=%s\n&quot;,
+                id, name, offset, gmt);
+    }
+
+    /**
+     * 打印getTimeZone(String id)支持的所有id
+     */
+    public static void printAllTimeZones() {
+
+        String[] ids = TimeZone.getAvailableIDs();
+        for (String id:ids) {
+            //int offset = TimeZone.getTimeZone(avaIds[i]).getRawOffset();
+            //System.out.println(i+&quot;  &quot;+avaIds[i]+&quot; &quot;+offset / (3600 * 1000) + &quot;\t&quot;);
+            System.out.printf(id+&quot;, &quot;);
+        }
+        System.out.println();
+    }
+}
+</code></pre>
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2018-06-27T09:39:57.953Z" itemprop="dateUpdated">2018-06-27 17:39:57</time>
+</span><br>
+
+
+        
+        本文固定链接：<a href="/2017/02/07/java-source-analysis-time-series/Java 时间相关内容07 TimeZone/" target="_blank" rel="external">https://smuwjs.github.io/2017/02/07/java-source-analysis-time-series/Java 时间相关内容07 TimeZone/</a>
+        
+    </div>
+    <footer>
+        <a href="https://smuwjs.github.io">
+            <img src="/img/head.png" alt="Jeeson">
+            Jeeson
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java-时间相关内容/">Java 时间相关内容</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java源码分析/">Java源码分析</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2017/02/07/java-source-analysis-time-series/Java 时间相关内容07 TimeZone/&title=《Java 时间相关内容07 TimeZone》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2017/02/07/java-source-analysis-time-series/Java 时间相关内容07 TimeZone/&title=《Java 时间相关内容07 TimeZone》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2017/02/07/java-source-analysis-time-series/Java 时间相关内容07 TimeZone/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Java 时间相关内容07 TimeZone》 — Jeeson's Blog&url=https://smuwjs.github.io/2017/02/07/java-source-analysis-time-series/Java 时间相关内容07 TimeZone/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2017/02/07/java-source-analysis-time-series/Java 时间相关内容07 TimeZone/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2017/03/01/java-source-analysis-exception-series/Java异常(一) Java异常简介及其架构/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">Java异常(一) Java异常简介及其架构</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2017/02/06/java-source-analysis-time-series/Java 时间相关内容06 Locale/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Java 时间相关内容06 Locale</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="java-source-analysis-time-series/Java 时间相关内容07 TimeZone" data-title="Java 时间相关内容07 TimeZone" data-url="https://smuwjs.github.io/2017/02/07/java-source-analysis-time-series/Java 时间相关内容07 TimeZone/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'smuwjs', theme: 'none'};
+lazyScripts.push('//unpkg.com/hexo-theme-material-indigo@latest/js/embed.min.js');
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循<a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>Jeeson &copy; 2015 - 2018</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2017/02/07/java-source-analysis-time-series/Java 时间相关内容07 TimeZone/&title=《Java 时间相关内容07 TimeZone》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2017/02/07/java-source-analysis-time-series/Java 时间相关内容07 TimeZone/&title=《Java 时间相关内容07 TimeZone》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2017/02/07/java-source-analysis-time-series/Java 时间相关内容07 TimeZone/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Java 时间相关内容07 TimeZone》 — Jeeson's Blog&url=https://smuwjs.github.io/2017/02/07/java-source-analysis-time-series/Java 时间相关内容07 TimeZone/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2017/02/07/java-source-analysis-time-series/Java 时间相关内容07 TimeZone/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://smuwjs.github.io/2017/02/07/java-source-analysis-time-series/Java 时间相关内容07 TimeZone/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

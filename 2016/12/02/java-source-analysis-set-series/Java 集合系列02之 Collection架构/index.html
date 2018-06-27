@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>Java 集合系列02之 Collection架构 | Jeeson&#39;s Blog | Write the code. Change the world.</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="Java源码分析,Java 集合系列">
+    <meta name="description" content="CollectionCollection框架类的关系图：                                                                                                            Collection是一个接口，它主要的两个分支是：List 和 Set。 List和Set都是接口，它们继承于Collecti">
+<meta name="keywords" content="Java源码分析,Java 集合系列">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java 集合系列02之 Collection架构">
+<meta property="og:url" content="https://smuwjs.github.io/2016/12/02/java-source-analysis-set-series/Java 集合系列02之 Collection架构/index.html">
+<meta property="og:site_name" content="Jeeson&#39;s Blog">
+<meta property="og:description" content="CollectionCollection框架类的关系图：                                                                                                            Collection是一个接口，它主要的两个分支是：List 和 Set。 List和Set都是接口，它们继承于Collecti">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://oov0wb0gl.bkt.clouddn.com/2017-06-06-14954368188311.jpg">
+<meta property="og:updated_time" content="2018-06-27T09:39:57.949Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java 集合系列02之 Collection架构">
+<meta name="twitter:description" content="CollectionCollection框架类的关系图：                                                                                                            Collection是一个接口，它主要的两个分支是：List 和 Set。 List和Set都是接口，它们继承于Collecti">
+<meta name="twitter:image" content="http://oov0wb0gl.bkt.clouddn.com/2017-06-06-14954368188311.jpg">
+    
+        <link rel="alternate" type="application/atom+xml" title="Jeeson&#39;s Blog" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/head.png">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Jeeson</h5>
+          <a href="mailto:smuwjs@163.com" title="smuwjs@163.com" class="mail">smuwjs@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/smuwjs" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Java 集合系列02之 Collection架构</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Java 集合系列02之 Collection架构</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2016-12-01T16:00:00.000Z" itemprop="datePublished" class="page-time">
+  2016-12-02
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#Collection"><span class="post-toc-number">1.</span> <span class="post-toc-text">Collection</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#1、Collection接口简介"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">1、Collection接口简介</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#2、List接口简介"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">2、List接口简介</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#3、Set-接口简介"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">3、Set 接口简介</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#4、AbstractCollection-抽象类"><span class="post-toc-number">1.4.</span> <span class="post-toc-text">4、AbstractCollection 抽象类</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#5、AbstractList-抽象类"><span class="post-toc-number">1.5.</span> <span class="post-toc-text">5、AbstractList 抽象类</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#6、AbstractSet-抽象类"><span class="post-toc-number">1.6.</span> <span class="post-toc-text">6、AbstractSet 抽象类</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#7、Iterator-接口"><span class="post-toc-number">1.7.</span> <span class="post-toc-text">7、Iterator 接口</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#8、ListIterator-接口"><span class="post-toc-number">1.8.</span> <span class="post-toc-text">8、ListIterator 接口</span></a></li></ol></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-java-source-analysis-set-series/Java 集合系列02之 Collection架构"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Java 集合系列02之 Collection架构</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2016-12-02 00:00:00" datetime="2016-12-01T16:00:00.000Z"  itemprop="datePublished">2016-12-02</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h1 id="Collection"><a href="#Collection" class="headerlink" title="Collection"></a>Collection</h1><p>Collection框架类的关系图：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://oov0wb0gl.bkt.clouddn.com/2017-06-06-14954368188311.jpg" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>Collection是一个接口，它主要的两个分支是：List 和 Set。</p>
+<p>List和Set都是接口，它们继承于Collection。List是有序的队列，List中可以有重复的元素；而Set是数学概念中的集合，Set中没有重复元素！<br>List和Set都有它们各自的实现类。</p>
+<p>为了方便，我们抽象出了AbstractCollection抽象类，它实现了Collection中的绝大部分函数；这样，在Collection的实现类中，我们就可以通过继承AbstractCollection省去重复编码。AbstractList和AbstractSet都继承于AbstractCollection，具体的List实现类继承于AbstractList，而Set的实现类则继承于AbstractSet。</p>
+<p>另外，Collection中有一个iterator()函数，它的作用是返回一个Iterator接口。通常，我们通过Iterator迭代器来遍历集合。ListIterator是List接口所特有的，在List接口中，通过ListIterator()返回一个ListIterator对象。</p>
+<h2 id="1、Collection接口简介"><a href="#1、Collection接口简介" class="headerlink" title="1、Collection接口简介"></a>1、Collection接口简介</h2><p>Collection的定义如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Collection</span>&lt;<span class="title">E</span>&gt; <span class="keyword">extends</span> <span class="title">Iterable</span>&lt;<span class="title">E</span>&gt; </span>&#123;&#125;</span><br></pre></td></tr></table></figure>
+<p>它是一个接口，是高度抽象出来的集合，它包含了集合的基本操作：添加、删除、清空、遍历(读取)、是否为空、获取大小、是否保护某元素等等。</p>
+<p>Collection接口的所有子类(直接子类和间接子类)都必须实现2种构造函数：不带参数的构造函数 和 参数为Collection的构造函数。带参数的构造函数，可以用来转换Collection的类型。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Collection的API</span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">boolean</span>         <span class="title">add</span><span class="params">(E object)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">boolean</span>         <span class="title">addAll</span><span class="params">(Collection&lt;? extends E&gt; collection)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">void</span>            <span class="title">clear</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">boolean</span>         <span class="title">contains</span><span class="params">(Object object)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">boolean</span>         <span class="title">containsAll</span><span class="params">(Collection&lt;?&gt; collection)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">boolean</span>         <span class="title">equals</span><span class="params">(Object object)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">int</span>             <span class="title">hashCode</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">boolean</span>         <span class="title">isEmpty</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> Iterator&lt;E&gt;     <span class="title">iterator</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">boolean</span>         <span class="title">remove</span><span class="params">(Object object)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">boolean</span>         <span class="title">removeAll</span><span class="params">(Collection&lt;?&gt; collection)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">boolean</span>         <span class="title">retainAll</span><span class="params">(Collection&lt;?&gt; collection)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">int</span>             <span class="title">size</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> &lt;T&gt; T[]         <span class="title">toArray</span><span class="params">(T[] array)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> Object[]        <span class="title">toArray</span><span class="params">()</span></span></span><br></pre></td></tr></table></figure>
+<h2 id="2、List接口简介"><a href="#2、List接口简介" class="headerlink" title="2、List接口简介"></a>2、List接口简介</h2><p>List的定义如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">List</span>&lt;<span class="title">E</span>&gt; <span class="keyword">extends</span> <span class="title">Collection</span>&lt;<span class="title">E</span>&gt; </span>&#123;&#125;</span><br></pre></td></tr></table></figure>
+<p>List是一个继承于Collection的接口，即List是集合中的一种。List是有序的队列，List中的每一个元素都有一个索引；第一个元素的索引值是0，往后的元素的索引值依次+1。和Set不同，List中允许有重复的元素。</p>
+<p>关于API方面。既然List是继承于Collection接口，它自然就包含了Collection中的全部函数接口；由于List是有序队列，它也额外的有自己的API接口。主要有“添加、删除、获取、修改指定位置的元素”、“获取List中的子队列”等。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Collection的API</span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">boolean</span>         <span class="title">add</span><span class="params">(E object)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">boolean</span>         <span class="title">addAll</span><span class="params">(Collection&lt;? extends E&gt; collection)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">void</span>            <span class="title">clear</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">boolean</span>         <span class="title">contains</span><span class="params">(Object object)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">boolean</span>         <span class="title">containsAll</span><span class="params">(Collection&lt;?&gt; collection)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">boolean</span>         <span class="title">equals</span><span class="params">(Object object)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">int</span>             <span class="title">hashCode</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">boolean</span>         <span class="title">isEmpty</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> Iterator&lt;E&gt;     <span class="title">iterator</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">boolean</span>         <span class="title">remove</span><span class="params">(Object object)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">boolean</span>         <span class="title">removeAll</span><span class="params">(Collection&lt;?&gt; collection)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">boolean</span>         <span class="title">retainAll</span><span class="params">(Collection&lt;?&gt; collection)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">int</span>             <span class="title">size</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> &lt;T&gt; T[]         <span class="title">toArray</span><span class="params">(T[] array)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> Object[]        <span class="title">toArray</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="comment">// 相比与Collection，List新增的API：</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">void</span>                <span class="title">add</span><span class="params">(<span class="keyword">int</span> location, E object)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">boolean</span>             <span class="title">addAll</span><span class="params">(<span class="keyword">int</span> location, Collection&lt;? extends E&gt; collection)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> E                   <span class="title">get</span><span class="params">(<span class="keyword">int</span> location)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">int</span>                 <span class="title">indexOf</span><span class="params">(Object object)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">int</span>                 <span class="title">lastIndexOf</span><span class="params">(Object object)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> ListIterator&lt;E&gt;     <span class="title">listIterator</span><span class="params">(<span class="keyword">int</span> location)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> ListIterator&lt;E&gt;     <span class="title">listIterator</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> E                   <span class="title">remove</span><span class="params">(<span class="keyword">int</span> location)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> E                   <span class="title">set</span><span class="params">(<span class="keyword">int</span> location, E object)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> List&lt;E&gt;             <span class="title">subList</span><span class="params">(<span class="keyword">int</span> start, <span class="keyword">int</span> end)</span></span></span><br></pre></td></tr></table></figure>
+<h2 id="3、Set-接口简介"><a href="#3、Set-接口简介" class="headerlink" title="3、Set 接口简介"></a>3、Set 接口简介</h2><p>Set的定义如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Set</span>&lt;<span class="title">E</span>&gt; <span class="keyword">extends</span> <span class="title">Collection</span>&lt;<span class="title">E</span>&gt; </span>&#123;&#125;</span><br></pre></td></tr></table></figure>
+<p>Set是一个继承于Collection的接口，即Set也是集合中的一种。Set是没有重复元素的集合。</p>
+<p>关于API方面。Set的API和Collection完全一样。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Set的API</span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">boolean</span>         <span class="title">add</span><span class="params">(E object)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">boolean</span>         <span class="title">addAll</span><span class="params">(Collection&lt;? extends E&gt; collection)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">void</span>             <span class="title">clear</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">boolean</span>         <span class="title">contains</span><span class="params">(Object object)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">boolean</span>         <span class="title">containsAll</span><span class="params">(Collection&lt;?&gt; collection)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">boolean</span>         <span class="title">equals</span><span class="params">(Object object)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">int</span>             <span class="title">hashCode</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">boolean</span>         <span class="title">isEmpty</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> Iterator&lt;E&gt;     <span class="title">iterator</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">boolean</span>         <span class="title">remove</span><span class="params">(Object object)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">boolean</span>         <span class="title">removeAll</span><span class="params">(Collection&lt;?&gt; collection)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">boolean</span>         <span class="title">retainAll</span><span class="params">(Collection&lt;?&gt; collection)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">int</span>             <span class="title">size</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> &lt;T&gt; T[]         <span class="title">toArray</span><span class="params">(T[] array)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> Object[]         <span class="title">toArray</span><span class="params">()</span></span></span><br></pre></td></tr></table></figure>
+<h2 id="4、AbstractCollection-抽象类"><a href="#4、AbstractCollection-抽象类" class="headerlink" title="4、AbstractCollection 抽象类"></a>4、AbstractCollection 抽象类</h2><p>AbstractCollection的定义如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">AbstractCollection</span>&lt;<span class="title">E</span>&gt; <span class="keyword">implements</span> <span class="title">Collection</span>&lt;<span class="title">E</span>&gt; </span>&#123;&#125;</span><br></pre></td></tr></table></figure>
+<p>AbstractCollection是一个抽象类，它实现了Collection中除iterator()和size()之外的函数。<br>AbstractCollection的主要作用：它实现了Collection接口中的大部分函数。从而方便其它类实现Collection，比如ArrayList、LinkedList等，它们这些类想要实现Collection接口，通过继承AbstractCollection就已经实现了大部分的接口了。</p>
+<h2 id="5、AbstractList-抽象类"><a href="#5、AbstractList-抽象类" class="headerlink" title="5、AbstractList 抽象类"></a>5、AbstractList 抽象类</h2><p>AbstractList的定义如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">AbstractList</span>&lt;<span class="title">E</span>&gt; <span class="keyword">extends</span> <span class="title">AbstractCollection</span>&lt;<span class="title">E</span>&gt; <span class="keyword">implements</span> <span class="title">List</span>&lt;<span class="title">E</span>&gt; </span>&#123;&#125;</span><br></pre></td></tr></table></figure>
+<p>AbstractList是一个继承于AbstractCollection，并且实现List接口的抽象类。它实现了List中除size()、get(int location)之外的函数。<br>AbstractList的主要作用：它实现了List接口中的大部分函数。从而方便其它类继承List。<br>另外，和AbstractCollection相比，AbstractList抽象类中，实现了iterator()接口。</p>
+<h2 id="6、AbstractSet-抽象类"><a href="#6、AbstractSet-抽象类" class="headerlink" title="6、AbstractSet 抽象类"></a>6、AbstractSet 抽象类</h2><p>AbstractSet的定义如下： </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">AbstractSet</span>&lt;<span class="title">E</span>&gt; <span class="keyword">extends</span> <span class="title">AbstractCollection</span>&lt;<span class="title">E</span>&gt; <span class="keyword">implements</span> <span class="title">Set</span>&lt;<span class="title">E</span>&gt; </span>&#123;&#125;</span><br></pre></td></tr></table></figure>
+<p>AbstractSet是一个继承于AbstractCollection，并且实现Set接口的抽象类。由于Set接口和Collection接口中的API完全一样，Set也就没有自己单独的API。和AbstractCollection一样，它实现了List中除iterator()和size()之外的函数。</p>
+<p>AbstractSet的主要作用：它实现了Set接口中的大部分函数。从而方便其它类实现Set接口。</p>
+<h2 id="7、Iterator-接口"><a href="#7、Iterator-接口" class="headerlink" title="7、Iterator 接口"></a>7、Iterator 接口</h2><p>Iterator的定义如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Iterator</span>&lt;<span class="title">E</span>&gt; </span>&#123;&#125;</span><br></pre></td></tr></table></figure>
+<p>Iterator是一个接口，它是集合的迭代器。集合可以通过Iterator去遍历集合中的元素。Iterator提供的API接口，包括：是否存在下一个元素、获取下一个元素、删除当前元素。</p>
+<p>注意：Iterator遍历Collection时，是fail-fast机制的。即，当某一个线程A通过iterator去遍历某集合的过程中，若该集合的内容被其他线程所改变了；那么线程A访问集合时，就会抛出ConcurrentModificationException异常，产生fail-fast事件。关于fail-fast的详细内容，我们会在后面专门进行说明。TODO</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Iterator的API</span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">boolean</span> <span class="title">hasNext</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> E <span class="title">next</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">remove</span><span class="params">()</span></span></span><br></pre></td></tr></table></figure>
+<h2 id="8、ListIterator-接口"><a href="#8、ListIterator-接口" class="headerlink" title="8、ListIterator 接口"></a>8、ListIterator 接口</h2><p>ListIterator的定义如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">ListIterator</span>&lt;<span class="title">E</span>&gt; <span class="keyword">extends</span> <span class="title">Iterator</span>&lt;<span class="title">E</span>&gt; </span>&#123;&#125;</span><br></pre></td></tr></table></figure>
+<p>ListIterator是一个继承于Iterator的接口，它是队列迭代器。专门用于遍历List，能提供向前/向后遍历。相比于Iterator，它新增了添加、是否存在上一个元素、获取上一个元素等等API接口。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ListIterator的API</span></span><br><span class="line"><span class="comment">// 继承于Iterator的接口</span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">boolean</span> <span class="title">hasNext</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> E <span class="title">next</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">remove</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="comment">// 新增API接口</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">add</span><span class="params">(E object)</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">boolean</span> <span class="title">hasPrevious</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">int</span> <span class="title">nextIndex</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> E <span class="title">previous</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">int</span> <span class="title">previousIndex</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">set</span><span class="params">(E object)</span></span></span><br></pre></td></tr></table></figure>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2018-06-27T09:39:57.949Z" itemprop="dateUpdated">2018-06-27 17:39:57</time>
+</span><br>
+
+
+        
+        本文固定链接：<a href="/2016/12/02/java-source-analysis-set-series/Java 集合系列02之 Collection架构/" target="_blank" rel="external">https://smuwjs.github.io/2016/12/02/java-source-analysis-set-series/Java 集合系列02之 Collection架构/</a>
+        
+    </div>
+    <footer>
+        <a href="https://smuwjs.github.io">
+            <img src="/img/head.png" alt="Jeeson">
+            Jeeson
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java-集合系列/">Java 集合系列</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java源码分析/">Java源码分析</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/12/02/java-source-analysis-set-series/Java 集合系列02之 Collection架构/&title=《Java 集合系列02之 Collection架构》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/12/02/java-source-analysis-set-series/Java 集合系列02之 Collection架构/&title=《Java 集合系列02之 Collection架构》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/12/02/java-source-analysis-set-series/Java 集合系列02之 Collection架构/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Java 集合系列02之 Collection架构》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/12/02/java-source-analysis-set-series/Java 集合系列02之 Collection架构/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/12/02/java-source-analysis-set-series/Java 集合系列02之 Collection架构/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2016/12/03/java-source-analysis-set-series/Java 集合系列03之 ArrayList详细介绍/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">Java 集合系列03之 ArrayList详细介绍</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2016/12/01/java-source-analysis-set-series/Java 集合系列01之 总体框架/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Java 集合系列01之 总体框架</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="java-source-analysis-set-series/Java 集合系列02之 Collection架构" data-title="Java 集合系列02之 Collection架构" data-url="https://smuwjs.github.io/2016/12/02/java-source-analysis-set-series/Java 集合系列02之 Collection架构/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'smuwjs', theme: 'none'};
+lazyScripts.push('//unpkg.com/hexo-theme-material-indigo@latest/js/embed.min.js');
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循<a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>Jeeson &copy; 2015 - 2018</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/12/02/java-source-analysis-set-series/Java 集合系列02之 Collection架构/&title=《Java 集合系列02之 Collection架构》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/12/02/java-source-analysis-set-series/Java 集合系列02之 Collection架构/&title=《Java 集合系列02之 Collection架构》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/12/02/java-source-analysis-set-series/Java 集合系列02之 Collection架构/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Java 集合系列02之 Collection架构》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/12/02/java-source-analysis-set-series/Java 集合系列02之 Collection架构/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/12/02/java-source-analysis-set-series/Java 集合系列02之 Collection架构/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://smuwjs.github.io/2016/12/02/java-source-analysis-set-series/Java 集合系列02之 Collection架构/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

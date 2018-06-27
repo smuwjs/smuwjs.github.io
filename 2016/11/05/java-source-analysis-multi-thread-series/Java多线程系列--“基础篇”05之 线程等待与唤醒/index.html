@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>Java多线程系列--“基础篇”05之 线程等待与唤醒 | Jeeson&#39;s Blog | Write the code. Change the world.</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="Java源码分析,Java多线程系列">
+    <meta name="description" content="本章，会对线程等待/唤醒方法进行介绍。   目录1. wait(), notify(), notifyAll()等方法介绍2. wait()和notify()示例3. wait(long timeout)和notify()4. wait() 和 notifyAll()5. 为什么notify(), wait()等函数定义在Object中，而不是Thread中      1. wait(), no">
+<meta name="keywords" content="Java源码分析,Java多线程系列">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java多线程系列--“基础篇”05之 线程等待与唤醒">
+<meta property="og:url" content="https://smuwjs.github.io/2016/11/05/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”05之 线程等待与唤醒/index.html">
+<meta property="og:site_name" content="Jeeson&#39;s Blog">
+<meta property="og:description" content="本章，会对线程等待/唤醒方法进行介绍。   目录1. wait(), notify(), notifyAll()等方法介绍2. wait()和notify()示例3. wait(long timeout)和notify()4. wait() 和 notifyAll()5. 为什么notify(), wait()等函数定义在Object中，而不是Thread中      1. wait(), no">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://wangkuiwu.github.io/media/pic/java/threads/basic05-01.png">
+<meta property="og:image" content="http://wangkuiwu.github.io/media/pic/java/threads/basic05-02.png">
+<meta property="og:image" content="http://wangkuiwu.github.io/media/pic/java/threads/basic05-03.png">
+<meta property="og:updated_time" content="2018-06-27T09:39:57.949Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java多线程系列--“基础篇”05之 线程等待与唤醒">
+<meta name="twitter:description" content="本章，会对线程等待/唤醒方法进行介绍。   目录1. wait(), notify(), notifyAll()等方法介绍2. wait()和notify()示例3. wait(long timeout)和notify()4. wait() 和 notifyAll()5. 为什么notify(), wait()等函数定义在Object中，而不是Thread中      1. wait(), no">
+<meta name="twitter:image" content="http://wangkuiwu.github.io/media/pic/java/threads/basic05-01.png">
+    
+        <link rel="alternate" type="application/atom+xml" title="Jeeson&#39;s Blog" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/head.png">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Jeeson</h5>
+          <a href="mailto:smuwjs@163.com" title="smuwjs@163.com" class="mail">smuwjs@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/smuwjs" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Java多线程系列--“基础篇”05之 线程等待与唤醒</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Java多线程系列--“基础篇”05之 线程等待与唤醒</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2016-11-04T16:00:00.000Z" itemprop="datePublished" class="page-time">
+  2016-11-05
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#1-wait-notify-notifyAll-等方法介绍"><span class="post-toc-number">1.</span> <span class="post-toc-text">1. wait(), notify(), notifyAll()等方法介绍</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#2-wait-和notify-示例"><span class="post-toc-number">2.</span> <span class="post-toc-text">2. wait()和notify()示例</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#3-wait-long-timeout-和notify"><span class="post-toc-number">3.</span> <span class="post-toc-text">3. wait(long timeout)和notify()</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#4-wait-和-notifyAll"><span class="post-toc-number">4.</span> <span class="post-toc-text">4. wait() 和 notifyAll()</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#5-为什么notify-wait-等函数定义在Object中，而不是Thread中"><span class="post-toc-number">5.</span> <span class="post-toc-text">5. 为什么notify(), wait()等函数定义在Object中，而不是Thread中</span></a></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”05之 线程等待与唤醒"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Java多线程系列--“基础篇”05之 线程等待与唤醒</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2016-11-05 00:00:00" datetime="2016-11-04T16:00:00.000Z"  itemprop="datePublished">2016-11-05</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <blockquote>
+<p>本章，会对线程等待/唤醒方法进行介绍。</p>
+</blockquote>
+<blockquote>
+<p><strong>目录</strong><br><a href="#anchor1">1. wait(), notify(), notifyAll()等方法介绍</a><br><a href="#anchor2">2. wait()和notify()示例</a><br><a href="#anchor3">3. wait(long timeout)和notify()</a><br><a href="#anchor4">4. wait() 和 notifyAll()</a><br><a href="#anchor5">5. 为什么notify(), wait()等函数定义在Object中，而不是Thread中</a>   </p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="1-wait-notify-notifyAll-等方法介绍"><a href="#1-wait-notify-notifyAll-等方法介绍" class="headerlink" title="1. wait(), notify(), notifyAll()等方法介绍"></a>1. wait(), notify(), notifyAll()等方法介绍</h1><p>在Object.java中，定义了wait(), notify()和notifyAll()等接口。wait()的作用是让当前线程进入等待状态，同时，wait()也会让当前线程释放它所持有的锁。而notify()和notifyAll()的作用，则是唤醒当前对象上的等待线程；notify()是唤醒单个线程，而notifyAll()是唤醒所有的线程。</p>
+<p>Object类中关于等待/唤醒的API详细信息如下：</p>
+<table>
+<thead>
+<tr>
+<th>API接口</th>
+<th>API说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>notify()</strong></td>
+<td>唤醒在此对象监视器上等待的单个线程。</td>
+</tr>
+<tr>
+<td><strong>notifyAll()</strong></td>
+<td>唤醒在此对象监视器上等待的所有线程。</td>
+</tr>
+<tr>
+<td><strong>wait()</strong></td>
+<td>让当前线程处于“等待(阻塞)状态”，“直到其他线程调用此对象的 notify() 方法或 notifyAll() 方法”，当前线程被唤醒(进入“就绪状态”)。</td>
+</tr>
+<tr>
+<td><strong>wait(long timeout)</strong></td>
+<td>让当前线程处于“等待(阻塞)状态”，“直到其他线程调用此对象的 notify() 方法或 notifyAll() 方法，或者超过指定的时间量”，当前线程被唤醒(进入“就绪状态”)。</td>
+</tr>
+<tr>
+<td><strong>wait(long timeout, int nanos)</strong></td>
+<td>让当前线程处于“等待(阻塞)状态”，“直到其他线程调用此对象的 notify() 方法或 notifyAll() 方法，或者其他某个线程中断当前线程，或者已超过某个实际时间量”，当前线程被唤醒(进入“就绪状态”)。</td>
+</tr>
+</tbody>
+</table>
+<p><a name="anchor2"></a></p>
+<h1 id="2-wait-和notify-示例"><a href="#2-wait-和notify-示例" class="headerlink" title="2. wait()和notify()示例"></a>2. wait()和notify()示例</h1><p>下面通过示例演示”wait()和notify()配合使用的情形”。</p>
+<pre><code>// WaitTest.java的源码
+class ThreadA extends Thread{
+
+    public ThreadA(String name) {
+        super(name);
+    }
+
+    public void run() {
+        synchronized (this) {
+            System.out.println(Thread.currentThread().getName()+&quot; call notify()&quot;);
+            // 唤醒当前的wait线程
+            notify();
+        }
+    }
+}
+
+public class WaitTest {
+
+    public static void main(String[] args) {
+
+        ThreadA t1 = new ThreadA(&quot;t1&quot;);
+
+        synchronized(t1) {
+            try {
+                // 启动“线程t1”
+                System.out.println(Thread.currentThread().getName()+&quot; start t1&quot;);
+                t1.start();
+
+                // 主线程等待t1通过notify()唤醒。
+                System.out.println(Thread.currentThread().getName()+&quot; wait()&quot;);
+                t1.wait();
+
+                System.out.println(Thread.currentThread().getName()+&quot; continue&quot;);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+}
+</code></pre><p>运行结果:</p>
+<pre><code>main start t1
+main wait()
+t1 call notify()
+main continue
+</code></pre><p>结果说明：<br>如下图，说明了“主线程”和“线程t1”的流程。<br>(01) 注意，图中”主线程” 代表“主线程main”。”线程t1” 代表WaitTest中启动的“线程t1”。 而“锁” 代表“t1这个对象的同步锁”。<br>(02) “主线程”通过 new ThreadA(“t1”) 新建“线程t1”。随后通过synchronized(t1)获取“t1对象的同步锁”。然后调用t1.start()启动“线程t1”。<br>(03) “主线程”执行t1.wait() 释放“t1对象的锁”并且进入“等待(阻塞)状态”。等待t1对象上的线程通过notify() 或 notifyAll()将其唤醒。<br>(04) “线程t1”运行之后，通过synchronized(this)获取“当前对象的锁”；接着调用notify()唤醒“当前对象上的等待线程”，也就是唤醒“主线程”。<br>(05) “线程t1”运行完毕之后，释放“当前对象的锁”。紧接着，“主线程”获取“t1对象的锁”，然后接着运行。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://wangkuiwu.github.io/media/pic/java/threads/basic05-01.png" alt="img" title="">
+                </div>
+                <div class="image-caption">img</div>
+            </figure>
+<p>对于上面的代码？曾经有个朋友问到过：t1.wait()应该是让“线程t1”等待；但是，为什么却是让“主线程main”等待了呢？<br>在解答该问题前，我们先看看jdk文档中关于wait的一段介绍：</p>
+<blockquote>
+<p>Causes the current thread to wait until another thread invokes the notify() method or the notifyAll() method for this object.<br>In other words, this method behaves exactly as if it simply performs the call wait(0).<br>The current thread must own this object’s monitor. The thread releases ownership of this monitor and waits until another thread notifies threads waiting on this object’s monitor to wake up either through a call to the notify method or the notifyAll method. The thread then waits until it can re-obtain ownership of the monitor and resumes execution.</p>
+</blockquote>
+<p>中文意思大概是：</p>
+<p><em>引起“当前线程”等待，直到另外一个线程调用notify()或notifyAll()唤醒该线程。换句话说，这个方法和wait(0)的效果一样！(补充，对于wait(long millis)方法，当millis为0时，表示无限等待，直到被notify()或notifyAll()唤醒)。</em><br><em>“当前线程”在调用wait()时，必须拥有该对象的同步锁。该线程调用wait()之后，会释放该锁；然后一直等待直到“其它线程”调用对象的同步锁的notify()或notifyAll()方法。然后，该线程继续等待直到它重新获取“该对象的同步锁”，然后就可以接着运行。</em></p>
+<p>注意：<strong>jdk的解释中，说wait()的作用是让“当前线程”等待，而“当前线程”是指正在cpu上运行的线程！</strong><br>这也意味着，虽然t1.wait()是通过“线程t1”调用的wait()方法，但是调用t1.wait()的地方是在“主线程main”中。而主线程必须是“当前线程”，也就是运行状态，才可以执行t1.wait()。所以，此时的“当前线程”是“主线程main”！因此，t1.wait()是让“主线程”等待，而不是“线程t1”！</p>
+<p><a name="anchor3"></a></p>
+<h1 id="3-wait-long-timeout-和notify"><a href="#3-wait-long-timeout-和notify" class="headerlink" title="3. wait(long timeout)和notify()"></a>3. wait(long timeout)和notify()</h1><p>wait(long timeout)会让当前线程处于“等待(阻塞)状态”，“直到其他线程调用此对象的 notify() 方法或 notifyAll() 方法，或者超过指定的时间量”，当前线程被唤醒(进入“就绪状态”)。</p>
+<p>下面的示例就是演示wait(long timeout)在超时情况下，线程被唤醒的情况。</p>
+<pre><code>// WaitTimeoutTest.java的源码
+class ThreadA extends Thread{
+
+    public ThreadA(String name) {
+        super(name);
+    }
+
+    public void run() {
+        System.out.println(Thread.currentThread().getName() + &quot; run &quot;);
+        // 死循环，不断运行。
+        while(true)
+            ;
+    }
+}
+
+public class WaitTimeoutTest {
+
+    public static void main(String[] args) {
+
+        ThreadA t1 = new ThreadA(&quot;t1&quot;);
+
+        synchronized(t1) {
+            try {
+                // 启动“线程t1”
+                System.out.println(Thread.currentThread().getName() + &quot; start t1&quot;);
+                t1.start();
+
+                // 主线程等待t1通过notify()唤醒 或 notifyAll()唤醒，或超过3000ms延时；然后才被唤醒。
+                System.out.println(Thread.currentThread().getName() + &quot; call wait &quot;);
+                t1.wait(3000);
+
+                System.out.println(Thread.currentThread().getName() + &quot; continue&quot;);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+}
+</code></pre><p>运行结果：</p>
+<pre><code>main start t1
+main call wait 
+t1 run                  // 大约3秒之后...输出“main continue”
+main continue
+</code></pre><p>结果说明：<br>如下图，说明了“主线程”和“线程t1”的流程。<br>(01) 注意，图中”主线程” 代表WaitTimeoutTest主线程(即，线程main)。”线程t1” 代表WaitTest中启动的线程t1。 而“锁” 代表“t1这个对象的同步锁”。<br>(02) 主线程main执行t1.start()启动“线程t1”。<br>(03) 主线程main执行t1.wait(3000)，此时，主线程进入“阻塞状态”。需要“用于t1对象锁的线程通过notify() 或者 notifyAll()将其唤醒” 或者 “超时3000ms之后”，主线程main才进入到“就绪状态”，然后才可以运行。<br>(04) “线程t1”运行之后，进入了死循环，一直不断的运行。<br>(05) 超时3000ms之后，主线程main会进入到“就绪状态”，然后接着进入“运行状态”。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://wangkuiwu.github.io/media/pic/java/threads/basic05-02.png" alt="img" title="">
+                </div>
+                <div class="image-caption">img</div>
+            </figure>
+<p><a name="anchor4"></a></p>
+<h1 id="4-wait-和-notifyAll"><a href="#4-wait-和-notifyAll" class="headerlink" title="4. wait() 和 notifyAll()"></a>4. wait() 和 notifyAll()</h1><p>通过前面的示例，我们知道 notify() 可以唤醒在此对象监视器上等待的单个线程。</p>
+<p>下面，我们通过示例演示notifyAll()的用法；它的作用是唤醒在此对象监视器上等待的所有线程。</p>
+<pre><code>public class NotifyAllTest {
+
+    private static Object obj = new Object();
+    public static void main(String[] args) {
+
+        ThreadA t1 = new ThreadA(&quot;t1&quot;);
+        ThreadA t2 = new ThreadA(&quot;t2&quot;);
+        ThreadA t3 = new ThreadA(&quot;t3&quot;);
+        t1.start();
+        t2.start();
+        t3.start();
+
+        try {
+            System.out.println(Thread.currentThread().getName()+&quot; sleep(3000)&quot;);
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        synchronized(obj) {
+            // 主线程等待唤醒。
+            System.out.println(Thread.currentThread().getName()+&quot; notifyAll()&quot;);
+            obj.notifyAll();
+        }
+    }
+
+    static class ThreadA extends Thread{
+
+        public ThreadA(String name){
+            super(name);
+        }
+
+        public void run() {
+            synchronized (obj) {
+                try {
+                    // 打印输出结果
+                    System.out.println(Thread.currentThread().getName() + &quot; wait&quot;);
+
+                    // 唤醒当前的wait线程
+                    obj.wait();
+
+                    // 打印输出结果
+                    System.out.println(Thread.currentThread().getName() + &quot; continue&quot;);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+}
+</code></pre><p>运行结果：</p>
+<pre><code>t1 wait
+main sleep(3000)
+t3 wait
+t2 wait
+main notifyAll()
+t2 continue
+t3 continue
+t1 continue
+</code></pre><p>结果说明：<br>参考下面的流程图。<br>(01) 主线程中新建并且启动了3个线程”t1”, “t2”和”t3”。<br>(02) 主线程通过sleep(3000)休眠3秒。在主线程休眠3秒的过程中，我们假设”t1”, “t2”和”t3”这3个线程都运行了。以”t1”为例，当它运行的时候，它会执行obj.wait()等待其它线程通过notify()或额nofityAll()来唤醒它；相同的道理，”t2”和”t3”也会等待其它线程通过nofity()或nofityAll()来唤醒它们。<br>(03) 主线程休眠3秒之后，接着运行。执行 obj.notifyAll() 唤醒obj上的等待线程，即唤醒”t1”, “t2”和”t3”这3个线程。 紧接着，主线程的synchronized(obj)运行完毕之后，主线程释放“obj锁”。这样，”t1”, “t2”和”t3”就可以获取“obj锁”而继续运行了！</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://wangkuiwu.github.io/media/pic/java/threads/basic05-03.png" alt="img" title="">
+                </div>
+                <div class="image-caption">img</div>
+            </figure>
+<p><a name="anchor5"></a></p>
+<h1 id="5-为什么notify-wait-等函数定义在Object中，而不是Thread中"><a href="#5-为什么notify-wait-等函数定义在Object中，而不是Thread中" class="headerlink" title="5. 为什么notify(), wait()等函数定义在Object中，而不是Thread中"></a>5. 为什么notify(), wait()等函数定义在Object中，而不是Thread中</h1><p>Object中的wait(), notify()等函数，和synchronized一样，会对“对象的同步锁”进行操作。</p>
+<p>wait()会使“当前线程”等待，因为线程进入等待状态，所以线程应该释放它锁持有的“同步锁”，否则其它线程获取不到该“同步锁”而无法运行！<br>OK，线程调用wait()之后，会释放它锁持有的“同步锁”；而且，根据前面的介绍，我们知道：等待线程可以被notify()或notifyAll()唤醒。现在，请思考一个问题：notify()是依据什么唤醒等待线程的？或者说，wait()等待线程和notify()之间是通过什么关联起来的？答案是：依据“对象的同步锁”。</p>
+<p>负责唤醒等待线程的那个线程(我们称为“唤醒线程”)，它只有在获取“该对象的同步锁”(这里的同步锁必须和等待线程的同步锁是同一个)，并且调用notify()或notifyAll()方法之后，才能唤醒等待线程。虽然，等待线程被唤醒；但是，它不能立刻执行，因为唤醒线程还持有“该对象的同步锁”。必须等到唤醒线程释放了“对象的同步锁”之后，等待线程才能获取到“对象的同步锁”进而继续运行。</p>
+<p>总之，notify(), wait()依赖于“同步锁”，而“同步锁”是对象锁持有，并且每个对象有且仅有一个！这就是为什么notify(), wait()等函数定义在Object类，而不是Thread类中的原因。</p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2018-06-27T09:39:57.949Z" itemprop="dateUpdated">2018-06-27 17:39:57</time>
+</span><br>
+
+
+        
+        本文固定链接：<a href="/2016/11/05/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”05之 线程等待与唤醒/" target="_blank" rel="external">https://smuwjs.github.io/2016/11/05/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”05之 线程等待与唤醒/</a>
+        
+    </div>
+    <footer>
+        <a href="https://smuwjs.github.io">
+            <img src="/img/head.png" alt="Jeeson">
+            Jeeson
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java多线程系列/">Java多线程系列</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java源码分析/">Java源码分析</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/11/05/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”05之 线程等待与唤醒/&title=《Java多线程系列--“基础篇”05之 线程等待与唤醒》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/11/05/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”05之 线程等待与唤醒/&title=《Java多线程系列--“基础篇”05之 线程等待与唤醒》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/11/05/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”05之 线程等待与唤醒/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Java多线程系列--“基础篇”05之 线程等待与唤醒》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/11/05/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”05之 线程等待与唤醒/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/11/05/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”05之 线程等待与唤醒/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2016/11/06/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”06之 线程让步/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">Java多线程系列--“基础篇”06之 线程让步</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2016/11/04/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”04之 synchronized关键字/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Java多线程系列--“基础篇”04之 synchronized关键字</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”05之 线程等待与唤醒" data-title="Java多线程系列--“基础篇”05之 线程等待与唤醒" data-url="https://smuwjs.github.io/2016/11/05/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”05之 线程等待与唤醒/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'smuwjs', theme: 'none'};
+lazyScripts.push('//unpkg.com/hexo-theme-material-indigo@latest/js/embed.min.js');
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循<a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>Jeeson &copy; 2015 - 2018</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/11/05/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”05之 线程等待与唤醒/&title=《Java多线程系列--“基础篇”05之 线程等待与唤醒》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/11/05/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”05之 线程等待与唤醒/&title=《Java多线程系列--“基础篇”05之 线程等待与唤醒》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/11/05/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”05之 线程等待与唤醒/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Java多线程系列--“基础篇”05之 线程等待与唤醒》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/11/05/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”05之 线程等待与唤醒/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/11/05/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”05之 线程等待与唤醒/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://smuwjs.github.io/2016/11/05/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”05之 线程等待与唤醒/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

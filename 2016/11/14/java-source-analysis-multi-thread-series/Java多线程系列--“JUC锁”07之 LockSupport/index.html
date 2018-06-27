@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>Java多线程系列--“JUC锁”07之 LockSupport | Jeeson&#39;s Blog | Write the code. Change the world.</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="Java源码分析,Java多线程系列,JUC锁">
+    <meta name="description" content="本章介绍JUC(java.util.concurrent)包中的LockSupport。   目录1. LockSupport介绍2. LockSupport示例     1. LockSupport介绍LockSupport是用来创建锁和其他同步类的基本线程阻塞原语。 LockSupport中的park() 和 unpark() 的作用分别是阻塞线程和解除阻塞线程，而且park()和unpar">
+<meta name="keywords" content="Java源码分析,Java多线程系列,JUC锁">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java多线程系列--“JUC锁”07之 LockSupport">
+<meta property="og:url" content="https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”07之 LockSupport/index.html">
+<meta property="og:site_name" content="Jeeson&#39;s Blog">
+<meta property="og:description" content="本章介绍JUC(java.util.concurrent)包中的LockSupport。   目录1. LockSupport介绍2. LockSupport示例     1. LockSupport介绍LockSupport是用来创建锁和其他同步类的基本线程阻塞原语。 LockSupport中的park() 和 unpark() 的作用分别是阻塞线程和解除阻塞线程，而且park()和unpar">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-06-27T09:39:57.945Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java多线程系列--“JUC锁”07之 LockSupport">
+<meta name="twitter:description" content="本章介绍JUC(java.util.concurrent)包中的LockSupport。   目录1. LockSupport介绍2. LockSupport示例     1. LockSupport介绍LockSupport是用来创建锁和其他同步类的基本线程阻塞原语。 LockSupport中的park() 和 unpark() 的作用分别是阻塞线程和解除阻塞线程，而且park()和unpar">
+    
+        <link rel="alternate" type="application/atom+xml" title="Jeeson&#39;s Blog" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/head.png">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Jeeson</h5>
+          <a href="mailto:smuwjs@163.com" title="smuwjs@163.com" class="mail">smuwjs@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/smuwjs" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Java多线程系列--“JUC锁”07之 LockSupport</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Java多线程系列--“JUC锁”07之 LockSupport</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2016-11-13T23:00:00.000Z" itemprop="datePublished" class="page-time">
+  2016-11-14
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#1-LockSupport介绍"><span class="post-toc-number">1.</span> <span class="post-toc-text">1. LockSupport介绍</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#2-LockSupport示例"><span class="post-toc-number">2.</span> <span class="post-toc-text">2. LockSupport示例</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#示例1"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">示例1</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#示例2"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">示例2</span></a></li></ol></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”07之 LockSupport"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Java多线程系列--“JUC锁”07之 LockSupport</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2016-11-14 07:00:00" datetime="2016-11-13T23:00:00.000Z"  itemprop="datePublished">2016-11-14</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <blockquote>
+<p>本章介绍JUC(java.util.concurrent)包中的LockSupport。</p>
+</blockquote>
+<blockquote>
+<p><strong>目录</strong><br><a href="#anchor1">1. LockSupport介绍</a><br><a href="#anchor2">2. LockSupport示例</a>  </p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="1-LockSupport介绍"><a href="#1-LockSupport介绍" class="headerlink" title="1. LockSupport介绍"></a>1. LockSupport介绍</h1><p>LockSupport是用来创建锁和其他同步类的基本线程阻塞原语。</p>
+<p>LockSupport中的park() 和 unpark() 的作用分别是阻塞线程和解除阻塞线程，而且park()和unpark()不会遇到“Thread.suspend 和 Thread.resume所可能引发的死锁”问题。</p>
+<p>因为park() 和 unpark()有许可的存在；调用 park() 的线程和另一个试图将其 unpark() 的线程之间的竞争将保持活性。</p>
+<p><strong>LockSupport函数列表</strong></p>
+<pre><code>// 返回提供给最近一次尚未解除阻塞的 park 方法调用的 blocker 对象，如果该调用不受阻塞，则返回 null。
+static Object getBlocker(Thread t)
+// 为了线程调度，禁用当前线程，除非许可可用。
+static void park()
+// 为了线程调度，在许可可用之前禁用当前线程。
+static void park(Object blocker)
+// 为了线程调度禁用当前线程，最多等待指定的等待时间，除非许可可用。
+static void parkNanos(long nanos)
+// 为了线程调度，在许可可用前禁用当前线程，并最多等待指定的等待时间。
+static void parkNanos(Object blocker, long nanos)
+// 为了线程调度，在指定的时限前禁用当前线程，除非许可可用。
+static void parkUntil(long deadline)
+// 为了线程调度，在指定的时限前禁用当前线程，除非许可可用。
+static void parkUntil(Object blocker, long deadline)
+// 如果给定线程的许可尚不可用，则使其可用。
+static void unpark(Thread thread)
+</code></pre><p><a name="anchor2"></a></p>
+<h1 id="2-LockSupport示例"><a href="#2-LockSupport示例" class="headerlink" title="2. LockSupport示例"></a>2. LockSupport示例</h1><p>对比下面的“示例1”和“示例2”可以更清晰的了解LockSupport的用法。</p>
+<h2 id="示例1"><a href="#示例1" class="headerlink" title="示例1"></a>示例1</h2><pre><code>public class WaitTest1 {
+
+    public static void main(String[] args) {
+
+        ThreadA ta = new ThreadA(&quot;ta&quot;);
+
+        synchronized(ta) { // 通过synchronized(ta)获取“对象ta的同步锁”
+            try {
+                System.out.println(Thread.currentThread().getName()+&quot; start ta&quot;);
+                ta.start();
+
+                System.out.println(Thread.currentThread().getName()+&quot; block&quot;);
+                // 主线程等待
+                ta.wait();
+
+                System.out.println(Thread.currentThread().getName()+&quot; continue&quot;);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    static class ThreadA extends Thread{
+
+        public ThreadA(String name) {
+            super(name);
+        }
+
+        public void run() {
+            synchronized (this) { // 通过synchronized(this)获取“当前对象的同步锁”
+                System.out.println(Thread.currentThread().getName()+&quot; wakup others&quot;);
+                notify();    // 唤醒“当前对象上的等待线程”
+            }
+        }
+    }
+}
+</code></pre><h2 id="示例2"><a href="#示例2" class="headerlink" title="示例2"></a>示例2</h2><pre><code>import java.util.concurrent.locks.LockSupport;
+
+public class LockSupportTest1 {
+
+    private static Thread mainThread;
+
+    public static void main(String[] args) {
+
+        ThreadA ta = new ThreadA(&quot;ta&quot;);
+        // 获取主线程
+        mainThread = Thread.currentThread();
+
+        System.out.println(Thread.currentThread().getName()+&quot; start ta&quot;);
+        ta.start();
+
+        System.out.println(Thread.currentThread().getName()+&quot; block&quot;);
+        // 主线程阻塞
+        LockSupport.park(mainThread);
+
+        System.out.println(Thread.currentThread().getName()+&quot; continue&quot;);
+    }
+
+    static class ThreadA extends Thread{
+
+        public ThreadA(String name) {
+            super(name);
+        }
+
+        public void run() {
+            System.out.println(Thread.currentThread().getName()+&quot; wakup others&quot;);
+            // 唤醒“主线程”
+            LockSupport.unpark(mainThread);
+        }
+    }
+}
+</code></pre><p>运行结果：</p>
+<pre><code>main start ta
+main block
+ta wakup others
+main continue
+</code></pre><p>说明：park和wait的区别。wait让线程阻塞前，必须通过synchronized获取同步锁。</p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2018-06-27T09:39:57.945Z" itemprop="dateUpdated">2018-06-27 17:39:57</time>
+</span><br>
+
+
+        
+        本文固定链接：<a href="/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”07之 LockSupport/" target="_blank" rel="external">https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”07之 LockSupport/</a>
+        
+    </div>
+    <footer>
+        <a href="https://smuwjs.github.io">
+            <img src="/img/head.png" alt="Jeeson">
+            Jeeson
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JUC锁/">JUC锁</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java多线程系列/">Java多线程系列</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java源码分析/">Java源码分析</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”07之 LockSupport/&title=《Java多线程系列--“JUC锁”07之 LockSupport》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”07之 LockSupport/&title=《Java多线程系列--“JUC锁”07之 LockSupport》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”07之 LockSupport/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Java多线程系列--“JUC锁”07之 LockSupport》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”07之 LockSupport/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”07之 LockSupport/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”08之 共享锁和ReentrantReadWriteLock/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">Java多线程系列--“JUC锁”08之 共享锁和ReentrantReadWriteLock</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”06之 Condition条件/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Java多线程系列--“JUC锁”06之 Condition条件</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”07之 LockSupport" data-title="Java多线程系列--“JUC锁”07之 LockSupport" data-url="https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”07之 LockSupport/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'smuwjs', theme: 'none'};
+lazyScripts.push('//unpkg.com/hexo-theme-material-indigo@latest/js/embed.min.js');
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循<a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>Jeeson &copy; 2015 - 2018</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”07之 LockSupport/&title=《Java多线程系列--“JUC锁”07之 LockSupport》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”07之 LockSupport/&title=《Java多线程系列--“JUC锁”07之 LockSupport》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”07之 LockSupport/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Java多线程系列--“JUC锁”07之 LockSupport》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”07之 LockSupport/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”07之 LockSupport/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”07之 LockSupport/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

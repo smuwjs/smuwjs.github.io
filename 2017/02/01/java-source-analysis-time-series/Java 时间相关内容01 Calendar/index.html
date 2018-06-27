@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>Java 时间相关内容01 Calendar | Jeeson&#39;s Blog | Write the code. Change the world.</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="Java源码分析,Java 时间相关内容">
+    <meta name="description" content="Java 操作日期/时间，往往会涉及到Calendar，Date，DateFormat这些类。最近决定把这些内容系统的整理一下，这样以后使用的时候，会更得心应手。本章的内容是主要讲解“Java时间框架”以及“类Calendar”。在学习Calendar类时，我们先对它有个整体认识，心中建立一个框架，然后再通过示例学习如何使用它。   目录第一部分 Java时间架构第二部分 Calendar介绍">
+<meta name="keywords" content="Java源码分析,Java 时间相关内容">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java 时间相关内容01 Calendar">
+<meta property="og:url" content="https://smuwjs.github.io/2017/02/01/java-source-analysis-time-series/Java 时间相关内容01 Calendar/index.html">
+<meta property="og:site_name" content="Jeeson&#39;s Blog">
+<meta property="og:description" content="Java 操作日期/时间，往往会涉及到Calendar，Date，DateFormat这些类。最近决定把这些内容系统的整理一下，这样以后使用的时候，会更得心应手。本章的内容是主要讲解“Java时间框架”以及“类Calendar”。在学习Calendar类时，我们先对它有个整体认识，心中建立一个框架，然后再通过示例学习如何使用它。   目录第一部分 Java时间架构第二部分 Calendar介绍">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://wangkuiwu.github.io/media/pic/java/time/time01.jpg">
+<meta property="og:updated_time" content="2018-06-27T09:39:57.953Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java 时间相关内容01 Calendar">
+<meta name="twitter:description" content="Java 操作日期/时间，往往会涉及到Calendar，Date，DateFormat这些类。最近决定把这些内容系统的整理一下，这样以后使用的时候，会更得心应手。本章的内容是主要讲解“Java时间框架”以及“类Calendar”。在学习Calendar类时，我们先对它有个整体认识，心中建立一个框架，然后再通过示例学习如何使用它。   目录第一部分 Java时间架构第二部分 Calendar介绍">
+<meta name="twitter:image" content="http://wangkuiwu.github.io/media/pic/java/time/time01.jpg">
+    
+        <link rel="alternate" type="application/atom+xml" title="Jeeson&#39;s Blog" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/head.png">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Jeeson</h5>
+          <a href="mailto:smuwjs@163.com" title="smuwjs@163.com" class="mail">smuwjs@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/smuwjs" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Java 时间相关内容01 Calendar</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Java 时间相关内容01 Calendar</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2017-01-31T16:00:00.000Z" itemprop="datePublished" class="page-time">
+  2017-02-01
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#第一部分-Java时间架构"><span class="post-toc-number">1.</span> <span class="post-toc-text">第一部分 Java时间架构</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#第二部分-Calendar介绍"><span class="post-toc-number">2.</span> <span class="post-toc-text">第二部分 Calendar介绍</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#第3部分-Calendar的原理和思想"><span class="post-toc-number">3.</span> <span class="post-toc-text">第3部分 Calendar的原理和思想</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#1-Calendar-各个字段值的来源"><span class="post-toc-number">3.1.</span> <span class="post-toc-text">1. Calendar 各个字段值的来源</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#2-Calendar-各个字段的定义和初始化"><span class="post-toc-number">3.2.</span> <span class="post-toc-text">2. Calendar 各个字段的定义和初始化</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#3-Calendar-各个字段值的计算"><span class="post-toc-number">3.3.</span> <span class="post-toc-text">3. Calendar 各个字段值的计算</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#第4部分-Calendar函数接口"><span class="post-toc-number">4.</span> <span class="post-toc-text">第4部分 Calendar函数接口</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#1-Calendar的17个字段的公共接口"><span class="post-toc-number">4.1.</span> <span class="post-toc-text">1. Calendar的17个字段的公共接口</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#2-Calendar的其它函数"><span class="post-toc-number">4.2.</span> <span class="post-toc-text">2. Calendar的其它函数</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#第5部分-Calendar示例"><span class="post-toc-number">5.</span> <span class="post-toc-text">第5部分 Calendar示例</span></a></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-java-source-analysis-time-series/Java 时间相关内容01 Calendar"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Java 时间相关内容01 Calendar</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2017-02-01 00:00:00" datetime="2017-01-31T16:00:00.000Z"  itemprop="datePublished">2017-02-01</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <blockquote>
+<p>Java 操作日期/时间，往往会涉及到Calendar，Date，DateFormat这些类。<br>最近决定把这些内容系统的整理一下，这样以后使用的时候，会更得心应手。本章的内容是主要讲解“Java时间框架”以及“类Calendar”。<br>在学习Calendar类时，我们先对它有个整体认识，心中建立一个框架，然后再通过示例学习如何使用它。</p>
+</blockquote>
+<blockquote>
+<p><strong>目录</strong><br><a href="#anchor1">第一部分 Java时间架构</a><br><a href="#anchor2">第二部分 Calendar介绍 </a><br><a href="#anchor3">第3部分 Calendar的原理和思想</a><br><a href="#anchor4">第4部分 Calendar函数接口</a><br><a href="#anchor5">第5部分 Calendar示例 </a>   </p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="第一部分-Java时间架构"><a href="#第一部分-Java时间架构" class="headerlink" title="第一部分 Java时间架构"></a>第一部分 Java时间架构</h1><p>Java 的Calendar, Date和DateFormat的关系图如下：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://wangkuiwu.github.io/media/pic/java/time/time01.jpg" alt="img" title="">
+                </div>
+                <div class="image-caption">img</div>
+            </figure>
+<p>说明：<br>(01) milliseconds 表示毫秒。<br>&nbsp;&nbsp;&nbsp;&nbsp; milliseconds = “实际时间” - “1970-01-01 00:00:00”。Calendar 和 Date依赖于 milliseconds，从而表示时间。<br>(02) Calendar表示日期/时间。<br>&nbsp;&nbsp;&nbsp;&nbsp; 它是一个抽象类，依赖于milliseconds。GregorianCalendar是Calendar的子类，通常我们通过Calendar.getInstance() 获取Calendar实例时，实际上返回的是 GregorianCalendar 对象。<br>&nbsp;&nbsp;&nbsp;&nbsp; Calendar和Locale关联，而Locale代表区域；Locale的值不同时，Calendar的日期/时间也不同。<br>&nbsp;&nbsp;&nbsp;&nbsp; Calendar和TimeZone关联，而TimeZone代表时区；不同的时区，Calendar的日期/时间也不同。<br>(03) Date 表示日期/时间。<br>&nbsp;&nbsp;&nbsp;&nbsp; 它也依赖于 milliseconds实现。<br>&nbsp;&nbsp;&nbsp;&nbsp; 在 JDK 1.1 之前，通常是通过Data操作“年月日时分秒”。不过，由于Date的相关 API 不易于实现国际化。从 JDK 1.1 开始，应该使用 Calendar 类来操作“年月日时分秒”，同时可以通过 DateFormat 类来格式化和解析日期字符串。Date 中的相应方法已废弃。<br>(04) DateFormat是格式化/解析“日期/时间”的工具类。<br>&nbsp;&nbsp;&nbsp;&nbsp; 它是Date的格式化工具，它能帮助我们格式化Date，进而将Date转换成我们想要的String字符串供我们使用。<br>&nbsp;&nbsp;&nbsp;&nbsp; 它是一个抽象类。通常，我们通过getInstance(), getDateInstance()和getDateTimeInstance() 等获取DateFormat实例时；实际上是返回的SimpleDateFormat对象。</p>
+<p><a name="anchor2"></a></p>
+<h1 id="第二部分-Calendar介绍"><a href="#第二部分-Calendar介绍" class="headerlink" title="第二部分 Calendar介绍"></a>第二部分 Calendar介绍</h1><p>Calendar 定义</p>
+<pre><code>public abstract class Calendar implements Serializable, Cloneable, Comparable&lt;Calendar&gt; {}
+</code></pre><p>Calendar 是一个抽象类。</p>
+<p>它的实现，采用了设计模式中的工厂方法。表现在：当我们获取Calendar实例时，Calendar会根据传入的参数来返回相应的Calendar对象。获取Calendar实例，有以下两种方式：<br>1) 当我们通过 Calendar.getInstance() 获取日历时，默认的是返回的一个GregorianCalendar对象。<br>&nbsp;&nbsp;&nbsp;&nbsp; GregorianCalendar是Calendar的一个实现类，它提供了世界上大多数国家/地区使用的标准日历系统。<br>2) 当我们通过 Calendar.getInstance(TimeZone timezone, Locale locale) 或 Calendar.getInstance(TimeZone timezone) 或 Calendar.getInstance(Locale locale)获取日历时，是返回“对应时区(zone) 或 地区(local)等所使用的日历”。<br>&nbsp;&nbsp;&nbsp;&nbsp; 例如，若是日本，则返回JapaneseImperialCalendar对象。</p>
+<p>参考如下代码：</p>
+<pre><code>public static Calendar getInstance()
+{
+    // 调用createCalendar()创建日历
+    Calendar cal = createCalendar(TimeZone.getDefaultRef(), Locale.getDefault());
+    cal.sharedZone = true;
+    return cal;
+}
+
+
+public static Calendar getInstance(TimeZone zone)
+{
+    // 调用createCalendar()创建日历
+    return createCalendar(zone, Locale.getDefault());
+}
+
+
+public static Calendar getInstance(Locale aLocale) {
+    // 调用createCalendar()创建日历
+    Calendar cal = createCalendar(TimeZone.getDefaultRef(), aLocale);
+    cal.sharedZone = true;
+    return cal;
+}
+
+public static Calendar getInstance(TimeZone zone,
+                   Locale aLocale)
+{
+    // 调用createCalendar()创建日历
+    return createCalendar(zone, aLocale);
+}
+
+private static Calendar createCalendar(TimeZone zone,
+                   Locale aLocale)
+{
+    // (01) 若地区是“th”，则返回BuddhistCalendar对象
+    // (02) 若地区是“JP”，则返回JapaneseImperialCalendar对象
+    if (&quot;th&quot;.equals(aLocale.getLanguage())
+        &amp;&amp; (&quot;TH&quot;.equals(aLocale.getCountry()))) {
+        return new sun.util.BuddhistCalendar(zone, aLocale);
+    } else if (&quot;JP&quot;.equals(aLocale.getVariant())
+       &amp;&amp; &quot;JP&quot;.equals(aLocale.getCountry())
+       &amp;&amp; &quot;ja&quot;.equals(aLocale.getLanguage())) {
+        return new JapaneseImperialCalendar(zone, aLocale);
+    }        
+
+    // (03) 否则，返回GregorianCalendar对象
+    return new GregorianCalendar(zone, aLocale);    
+}
+</code></pre><p>当我们获取Calendar实例之后，就可以通过Calendar提供的一些列方法来操作日历。</p>
+<p><a name="anchor3"></a></p>
+<h1 id="第3部分-Calendar的原理和思想"><a href="#第3部分-Calendar的原理和思想" class="headerlink" title="第3部分 Calendar的原理和思想"></a>第3部分 Calendar的原理和思想</h1><p>我们使用Calendar，无非是操作Calendar的“年、月、日、星期、时、分、秒”这些字段。下面，我们对这些字段的的来源、定义以及计算方法进行学习。</p>
+<h2 id="1-Calendar-各个字段值的来源"><a href="#1-Calendar-各个字段值的来源" class="headerlink" title="1. Calendar 各个字段值的来源"></a>1. Calendar 各个字段值的来源</h2><p>我们使用Calendar，无非是使用“年、月、日、星期、时、分、秒”等信息。那么它是如何做到的呢？<br>本质上，Calendar就是保存了一个时间。如下定义：</p>
+<pre><code>// time 是当前时间，单位是毫秒。
+// 它是当前时间距离“January 1, 1970, 0:00:00 GMT”的差值。
+protected long time;
+</code></pre><p>Calendar就是根据 time 计算出 “Calendar的年、月、日、星期、时、分、秒”等等信息。</p>
+<h2 id="2-Calendar-各个字段的定义和初始化"><a href="#2-Calendar-各个字段的定义和初始化" class="headerlink" title="2. Calendar 各个字段的定义和初始化"></a>2. Calendar 各个字段的定义和初始化</h2><p>Calendar 的“年、月、日、星期、时、分、秒”这些信息，一共是17个字段。<br>我们使用Calendar，无非是就是使用这17个字段。它们的定义如下：  </p>
+<p>(<strong>字段0</strong>) public final static int ERA = 0;<br>说明：纪元。<br>取值：只能为0 或 1。0表示BC(“before Christ”,即公元前)，1表示AD(拉丁语“Anno Domini”,即公元)。</p>
+<p>(<strong>字段1</strong>) public final static int YEAR = 1;<br>说明：年。</p>
+<p>(<strong>字段2</strong>) public final static int MONTH = 2;<br>说明：月<br>取值：可以为，JANUARY, FEBRUARY, MARCH, APRIL, MAY, JUNE, JULY, AUGUST, SEPTEMBER, OCTOBER, NOVEMBER, DECEMBER, UNDECIMBER。<br>&nbsp;&nbsp;&nbsp;&nbsp; 其中第一个月是 JANUARY，它为 0。</p>
+<p>(<strong>字段3</strong>) public final static int WEEK_OF_YEAR = 3;<br>说明：当前日期在本年中对应第几个星期。一年中第一个星期的值为 1。</p>
+<p>(<strong>字段4</strong>) public final static int WEEK_OF_MONTH = 4;<br>说明：当前日期在本月中对应第几个星期。一个月中第一个星期的值为 1。</p>
+<p>(<strong>字段5</strong>) public final static int DATE = 5;<br>说明：日。一个月中第一天的值为 1。</p>
+<p>(<strong>字段5</strong>) public final static int DAY_OF_MONTH = 5;<br>说明：同“DATE”，表示“日”。</p>
+<p>(<strong>字段6</strong>) public final static int DAY_OF_YEAR = 6;<br>说明：当前日期在本年中对应第几天。一年中第一天的值为 1。</p>
+<p>(<strong>字段7</strong>) public final static int DAY_OF_WEEK = 7;<br>说明：星期几。<br>取值：可以为，SUNDAY、MONDAY、TUESDAY、WEDNESDAY、THURSDAY、FRIDAY 和 SATURDAY。<br>&nbsp;&nbsp;&nbsp;&nbsp; 其中，SUNDAY为1，MONDAY为2，依次类推。</p>
+<p>(<strong>字段8</strong>) public final static int DAY_OF_WEEK_IN_MONTH = 8;<br>说明：当前月中的第几个星期。<br>取值：DAY_OF_MONTH 1 到 7 总是对应于 DAY_OF_WEEK_IN_MONTH 1；8 到 14 总是对应于 DAY_OF_WEEK_IN_MONTH 2，依此类推。</p>
+<p>(<strong>字段9</strong>) public final static int AM_PM = 9;<br>说明：上午 还是 下午<br>取值：可以是AM 或 PM。AM为0,表示上午；PM为1,表示下午。</p>
+<p>(<strong>字段10</strong>) public final static int HOUR = 10;<br>说明：指示一天中的第几小时。<br>&nbsp;&nbsp;&nbsp;&nbsp; HOUR 用于 12 小时制时钟 (0 - 11)。中午和午夜用 0 表示，不用 12 表示。</p>
+<p>(<strong>字段11</strong>) public final static int HOUR_OF_DAY = 11;<br>说明：指示一天中的第几小时。<br> &nbsp;&nbsp;&nbsp;&nbsp; HOUR_OF_DAY 用于 24 小时制时钟。例如，在 10:04:15.250 PM 这一时刻，HOUR_OF_DAY 为 22。</p>
+<p>(<strong>字段12</strong>) public final static int MINUTE = 12;<br>说明：一小时中的第几分钟。<br>例如，在 10:04:15.250 PM这一时刻，MINUTE 为 4。</p>
+<p>(<strong>字段13</strong>) public final static int SECOND = 13;<br>说明：一分钟中的第几秒。<br>例如，在 10:04:15.250 PM 这一时刻，SECOND 为 15。</p>
+<p>(<strong>字段14</strong>) public final static int MILLISECOND = 14;<br>说明：一秒中的第几毫秒。<br>例如，在 10:04:15.250 PM 这一时刻，MILLISECOND 为 250。</p>
+<p>(<strong>字段15</strong>) public final static int ZONE_OFFSET = 15;<br>说明：毫秒为单位指示距 GMT 的大致偏移量。</p>
+<p>(<strong>字段16</strong>) public final static int DST_OFFSET = 16;<br>说明：毫秒为单位指示夏令时的偏移量。</p>
+<p>public final static int FIELD_COUNT = 17;</p>
+<p>这17个字段是保存在int数组中。定义如下：</p>
+<pre><code>// 保存这17个字段的数组
+protected int           fields[];
+// 数组的定义函数
+protected Calendar(TimeZone zone, Locale aLocale)
+{
+    // 初始化“fields数组”
+    fields = new int[FIELD_COUNT];
+    isSet = new boolean[FIELD_COUNT];
+    stamp = new int[FIELD_COUNT];
+
+    this.zone = zone;
+    setWeekCountData(aLocale);
+}
+</code></pre><p>protected Calendar(TimeZone zone, Locale aLocale) 这是Calendar的构造函数。它会被它的子类的构造函数调用到，从而新建“保存Calendar的17个字段数据”的数组。</p>
+<h2 id="3-Calendar-各个字段值的计算"><a href="#3-Calendar-各个字段值的计算" class="headerlink" title="3. Calendar 各个字段值的计算"></a>3. Calendar 各个字段值的计算</h2><p>下面以get(int field)为例，简要的说明Calendar的17个字段的计算和操作。<br>get(int field)是获取“field”字段的值。它的定义如下：</p>
+<pre><code>public int get(int field) {
+    // 计算各个字段的值
+    complete();
+    // 返回field字段的值
+    return internalGet(field);
+}
+</code></pre><p>说明：get(int field)的代码很简单。先通过 complete() 计算各个字段的值，然后在通过 internalGet(field) 返回“field字段的值”。</p>
+<p>complete() 的作用就是计算Calendar各个字段的值。它定义在Calendar.java中，代码如下：</p>
+<pre><code>protected void complete()
+{
+    if (!isTimeSet)
+    updateTime();
+    if (!areFieldsSet || !areAllFieldsSet) {
+        computeFields(); // fills in unset fields
+        areAllFieldsSet = areFieldsSet = true;
+    }
+}
+private void updateTime() {
+    computeTime();
+    isTimeSet = true;
+}
+</code></pre><p>updateTime() 调用到的 computeTime() 定义在 Calendar.java的实现类中。下面，我列出GregorianCalendar.java中computeTime()的实现：</p>
+<pre><code>protected void computeTime() {
+    // In non-lenient mode, perform brief checking of calendar
+    // fields which have been set externally. Through this
+    // checking, the field values are stored in originalFields[]
+    // to see if any of them are normalized later.
+    if (!isLenient()) {
+        if (originalFields == null) {
+            originalFields = new int[FIELD_COUNT];
+        }
+        for (int field = 0; field &lt; FIELD_COUNT; field++) {
+            int value = internalGet(field);
+            if (isExternallySet(field)) {
+                // Quick validation for any out of range values
+                if (value &lt; getMinimum(field) || value &gt; getMaximum(field)) {
+                    throw new IllegalArgumentException(getFieldName(field));
+                }
+            }
+            originalFields[field] = value;
+        }
+    }
+
+    // Let the super class determine which calendar fields to be
+    // used to calculate the time.
+    int fieldMask = selectFields();
+
+    // The year defaults to the epoch start. We don&apos;t check
+    // fieldMask for YEAR because YEAR is a mandatory field to
+    // determine the date.
+    int year = isSet(YEAR) ? internalGet(YEAR) : EPOCH_YEAR;
+
+    int era = internalGetEra();
+    if (era == BCE) {
+        year = 1 - year;
+    } else if (era != CE) {
+        // Even in lenient mode we disallow ERA values other than CE &amp; BCE.
+        // (The same normalization rule as add()/roll() could be
+        // applied here in lenient mode. But this checking is kept
+        // unchanged for compatibility as of 1.5.)
+        throw new IllegalArgumentException(&quot;Invalid era&quot;);
+    }
+
+    // If year is 0 or negative, we need to set the ERA value later.
+    if (year &lt;= 0 &amp;&amp; !isSet(ERA)) {
+        fieldMask |= ERA_MASK;
+        setFieldsComputed(ERA_MASK);
+    }
+
+    // Calculate the time of day. We rely on the convention that
+    // an UNSET field has 0.
+    long timeOfDay = 0;
+    if (isFieldSet(fieldMask, HOUR_OF_DAY)) {
+        timeOfDay += (long) internalGet(HOUR_OF_DAY);
+    } else {
+        timeOfDay += internalGet(HOUR);
+        // The default value of AM_PM is 0 which designates AM.
+        if (isFieldSet(fieldMask, AM_PM)) {
+            timeOfDay += 12 * internalGet(AM_PM);
+        }
+    }
+    timeOfDay *= 60;
+    timeOfDay += internalGet(MINUTE);
+    timeOfDay *= 60;
+    timeOfDay += internalGet(SECOND);
+    timeOfDay *= 1000;
+    timeOfDay += internalGet(MILLISECOND);
+
+    // Convert the time of day to the number of days and the
+    // millisecond offset from midnight.
+    long fixedDate = timeOfDay / ONE_DAY;
+    timeOfDay %= ONE_DAY;
+    while (timeOfDay &lt; 0) {
+        timeOfDay += ONE_DAY;
+        --fixedDate;
+    }
+
+    // Calculate the fixed date since January 1, 1 (Gregorian).
+    calculateFixedDate: {
+        long gfd, jfd;
+        if (year &gt; gregorianCutoverYear &amp;&amp; year &gt; gregorianCutoverYearJulian) {
+            gfd = fixedDate + getFixedDate(gcal, year, fieldMask);
+            if (gfd &gt;= gregorianCutoverDate) {
+                fixedDate = gfd;
+                break calculateFixedDate;
+            }
+            jfd = fixedDate + getFixedDate(getJulianCalendarSystem(), year, fieldMask);
+        } else if (year &lt; gregorianCutoverYear &amp;&amp; year &lt; gregorianCutoverYearJulian) {
+            jfd = fixedDate + getFixedDate(getJulianCalendarSystem(), year, fieldMask);
+            if (jfd &lt; gregorianCutoverDate) {
+                fixedDate = jfd;
+                break calculateFixedDate;
+            }
+            gfd = fixedDate + getFixedDate(gcal, year, fieldMask);
+        } else {
+            gfd = fixedDate + getFixedDate(gcal, year, fieldMask);
+            jfd = fixedDate + getFixedDate(getJulianCalendarSystem(), year, fieldMask);
+        }
+        // Now we have to determine which calendar date it is.
+        if (gfd &gt;= gregorianCutoverDate) {
+            if (jfd &gt;= gregorianCutoverDate) {
+                fixedDate = gfd;
+            } else {
+                // The date is in an &quot;overlapping&quot; period. No way
+                // to disambiguate it. Determine it using the
+                // previous date calculation.
+                if (calsys == gcal || calsys == null) {
+                    fixedDate = gfd;
+                } else {
+                    fixedDate = jfd;
+                }
+            }
+        } else {
+            if (jfd &lt; gregorianCutoverDate) {
+                fixedDate = jfd;
+            } else {
+                // The date is in a &quot;missing&quot; period.
+                if (!isLenient()) {
+                    throw new IllegalArgumentException(&quot;the specified date doesn&apos;t exist&quot;);
+                }
+                // Take the Julian date for compatibility, which
+                // will produce a Gregorian date.
+                fixedDate = jfd;
+            }
+        }
+    }
+
+    // millis represents local wall-clock time in milliseconds.
+    long millis = (fixedDate - EPOCH_OFFSET) * ONE_DAY + timeOfDay;
+
+    // Compute the time zone offset and DST offset.  There are two potential
+    // ambiguities here.  We&apos;ll assume a 2:00 am (wall time) switchover time
+    // for discussion purposes here.
+    // 1. The transition into DST.  Here, a designated time of 2:00 am - 2:59 am
+    //    can be in standard or in DST depending.  However, 2:00 am is an invalid
+    //    representation (the representation jumps from 1:59:59 am Std to 3:00:00 am DST).
+    //    We assume standard time.
+    // 2. The transition out of DST.  Here, a designated time of 1:00 am - 1:59 am
+    //    can be in standard or DST.  Both are valid representations (the rep
+    //    jumps from 1:59:59 DST to 1:00:00 Std).
+    //    Again, we assume standard time.
+    // We use the TimeZone object, unless the user has explicitly set the ZONE_OFFSET
+    // or DST_OFFSET fields; then we use those fields.
+    TimeZone zone = getZone();
+    if (zoneOffsets == null) {
+        zoneOffsets = new int[2];
+    }
+    int tzMask = fieldMask &amp; (ZONE_OFFSET_MASK|DST_OFFSET_MASK);
+    if (tzMask != (ZONE_OFFSET_MASK|DST_OFFSET_MASK)) {
+        if (zone instanceof ZoneInfo) {
+            ((ZoneInfo)zone).getOffsetsByWall(millis, zoneOffsets);
+        } else {
+            int gmtOffset = isFieldSet(fieldMask, ZONE_OFFSET) ?
+                internalGet(ZONE_OFFSET) : zone.getRawOffset();
+            zone.getOffsets(millis - gmtOffset, zoneOffsets);
+        }
+    }
+    if (tzMask != 0) {
+        if (isFieldSet(tzMask, ZONE_OFFSET)) {
+            zoneOffsets[0] = internalGet(ZONE_OFFSET);
+        }
+        if (isFieldSet(tzMask, DST_OFFSET)) {
+            zoneOffsets[1] = internalGet(DST_OFFSET);
+        }
+    }
+
+    // Adjust the time zone offset values to get the UTC time.
+    millis -= zoneOffsets[0] + zoneOffsets[1];
+
+    // Set this calendar&apos;s time in milliseconds
+    time = millis;
+
+    int mask = computeFields(fieldMask | getSetStateFields(), tzMask);
+
+    if (!isLenient()) {
+        for (int field = 0; field &lt; FIELD_COUNT; field++) {
+            if (!isExternallySet(field)) {
+                continue;
+            }
+            if (originalFields[field] != internalGet(field)) {
+                // Restore the original field values
+                System.arraycopy(originalFields, 0, fields, 0, fields.length);
+                throw new IllegalArgumentException(getFieldName(field));
+            }
+        }
+    }
+    setFieldsNormalized(mask);
+}
+</code></pre><p>下面，我们看看internalGet(field)的定义。如下：</p>
+<pre><code>protected final int internalGet(int field) {
+    return fields[field];
+}
+</code></pre><p>从中，我们就看出，get(int field) 最终是通过 internalGet(int field)来返回值的。<br>而 internalGet(int field) ，实际上返回的是field数组中的第field个元素。这就正好和Calendar的17个元素所对应了！</p>
+<p>总之，我们需要了解的就是：Calendar就是以一个time(毫秒)为基数，而计算出“年月日时分秒”等，从而方便我们对“年月日时分秒”等进行操作。下面，介绍以下Calendar提供的相关操作函数。</p>
+<p><a name="anchor4"></a></p>
+<h1 id="第4部分-Calendar函数接口"><a href="#第4部分-Calendar函数接口" class="headerlink" title="第4部分 Calendar函数接口"></a>第4部分 Calendar函数接口</h1><h2 id="1-Calendar的17个字段的公共接口"><a href="#1-Calendar的17个字段的公共接口" class="headerlink" title="1. Calendar的17个字段的公共接口"></a>1. Calendar的17个字段的公共接口</h2><p>Calendar的这17个字段，都支持下面的公共函数接口。<br>这些公共接口的使用示例，请参考CalendarTest.java 示例中的 testAllCalendarSections() 函数。</p>
+<p><strong>1) getMaximum(int field)</strong></p>
+<p>作用：获取“字段的最大值”。注意“对比它和 getActualMaximum() 的区别”。<br>示例：以“MONTH”字段来说。使用方法为：</p>
+<pre><code>// 获取Calendar实例
+Calendar cal = Calendar.getInstance();
+// 获取MONTH的最大值
+int max = cal.getMaximum(Calendar.MONTH);
+</code></pre><p>若要获取其它字段的最大值，只需要将示例中的MONTH相应的替换成其它字段名即可。</p>
+<p><strong>2) getActualMaximum(int field)</strong></p>
+<p>作用：获取“当前日期下，该字段的最大值”。<br>示例：以“MONTH”字段来说。使用方法为：</p>
+<pre><code>// 获取Calendar实例
+Calendar cal = Calendar.getInstance();
+// 获取当前MONTH的最大值
+int max = cal.getActualMaximum(Calendar.MONTH);
+</code></pre><p>若要获取其它字段的最大值，只需要将示例中的MONTH相应的替换成其它字段名即可。</p>
+<p>注意：对比getActualMaximum() 和 getMaximum() 的区别。参考下面的对比示例，</p>
+<p>(01) getMaximum() 获取的“字段最大值”，是指在综合所有的日期，在所有这些日期中得出的“字段最大值”。<br>&nbsp;&nbsp;&nbsp;&nbsp; 例如，getMaximum(Calendar.DATE)的目的是“获取‘日的最大值’”。综合所有的日期，得出一个月最多有31天。因此，getMaximum(Calendar.DATE)的返回值是“31”！<br>(02) getActualMaximum() 获取的“当前日期时，该字段的最大值”。<br>&nbsp;&nbsp;&nbsp;&nbsp; 例如，当日期为2013-09-01时，getActualMaximum(Calendar.DATE)是获取“日的最大值”是“30”。当前日期是9月份，而9月只有30天。因此，getActualMaximum(Calendar.DATE)的返回值是“30”！</p>
+<p><strong>3) getMinimum(int field)</strong></p>
+<p>作用：获取“字段的最小值”。注意“对比它和 getActualMinimum() 的区别”。<br>示例：以“MONTH”字段来说。使用方法为：</p>
+<pre><code>// 获取Calendar实例
+Calendar cal = Calendar.getInstance();
+// 获取MONTH的最小值
+int min = cal.getMinimum(Calendar.MONTH);
+</code></pre><p>若要获取其它字段的最小值，只需要将示例中的MONTH相应的替换成其它字段名即可。</p>
+<p><strong>4) getActualMinimum(int field)</strong></p>
+<p>作用：获取“当前日期下，该字段的最小值”。<br>示例：以“MONTH”字段来说。使用方法为：</p>
+<pre><code>// 获取Calendar实例
+Calendar cal = Calendar.getInstance();
+// 获取MONTH的最小值
+int min = cal.getMinimum(Calendar.MONTH);
+</code></pre><p>若要获取其它字段的最小值，只需要将示例中的MONTH相应的替换成其它字段名即可。</p>
+<p>注意：在Java默认的Calendar中，虽然 getMinimum() 和 getActualMinimum() 的含义不同；但是，它们的返回值是一样的。因为Calendar的默认是返回GregorianCalendar对象，而在GregorianCalendar.java中，getMinimum() 和 getActualMinimum() 返回值一样。</p>
+<p><strong>5) get(int field)</strong></p>
+<p>作用：获取“字段的当前值”。获取field字段的当前值。<br>示例：以“MONTH”字段来说。“获取MONTH的当前值”的方法为：</p>
+<pre><code>// 获取Calendar实例
+Calendar cal = Calendar.getInstance();
+// 获取“cal日历”的当前MONTH值
+int MONTH = cal.get(Calendar.MONTH);
+</code></pre><p>若要获取其它字段的当前值，只需要将示例中的MONTH相应的替换成其它字段名即可。</p>
+<p><strong>6) set(int field, int value)</strong></p>
+<p>作用：设置“字段的当前值”。设置field字段的当前值为value<br>示例：以“MONTH”字段来说。“设置MONTH的当前值”的方法为：</p>
+<pre><code>// 获取Calendar实例
+Calendar cal = Calendar.getInstance();
+// 设置“cal日历”的当前MONTH值为 1988年
+cal.set(Calendar.MONTH, 1988);
+</code></pre><p>说明：<br>(01) 1988 是想要设置的MONTH的当前值。这个设置值必须是整数。<br>(02) 若要设置其它字段的当前值，只需要将示例中的MONTH相应的替换成其它字段名即可。</p>
+<p><strong>7) add(int field, int value)</strong></p>
+<p>作用：给“字段的当前值”添加值。给field字段的当前值添加value。<br>示例：以“MONTH”字段来说。方法如下：</p>
+<pre><code>// 获取Calendar实例，并设置日期为“2013-09-01”
+Calendar cal = Calendar.getInstance();
+cal.set(Calendar.YEAR, 2013);
+cal.set(Calendar.MONTH, 8);
+cal.set(Calendar.DATE, 1);
+// 给“cal日历”的当前MONTH值 “添加-10”
+cal.add(Calendar.MONTH, -10);
+</code></pre><p>说明：<br>(01) -10 是添加值。<br>&nbsp;&nbsp;&nbsp;&nbsp; 添加值可以为正数，也可以是负数。<br>&nbsp;&nbsp;&nbsp;&nbsp; 正数表示将日期增加，负数表示将日期减少。<br>&nbsp;&nbsp;&nbsp;&nbsp; 假设：现在cal的值是“2013-09-01”，现在我们将MONTH字段值增加-10。得到的结果是：“2012-10-01”。<br>&nbsp;&nbsp;&nbsp;&nbsp; 为什么会这样呢？“2013-09-01”增加-10，也就是将日期向前减少10个月；得到的结果就是“2012-10-01”。<br>(02) Calendar的17个字段中：除了回滚Calendar.ZONE_OFFSET时，会抛出IllegalArgumentException异常；其它的字段都支持该操作。<br>(03) 若要设置其它字段的当前值，只需要将示例中的MONTH相应的替换成其它字段名即可。</p>
+<p><strong>8) roll(int field, int value)</strong></p>
+<p>作用：回滚“字段的当前值”<br>示例：以“MONTH”字段来说。“回滚MONTH的当前值”的方法为：</p>
+<pre><code>// 获取Calendar实例，并设置日期为“2013-09-01”
+Calendar cal = Calendar.getInstance();
+cal.set(Calendar.YEAR, 2013);
+cal.set(Calendar.MONTH, 8);
+cal.set(Calendar.DATE, 1);
+// 将“cal日历”的当前MONTH值 “向前滚动10”
+cal.roll(Calendar.MONTH, -10);
+</code></pre><p>说明：<br>(01) -10 是回滚值。<br>&nbsp;&nbsp;&nbsp;&nbsp; 当回滚值是负数时，表示将当前字段向前滚；<br>&nbsp;&nbsp;&nbsp;&nbsp; 当回滚值是正数时，表示将当前字段向后滚。</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp; 回滚Calendar中某一字段时，不更改更大的字段！<br>&nbsp;&nbsp;&nbsp;&nbsp; 这是roll()与add()的根据区别！add()可能会更改更大字段，比如“使用add()修改‘MONTH’字段，可能会引起‘YEAR’字段的改变”；但是roll()不会更改更大的字段，例如“使用roll()修改‘MONTH’字段，不回引起‘YEAR’字段的改变。”</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp; 假设：现在cal的值是“2013-09-01”，现在我们将MONTH字段值增加-10。得到的结果是：“2013-10-01”。<br>&nbsp;&nbsp;&nbsp;&nbsp; 为什么会这样呢？这就是因为“回滚”就是“在最小值和最大值之间来回滚动”。本例中，MONTH是9月，前回滚10，得到的值是10月，但是roll()不会改变“比MONTH”更大的字段，所以YEAR字段不会改变。所以结果是“2013-10-01”。<br>(02) Calendar的17个字段中：除了回滚Calendar.ZONE_OFFSET时，会抛出IllegalArgumentException异常；其它的字段都支持该操作。<br>(03) 若要设置其它字段的当前值，只需要将示例中的MONTH相应的替换成其它字段名即可。</p>
+<p><strong>9) clear(int field)</strong></p>
+<p>作用：清空“字段的当前值”。所谓清空，实际上是将“field”的值设置为0；若field最小值为1,则设置为1。<br>示例：以“MONTH”字段来说。“清空MONTH”的方法为：</p>
+<pre><code>// 获取Calendar实例，并设置日期为“9月”
+Calendar cal = Calendar.getInstance();
+cal.set(Calendar.MONTH, 9);
+// 清空MONTH
+cal.clear(Calendar.MONTH);
+</code></pre><p>若要清空其它字段，只需要将示例中的MONTH相应的替换成其它字段名即可。</p>
+<p><strong>10) isSet(int field)</strong></p>
+<p>作用：判断“字段field”是否被设置。若调用clear()清空之后，则field变为“没有设置状态”。<br>示例：以“MONTH”字段来说。“判断MONTH是否被设置”的方法为：</p>
+<pre><code>// 获取Calendar实例
+Calendar cal = Calendar.getInstance();
+// 判断MONTH是否被设置
+boolean bset = cal.isSet(Calendar.MONTH);
+</code></pre><p>若要判断其它字段，只需要将示例中的MONTH相应的替换成其它字段名即可。</p>
+<h2 id="2-Calendar的其它函数"><a href="#2-Calendar的其它函数" class="headerlink" title="2. Calendar的其它函数"></a>2. Calendar的其它函数</h2><p><strong>1) 日期比较函数</strong></p>
+<p>Calendar的比较函数，主要有以下几个：</p>
+<pre><code>// 比较“当前Calendar对象”和“calendar” 的日期、时区等内容是否相等。
+boolean equals(Object object)
+// 当前Calendar对象 是否 早于calendar
+boolean before(Object calendar)
+// 当前Calendar对象 是否 晚于calendar
+boolean after(Object calendar)
+// 比较“当前Calendar对象”和“calendar”。
+// 若 早于 “calendar” 则，返回-1
+// 若 相等， 则，返回0
+// 若 晚于 “calendar” 则，返回1
+int compareTo(Calendar anotherCalendar) 
+</code></pre><p>这些函数的使用示例，请参考CalendarTest.java示例中的 testComparatorAPIs() 函数。</p>
+<p>示例：假设cal1 和 cal2 都是Calendar的两个对象。</p>
+<pre><code>// 它们的使用方法如下
+boolean isEqual = cal1.equals(cal2);
+boolean isBefore = cal1.before(cal2);
+boolean isAfter = cal1.after(cal2);
+int icompare = cal1.compareTo(cal2);
+</code></pre><p><strong>2) “宽容”函数</strong></p>
+<pre><code>// 设置“Calendar的宽容度”
+void setLenient(boolean value)
+// 获取“Calendar的宽容度”
+boolean isLenient()
+</code></pre><p>这些函数的使用示例，请参考CalendarTest.java示例中的 testLenientAPIs() 函数。</p>
+<p>说明：<br>Calendar 有两种解释日历字段的模式，即 lenient 和 non-lenient。<br>(01) 当 Calendar 处于 lenient 模式时，它可接受比它所生成的日历字段范围更大范围内的值。当 Calendar 重新计算日历字段值，以便由 get() 返回这些值时，所有日历字段都被标准化。<br>&nbsp;&nbsp;&nbsp;&nbsp; 例如，lenient 模式下的 GregorianCalendar 将 MONTH == JANUARY、DAY_OF_MONTH == 32 解释为 February 1。<br>(02) 当 Calendar 处于 non-lenient 模式时，如果其日历字段中存在任何不一致性，它都会抛出一个异常。<br>&nbsp;&nbsp;&nbsp;&nbsp; 例如，GregorianCalendar 总是在 1 与月份的长度之间生成 DAY_OF_MONTH 值。如果已经设置了任何超出范围的字段值，那么在计算时间或日历字段值时，处于 non-lenient 模式下的 GregorianCalendar 会抛出一个异常。<br>注意：在(02)步骤中的异常，在使用set()时不会抛出，而需要在使用get()、getTimeInMillis()、getTime()、add() 和 roll() 等函数中才抛出。因为set()只是设置了一个修改标志，而get()等方法才会引起时间的重新计算，此时才会抛出异常！</p>
+<p><strong>3) “年月日(时分秒)”、Date、TimeZone、MilliSecond函数</strong></p>
+<pre><code>// 设置“年月日”
+final void     set(int year, int month, int day)
+// 设置“年月日时分”
+final void     set(int year, int month, int day, int hourOfDay, int minute, int second)
+// 设置“年月日时分秒”
+final void     set(int year, int month, int day, int hourOfDay, int minute)
+// 获取Calendar对应的日期
+final Date     getTime()
+// 设置Calendar为date
+final void    setTime(Date date)
+// 获取Calendar对应的时区
+TimeZone     getTimeZone()
+// 设置Calendar对应的时区
+void     setTimeZone(TimeZone timezone)
+// 获取Calendar对应的milliscondes值，就是“Calendar当前日期”距离“1970-01-01 0:00:00 GMT”的毫秒数
+long     getTimeInMillis()
+// 设置Calendar对应的milliscondes值
+void     setTimeInMillis(long milliseconds)
+</code></pre><p>这些函数的使用示例，请参考CalendarTest.java示例中的 testTimeAPIs() 函数。</p>
+<p><strong>4) 其它操作</strong></p>
+<pre><code>// 克隆Calendar
+Object clone()
+// 获取“每周的第一天是星期几”。例如，在美国，这一天是 SUNDAY，而在法国，这一天是 MONDAY。
+int getFirstDayOfWeek()
+// 设置“每周的第一天是星期几”。例如，在美国，这一天是 SUNDAY，而在法国，这一天是 MONDAY。
+void setFirstDayOfWeek(int value)
+// 获取一年中第一个星期所需的最少天数，例如，如果定义第一个星期包含一年第一个月的第一天，则此方法将返回 1。如果最少天数必须是一整个星期，则此方法将返回 7。
+int getMinimalDaysInFirstWeek()
+// 设置一年中第一个星期所需的最少天数，例如，如果定义第一个星期包含一年第一个月的第一天，则使用值 1 调用此方法。如果最少天数必须是一整个星期，则使用值 7 调用此方法。
+void setMinimalDaysInFirstWeek(int value)
+</code></pre><p>这些函数的使用示例，请参考CalendarTest.java示例中的 testOtherAPIs() 函数。</p>
+<p><a name="anchor5"></a></p>
+<h1 id="第5部分-Calendar示例"><a href="#第5部分-Calendar示例" class="headerlink" title="第5部分 Calendar示例"></a>第5部分 Calendar示例</h1><p>下面，我们通过示例学习使用Calendar的API。CalendarTest.java的源码如下：</p>
+<pre><code>import java.util.Date;
+import java.util.Calendar;
+import java.util.TimeZone;
+import java.util.Random;
+
+/**
+ * Calendar的API测试程序
+ *
+ * @author skywang 
+ * @email kuiwu-wang@163.com
+ */
+public class CalendarTest {
+
+    public static void main(String[] args) {
+
+        // 测试Calendar的“17个字段的公共函数接口”
+        testAllCalendarSections() ;
+
+        // 测试Calendar的“比较接口”
+        testComparatorAPIs() ;
+
+        // 测试Calendar的“比较接口”
+        testLenientAPIs() ;
+
+        // 测试Calendar的Date、TimeZone、MilliSecond等相关函数
+        testTimeAPIs() ;
+
+        // 测试Calendar的clone()，getFirstDayOfWeek()等接口
+        testOtherAPIs() ;
+
+    }
+
+
+    /**
+     * 测试“Calendar的字段”
+     *
+     * @param cal   -- Calendar对象
+     * @param field -- 要测试的“Calendar字段”。可以为以下值：
+     *   Calendar.YEAR, Calendar.MONTH, Calendar.DATE, ... 等等
+     * @param title -- 标题
+     * @author skywang (kuiwu-wang@163.com)
+     */
+    private static void testSection(Calendar cal, int field, String title) {
+        final Random random = new Random();
+        final Date date = cal.getTime();
+
+        final int min = cal.getMinimum(field);    // 获取&quot;字段最小值&quot;
+        final int max = cal.getMaximum(field);    // 获取“字段最大值”
+
+        final int actualMin = cal.getActualMinimum(field);    // 获取&quot;当前日期下，该字段最小值&quot;
+        final int actualMax = cal.getActualMaximum(field);    // 获取“当前日期下，该字段的最大值”
+
+        // 获取“字段的当前值”
+        final int ori = cal.get(field);            
+
+        // 设置“字段的当前值”, 并获取“设置之后的值”
+        final int r1 = random.nextInt(max);
+        cal.set(field, r1);                
+        final int set = cal.get(field);            
+        try {
+            // 回滚“字段的当前值”：在“字段最小值”和“字段最大值”之间回滚。
+            // “回滚值”可以为正，也可以为负。
+            cal.roll(field, -max);            
+        } catch (IllegalArgumentException e) {
+            // 当field == Calendar.ZONE_OFFSET时，会抛出该异常！
+            e.printStackTrace();
+        }
+        final int roll = cal.get(field);            
+
+        // 获取一个随机值
+        final int sign = ( random.nextInt(2) == 1) ? 1 : -1;
+        final int r2 = sign * random.nextInt(max);
+        try {
+            // 增加“字段的当前值” ，并获取“新的当前字段值”
+            // add的“参数值”可以为正，也可以为负。
+            cal.add(field, r2);            
+        } catch (IllegalArgumentException e) {
+            // 当field == Calendar.ZONE_OFFSET时，会抛出该异常！
+            e.printStackTrace();
+        }
+        final int add = cal.get(field);
+
+
+
+        // 打印字段信息
+        System.out.printf(&quot;%s:\n\trange is [%d - %d] actualRange is [%d - %d].  original=%d, set(%d)=%d, roll(%d)=%d, add(%d)=%d\n&quot;,
+               title, min, max, actualMin, actualMax, ori, r1, set, -max, roll, r2, add);
+    }
+
+    /**
+     * 测试Calendar的“17个字段的公共函数接口”
+     *
+     * @author skywang (kuiwu-wang@163.com)
+     */
+    private static void testAllCalendarSections() {
+        // 00. ERA 字段
+        testSection(Calendar.getInstance(), Calendar.ERA, &quot;Calendar.ERA&quot;);
+        // 01. YEAR 字段
+        testSection(Calendar.getInstance(), Calendar.YEAR, &quot;Calendar.YEAR&quot;);
+        // 02. MONTH 字段
+        testSection(Calendar.getInstance(), Calendar.MONTH, &quot;Calendar.MONTH&quot;);
+        // 03. WEEK_OF_YEAR 字段
+        testSection(Calendar.getInstance(), Calendar.WEEK_OF_YEAR, &quot;Calendar.WEEK_OF_YEAR&quot;);
+        // 04. WEEK_OF_MONTH 字段
+        testSection(Calendar.getInstance(), Calendar.WEEK_OF_MONTH, &quot;Calendar.WEEK_OF_MONTH&quot;);
+        // 05. DATE 字段
+        testSection(Calendar.getInstance(), Calendar.DATE, &quot;Calendar.DATE&quot;);
+        // 06. DAY_OF_MONTH 字段
+        testSection(Calendar.getInstance(), Calendar.DAY_OF_MONTH, &quot;Calendar.DAY_OF_MONTH&quot;);
+        // 07. DAY_OF_YEAR 字段
+        testSection(Calendar.getInstance(), Calendar.DAY_OF_YEAR, &quot;Calendar.DAY_OF_YEAR&quot;);
+        // 08. DAY_OF_WEEK 字段
+        testSection(Calendar.getInstance(), Calendar.DAY_OF_WEEK, &quot;Calendar.DAY_OF_WEEK&quot;);
+        // 09. DAY_OF_WEEK_IN_MONTH 字段
+        testSection(Calendar.getInstance(), Calendar.DAY_OF_WEEK_IN_MONTH, &quot;Calendar.DAY_OF_WEEK_IN_MONTH&quot;);
+        // 10. AM_PM 字段
+        testSection(Calendar.getInstance(), Calendar.AM_PM, &quot;Calendar.AM_PM&quot;);
+        // 11. HOUR 字段
+        testSection(Calendar.getInstance(), Calendar.HOUR, &quot;Calendar.HOUR&quot;);
+        // 12. HOUR_OF_DAY 字段
+        testSection(Calendar.getInstance(), Calendar.HOUR_OF_DAY, &quot;Calendar.HOUR_OF_DAY&quot;);
+        // 13. MINUTE 字段
+        testSection(Calendar.getInstance(), Calendar.MINUTE, &quot;Calendar.MINUTE&quot;);
+        // 14. SECOND 字段
+        testSection(Calendar.getInstance(), Calendar.SECOND, &quot;Calendar.SECOND&quot;);
+        // 15. MILLISECOND 字段
+        testSection(Calendar.getInstance(), Calendar.MILLISECOND, &quot;Calendar.MILLISECOND&quot;);
+        // 16. ZONE_OFFSET 字段
+        testSection(Calendar.getInstance(), Calendar.ZONE_OFFSET, &quot;Calendar.ZONE_OFFSET&quot;);
+    }
+
+    /**
+     * 测试Calendar的“比较接口”
+     *
+     * @author skywang (kuiwu-wang@163.com)
+     */
+    private static void testComparatorAPIs() {
+        // 新建cal1 ，且时间为1988年
+        Calendar cal1 = Calendar.getInstance();
+        cal1.set(Calendar.YEAR, 1988);
+        // 新建cal2 ，且时间为2000年
+        Calendar cal2 = Calendar.getInstance();
+        cal2.set(Calendar.YEAR, 2000);
+        // 新建cal3, 为cal1的克隆对象
+        Calendar cal3 = (Calendar)cal1.clone();
+
+        // equals 判断 cal1和cal2的“时间、时区等”内容是否相等
+        boolean isEqual12 = cal1.equals(cal2);
+        // equals 判断 cal1和cal3的“时间、时区等”内容是否相等
+        boolean isEqual13 = cal1.equals(cal3);
+        // cal1是否比cal2早
+        boolean isBefore = cal1.before(cal2);
+        // cal1是否比cal2晚
+        boolean isAfter = cal1.after(cal2);
+        // 比较cal1和cal2
+        // (01) 若cal1 早于 cal2，返回-1
+        // (02) 若cal1 等于 cal2，返回0
+        // (03) 若cal1 晚于 cal2，返回1
+        int icompare = cal1.compareTo(cal2);
+
+        System.out.printf(&quot;\ntestComparatorAPIs: isEuqal12=%s, isEqual13=%s, isBefore=%s, isAfter=%s, icompare=%s\n&quot;,
+               isEqual12, isEqual13, isBefore, isAfter, icompare);
+    }
+
+    /**
+     * 测试Calendar的“比较接口”
+     *
+     * @author skywang (kuiwu-wang@163.com)
+     */
+    private static void testLenientAPIs() {
+            Calendar cal = Calendar.getInstance();
+
+            // 获取默认的“宽容度”。返回true
+            boolean oriLenient = cal.isLenient();
+            // MONTH值只能是“0-11”，这里越界。但是由于当前cal是宽容的，所以不会抛出异常
+            cal.set(Calendar.MONTH, 50);    
+
+            // 设置“宽容度”为false。
+            cal.setLenient(false);
+            // 获取设置后的“宽容度”
+            boolean curLenient = cal.isLenient();
+            try {
+            // MONTH值只能是“0-11”，这里越界。而且当前cal是不宽容的，所以会产生异常。
+            // 但是，异常到下次计算日期时才会抛出。即，set()中不回抛出异常，而要等到get()中才会抛出异常
+            cal.set(Calendar.MONTH, 50);
+            // 此时，对cal进行读取。读取会导致重新计算cal的值，所以此时抛出异常！
+            int m2 = cal.get(Calendar.MONTH);    
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        }
+
+        System.out.printf(&quot;\ntestLenientAPIs: oriLenient=%s, curLenient=%s\n&quot;,
+               oriLenient, curLenient);
+    }
+
+    /**
+     * 测试Calendar的Date、TimeZone、MilliSecond等相关函数
+     *
+     * @author skywang (kuiwu-wang@163.com)
+     */
+    private static void testTimeAPIs() {
+        Calendar cal = Calendar.getInstance();
+
+        // 设置cal的时区为“GMT+8”
+        cal.setTimeZone(TimeZone.getTimeZone(&quot;GMT+8&quot;));
+        // 获取当前的cal时区
+        TimeZone timezone = cal.getTimeZone();
+
+        // 设置 milliseconds
+        cal.setTimeInMillis(1279419645742l);
+        // 获取 milliseconds
+        long millis = cal.getTimeInMillis();
+        // 设置 milliseconds之后，时间也改变了。
+        // 获取cal对应的日期
+        Date date = cal.getTime();
+
+        // 设置时间为“1988-08-08”
+        cal.set(1988, 08, 08);
+        // 设置时间为“1999-09-09 09:09”
+        cal.set(1999, 09, 09, 9, 9);
+        // 设置时间为“2000-10-10 10:10:10”
+        cal.set(2000, 10, 10, 10, 10, 10);
+
+        System.out.printf(&quot;\ntestTimeAPIs: date=%s, timezone=%s, millis=%s\n&quot;,
+               date, timezone, millis);
+    }
+
+    /**
+     * 测试Calendar的clone()，getFirstDayOfWeek()等接口
+     *
+     * @author skywang (kuiwu-wang@163.com)
+     */
+    private static void testOtherAPIs() {
+        Calendar cal = Calendar.getInstance();
+        // 克隆cal
+        Calendar clone = (Calendar)cal.clone();
+
+        // 设置 为 2013-01-10。 
+        // 注：2013-01-01 为“星期二”，2013-01-06为“星期天”，
+        clone.set(Calendar.YEAR, 2013);
+        clone.set(Calendar.MONTH, 0);
+        clone.set(Calendar.DATE, 10);
+        // 设置“本年的第一个星期最少包含1天”。
+        // 则2013-01-10属于第2个星期
+        clone.setMinimalDaysInFirstWeek(1);
+        int m1 = clone.getMinimalDaysInFirstWeek();
+        int index1 = clone.get(Calendar.WEEK_OF_YEAR);
+
+        // 设置“本年的第一个星期最少包含7天”。
+        // 则2013-01-10属于第1个星期
+        clone.setMinimalDaysInFirstWeek(7);
+        int m2 = clone.getMinimalDaysInFirstWeek();
+        int index2 = clone.get(Calendar.WEEK_OF_YEAR);
+
+        // 设置“每周的第一天是星期几”。
+        clone.setFirstDayOfWeek(Calendar.WEDNESDAY);
+        // 获取“每周的第一天是星期几”。
+        int firstdayOfWeek = clone.getFirstDayOfWeek();
+
+        System.out.printf(&quot;\ntestOtherAPIs: firstdayOfWeek=%s, [minimalDay, WeekOfYear]={(%s, %s), (%s, %s)} %s\n&quot;,
+               firstdayOfWeek, m1, index1, m2, index2, clone.getTime());
+    }
+}
+</code></pre><p>OK。今天先到此为止！</p>
+<p>明天再继续总结。</p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2018-06-27T09:39:57.953Z" itemprop="dateUpdated">2018-06-27 17:39:57</time>
+</span><br>
+
+
+        
+        本文固定链接：<a href="/2017/02/01/java-source-analysis-time-series/Java 时间相关内容01 Calendar/" target="_blank" rel="external">https://smuwjs.github.io/2017/02/01/java-source-analysis-time-series/Java 时间相关内容01 Calendar/</a>
+        
+    </div>
+    <footer>
+        <a href="https://smuwjs.github.io">
+            <img src="/img/head.png" alt="Jeeson">
+            Jeeson
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java-时间相关内容/">Java 时间相关内容</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java源码分析/">Java源码分析</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2017/02/01/java-source-analysis-time-series/Java 时间相关内容01 Calendar/&title=《Java 时间相关内容01 Calendar》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2017/02/01/java-source-analysis-time-series/Java 时间相关内容01 Calendar/&title=《Java 时间相关内容01 Calendar》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2017/02/01/java-source-analysis-time-series/Java 时间相关内容01 Calendar/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Java 时间相关内容01 Calendar》 — Jeeson's Blog&url=https://smuwjs.github.io/2017/02/01/java-source-analysis-time-series/Java 时间相关内容01 Calendar/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2017/02/01/java-source-analysis-time-series/Java 时间相关内容01 Calendar/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2017/02/02/java-source-analysis-time-series/Java 时间相关内容02 万年历和自定义Calendar接口/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">Java 时间相关内容02 万年历和自定义Calendar接口</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2017/01/14/java-source-analysis-design-pattern-series/设计模式14之 复合模式/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">设计模式14之 复合模式</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="java-source-analysis-time-series/Java 时间相关内容01 Calendar" data-title="Java 时间相关内容01 Calendar" data-url="https://smuwjs.github.io/2017/02/01/java-source-analysis-time-series/Java 时间相关内容01 Calendar/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'smuwjs', theme: 'none'};
+lazyScripts.push('//unpkg.com/hexo-theme-material-indigo@latest/js/embed.min.js');
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循<a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>Jeeson &copy; 2015 - 2018</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2017/02/01/java-source-analysis-time-series/Java 时间相关内容01 Calendar/&title=《Java 时间相关内容01 Calendar》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2017/02/01/java-source-analysis-time-series/Java 时间相关内容01 Calendar/&title=《Java 时间相关内容01 Calendar》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2017/02/01/java-source-analysis-time-series/Java 时间相关内容01 Calendar/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Java 时间相关内容01 Calendar》 — Jeeson's Blog&url=https://smuwjs.github.io/2017/02/01/java-source-analysis-time-series/Java 时间相关内容01 Calendar/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2017/02/01/java-source-analysis-time-series/Java 时间相关内容01 Calendar/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://smuwjs.github.io/2017/02/01/java-source-analysis-time-series/Java 时间相关内容01 Calendar/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

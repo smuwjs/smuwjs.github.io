@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>Android Studio系列教程二--基本设置与运行 | Jeeson&#39;s Blog | Write the code. Change the world.</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="AndroidStudio">
+    <meta name="description" content="原文地址  上面一篇博客，介绍了Studio的优点与1.0 RC的安装与上手体验，没想到google的更新速度这么快，已经出了RC 2版本，主要是修复一些bug。那么今天就带大家预览下Stduio的界面与基本功能。 项目结构当我们新建一个项目的目录结构默认是这样的">
+<meta name="keywords" content="AndroidStudio">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android Studio系列教程二--基本设置与运行">
+<meta property="og:url" content="https://smuwjs.github.io/2016/09/12/android-studio-tutorial2/index.html">
+<meta property="og:site_name" content="Jeeson&#39;s Blog">
+<meta property="og:description" content="原文地址  上面一篇博客，介绍了Studio的优点与1.0 RC的安装与上手体验，没想到google的更新速度这么快，已经出了RC 2版本，主要是修复一些bug。那么今天就带大家预览下Stduio的界面与基本功能。 项目结构当我们新建一个项目的目录结构默认是这样的">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://opesdt6ii.bkt.clouddn.com/summary1.png">
+<meta property="og:image" content="http://opesdt6ii.bkt.clouddn.com/summary2.png">
+<meta property="og:image" content="http://opesdt6ii.bkt.clouddn.com/summary3.png">
+<meta property="og:image" content="http://opesdt6ii.bkt.clouddn.com/preference_font1.png">
+<meta property="og:image" content="http://opesdt6ii.bkt.clouddn.com/preference_font2.png">
+<meta property="og:image" content="http://opesdt6ii.bkt.clouddn.com/preference_font3.png">
+<meta property="og:image" content="http://opesdt6ii.bkt.clouddn.com/preference_font4.png">
+<meta property="og:image" content="http://opesdt6ii.bkt.clouddn.com/menu1.png">
+<meta property="og:image" content="http://opesdt6ii.bkt.clouddn.com/menu2.png">
+<meta property="og:image" content="http://opesdt6ii.bkt.clouddn.com/menu3.png">
+<meta property="og:image" content="http://opesdt6ii.bkt.clouddn.com/menu4.png">
+<meta property="og:image" content="http://opesdt6ii.bkt.clouddn.com/avd1.png">
+<meta property="og:image" content="http://opesdt6ii.bkt.clouddn.com/avd2.png">
+<meta property="og:image" content="http://opesdt6ii.bkt.clouddn.com/avd3.png">
+<meta property="og:image" content="http://opesdt6ii.bkt.clouddn.com/avd4.png">
+<meta property="og:image" content="http://opesdt6ii.bkt.clouddn.com/avd5.png">
+<meta property="og:image" content="http://opesdt6ii.bkt.clouddn.com/select_avd.png">
+<meta property="og:image" content="http://opesdt6ii.bkt.clouddn.com/avd6.png">
+<meta property="og:updated_time" content="2018-06-27T09:39:57.937Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android Studio系列教程二--基本设置与运行">
+<meta name="twitter:description" content="原文地址  上面一篇博客，介绍了Studio的优点与1.0 RC的安装与上手体验，没想到google的更新速度这么快，已经出了RC 2版本，主要是修复一些bug。那么今天就带大家预览下Stduio的界面与基本功能。 项目结构当我们新建一个项目的目录结构默认是这样的">
+<meta name="twitter:image" content="http://opesdt6ii.bkt.clouddn.com/summary1.png">
+    
+        <link rel="alternate" type="application/atom+xml" title="Jeeson&#39;s Blog" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/head.png">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Jeeson</h5>
+          <a href="mailto:smuwjs@163.com" title="smuwjs@163.com" class="mail">smuwjs@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/smuwjs" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Android Studio系列教程二--基本设置与运行</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Android Studio系列教程二--基本设置与运行</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2016-09-11T17:01:02.000Z" itemprop="datePublished" class="page-time">
+  2016-09-12
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/DevTools/">DevTools</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#项目结构"><span class="post-toc-number">1.</span> <span class="post-toc-text">项目结构</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#偏好设置"><span class="post-toc-number">2.</span> <span class="post-toc-text">偏好设置</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#运行"><span class="post-toc-number">3.</span> <span class="post-toc-text">运行</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#常用功能"><span class="post-toc-number">4.</span> <span class="post-toc-text">常用功能</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#创建模拟器"><span class="post-toc-number">5.</span> <span class="post-toc-text">创建模拟器</span></a></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-android-studio-tutorial2"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Android Studio系列教程二--基本设置与运行</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2016-09-12 01:01:02" datetime="2016-09-11T17:01:02.000Z"  itemprop="datePublished">2016-09-12</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/DevTools/">DevTools</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <blockquote>
+<p><a href="http://stormzhang.com/devtools/2014/11/25/android-studio-tutorial2/" target="_blank" rel="noopener">原文地址</a></p>
+</blockquote>
+<p>上面一篇博客，介绍了Studio的优点与1.0 RC的安装与上手体验，没想到google的更新速度这么快，已经出了RC 2版本，主要是修复一些bug。那么今天就带大家预览下Stduio的界面与基本功能。</p>
+<h2 id="项目结构"><a href="#项目结构" class="headerlink" title="项目结构"></a>项目结构</h2><p>当我们新建一个项目的目录结构默认是这样的</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://opesdt6ii.bkt.clouddn.com/summary1.png" alt="image" title="">
+                </div>
+                <div class="image-caption">image</div>
+            </figure>
+<p>可以看到和Eclipse的目录结构有很大区别，Studio一个窗口只能有一个项目，而Eclipse则可以同时存在很多项目，如果你看着不习惯可以点击左上角进行切换</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://opesdt6ii.bkt.clouddn.com/summary2.png" alt="image" title="">
+                </div>
+                <div class="image-caption">image</div>
+            </figure>
+<p>切换到“project”模式下的目录结构是这样的，我个人也更习惯这种格式</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://opesdt6ii.bkt.clouddn.com/summary3.png" alt="image" title="">
+                </div>
+                <div class="image-caption">image</div>
+            </figure>
+<p>和Eclipse的区别有如下：</p>
+<ul>
+<li><p>1、Studio中有Project和Module的概念，前面说到Studio中一个窗口只能有一个项目，即Project，代表一个workspace，但是一个Project可以包含多个Module，比如你项目引用的Android Library, Java Library等，这些都可以看做是一个Module;</p>
+</li>
+<li><p>2、上述目录中将java代码和资源文件（图片、布局文件等）全部归结为src，在src目录下有一个main的分组，同时划分出java和res两个文件夹，java文件夹则相当于Eclipse下的src文件夹，res目录结构则一样.</p>
+</li>
+</ul>
+<h2 id="偏好设置"><a href="#偏好设置" class="headerlink" title="偏好设置"></a>偏好设置</h2><p>进入后你也许发现字体大小或者样式不符合你的习惯，比如我是觉得代码太小看起来伤眼，Darcular主题默认的字体是12，我个人更习惯14的字体大小。没关系，到 <strong>Preferences</strong> (设置)页面搜索 <strong>Font</strong> 找到 <strong>Colors&amp;Fonts</strong> 下的 <strong>Font</strong> 选项，我们可以看到默认字体大小是12，但是无法修改，需要先保存才可以修改，点击 <strong>Save as</strong> 输入一个名字，比如 <strong>MyDarcular</strong>，然后就可以修改字体大小和字体样式了.</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://opesdt6ii.bkt.clouddn.com/preference_font1.png" alt="image" title="">
+                </div>
+                <div class="image-caption">image</div>
+            </figure>
+<p>点击确定之后再回到页面发现字体是变大了，但是Studio默认的一些字体大小如侧边栏等确没有变化，看起来很不协调，如下图</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://opesdt6ii.bkt.clouddn.com/preference_font2.png" alt="image" title="">
+                </div>
+                <div class="image-caption">image</div>
+            </figure>
+<p>强迫症的你肯定无法忍受，没关系，这里也同样可以设置，到 <strong>Preferences</strong> -&gt; <strong>Appearance</strong> 修改如图所示就ok，这里同样不仅可以更改字体大小，也可以选择不同的字体,点击OK，这次页面字体就完全对你胃口了。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://opesdt6ii.bkt.clouddn.com/preference_font3.png" alt="image" title="">
+                </div>
+                <div class="image-caption">image</div>
+            </figure>
+<p>调整之后再看下效果</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://opesdt6ii.bkt.clouddn.com/preference_font4.png" alt="image" title="">
+                </div>
+                <div class="image-caption">image</div>
+            </figure>
+<h2 id="运行"><a href="#运行" class="headerlink" title="运行"></a>运行</h2><p>接下来运行程序，运行和 <strong>Eclipse</strong> 中比较像，点击菜单栏的绿色箭头直接运行</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://opesdt6ii.bkt.clouddn.com/menu1.png" alt="image" title="">
+                </div>
+                <div class="image-caption">image</div>
+            </figure>
+<p><strong>Studio</strong> 默认安装会启动模拟器，如果想让安装到真机上可以配置一下。在下拉菜单中选择 <strong>Edit Configurations</strong> 选择提示或者是USB设备。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://opesdt6ii.bkt.clouddn.com/menu2.png" alt="image" title="">
+                </div>
+                <div class="image-caption">image</div>
+            </figure>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://opesdt6ii.bkt.clouddn.com/menu3.png" alt="image" title="">
+                </div>
+                <div class="image-caption">image</div>
+            </figure>
+<h2 id="常用功能"><a href="#常用功能" class="headerlink" title="常用功能"></a>常用功能</h2><p>在Studio菜单栏的右边有这样几个常用的功能，如图分别是 <strong>Gradle同步</strong>、<strong>AVD Manager</strong>、<strong>SDK Manager</strong>、<strong>DDMS</strong></p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://opesdt6ii.bkt.clouddn.com/menu4.png" alt="image" title="">
+                </div>
+                <div class="image-caption">image</div>
+            </figure>
+<p><strong>Gradle同步</strong> 在你项目运行或者更改Gradle配置的时候都要点击下这个按钮，会下载相应的依赖</p>
+<p><strong>AVD Manager</strong> 模拟器管理</p>
+<p><strong>SDK Manager</strong> 就是管理你的SDK版本</p>
+<p><strong>DDMS</strong> 即 Dalvik Debug Monitor Service，Dalvik调试监控服务。</p>
+<h2 id="创建模拟器"><a href="#创建模拟器" class="headerlink" title="创建模拟器"></a>创建模拟器</h2><p>建议在创建模拟器前把 <strong>SDK Manager</strong> 中的 <strong>Tools</strong>、<strong>Extras</strong> 都更新到最新。</p>
+<p>点击 <strong>AVD Manager</strong> 按钮</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://opesdt6ii.bkt.clouddn.com/avd1.png" alt="image" title="">
+                </div>
+                <div class="image-caption">image</div>
+            </figure>
+<p>点击图中的创建按钮</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://opesdt6ii.bkt.clouddn.com/avd2.png" alt="image" title="">
+                </div>
+                <div class="image-caption">image</div>
+            </figure>
+<p>选择一个设备，这里我选择 Nexus 5，然后Next</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://opesdt6ii.bkt.clouddn.com/avd3.png" alt="image" title="">
+                </div>
+                <div class="image-caption">image</div>
+            </figure>
+<p>这里选择一个系统版本，这里以5.0为例，然后Next</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://opesdt6ii.bkt.clouddn.com/avd4.png" alt="image" title="">
+                </div>
+                <div class="image-caption">image</div>
+            </figure>
+<p>由于各位的屏幕尺寸不一样，建议这里Scale一栏选择Auto，然后点击Finish接着可以看到我们已经创建好一个5.0的模拟器了</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://opesdt6ii.bkt.clouddn.com/avd5.png" alt="image" title="">
+                </div>
+                <div class="image-caption">image</div>
+            </figure>
+<p>这次我们再运行，选择模拟器启动看下最终效果（模拟器的启动很慢，大家耐心等待）</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://opesdt6ii.bkt.clouddn.com/select_avd.png" alt="image" title="">
+                </div>
+                <div class="image-caption">image</div>
+            </figure>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://opesdt6ii.bkt.clouddn.com/avd6.png" alt="image" title="">
+                </div>
+                <div class="image-caption">image</div>
+            </figure>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2018-06-27T09:39:57.937Z" itemprop="dateUpdated">2018-06-27 17:39:57</time>
+</span><br>
+
+
+        
+        本文固定链接：<a href="/2016/09/12/android-studio-tutorial2/" target="_blank" rel="external">https://smuwjs.github.io/2016/09/12/android-studio-tutorial2/</a>
+        
+    </div>
+    <footer>
+        <a href="https://smuwjs.github.io">
+            <img src="/img/head.png" alt="Jeeson">
+            Jeeson
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/AndroidStudio/">AndroidStudio</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/09/12/android-studio-tutorial2/&title=《Android Studio系列教程二--基本设置与运行》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/09/12/android-studio-tutorial2/&title=《Android Studio系列教程二--基本设置与运行》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/09/12/android-studio-tutorial2/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Android Studio系列教程二--基本设置与运行》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/09/12/android-studio-tutorial2/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/09/12/android-studio-tutorial2/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2016/09/12/android-studio-tutorial3/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">Android Studio系列教程三--快捷键</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2016/09/12/android-studio-tutorial1/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Android Studio系列教程一--下载与安装</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="android-studio-tutorial2" data-title="Android Studio系列教程二--基本设置与运行" data-url="https://smuwjs.github.io/2016/09/12/android-studio-tutorial2/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'smuwjs', theme: 'none'};
+lazyScripts.push('//unpkg.com/hexo-theme-material-indigo@latest/js/embed.min.js');
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循<a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>Jeeson &copy; 2015 - 2018</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/09/12/android-studio-tutorial2/&title=《Android Studio系列教程二--基本设置与运行》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/09/12/android-studio-tutorial2/&title=《Android Studio系列教程二--基本设置与运行》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/09/12/android-studio-tutorial2/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Android Studio系列教程二--基本设置与运行》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/09/12/android-studio-tutorial2/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/09/12/android-studio-tutorial2/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://smuwjs.github.io/2016/09/12/android-studio-tutorial2/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

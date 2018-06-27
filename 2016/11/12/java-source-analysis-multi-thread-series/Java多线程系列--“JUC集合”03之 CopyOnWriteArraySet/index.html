@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>Java多线程系列--“JUC集合”03之 CopyOnWriteArraySet | Jeeson&#39;s Blog | Write the code. Change the world.</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="Java源码分析,Java多线程系列,JUC集合">
+    <meta name="description" content="本章是JUC系列中的CopyOnWriteArraySet篇。接下来，会先对CopyOnWriteArraySet进行基本介绍，然后再说明它的原理，接着通过代码去分析，最后通过示例更进一步的了解CopyOnWriteArraySet。   目录1. CopyOnWriteArraySet介绍2. CopyOnWriteArraySet原理和数据结构3. CopyOnWriteArraySet函数">
+<meta name="keywords" content="Java源码分析,Java多线程系列,JUC集合">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java多线程系列--“JUC集合”03之 CopyOnWriteArraySet">
+<meta property="og:url" content="https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”03之 CopyOnWriteArraySet/index.html">
+<meta property="og:site_name" content="Jeeson&#39;s Blog">
+<meta property="og:description" content="本章是JUC系列中的CopyOnWriteArraySet篇。接下来，会先对CopyOnWriteArraySet进行基本介绍，然后再说明它的原理，接着通过代码去分析，最后通过示例更进一步的了解CopyOnWriteArraySet。   目录1. CopyOnWriteArraySet介绍2. CopyOnWriteArraySet原理和数据结构3. CopyOnWriteArraySet函数">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://wangkuiwu.github.io/media/pic/java/threads/juc-col03-01.jpg">
+<meta property="og:updated_time" content="2018-06-27T09:39:57.945Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java多线程系列--“JUC集合”03之 CopyOnWriteArraySet">
+<meta name="twitter:description" content="本章是JUC系列中的CopyOnWriteArraySet篇。接下来，会先对CopyOnWriteArraySet进行基本介绍，然后再说明它的原理，接着通过代码去分析，最后通过示例更进一步的了解CopyOnWriteArraySet。   目录1. CopyOnWriteArraySet介绍2. CopyOnWriteArraySet原理和数据结构3. CopyOnWriteArraySet函数">
+<meta name="twitter:image" content="http://wangkuiwu.github.io/media/pic/java/threads/juc-col03-01.jpg">
+    
+        <link rel="alternate" type="application/atom+xml" title="Jeeson&#39;s Blog" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/head.png">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Jeeson</h5>
+          <a href="mailto:smuwjs@163.com" title="smuwjs@163.com" class="mail">smuwjs@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/smuwjs" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Java多线程系列--“JUC集合”03之 CopyOnWriteArraySet</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Java多线程系列--“JUC集合”03之 CopyOnWriteArraySet</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2016-11-11T19:00:00.000Z" itemprop="datePublished" class="page-time">
+  2016-11-12
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#1-CopyOnWriteArraySet介绍"><span class="post-toc-number">1.</span> <span class="post-toc-text">1. CopyOnWriteArraySet介绍</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#2-CopyOnWriteArraySet原理和数据结构"><span class="post-toc-number">2.</span> <span class="post-toc-text">2. CopyOnWriteArraySet原理和数据结构</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#3-CopyOnWriteArraySet函数列表"><span class="post-toc-number">3.</span> <span class="post-toc-text">3. CopyOnWriteArraySet函数列表</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#4-CopyOnWriteArraySet源码-JDK1-7-0-40版本"><span class="post-toc-number">4.</span> <span class="post-toc-text">4. CopyOnWriteArraySet源码(JDK1.7.0_40版本)</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#5-CopyOnWriteArraySet示例"><span class="post-toc-number">5.</span> <span class="post-toc-text">5. CopyOnWriteArraySet示例</span></a></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”03之 CopyOnWriteArraySet"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Java多线程系列--“JUC集合”03之 CopyOnWriteArraySet</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2016-11-12 03:00:00" datetime="2016-11-11T19:00:00.000Z"  itemprop="datePublished">2016-11-12</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <blockquote>
+<p>本章是JUC系列中的CopyOnWriteArraySet篇。接下来，会先对CopyOnWriteArraySet进行基本介绍，然后再说明它的原理，接着通过代码去分析，最后通过示例更进一步的了解CopyOnWriteArraySet。</p>
+</blockquote>
+<blockquote>
+<p><strong>目录</strong><br><a href="#anchor1">1. CopyOnWriteArraySet介绍</a><br><a href="#anchor2">2. CopyOnWriteArraySet原理和数据结构</a><br><a href="#anchor3">3. CopyOnWriteArraySet函数列表</a><br><a href="#anchor4">4. CopyOnWriteArraySet源码(JDK1.7.0_40版本)</a><br><a href="#anchor5">5. CopyOnWriteArraySet示例</a>  </p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="1-CopyOnWriteArraySet介绍"><a href="#1-CopyOnWriteArraySet介绍" class="headerlink" title="1. CopyOnWriteArraySet介绍"></a>1. CopyOnWriteArraySet介绍</h1><p>它是线程安全的无序的集合，可以将它理解成线程安全的HashSet。有意思的是，CopyOnWriteArraySet和HashSet虽然都继承于共同的父类AbstractSet；但是，HashSet是通过“散列表(HashMap)”实现的，而CopyOnWriteArraySet则是通过“动态数组(CopyOnWriteArrayList)”实现的，并不是散列表。</p>
+<p>和CopyOnWriteArrayList类似，CopyOnWriteArraySet具有以下特性：<br><strong>(01). 它最适合于具有以下特征的应用程序：Set 大小通常保持很小，只读操作远多于可变操作，需要在遍历期间防止线程间的冲突。</strong><br><strong>(02). 它是线程安全的。</strong><br><strong>(03). 因为通常需要复制整个基础数组，所以可变操作（add()、set() 和 remove() 等等）的开销很大。</strong><br><strong>(04). 迭代器支持hasNext(), next()等不可变操作，但不支持可变 remove()等 操作。</strong><br>**(05). 使用迭代器进行遍历的速度很快，并且不会与其他线程发生冲突。在构造迭代器时，迭代器依赖于不变的数组快照。</p>
+<p>建议：在学习CopyOnWriteArraySet之前，先通过”[Java 集合系列16之 HashSet详细介绍(源码解析)和使用示例][link_java_collection_16]”对HashSet进行了解。</p>
+<p><a name="anchor2"></a></p>
+<h1 id="2-CopyOnWriteArraySet原理和数据结构"><a href="#2-CopyOnWriteArraySet原理和数据结构" class="headerlink" title="2. CopyOnWriteArraySet原理和数据结构"></a>2. CopyOnWriteArraySet原理和数据结构</h1><p>CopyOnWriteArraySet的数据结构，如下图所示：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://wangkuiwu.github.io/media/pic/java/threads/juc-col03-01.jpg" alt="img" title="">
+                </div>
+                <div class="image-caption">img</div>
+            </figure>
+<p>说明：<br>(01). CopyOnWriteArraySet继承于AbstractSet，这就意味着它是一个集合。<br>(02). CopyOnWriteArraySet包含CopyOnWriteArrayList对象，它是通过CopyOnWriteArrayList实现的。而CopyOnWriteArrayList本质是个动态数组队列，</p>
+<p>所以CopyOnWriteArraySet相当于通过通过动态数组实现的“集合”！ CopyOnWriteArrayList中允许有重复的元素；但是，CopyOnWriteArraySet是一个集合，所以它不能有重复集合。<br>因此，CopyOnWriteArrayList额外提供了addIfAbsent()和addAllAbsent()这两个添加元素的API，通过这些API来添加元素时，只有当元素不存在时才执行添加操作！<br>至于CopyOnWriteArraySet的“线程安全”机制，和CopyOnWriteArrayList一样，是通过volatile和互斥锁来实现的。这个在前一章节介绍CopyOnWriteArrayList时数据结构时，已经进行了说明，这里就不再重复叙述了。</p>
+<p><a name="anchor3"></a></p>
+<h1 id="3-CopyOnWriteArraySet函数列表"><a href="#3-CopyOnWriteArraySet函数列表" class="headerlink" title="3. CopyOnWriteArraySet函数列表"></a>3. CopyOnWriteArraySet函数列表</h1><pre><code>// 创建一个空 set。
+CopyOnWriteArraySet()
+// 创建一个包含指定 collection 所有元素的 set。
+CopyOnWriteArraySet(Collection&lt;? extends E&gt; c)
+
+// 如果指定元素并不存在于此 set 中，则添加它。
+boolean add(E e)
+// 如果此 set 中没有指定 collection 中的所有元素，则将它们都添加到此 set 中。
+boolean addAll(Collection&lt;? extends E&gt; c)
+// 移除此 set 中的所有元素。
+void clear()
+// 如果此 set 包含指定元素，则返回 true。
+boolean contains(Object o)
+// 如果此 set 包含指定 collection 的所有元素，则返回 true。
+boolean containsAll(Collection&lt;?&gt; c)
+// 比较指定对象与此 set 的相等性。
+boolean equals(Object o)
+// 如果此 set 不包含任何元素，则返回 true。
+boolean isEmpty()
+// 返回按照元素添加顺序在此 set 中包含的元素上进行迭代的迭代器。
+Iterator&lt;E&gt; iterator()
+// 如果指定元素存在于此 set 中，则将其移除。
+boolean remove(Object o)
+// 移除此 set 中包含在指定 collection 中的所有元素。
+boolean removeAll(Collection&lt;?&gt; c)
+// 仅保留此 set 中那些包含在指定 collection 中的元素。
+boolean retainAll(Collection&lt;?&gt; c)
+// 返回此 set 中的元素数目。
+int size()
+// 返回一个包含此 set 所有元素的数组。
+Object[] toArray()
+// 返回一个包含此 set 所有元素的数组；返回数组的运行时类型是指定数组的类型。
+&lt;T&gt; T[] toArray(T[] a)
+</code></pre><p><a name="anchor4"></a></p>
+<h1 id="4-CopyOnWriteArraySet源码-JDK1-7-0-40版本"><a href="#4-CopyOnWriteArraySet源码-JDK1-7-0-40版本" class="headerlink" title="4. CopyOnWriteArraySet源码(JDK1.7.0_40版本)"></a>4. CopyOnWriteArraySet源码(JDK1.7.0_40版本)</h1><p>CopyOnWriteArraySet.java的完整源码如下：</p>
+<pre><code>package java.util.concurrent;
+import java.util.*;
+
+/**
+ * A {@link java.util.Set} that uses an internal {@link CopyOnWriteArrayList}
+ * for all of its operations.  Thus, it shares the same basic properties:
+ * &lt;ul&gt;
+ *  &lt;li&gt;It is best suited for applications in which set sizes generally
+ *       stay small, read-only operations
+ *       vastly outnumber mutative operations, and you need
+ *       to prevent interference among threads during traversal.
+ *  &lt;li&gt;It is thread-safe.
+ *  &lt;li&gt;Mutative operations (&lt;tt&gt;add&lt;/tt&gt;, &lt;tt&gt;set&lt;/tt&gt;, &lt;tt&gt;remove&lt;/tt&gt;, etc.)
+ *      are expensive since they usually entail copying the entire underlying
+ *      array.
+ *  &lt;li&gt;Iterators do not support the mutative &lt;tt&gt;remove&lt;/tt&gt; operation.
+ *  &lt;li&gt;Traversal via iterators is fast and cannot encounter
+ *      interference from other threads. Iterators rely on
+ *      unchanging snapshots of the array at the time the iterators were
+ *      constructed.
+ * &lt;/ul&gt;
+ *
+ * &lt;p&gt; &lt;b&gt;Sample Usage.&lt;/b&gt; The following code sketch uses a
+ * copy-on-write set to maintain a set of Handler objects that
+ * perform some action upon state updates.
+ *
+ *  &lt;pre&gt; {@code
+ * class Handler { void handle(); ... }
+ *
+ * class X {
+ *   private final CopyOnWriteArraySet&lt;Handler&gt; handlers
+ *     = new CopyOnWriteArraySet&lt;Handler&gt;();
+ *   public void addHandler(Handler h) { handlers.add(h); }
+ *
+ *   private long internalState;
+ *   private synchronized void changeState() { internalState = ...; }
+ *
+ *   public void update() {
+ *     changeState();
+ *     for (Handler handler : handlers)
+ *        handler.handle();
+ *   }
+ * }}&lt;/pre&gt;
+ *
+ * &lt;p&gt;This class is a member of the
+ * &lt;a href=&quot;{@docRoot}/../technotes/guides/collections/index.html&quot;&gt;
+ * Java Collections Framework&lt;/a&gt;.
+ *
+ * @see CopyOnWriteArrayList
+ * @since 1.5
+ * @author Doug Lea
+ * @param &lt;E&gt; the type of elements held in this collection
+ */
+public class CopyOnWriteArraySet&lt;E&gt; extends AbstractSet&lt;E&gt;
+        implements java.io.Serializable {
+    private static final long serialVersionUID = 5457747651344034263L;
+
+    private final CopyOnWriteArrayList&lt;E&gt; al;
+
+    /**
+     * Creates an empty set.
+     */
+    public CopyOnWriteArraySet() {
+        al = new CopyOnWriteArrayList&lt;E&gt;();
+    }
+
+    /**
+     * Creates a set containing all of the elements of the specified
+     * collection.
+     *
+     * @param c the collection of elements to initially contain
+     * @throws NullPointerException if the specified collection is null
+     */
+    public CopyOnWriteArraySet(Collection&lt;? extends E&gt; c) {
+        al = new CopyOnWriteArrayList&lt;E&gt;();
+        al.addAllAbsent(c);
+    }
+
+    /**
+     * Returns the number of elements in this set.
+     *
+     * @return the number of elements in this set
+     */
+    public int size() {
+        return al.size();
+    }
+
+    /**
+     * Returns &lt;tt&gt;true&lt;/tt&gt; if this set contains no elements.
+     *
+     * @return &lt;tt&gt;true&lt;/tt&gt; if this set contains no elements
+     */
+    public boolean isEmpty() {
+        return al.isEmpty();
+    }
+
+    /**
+     * Returns &lt;tt&gt;true&lt;/tt&gt; if this set contains the specified element.
+     * More formally, returns &lt;tt&gt;true&lt;/tt&gt; if and only if this set
+     * contains an element &lt;tt&gt;e&lt;/tt&gt; such that
+     * &lt;tt&gt;(o==null&amp;nbsp;?&amp;nbsp;e==null&amp;nbsp;:&amp;nbsp;o.equals(e))&lt;/tt&gt;.
+     *
+     * @param o element whose presence in this set is to be tested
+     * @return &lt;tt&gt;true&lt;/tt&gt; if this set contains the specified element
+     */
+    public boolean contains(Object o) {
+        return al.contains(o);
+    }
+
+    /**
+     * Returns an array containing all of the elements in this set.
+     * If this set makes any guarantees as to what order its elements
+     * are returned by its iterator, this method must return the
+     * elements in the same order.
+     *
+     * &lt;p&gt;The returned array will be &quot;safe&quot; in that no references to it
+     * are maintained by this set.  (In other words, this method must
+     * allocate a new array even if this set is backed by an array).
+     * The caller is thus free to modify the returned array.
+     *
+     * &lt;p&gt;This method acts as bridge between array-based and collection-based
+     * APIs.
+     *
+     * @return an array containing all the elements in this set
+     */
+    public Object[] toArray() {
+        return al.toArray();
+    }
+
+    /**
+     * Returns an array containing all of the elements in this set; the
+     * runtime type of the returned array is that of the specified array.
+     * If the set fits in the specified array, it is returned therein.
+     * Otherwise, a new array is allocated with the runtime type of the
+     * specified array and the size of this set.
+     *
+     * &lt;p&gt;If this set fits in the specified array with room to spare
+     * (i.e., the array has more elements than this set), the element in
+     * the array immediately following the end of the set is set to
+     * &lt;tt&gt;null&lt;/tt&gt;.  (This is useful in determining the length of this
+     * set &lt;i&gt;only&lt;/i&gt; if the caller knows that this set does not contain
+     * any null elements.)
+     *
+     * &lt;p&gt;If this set makes any guarantees as to what order its elements
+     * are returned by its iterator, this method must return the elements
+     * in the same order.
+     *
+     * &lt;p&gt;Like the {@link #toArray()} method, this method acts as bridge between
+     * array-based and collection-based APIs.  Further, this method allows
+     * precise control over the runtime type of the output array, and may,
+     * under certain circumstances, be used to save allocation costs.
+     *
+     * &lt;p&gt;Suppose &lt;tt&gt;x&lt;/tt&gt; is a set known to contain only strings.
+     * The following code can be used to dump the set into a newly allocated
+     * array of &lt;tt&gt;String&lt;/tt&gt;:
+     *
+     * &lt;pre&gt;
+     *     String[] y = x.toArray(new String[0]);&lt;/pre&gt;
+     *
+     * Note that &lt;tt&gt;toArray(new Object[0])&lt;/tt&gt; is identical in function to
+     * &lt;tt&gt;toArray()&lt;/tt&gt;.
+     *
+     * @param a the array into which the elements of this set are to be
+     *        stored, if it is big enough; otherwise, a new array of the same
+     *        runtime type is allocated for this purpose.
+     * @return an array containing all the elements in this set
+     * @throws ArrayStoreException if the runtime type of the specified array
+     *         is not a supertype of the runtime type of every element in this
+     *         set
+     * @throws NullPointerException if the specified array is null
+     */
+    public &lt;T&gt; T[] toArray(T[] a) {
+        return al.toArray(a);
+    }
+
+    /**
+     * Removes all of the elements from this set.
+     * The set will be empty after this call returns.
+     */
+    public void clear() {
+        al.clear();
+    }
+
+    /**
+     * Removes the specified element from this set if it is present.
+     * More formally, removes an element &lt;tt&gt;e&lt;/tt&gt; such that
+     * &lt;tt&gt;(o==null&amp;nbsp;?&amp;nbsp;e==null&amp;nbsp;:&amp;nbsp;o.equals(e))&lt;/tt&gt;,
+     * if this set contains such an element.  Returns &lt;tt&gt;true&lt;/tt&gt; if
+     * this set contained the element (or equivalently, if this set
+     * changed as a result of the call).  (This set will not contain the
+     * element once the call returns.)
+     *
+     * @param o object to be removed from this set, if present
+     * @return &lt;tt&gt;true&lt;/tt&gt; if this set contained the specified element
+     */
+    public boolean remove(Object o) {
+        return al.remove(o);
+    }
+
+    /**
+     * Adds the specified element to this set if it is not already present.
+     * More formally, adds the specified element &lt;tt&gt;e&lt;/tt&gt; to this set if
+     * the set contains no element &lt;tt&gt;e2&lt;/tt&gt; such that
+     * &lt;tt&gt;(e==null&amp;nbsp;?&amp;nbsp;e2==null&amp;nbsp;:&amp;nbsp;e.equals(e2))&lt;/tt&gt;.
+     * If this set already contains the element, the call leaves the set
+     * unchanged and returns &lt;tt&gt;false&lt;/tt&gt;.
+     *
+     * @param e element to be added to this set
+     * @return &lt;tt&gt;true&lt;/tt&gt; if this set did not already contain the specified
+     *         element
+     */
+    public boolean add(E e) {
+        return al.addIfAbsent(e);
+    }
+
+    /**
+     * Returns &lt;tt&gt;true&lt;/tt&gt; if this set contains all of the elements of the
+     * specified collection.  If the specified collection is also a set, this
+     * method returns &lt;tt&gt;true&lt;/tt&gt; if it is a &lt;i&gt;subset&lt;/i&gt; of this set.
+     *
+     * @param  c collection to be checked for containment in this set
+     * @return &lt;tt&gt;true&lt;/tt&gt; if this set contains all of the elements of the
+     *         specified collection
+     * @throws NullPointerException if the specified collection is null
+     * @see #contains(Object)
+     */
+    public boolean containsAll(Collection&lt;?&gt; c) {
+        return al.containsAll(c);
+    }
+
+    /**
+     * Adds all of the elements in the specified collection to this set if
+     * they&apos;re not already present.  If the specified collection is also a
+     * set, the &lt;tt&gt;addAll&lt;/tt&gt; operation effectively modifies this set so
+     * that its value is the &lt;i&gt;union&lt;/i&gt; of the two sets.  The behavior of
+     * this operation is undefined if the specified collection is modified
+     * while the operation is in progress.
+     *
+     * @param  c collection containing elements to be added to this set
+     * @return &lt;tt&gt;true&lt;/tt&gt; if this set changed as a result of the call
+     * @throws NullPointerException if the specified collection is null
+     * @see #add(Object)
+     */
+    public boolean addAll(Collection&lt;? extends E&gt; c) {
+        return al.addAllAbsent(c) &gt; 0;
+    }
+
+    /**
+     * Removes from this set all of its elements that are contained in the
+     * specified collection.  If the specified collection is also a set,
+     * this operation effectively modifies this set so that its value is the
+     * &lt;i&gt;asymmetric set difference&lt;/i&gt; of the two sets.
+     *
+     * @param  c collection containing elements to be removed from this set
+     * @return &lt;tt&gt;true&lt;/tt&gt; if this set changed as a result of the call
+     * @throws ClassCastException if the class of an element of this set
+     *         is incompatible with the specified collection (optional)
+     * @throws NullPointerException if this set contains a null element and the
+     *         specified collection does not permit null elements (optional),
+     *         or if the specified collection is null
+     * @see #remove(Object)
+     */
+    public boolean removeAll(Collection&lt;?&gt; c) {
+        return al.removeAll(c);
+    }
+
+    /**
+     * Retains only the elements in this set that are contained in the
+     * specified collection.  In other words, removes from this set all of
+     * its elements that are not contained in the specified collection.  If
+     * the specified collection is also a set, this operation effectively
+     * modifies this set so that its value is the &lt;i&gt;intersection&lt;/i&gt; of the
+     * two sets.
+     *
+     * @param  c collection containing elements to be retained in this set
+     * @return &lt;tt&gt;true&lt;/tt&gt; if this set changed as a result of the call
+     * @throws ClassCastException if the class of an element of this set
+     *         is incompatible with the specified collection (optional)
+     * @throws NullPointerException if this set contains a null element and the
+     *         specified collection does not permit null elements (optional),
+     *         or if the specified collection is null
+     * @see #remove(Object)
+     */
+    public boolean retainAll(Collection&lt;?&gt; c) {
+        return al.retainAll(c);
+    }
+
+    /**
+     * Returns an iterator over the elements contained in this set
+     * in the order in which these elements were added.
+     *
+     * &lt;p&gt;The returned iterator provides a snapshot of the state of the set
+     * when the iterator was constructed. No synchronization is needed while
+     * traversing the iterator. The iterator does &lt;em&gt;NOT&lt;/em&gt; support the
+     * &lt;tt&gt;remove&lt;/tt&gt; method.
+     *
+     * @return an iterator over the elements in this set
+     */
+    public Iterator&lt;E&gt; iterator() {
+        return al.iterator();
+    }
+
+    /**
+     * Compares the specified object with this set for equality.
+     * Returns {@code true} if the specified object is the same object
+     * as this object, or if it is also a {@link Set} and the elements
+     * returned by an {@linkplain List#iterator() iterator} over the
+     * specified set are the same as the elements returned by an
+     * iterator over this set.  More formally, the two iterators are
+     * considered to return the same elements if they return the same
+     * number of elements and for every element {@code e1} returned by
+     * the iterator over the specified set, there is an element
+     * {@code e2} returned by the iterator over this set such that
+     * {@code (e1==null ? e2==null : e1.equals(e2))}.
+     *
+     * @param o object to be compared for equality with this set
+     * @return {@code true} if the specified object is equal to this set
+     */
+    public boolean equals(Object o) {
+        if (o == this)
+            return true;
+        if (!(o instanceof Set))
+            return false;
+        Set&lt;?&gt; set = (Set&lt;?&gt;)(o);
+        Iterator&lt;?&gt; it = set.iterator();
+
+        // Uses O(n^2) algorithm that is only appropriate
+        // for small sets, which CopyOnWriteArraySets should be.
+
+        //  Use a single snapshot of underlying array
+        Object[] elements = al.getArray();
+        int len = elements.length;
+        // Mark matched elements to avoid re-checking
+        boolean[] matched = new boolean[len];
+        int k = 0;
+        outer: while (it.hasNext()) {
+            if (++k &gt; len)
+                return false;
+            Object x = it.next();
+            for (int i = 0; i &lt; len; ++i) {
+                if (!matched[i] &amp;&amp; eq(x, elements[i])) {
+                    matched[i] = true;
+                    continue outer;
+                }
+            }
+            return false;
+        }
+        return k == len;
+    }
+
+    /**
+     * Test for equality, coping with nulls.
+     */
+    private static boolean eq(Object o1, Object o2) {
+        return (o1 == null ? o2 == null : o1.equals(o2));
+    }
+}
+</code></pre><p>CopyOnWriteArraySet是通过CopyOnWriteArrayList实现的，它的API基本上都是通过调用CopyOnWriteArrayList的API来实现的。<br>相信对CopyOnWriteArrayList了解的话，对CopyOnWriteArraySet的了解是水到渠成的事；所以，这里就不再对CopyOnWriteArraySet的代码进行详细的解析了。若对CopyOnWriteArrayList不了解，请参考“[Java多线程系列–“JUC集合”02之 CopyOnWriteArrayList][link_juc_col02]”。</p>
+<p><a name="anchor5"></a></p>
+<h1 id="5-CopyOnWriteArraySet示例"><a href="#5-CopyOnWriteArraySet示例" class="headerlink" title="5. CopyOnWriteArraySet示例"></a>5. CopyOnWriteArraySet示例</h1><p>下面，我们通过一个例子去对比HashSet和CopyOnWriteArraySet。</p>
+<pre><code>import java.util.*;
+import java.util.concurrent.*;
+
+/*
+ *   CopyOnWriteArraySet是“线程安全”的集合，而HashSet是非线程安全的。
+ *
+ *   下面是“多个线程同时操作并且遍历集合set”的示例
+ *   (01) 当set是CopyOnWriteArraySet对象时，程序能正常运行。
+ *   (02) 当set是HashSet对象时，程序会产生ConcurrentModificationException异常。
+ *
+ * @author skywang
+ */
+public class CopyOnWriteArraySetTest1 {
+
+    // TODO: set是HashSet对象时，程序会出错。
+    //private static Set&lt;String&gt; set = new HashSet&lt;String&gt;();
+    private static Set&lt;String&gt; set = new CopyOnWriteArraySet&lt;String&gt;();
+    public static void main(String[] args) {
+
+        // 同时启动两个线程对set进行操作！
+        new MyThread(&quot;ta&quot;).start();
+        new MyThread(&quot;tb&quot;).start();
+    }
+
+    private static void printAll() {
+        String value = null;
+        Iterator iter = set.iterator();
+        while(iter.hasNext()) {
+            value = (String)iter.next();
+            System.out.print(value+&quot;, &quot;);
+        }
+        System.out.println();
+    }
+
+    private static class MyThread extends Thread {
+        MyThread(String name) {
+            super(name);
+        }
+        @Override
+        public void run() {
+                int i = 0;
+            while (i++ &lt; 10) {
+                // “线程名” + &quot;-&quot; + &quot;序号&quot;
+                String val = Thread.currentThread().getName() + &quot;-&quot; + (i%6);
+                set.add(val);
+                // 通过“Iterator”遍历set。
+                printAll();
+            }
+        }
+    }
+}
+</code></pre><p>(某一次)运行结果：</p>
+<pre><code>ta-1, tb-1, ta-1, 
+tb-1, ta-1, 
+tb-1, ta-1, ta-2, 
+tb-1, ta-1, ta-2, tb-1, tb-2, 
+ta-2, ta-1, tb-2, tb-1, ta-3, 
+ta-2, ta-1, tb-2, tb-1, ta-3, ta-2, tb-3, 
+tb-2, ta-1, ta-3, tb-1, tb-3, ta-2, ta-4, 
+tb-2, ta-1, ta-3, tb-1, tb-3, ta-2, ta-4, tb-2, tb-4, 
+ta-3, ta-1, tb-3, tb-1, ta-4, ta-2, tb-4, tb-2, ta-5, 
+ta-3, ta-1, tb-3, tb-1, ta-4, ta-2, tb-4, tb-2, ta-5, ta-3, tb-5, 
+tb-3, ta-1, ta-4, tb-1, tb-4, ta-2, ta-5, tb-2, tb-5, ta-3, ta-0, 
+tb-3, ta-1, ta-4, tb-1, tb-4, ta-2, ta-5, tb-2, tb-5, ta-3, ta-0, tb-3, tb-0, 
+ta-4, ta-1, tb-4, tb-1, ta-5, ta-2, tb-5, tb-2, ta-0, ta-3, tb-0, 
+tb-3, ta-1, ta-4, tb-1, tb-4, ta-2, ta-5, tb-5, ta-0, tb-0, 
+ta-1, tb-2, tb-1, ta-3, ta-2, tb-3, tb-2, ta-4, ta-3, tb-4, tb-3, ta-5, ta-4, tb-5, tb-4, ta-0, ta-5, tb-0, 
+tb-5, ta-1, ta-0, tb-1, tb-0, 
+ta-2, ta-1, tb-2, tb-1, ta-3, ta-2, tb-3, tb-2, ta-4, ta-3, tb-4, tb-3, ta-5, tb-5, ta-0, tb-0, 
+ta-4, ta-1, tb-4, tb-1, ta-5, ta-2, tb-5, tb-2, ta-0, ta-3, tb-0, 
+tb-3, ta-1, ta-4, tb-1, tb-4, ta-2, ta-5, tb-2, tb-5, ta-3, ta-0, tb-3, tb-0, 
+ta-4, tb-4, ta-5, tb-5, ta-0, tb-0, 
+</code></pre><p>结果说明：<br>由于set是集合对象，因此它不会包含重复的元素。<br>如果将源码中的set改成HashSet对象时，程序会产生ConcurrentModificationException异常。</p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2018-06-27T09:39:57.945Z" itemprop="dateUpdated">2018-06-27 17:39:57</time>
+</span><br>
+
+
+        
+        本文固定链接：<a href="/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”03之 CopyOnWriteArraySet/" target="_blank" rel="external">https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”03之 CopyOnWriteArraySet/</a>
+        
+    </div>
+    <footer>
+        <a href="https://smuwjs.github.io">
+            <img src="/img/head.png" alt="Jeeson">
+            Jeeson
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JUC集合/">JUC集合</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java多线程系列/">Java多线程系列</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java源码分析/">Java源码分析</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”03之 CopyOnWriteArraySet/&title=《Java多线程系列--“JUC集合”03之 CopyOnWriteArraySet》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”03之 CopyOnWriteArraySet/&title=《Java多线程系列--“JUC集合”03之 CopyOnWriteArraySet》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”03之 CopyOnWriteArraySet/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Java多线程系列--“JUC集合”03之 CopyOnWriteArraySet》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”03之 CopyOnWriteArraySet/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”03之 CopyOnWriteArraySet/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”04之 ConcurrentHashMap/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">Java多线程系列--“JUC集合”04之 ConcurrentHashMap</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”02之 CopyOnWriteArrayList/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Java多线程系列--“JUC集合”02之 CopyOnWriteArrayList</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”03之 CopyOnWriteArraySet" data-title="Java多线程系列--“JUC集合”03之 CopyOnWriteArraySet" data-url="https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”03之 CopyOnWriteArraySet/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'smuwjs', theme: 'none'};
+lazyScripts.push('//unpkg.com/hexo-theme-material-indigo@latest/js/embed.min.js');
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循<a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>Jeeson &copy; 2015 - 2018</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”03之 CopyOnWriteArraySet/&title=《Java多线程系列--“JUC集合”03之 CopyOnWriteArraySet》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”03之 CopyOnWriteArraySet/&title=《Java多线程系列--“JUC集合”03之 CopyOnWriteArraySet》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”03之 CopyOnWriteArraySet/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Java多线程系列--“JUC集合”03之 CopyOnWriteArraySet》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”03之 CopyOnWriteArraySet/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”03之 CopyOnWriteArraySet/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”03之 CopyOnWriteArraySet/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

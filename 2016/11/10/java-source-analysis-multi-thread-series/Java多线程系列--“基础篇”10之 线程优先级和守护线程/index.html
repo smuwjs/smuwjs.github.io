@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>Java多线程系列--“基础篇”10之 线程优先级和守护线程 | Jeeson&#39;s Blog | Write the code. Change the world.</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="Java源码分析,Java多线程系列">
+    <meta name="description" content="本章，会对守护线程和线程优先级进行介绍。   目录1. 线程优先级的介绍2. 线程优先级的示例3. 守护线程的示例     1. 线程优先级的介绍java 中的线程优先级的范围是1～10，默认的优先级是5。“高优先级线程”会优先于“低优先级线程”执行。 java 中有两种线程：用户线程和守护线程。可以通过isDaemon()方法来区别它们：如果返回false，则说明该线程是“用户线程”；否则就是">
+<meta name="keywords" content="Java源码分析,Java多线程系列">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java多线程系列--“基础篇”10之 线程优先级和守护线程">
+<meta property="og:url" content="https://smuwjs.github.io/2016/11/10/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”10之 线程优先级和守护线程/index.html">
+<meta property="og:site_name" content="Jeeson&#39;s Blog">
+<meta property="og:description" content="本章，会对守护线程和线程优先级进行介绍。   目录1. 线程优先级的介绍2. 线程优先级的示例3. 守护线程的示例     1. 线程优先级的介绍java 中的线程优先级的范围是1～10，默认的优先级是5。“高优先级线程”会优先于“低优先级线程”执行。 java 中有两种线程：用户线程和守护线程。可以通过isDaemon()方法来区别它们：如果返回false，则说明该线程是“用户线程”；否则就是">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-06-27T09:39:57.949Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java多线程系列--“基础篇”10之 线程优先级和守护线程">
+<meta name="twitter:description" content="本章，会对守护线程和线程优先级进行介绍。   目录1. 线程优先级的介绍2. 线程优先级的示例3. 守护线程的示例     1. 线程优先级的介绍java 中的线程优先级的范围是1～10，默认的优先级是5。“高优先级线程”会优先于“低优先级线程”执行。 java 中有两种线程：用户线程和守护线程。可以通过isDaemon()方法来区别它们：如果返回false，则说明该线程是“用户线程”；否则就是">
+    
+        <link rel="alternate" type="application/atom+xml" title="Jeeson&#39;s Blog" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/head.png">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Jeeson</h5>
+          <a href="mailto:smuwjs@163.com" title="smuwjs@163.com" class="mail">smuwjs@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/smuwjs" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Java多线程系列--“基础篇”10之 线程优先级和守护线程</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Java多线程系列--“基础篇”10之 线程优先级和守护线程</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2016-11-09T16:00:00.000Z" itemprop="datePublished" class="page-time">
+  2016-11-10
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#1-线程优先级的介绍"><span class="post-toc-number">1.</span> <span class="post-toc-text">1. 线程优先级的介绍</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#2-线程优先级的示例"><span class="post-toc-number">2.</span> <span class="post-toc-text">2. 线程优先级的示例</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#3-守护线程的示例"><span class="post-toc-number">3.</span> <span class="post-toc-text">3. 守护线程的示例</span></a></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”10之 线程优先级和守护线程"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Java多线程系列--“基础篇”10之 线程优先级和守护线程</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2016-11-10 00:00:00" datetime="2016-11-09T16:00:00.000Z"  itemprop="datePublished">2016-11-10</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <blockquote>
+<p>本章，会对守护线程和线程优先级进行介绍。</p>
+</blockquote>
+<blockquote>
+<p><strong>目录</strong><br><a href="#anchor1">1. 线程优先级的介绍</a><br><a href="#anchor2">2. 线程优先级的示例</a><br><a href="#anchor3">3. 守护线程的示例</a>  </p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="1-线程优先级的介绍"><a href="#1-线程优先级的介绍" class="headerlink" title="1. 线程优先级的介绍"></a>1. 线程优先级的介绍</h1><p>java 中的线程优先级的范围是1～10，默认的优先级是5。“高优先级线程”会优先于“低优先级线程”执行。</p>
+<p>java 中有两种线程：用户线程和守护线程。可以通过isDaemon()方法来区别它们：如果返回false，则说明该线程是“用户线程”；否则就是“守护线程”。<br>用户线程一般用户执行用户级任务，而守护线程也就是“后台线程”，一般用来执行后台任务。需要注意的是：Java虚拟机在“用户线程”都结束后会后退出。</p>
+<p>JDK 中关于线程优先级和守护线程的介绍如下：</p>
+<blockquote>
+<p>Every thread has a priority. Threads with higher priority are executed in preference to threads with lower priority. Each thread may or may not also be marked as a daemon. When code running in some thread creates a new Thread object, the new thread has its priority initially set equal to the priority of the creating thread, and is a daemon thread if and only if the creating thread is a daemon.<br>When a Java Virtual Machine starts up, there is usually a single non-daemon thread (which typically calls the method named main of some designated class). The Java Virtual Machine continues to execute threads until either of the following occurs:<br>The exit method of class Runtime has been called and the security manager has permitted the exit operation to take place.<br>All threads that are not daemon threads have died, either by returning from the call to the run method or by throwing an exception that propagates beyond the run method.<br>Marks this thread as either a daemon thread or a user thread. The Java Virtual Machine exits when the only threads running are all daemon threads.</p>
+</blockquote>
+<p>大致意思是：</p>
+<p>每个线程都有一个优先级。“高优先级线程”会优先于“低优先级线程”执行。每个线程都可以被标记为一个守护进程或非守护进程。在一些运行的主线程中创建新的子线程时，子线程的优先级被设置为等于“创建它的主线程的优先级”，当且仅当“创建它的主线程是守护线程”时“子线程才会是守护线程”。</p>
+<p>当Java虚拟机启动时，通常有一个单一的非守护线程（该线程通过是通过main()方法启动）。JVM会一直运行直到下面的任意一个条件发生，JVM就会终止运行：<br>(01) 调用了exit()方法，并且exit()有权限被正常执行。<br>(02) 所有的“非守护线程”都死了(即JVM中仅仅只有“守护线程”)。  </p>
+<p>每一个线程都被标记为“守护线程”或“用户线程”。当只有守护线程运行时，JVM会自动退出。</p>
+<p><a name="anchor2"></a></p>
+<h1 id="2-线程优先级的示例"><a href="#2-线程优先级的示例" class="headerlink" title="2. 线程优先级的示例"></a>2. 线程优先级的示例</h1><p>我们先看看优先级的示例 </p>
+<pre><code>class MyThread extends Thread{
+    public MyThread(String name) {
+        super(name);
+    }
+
+    public void run(){
+        for (int i=0; i&lt;5; i++) {
+            System.out.println(Thread.currentThread().getName()
+                    +&quot;(&quot;+Thread.currentThread().getPriority()+ &quot;)&quot;
+                    +&quot;, loop &quot;+i);
+        }
+    } 
+}; 
+
+public class Demo {  
+    public static void main(String[] args) {  
+
+        System.out.println(Thread.currentThread().getName()
+                +&quot;(&quot;+Thread.currentThread().getPriority()+ &quot;)&quot;);
+
+        Thread t1=new MyThread(&quot;t1&quot;);    // 新建t1
+        Thread t2=new MyThread(&quot;t2&quot;);    // 新建t2
+        t1.setPriority(1);                // 设置t1的优先级为1
+        t2.setPriority(10);                // 设置t2的优先级为10
+        t1.start();                        // 启动t1
+        t2.start();                        // 启动t2
+    }  
+}
+</code></pre><p>运行结果：</p>
+<pre><code>main(5)
+t1(1), loop 0
+t2(10), loop 0
+t1(1), loop 1
+t2(10), loop 1
+t1(1), loop 2
+t2(10), loop 2
+t1(1), loop 3
+t2(10), loop 3
+t1(1), loop 4
+t2(10), loop 4
+</code></pre><p>结果说明：<br>(01) 主线程main的优先级是5。<br>(02) t1的优先级被设为1，而t2的优先级被设为10。cpu在执行t1和t2的时候，根据时间片轮循调度，所以能够并发执行。</p>
+<p><a name="anchor3"></a></p>
+<h1 id="3-守护线程的示例"><a href="#3-守护线程的示例" class="headerlink" title="3. 守护线程的示例"></a>3. 守护线程的示例</h1><p>下面是守护线程的示例。</p>
+<pre><code>// Demo.java
+class MyThread extends Thread{
+    public MyThread(String name) {
+        super(name);
+    }
+
+    public void run(){
+        try {
+            for (int i=0; i&lt;5; i++) {
+                Thread.sleep(3);
+                System.out.println(this.getName() +&quot;(isDaemon=&quot;+this.isDaemon()+ &quot;)&quot; +&quot;, loop &quot;+i);
+            }
+        } catch (InterruptedException e) {
+        }
+    } 
+}; 
+
+class MyDaemon extends Thread{  
+    public MyDaemon(String name) {
+        super(name);
+    }
+
+    public void run(){
+        try {
+            for (int i=0; i&lt;10000; i++) {
+                Thread.sleep(1);
+                System.out.println(this.getName() +&quot;(isDaemon=&quot;+this.isDaemon()+ &quot;)&quot; +&quot;, loop &quot;+i);
+            }
+        } catch (InterruptedException e) {
+        }
+    } 
+}
+public class Demo {  
+    public static void main(String[] args) {  
+
+        System.out.println(Thread.currentThread().getName()
+                +&quot;(isDaemon=&quot;+Thread.currentThread().isDaemon()+ &quot;)&quot;);
+
+        Thread t1=new MyThread(&quot;t1&quot;);    // 新建t1
+        Thread t2=new MyDaemon(&quot;t2&quot;);    // 新建t2
+        t2.setDaemon(true);                // 设置t2为守护线程
+        t1.start();                        // 启动t1
+        t2.start();                        // 启动t2
+    }  
+}
+</code></pre><p>运行结果：</p>
+<pre><code>main(isDaemon=false)
+t2(isDaemon=true), loop 0
+t2(isDaemon=true), loop 1
+t1(isDaemon=false), loop 0
+t2(isDaemon=true), loop 2
+t2(isDaemon=true), loop 3
+t1(isDaemon=false), loop 1
+t2(isDaemon=true), loop 4
+t2(isDaemon=true), loop 5
+t2(isDaemon=true), loop 6
+t1(isDaemon=false), loop 2
+t2(isDaemon=true), loop 7
+t2(isDaemon=true), loop 8
+t2(isDaemon=true), loop 9
+t1(isDaemon=false), loop 3
+t2(isDaemon=true), loop 10
+t2(isDaemon=true), loop 11
+t1(isDaemon=false), loop 4
+t2(isDaemon=true), loop 12
+</code></pre><p>结果说明：<br>(01) 主线程main是用户线程，它创建的子线程t1也是用户线程。<br>(02) t2是守护线程。在“主线程main”和“子线程t1”(它们都是用户线程)执行完毕，只剩t2这个守护线程的时候，JVM自动退出。</p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2018-06-27T09:39:57.949Z" itemprop="dateUpdated">2018-06-27 17:39:57</time>
+</span><br>
+
+
+        
+        本文固定链接：<a href="/2016/11/10/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”10之 线程优先级和守护线程/" target="_blank" rel="external">https://smuwjs.github.io/2016/11/10/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”10之 线程优先级和守护线程/</a>
+        
+    </div>
+    <footer>
+        <a href="https://smuwjs.github.io">
+            <img src="/img/head.png" alt="Jeeson">
+            Jeeson
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java多线程系列/">Java多线程系列</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java源码分析/">Java源码分析</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/11/10/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”10之 线程优先级和守护线程/&title=《Java多线程系列--“基础篇”10之 线程优先级和守护线程》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/11/10/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”10之 线程优先级和守护线程/&title=《Java多线程系列--“基础篇”10之 线程优先级和守护线程》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/11/10/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”10之 线程优先级和守护线程/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Java多线程系列--“基础篇”10之 线程优先级和守护线程》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/11/10/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”10之 线程优先级和守护线程/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/11/10/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”10之 线程优先级和守护线程/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2016/11/11/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”11之 生产消费者问题/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">Java多线程系列--“基础篇”11之 生产消费者问题</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2016/11/09/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”09之 interrupt()和线程终止方式/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Java多线程系列--“基础篇”09之 interrupt()和线程终止方式</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”10之 线程优先级和守护线程" data-title="Java多线程系列--“基础篇”10之 线程优先级和守护线程" data-url="https://smuwjs.github.io/2016/11/10/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”10之 线程优先级和守护线程/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'smuwjs', theme: 'none'};
+lazyScripts.push('//unpkg.com/hexo-theme-material-indigo@latest/js/embed.min.js');
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循<a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>Jeeson &copy; 2015 - 2018</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/11/10/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”10之 线程优先级和守护线程/&title=《Java多线程系列--“基础篇”10之 线程优先级和守护线程》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/11/10/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”10之 线程优先级和守护线程/&title=《Java多线程系列--“基础篇”10之 线程优先级和守护线程》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/11/10/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”10之 线程优先级和守护线程/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Java多线程系列--“基础篇”10之 线程优先级和守护线程》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/11/10/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”10之 线程优先级和守护线程/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/11/10/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”10之 线程优先级和守护线程/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://smuwjs.github.io/2016/11/10/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”10之 线程优先级和守护线程/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

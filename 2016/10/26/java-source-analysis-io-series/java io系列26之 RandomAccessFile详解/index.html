@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>java io系列26之 RandomAccessFile详解 | Jeeson&#39;s Blog | Write the code. Change the world.</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="Java源码分析,Java IO系列">
+    <meta name="description" content="目录1. RandomAccessFile2. RandomAccessFile 模式说明3. 演示程序      1. RandomAccessFileRandomAccessFile 是随机访问文件(包括读/写)的类。它支持对文件随机访问的读取和写入，即我们可以从指定的位置读取/写入文件数据。 需要注意的是，RandomAccessFile 虽然属于java.io包，但它不是InputStr">
+<meta name="keywords" content="Java源码分析,Java IO系列">
+<meta property="og:type" content="article">
+<meta property="og:title" content="java io系列26之 RandomAccessFile详解">
+<meta property="og:url" content="https://smuwjs.github.io/2016/10/26/java-source-analysis-io-series/java io系列26之 RandomAccessFile详解/index.html">
+<meta property="og:site_name" content="Jeeson&#39;s Blog">
+<meta property="og:description" content="目录1. RandomAccessFile2. RandomAccessFile 模式说明3. 演示程序      1. RandomAccessFileRandomAccessFile 是随机访问文件(包括读/写)的类。它支持对文件随机访问的读取和写入，即我们可以从指定的位置读取/写入文件数据。 需要注意的是，RandomAccessFile 虽然属于java.io包，但它不是InputStr">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://smuwjs.github.io/2016/10/26/java-source-analysis-io-series/java%20io系列26之%20RandomAccessFile详解/media/pic/java/io/RandomAccessFile01.jpg">
+<meta property="og:image" content="https://smuwjs.github.io/2016/10/26/java-source-analysis-io-series/java%20io系列26之%20RandomAccessFile详解/media/pic/java/io/RandomAccessFile02.jpg">
+<meta property="og:updated_time" content="2018-06-27T09:39:57.941Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="java io系列26之 RandomAccessFile详解">
+<meta name="twitter:description" content="目录1. RandomAccessFile2. RandomAccessFile 模式说明3. 演示程序      1. RandomAccessFileRandomAccessFile 是随机访问文件(包括读/写)的类。它支持对文件随机访问的读取和写入，即我们可以从指定的位置读取/写入文件数据。 需要注意的是，RandomAccessFile 虽然属于java.io包，但它不是InputStr">
+<meta name="twitter:image" content="https://smuwjs.github.io/2016/10/26/java-source-analysis-io-series/java%20io系列26之%20RandomAccessFile详解/media/pic/java/io/RandomAccessFile01.jpg">
+    
+        <link rel="alternate" type="application/atom+xml" title="Jeeson&#39;s Blog" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/head.png">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Jeeson</h5>
+          <a href="mailto:smuwjs@163.com" title="smuwjs@163.com" class="mail">smuwjs@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/smuwjs" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">java io系列26之 RandomAccessFile详解</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">java io系列26之 RandomAccessFile详解</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2016-10-25T16:00:00.000Z" itemprop="datePublished" class="page-time">
+  2016-10-26
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#1-RandomAccessFile"><span class="post-toc-number">1.</span> <span class="post-toc-text">1. RandomAccessFile</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#2-RandomAccessFile-模式说明"><span class="post-toc-number">2.</span> <span class="post-toc-text">2. RandomAccessFile 模式说明</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#3-演示程序"><span class="post-toc-number">3.</span> <span class="post-toc-text">3. 演示程序</span></a></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-java-source-analysis-io-series/java io系列26之 RandomAccessFile详解"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">java io系列26之 RandomAccessFile详解</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2016-10-26 00:00:00" datetime="2016-10-25T16:00:00.000Z"  itemprop="datePublished">2016-10-26</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <blockquote>
+<p><strong>目录</strong><br><a href="#anchor1">1. RandomAccessFile</a><br><a href="#anchor2">2. RandomAccessFile 模式说明</a><br><a href="#anchor3">3. 演示程序</a>   </p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="1-RandomAccessFile"><a href="#1-RandomAccessFile" class="headerlink" title="1. RandomAccessFile"></a>1. RandomAccessFile</h1><p>RandomAccessFile 是随机访问文件(包括读/写)的类。它支持对文件随机访问的读取和写入，即我们可以从指定的位置读取/写入文件数据。</p>
+<p>需要注意的是，RandomAccessFile 虽然属于java.io包，但它不是InputStream或者OutputStream的子类；它也不同于FileInputStream和FileOutputStream。 FileInputStream 只能对文件进行读操作，而FileOutputStream 只能对文件进行写操作；但是，RandomAccessFile 同时支持文件的读和写，并且它支持随机访问。</p>
+<p><strong>RandomAccessFile 函数列表</strong></p>
+<pre><code>RandomAccessFile(File file, String mode)
+RandomAccessFile(String fileName, String mode)
+
+void     close()
+synchronized final FileChannel     getChannel()
+final FileDescriptor     getFD()
+long     getFilePointer()
+long     length()
+int     read(byte[] buffer, int byteOffset, int byteCount)
+int     read(byte[] buffer)
+int     read()
+final boolean     readBoolean()
+final byte     readByte()
+final char     readChar()
+final double     readDouble()
+final float     readFloat()
+final void     readFully(byte[] dst)
+final void     readFully(byte[] dst, int offset, int byteCount)
+final int     readInt()
+final String     readLine()
+final long     readLong()
+final short     readShort()
+final String     readUTF()
+final int     readUnsignedByte()
+final int     readUnsignedShort()
+void     seek(long offset)
+void     setLength(long newLength)
+int     skipBytes(int count)
+void     write(int oneByte)
+void     write(byte[] buffer, int byteOffset, int byteCount)
+void     write(byte[] buffer)
+final void     writeBoolean(boolean val)
+final void     writeByte(int val)
+final void     writeBytes(String str)
+final void     writeChar(int val)
+final void     writeChars(String str)
+final void     writeDouble(double val)
+final void     writeFloat(float val)
+final void     writeInt(int val)
+final void     writeLong(long val)
+final void     writeShort(int val)
+final void     writeUTF(String str)
+</code></pre><p><a name="anchor2"></a></p>
+<h1 id="2-RandomAccessFile-模式说明"><a href="#2-RandomAccessFile-模式说明" class="headerlink" title="2. RandomAccessFile 模式说明"></a>2. RandomAccessFile 模式说明</h1><p>RandomAccessFile共有4种模式：”r”, “rw”, “rws”和”rwd”。</p>
+<blockquote>
+<p>“r”    以只读方式打开。调用结果对象的任何 write 方法都将导致抛出 IOException。<br>“rw”   打开以便读取和写入。<br>“rws”  打开以便读取和写入。相对于 “rw”，”rws” 还要求对“文件的内容”或“元数据”的每个更新都同步写入到基础存储设备。<br>“rwd”  打开以便读取和写入，相对于 “rw”，”rwd” 还要求对“文件的内容”的每个更新都同步写入到基础存储设备。  </p>
+</blockquote>
+<p>说明：</p>
+<p>(01) 什么是“元数据”，即metadata？</p>
+<p>英文解释如下：</p>
+<blockquote>
+<p>The definition of metadata is “data about other data.” With a file system, the data is contained in its files and directories, and the metadata tracks information about each of these objects: Is it a regular file, a directory, or a link? What is its size, creation date, last modified date, file owner, group owner, and access permissions?</p>
+</blockquote>
+<p>大致意思是：<br>metadata是“关于数据的数据”。在文件系统中，数据被包含在文件和文件夹中；metadata信息包括：“数据是一个文件，一个目录还是一个链接”，“数据的创建时间(简称ctime)”，“最后一次修改时间(简称mtime)”，“数据拥有者”，“数据拥有群组”，“访问权限”等等。</p>
+<p>(02) “rw”, “rws”, “rwd” 的区别。</p>
+<p>当操作的文件是存储在本地的基础存储设备上时(如硬盘, NandFlash等)，”rws” 或 “rwd”, “rw” 才有区别。<br>当模式是 “rws” 并且 操作的是基础存储设备上的文件；那么，每次“更改文件内容[如write()写入数据]” 或 “修改文件元数据(如文件的mtime)”时，都会将这些改变同步到基础存储设备上。<br>当模式是 “rwd” 并且 操作的是基础存储设备上的文件；那么，每次“更改文件内容[如write()写入数据]”时，都会将这些改变同步到基础存储设备上。<br>当模式是 “rw” 并且 操作的是基础存储设备上的文件；那么，关闭文件时，会将“文件内容的修改”同步到基础存储设备上。至于，“更改文件内容”时，是否会立即同步，取决于系统底层实现。</p>
+<p><a name="anchor3"></a></p>
+<h1 id="3-演示程序"><a href="#3-演示程序" class="headerlink" title="3. 演示程序"></a>3. 演示程序</h1><p>源码如下：</p>
+<pre><code>import java.io.File;
+import java.io.FileDescriptor;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.PrintStream;;
+import java.io.RandomAccessFile;
+import java.io.IOException;
+
+/**
+ * RandomAccessFile 测试程序
+ *
+ * 运行结果(输出如下)：
+ * c1=a
+ * c2=b
+ * buf=9876543210
+ * 
+ * 此外,
+ * (01) 在源文件所在目录生成了file.txt。
+ * (02) 注意RandomAccessFile写入boolean, byte, char, int,所占的字符个数。
+ *
+ * @author skywang
+ */
+public class RandomAccessFileTest {
+
+    private static final String FileName = &quot;file.txt&quot;;
+
+    public static void main(String[] args) {
+        // 若文件“file.txt”存在，则删除该文件。
+        File file = new File(FileName);
+        if (file.exists())
+            file.delete();
+
+        testCreateWrite();
+        testAppendWrite();
+        testRead();
+    }
+
+    /**
+     * 若“file.txt”不存在的话，则新建文件，并向文件中写入内容
+     */
+    private static void testCreateWrite() {
+        try {
+            // 创建文件“file.txt”对应File对象
+            File file = new File(FileName);
+            // 创建文件“file.txt”对应的RandomAccessFile对象
+            RandomAccessFile raf = new RandomAccessFile(file, &quot;rw&quot;);
+
+            // 向“文件中”写入26个字母+回车
+            raf.writeChars(&quot;abcdefghijklmnopqrstuvwxyz\n&quot;);
+            // 向“文件中”写入&quot;9876543210&quot;+回车
+            raf.writeChars(&quot;9876543210\n&quot;);
+
+            raf.close();
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 向文件末尾追加内容
+     */
+    private static void testAppendWrite() {
+        try {
+            // 创建文件“file.txt”对应File对象
+            File file = new File(FileName);
+            // 创建文件“file.txt”对应的RandomAccessFile对象
+            RandomAccessFile raf = new RandomAccessFile(file, &quot;rw&quot;);
+
+            // 获取文件长度
+            long fileLen = raf.length();
+            // 将位置定位到“文件末尾”
+            raf.seek(fileLen);
+
+            // 以下向raf文件中写数据  
+            raf.writeBoolean(true); // 占1个字节  
+            raf.writeByte(0x41);    // 占1个字节  
+            raf.writeChar(&apos;a&apos;);     // 占2个字节  
+            raf.writeShort(0x3c3c); // 占2个字节  
+            raf.writeInt(0x75);     // 占4个字节  
+            raf.writeLong(0x1234567890123456L); // 占8个字节  
+            raf.writeFloat(4.7f);  // 占4个字节  
+            raf.writeDouble(8.256);// 占8个字节  
+            raf.writeUTF(&quot;UTF严&quot;); // UTF-8格式写入
+            raf.writeChar(&apos;\n&apos;);   // 占2个字符。“换行符”
+
+            raf.close();
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 通过RandomAccessFile读取文件
+     */
+    private static void testRead() {
+        try {
+            // 创建文件“file.txt”对应File对象
+            File file = new File(FileName);
+            // 创建文件“file.txt”对应的RandomAccessFile对象，以只读方式打开
+            RandomAccessFile raf = new RandomAccessFile(file, &quot;r&quot;);
+
+            // 读取一个字符
+            char c1 = raf.readChar();
+            System.out.println(&quot;c1=&quot;+c1);
+            // 读取一个字符
+            char c2 = raf.readChar();
+            System.out.println(&quot;c2=&quot;+c2);
+
+            // 跳过54个字节。
+            raf.seek(54);
+
+            // 测试read(byte[] buffer, int byteOffset, int byteCount)
+            byte[] buf = new byte[20];
+            raf.read(buf, 0, buf.length);
+            System.out.println(&quot;buf=&quot;+(new String(buf)));
+
+            raf.close();
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+</code></pre><p>运行结果：</p>
+<pre><code>c1=a
+c2=b
+buf=9876543210
+</code></pre><p>结果说明：程序会在源文件所在目录生成file.txt；file.txt的内容如下：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="media/pic/java/io/RandomAccessFile01.jpg" alt="img" title="">
+                </div>
+                <div class="image-caption">img</div>
+            </figure>
+<p>file.txt对应的16进制内容如下：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="media/pic/java/io/RandomAccessFile02.jpg" alt="img" title="">
+                </div>
+                <div class="image-caption">img</div>
+            </figure>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2018-06-27T09:39:57.941Z" itemprop="dateUpdated">2018-06-27 17:39:57</time>
+</span><br>
+
+
+        
+        本文固定链接：<a href="/2016/10/26/java-source-analysis-io-series/java io系列26之 RandomAccessFile详解/" target="_blank" rel="external">https://smuwjs.github.io/2016/10/26/java-source-analysis-io-series/java io系列26之 RandomAccessFile详解/</a>
+        
+    </div>
+    <footer>
+        <a href="https://smuwjs.github.io">
+            <img src="/img/head.png" alt="Jeeson">
+            Jeeson
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java-IO系列/">Java IO系列</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java源码分析/">Java源码分析</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/10/26/java-source-analysis-io-series/java io系列26之 RandomAccessFile详解/&title=《java io系列26之 RandomAccessFile详解》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/10/26/java-source-analysis-io-series/java io系列26之 RandomAccessFile详解/&title=《java io系列26之 RandomAccessFile详解》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/10/26/java-source-analysis-io-series/java io系列26之 RandomAccessFile详解/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《java io系列26之 RandomAccessFile详解》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/10/26/java-source-analysis-io-series/java io系列26之 RandomAccessFile详解/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/10/26/java-source-analysis-io-series/java io系列26之 RandomAccessFile详解/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2016/11/01/java-source-analysis-multi-thread-series/Java多线程系列--“基础篇”01之 基本概念/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">Java多线程系列--“基础篇”01之 基本概念</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2016/10/25/java-source-analysis-io-series/java io系列25之 PrintWriter详解/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">java io系列25之 PrintWriter详解</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="java-source-analysis-io-series/java io系列26之 RandomAccessFile详解" data-title="java io系列26之 RandomAccessFile详解" data-url="https://smuwjs.github.io/2016/10/26/java-source-analysis-io-series/java io系列26之 RandomAccessFile详解/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'smuwjs', theme: 'none'};
+lazyScripts.push('//unpkg.com/hexo-theme-material-indigo@latest/js/embed.min.js');
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循<a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>Jeeson &copy; 2015 - 2018</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/10/26/java-source-analysis-io-series/java io系列26之 RandomAccessFile详解/&title=《java io系列26之 RandomAccessFile详解》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/10/26/java-source-analysis-io-series/java io系列26之 RandomAccessFile详解/&title=《java io系列26之 RandomAccessFile详解》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/10/26/java-source-analysis-io-series/java io系列26之 RandomAccessFile详解/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《java io系列26之 RandomAccessFile详解》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/10/26/java-source-analysis-io-series/java io系列26之 RandomAccessFile详解/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/10/26/java-source-analysis-io-series/java io系列26之 RandomAccessFile详解/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://smuwjs.github.io/2016/10/26/java-source-analysis-io-series/java io系列26之 RandomAccessFile详解/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,1535 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>Java多线程系列--“JUC集合”07之 ArrayBlockingQueue | Jeeson&#39;s Blog | Write the code. Change the world.</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="Java源码分析,Java多线程系列,JUC集合">
+    <meta name="description" content="本章对Java.util.concurrent包中的ArrayBlockingQueue类进行详细的介绍。   目录1. ArrayBlockingQueue介绍2. ArrayBlockingQueue原理和数据结构3. ArrayBlockingQueue函数列表4. ArrayBlockingQueue源码分析(JDK1.7.0_40版本)&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;">
+<meta name="keywords" content="Java源码分析,Java多线程系列,JUC集合">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java多线程系列--“JUC集合”07之 ArrayBlockingQueue">
+<meta property="og:url" content="https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”07之 ArrayBlockingQueue/index.html">
+<meta property="og:site_name" content="Jeeson&#39;s Blog">
+<meta property="og:description" content="本章对Java.util.concurrent包中的ArrayBlockingQueue类进行详细的介绍。   目录1. ArrayBlockingQueue介绍2. ArrayBlockingQueue原理和数据结构3. ArrayBlockingQueue函数列表4. ArrayBlockingQueue源码分析(JDK1.7.0_40版本)&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://wangkuiwu.github.io/media/pic/java/threads/juc-col07-01.jpg">
+<meta property="og:updated_time" content="2018-06-27T09:39:57.949Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java多线程系列--“JUC集合”07之 ArrayBlockingQueue">
+<meta name="twitter:description" content="本章对Java.util.concurrent包中的ArrayBlockingQueue类进行详细的介绍。   目录1. ArrayBlockingQueue介绍2. ArrayBlockingQueue原理和数据结构3. ArrayBlockingQueue函数列表4. ArrayBlockingQueue源码分析(JDK1.7.0_40版本)&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;">
+<meta name="twitter:image" content="http://wangkuiwu.github.io/media/pic/java/threads/juc-col07-01.jpg">
+    
+        <link rel="alternate" type="application/atom+xml" title="Jeeson&#39;s Blog" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/head.png">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Jeeson</h5>
+          <a href="mailto:smuwjs@163.com" title="smuwjs@163.com" class="mail">smuwjs@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/smuwjs" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Java多线程系列--“JUC集合”07之 ArrayBlockingQueue</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Java多线程系列--“JUC集合”07之 ArrayBlockingQueue</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2016-11-11T23:00:00.000Z" itemprop="datePublished" class="page-time">
+  2016-11-12
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#1-ArrayBlockingQueue介绍"><span class="post-toc-number">1.</span> <span class="post-toc-text">1. ArrayBlockingQueue介绍</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#2-ArrayBlockingQueue原理和数据结构"><span class="post-toc-number">2.</span> <span class="post-toc-text">2. ArrayBlockingQueue原理和数据结构</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#3-ArrayBlockingQueue函数列表"><span class="post-toc-number">3.</span> <span class="post-toc-text">3. ArrayBlockingQueue函数列表</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#4-ArrayBlockingQueue源码分析-JDK1-7-0-40版本"><span class="post-toc-number">4.</span> <span class="post-toc-text">4. ArrayBlockingQueue源码分析(JDK1.7.0_40版本)</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#4-1-创建"><span class="post-toc-number">4.1.</span> <span class="post-toc-text">4.1 创建</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#4-2-添加"><span class="post-toc-number">4.2.</span> <span class="post-toc-text">4.2 添加</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#4-3-取出"><span class="post-toc-number">4.3.</span> <span class="post-toc-text">4.3 取出</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#4-4-遍历"><span class="post-toc-number">4.4.</span> <span class="post-toc-text">4.4 遍历</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#5-ArrayBlockingQueue示例"><span class="post-toc-number">5.</span> <span class="post-toc-text">5. ArrayBlockingQueue示例</span></a></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”07之 ArrayBlockingQueue"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Java多线程系列--“JUC集合”07之 ArrayBlockingQueue</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2016-11-12 07:00:00" datetime="2016-11-11T23:00:00.000Z"  itemprop="datePublished">2016-11-12</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <blockquote>
+<p>本章对Java.util.concurrent包中的ArrayBlockingQueue类进行详细的介绍。</p>
+</blockquote>
+<blockquote>
+<p><strong>目录</strong><br><a href="#anchor1">1. ArrayBlockingQueue介绍</a><br><a href="#anchor2">2. ArrayBlockingQueue原理和数据结构</a><br><a href="#anchor3">3. ArrayBlockingQueue函数列表</a><br><a href="#anchor4">4. ArrayBlockingQueue源码分析(JDK1.7.0_40版本)</a><br>&nbsp;&nbsp;&nbsp;&nbsp; <a href="#anchor4_1">4.1 创建</a><br>&nbsp;&nbsp;&nbsp;&nbsp; <a href="#anchor4_2">4.2 添加</a><br>&nbsp;&nbsp;&nbsp;&nbsp; <a href="#anchor4_3">4.3 取出</a><br><a href="#anchor5">5. ArrayBlockingQueue示例</a>  </p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="1-ArrayBlockingQueue介绍"><a href="#1-ArrayBlockingQueue介绍" class="headerlink" title="1. ArrayBlockingQueue介绍"></a>1. ArrayBlockingQueue介绍</h1><p>ArrayBlockingQueue是数组实现的线程安全的有界的阻塞队列。</p>
+<p>线程安全是指，ArrayBlockingQueue内部通过“互斥锁”保护竞争资源，实现了多线程对竞争资源的互斥访问。<br>而有界，则是指ArrayBlockingQueue对应的数组是有界限的。<br>阻塞队列，是指多线程访问竞争资源时，当竞争资源已被某线程获取时，其它要获取该资源的线程需要阻塞等待。<br>而且，ArrayBlockingQueue是按 FIFO（先进先出）原则对元素进行排序，元素都是从尾部插入到队列，从头部开始返回。</p>
+<p>注意：ArrayBlockingQueue不同于ConcurrentLinkedQueue，ArrayBlockingQueue是数组实现的，并且是有界限的；而ConcurrentLinkedQueue是链表实现的，是无界限的。</p>
+<p><a name="anchor2"></a></p>
+<h1 id="2-ArrayBlockingQueue原理和数据结构"><a href="#2-ArrayBlockingQueue原理和数据结构" class="headerlink" title="2. ArrayBlockingQueue原理和数据结构"></a>2. ArrayBlockingQueue原理和数据结构</h1><p>ArrayBlockingQueue的数据结构，如下图所示：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://wangkuiwu.github.io/media/pic/java/threads/juc-col07-01.jpg" alt="img" title="">
+                </div>
+                <div class="image-caption">img</div>
+            </figure>
+<p>说明：<br>(01). ArrayBlockingQueue继承于AbstractQueue，并且它实现了BlockingQueue接口。<br>(02). ArrayBlockingQueue内部是通过Object[]数组保存数据的，也就是说ArrayBlockingQueue本质上是通过数组实现的。ArrayBlockingQueue的大小，即数组的容量是创建ArrayBlockingQueue时指定的。<br>(03). ArrayBlockingQueue与ReentrantLock是组合关系，ArrayBlockingQueue中包含一个ReentrantLock对象(lock)。ReentrantLock是可重入的互斥锁，ArrayBlockingQueue就是根据该互斥锁实现“多线程对竞争资源的互斥访问”。而且，ReentrantLock分为公平锁和非公平锁，关于具体使用公平锁还是非公平锁，在创建ArrayBlockingQueue时可以指定；而且，ArrayBlockingQueue默认会使用非公平锁。<br>(04). ArrayBlockingQueue与Condition是组合关系，ArrayBlockingQueue中包含两个Condition对象(notEmpty和notFull)。而且，Condition又依赖于ArrayBlockingQueue而存在，通过Condition可以实现对ArrayBlockingQueue的更精确的访问 – (01)若某线程(线程A)要取数据时，数组正好为空，则该线程会执行notEmpty.await()进行等待；当其它某个线程(线程B)向数组中插入了数据之后，会调用notEmpty.signal()唤醒“notEmpty上的等待线程”。此时，线程A会被唤醒从而得以继续运行。(02)若某线程(线程H)要插入数据时，数组已满，则该线程会它执行notFull.await()进行等待；当其它某个线程(线程I)取出数据之后，会调用notFull.signal()唤醒“notFull上的等待线程”。此时，线程H就会被唤醒从而得以继续运行。</p>
+<p>关于ReentrantLock，公平锁，非公平锁，以及Condition等更多的内容，可以参考前面的文章。</p>
+<p><a name="anchor3"></a></p>
+<h1 id="3-ArrayBlockingQueue函数列表"><a href="#3-ArrayBlockingQueue函数列表" class="headerlink" title="3. ArrayBlockingQueue函数列表"></a>3. ArrayBlockingQueue函数列表</h1><pre><code>// 创建一个带有给定的（固定）容量和默认访问策略的 ArrayBlockingQueue。
+ArrayBlockingQueue(int capacity)
+// 创建一个具有给定的（固定）容量和指定访问策略的 ArrayBlockingQueue。
+ArrayBlockingQueue(int capacity, boolean fair)
+// 创建一个具有给定的（固定）容量和指定访问策略的 ArrayBlockingQueue，它最初包含给定 collection 的元素，并以 collection 迭代器的遍历顺序添加元素。
+ArrayBlockingQueue(int capacity, boolean fair, Collection&lt;? extends E&gt; c)
+
+// 将指定的元素插入到此队列的尾部（如果立即可行且不会超过该队列的容量），在成功时返回 true，如果此队列已满，则抛出 IllegalStateException。
+boolean add(E e)
+// 自动移除此队列中的所有元素。
+void clear()
+// 如果此队列包含指定的元素，则返回 true。
+boolean contains(Object o)
+// 移除此队列中所有可用的元素，并将它们添加到给定 collection 中。
+int drainTo(Collection&lt;? super E&gt; c)
+// 最多从此队列中移除给定数量的可用元素，并将这些元素添加到给定 collection 中。
+int drainTo(Collection&lt;? super E&gt; c, int maxElements)
+// 返回在此队列中的元素上按适当顺序进行迭代的迭代器。
+Iterator&lt;E&gt; iterator()
+// 将指定的元素插入到此队列的尾部（如果立即可行且不会超过该队列的容量），在成功时返回 true，如果此队列已满，则返回 false。
+boolean offer(E e)
+// 将指定的元素插入此队列的尾部，如果该队列已满，则在到达指定的等待时间之前等待可用的空间。
+boolean offer(E e, long timeout, TimeUnit unit)
+// 获取但不移除此队列的头；如果此队列为空，则返回 null。
+E peek()
+// 获取并移除此队列的头，如果此队列为空，则返回 null。
+E poll()
+// 获取并移除此队列的头部，在指定的等待时间前等待可用的元素（如果有必要）。
+E poll(long timeout, TimeUnit unit)
+// 将指定的元素插入此队列的尾部，如果该队列已满，则等待可用的空间。
+void put(E e)
+// 返回在无阻塞的理想情况下（不存在内存或资源约束）此队列能接受的其他元素数量。
+int remainingCapacity()
+// 从此队列中移除指定元素的单个实例（如果存在）。
+boolean remove(Object o)
+// 返回此队列中元素的数量。
+int size()
+// 获取并移除此队列的头部，在元素变得可用之前一直等待（如果有必要）。
+E take()
+// 返回一个按适当顺序包含此队列中所有元素的数组。
+Object[] toArray()
+// 返回一个按适当顺序包含此队列中所有元素的数组；返回数组的运行时类型是指定数组的运行时类型。
+&lt;T&gt; T[] toArray(T[] a)
+// 返回此 collection 的字符串表示形式。
+String toString()
+</code></pre><p><a name="anchor4"></a></p>
+<h1 id="4-ArrayBlockingQueue源码分析-JDK1-7-0-40版本"><a href="#4-ArrayBlockingQueue源码分析-JDK1-7-0-40版本" class="headerlink" title="4. ArrayBlockingQueue源码分析(JDK1.7.0_40版本)"></a>4. ArrayBlockingQueue源码分析(JDK1.7.0_40版本)</h1><p>ArrayBlockingQueue.java的完整源码如下：</p>
+<pre><code>package java.util.concurrent;
+import java.util.concurrent.locks.*;
+import java.util.*;
+
+/**
+ * A bounded {@linkplain BlockingQueue blocking queue} backed by an
+ * array.  This queue orders elements FIFO (first-in-first-out).  The
+ * &lt;em&gt;head&lt;/em&gt; of the queue is that element that has been on the
+ * queue the longest time.  The &lt;em&gt;tail&lt;/em&gt; of the queue is that
+ * element that has been on the queue the shortest time. New elements
+ * are inserted at the tail of the queue, and the queue retrieval
+ * operations obtain elements at the head of the queue.
+ *
+ * &lt;p&gt;This is a classic &amp;quot;bounded buffer&amp;quot;, in which a
+ * fixed-sized array holds elements inserted by producers and
+ * extracted by consumers.  Once created, the capacity cannot be
+ * changed.  Attempts to {@code put} an element into a full queue
+ * will result in the operation blocking; attempts to {@code take} an
+ * element from an empty queue will similarly block.
+ *
+ * &lt;p&gt;This class supports an optional fairness policy for ordering
+ * waiting producer and consumer threads.  By default, this ordering
+ * is not guaranteed. However, a queue constructed with fairness set
+ * to {@code true} grants threads access in FIFO order. Fairness
+ * generally decreases throughput but reduces variability and avoids
+ * starvation.
+ *
+ * &lt;p&gt;This class and its iterator implement all of the
+ * &lt;em&gt;optional&lt;/em&gt; methods of the {@link Collection} and {@link
+ * Iterator} interfaces.
+ *
+ * &lt;p&gt;This class is a member of the
+ * &lt;a href=&quot;{@docRoot}/../technotes/guides/collections/index.html&quot;&gt;
+ * Java Collections Framework&lt;/a&gt;.
+ *
+ * @since 1.5
+ * @author Doug Lea
+ * @param &lt;E&gt; the type of elements held in this collection
+ */
+public class ArrayBlockingQueue&lt;E&gt; extends AbstractQueue&lt;E&gt;
+        implements BlockingQueue&lt;E&gt;, java.io.Serializable {
+
+    /**
+     * Serialization ID. This class relies on default serialization
+     * even for the items array, which is default-serialized, even if
+     * it is empty. Otherwise it could not be declared final, which is
+     * necessary here.
+     */
+    private static final long serialVersionUID = -817911632652898426L;
+
+    /** The queued items */
+    final Object[] items;
+
+    /** items index for next take, poll, peek or remove */
+    int takeIndex;
+
+    /** items index for next put, offer, or add */
+    int putIndex;
+
+    /** Number of elements in the queue */
+    int count;
+
+    /*
+     * Concurrency control uses the classic two-condition algorithm
+     * found in any textbook.
+     */
+
+    /** Main lock guarding all access */
+    final ReentrantLock lock;
+    /** Condition for waiting takes */
+    private final Condition notEmpty;
+    /** Condition for waiting puts */
+    private final Condition notFull;
+
+    // Internal helper methods
+
+    /**
+     * Circularly increment i.
+     */
+    final int inc(int i) {
+        return (++i == items.length) ? 0 : i;
+    }
+
+    /**
+     * Circularly decrement i.
+     */
+    final int dec(int i) {
+        return ((i == 0) ? items.length : i) - 1;
+    }
+
+    @SuppressWarnings(&quot;unchecked&quot;)
+    static &lt;E&gt; E cast(Object item) {
+        return (E) item;
+    }
+
+    /**
+     * Returns item at index i.
+     */
+    final E itemAt(int i) {
+        return this.&lt;E&gt;cast(items[i]);
+    }
+
+    /**
+     * Throws NullPointerException if argument is null.
+     *
+     * @param v the element
+     */
+    private static void checkNotNull(Object v) {
+        if (v == null)
+            throw new NullPointerException();
+    }
+
+    /**
+     * Inserts element at current put position, advances, and signals.
+     * Call only when holding lock.
+     */
+    private void insert(E x) {
+        items[putIndex] = x;
+        putIndex = inc(putIndex);
+        ++count;
+        notEmpty.signal();
+    }
+
+    /**
+     * Extracts element at current take position, advances, and signals.
+     * Call only when holding lock.
+     */
+    private E extract() {
+        final Object[] items = this.items;
+        E x = this.&lt;E&gt;cast(items[takeIndex]);
+        items[takeIndex] = null;
+        takeIndex = inc(takeIndex);
+        --count;
+        notFull.signal();
+        return x;
+    }
+
+    /**
+     * Deletes item at position i.
+     * Utility for remove and iterator.remove.
+     * Call only when holding lock.
+     */
+    void removeAt(int i) {
+        final Object[] items = this.items;
+        // if removing front item, just advance
+        if (i == takeIndex) {
+            items[takeIndex] = null;
+            takeIndex = inc(takeIndex);
+        } else {
+            // slide over all others up through putIndex.
+            for (;;) {
+                int nexti = inc(i);
+                if (nexti != putIndex) {
+                    items[i] = items[nexti];
+                    i = nexti;
+                } else {
+                    items[i] = null;
+                    putIndex = i;
+                    break;
+                }
+            }
+        }
+        --count;
+        notFull.signal();
+    }
+
+    /**
+     * Creates an {@code ArrayBlockingQueue} with the given (fixed)
+     * capacity and default access policy.
+     *
+     * @param capacity the capacity of this queue
+     * @throws IllegalArgumentException if {@code capacity &lt; 1}
+     */
+    public ArrayBlockingQueue(int capacity) {
+        this(capacity, false);
+    }
+
+    /**
+     * Creates an {@code ArrayBlockingQueue} with the given (fixed)
+     * capacity and the specified access policy.
+     *
+     * @param capacity the capacity of this queue
+     * @param fair if {@code true} then queue accesses for threads blocked
+     *        on insertion or removal, are processed in FIFO order;
+     *        if {@code false} the access order is unspecified.
+     * @throws IllegalArgumentException if {@code capacity &lt; 1}
+     */
+    public ArrayBlockingQueue(int capacity, boolean fair) {
+        if (capacity &lt;= 0)
+            throw new IllegalArgumentException();
+        this.items = new Object[capacity];
+        lock = new ReentrantLock(fair);
+        notEmpty = lock.newCondition();
+        notFull =  lock.newCondition();
+    }
+
+    /**
+     * Creates an {@code ArrayBlockingQueue} with the given (fixed)
+     * capacity, the specified access policy and initially containing the
+     * elements of the given collection,
+     * added in traversal order of the collection&apos;s iterator.
+     *
+     * @param capacity the capacity of this queue
+     * @param fair if {@code true} then queue accesses for threads blocked
+     *        on insertion or removal, are processed in FIFO order;
+     *        if {@code false} the access order is unspecified.
+     * @param c the collection of elements to initially contain
+     * @throws IllegalArgumentException if {@code capacity} is less than
+     *         {@code c.size()}, or less than 1.
+     * @throws NullPointerException if the specified collection or any
+     *         of its elements are null
+     */
+    public ArrayBlockingQueue(int capacity, boolean fair,
+                              Collection&lt;? extends E&gt; c) {
+        this(capacity, fair);
+
+        final ReentrantLock lock = this.lock;
+        lock.lock(); // Lock only for visibility, not mutual exclusion
+        try {
+            int i = 0;
+            try {
+                for (E e : c) {
+                    checkNotNull(e);
+                    items[i++] = e;
+                }
+            } catch (ArrayIndexOutOfBoundsException ex) {
+                throw new IllegalArgumentException();
+            }
+            count = i;
+            putIndex = (i == capacity) ? 0 : i;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * Inserts the specified element at the tail of this queue if it is
+     * possible to do so immediately without exceeding the queue&apos;s capacity,
+     * returning {@code true} upon success and throwing an
+     * {@code IllegalStateException} if this queue is full.
+     *
+     * @param e the element to add
+     * @return {@code true} (as specified by {@link Collection#add})
+     * @throws IllegalStateException if this queue is full
+     * @throws NullPointerException if the specified element is null
+     */
+    public boolean add(E e) {
+        return super.add(e);
+    }
+
+    /**
+     * Inserts the specified element at the tail of this queue if it is
+     * possible to do so immediately without exceeding the queue&apos;s capacity,
+     * returning {@code true} upon success and {@code false} if this queue
+     * is full.  This method is generally preferable to method {@link #add},
+     * which can fail to insert an element only by throwing an exception.
+     *
+     * @throws NullPointerException if the specified element is null
+     */
+    public boolean offer(E e) {
+        checkNotNull(e);
+        final ReentrantLock lock = this.lock;
+        lock.lock();
+        try {
+            if (count == items.length)
+                return false;
+            else {
+                insert(e);
+                return true;
+            }
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * Inserts the specified element at the tail of this queue, waiting
+     * for space to become available if the queue is full.
+     *
+     * @throws InterruptedException {@inheritDoc}
+     * @throws NullPointerException {@inheritDoc}
+     */
+    public void put(E e) throws InterruptedException {
+        checkNotNull(e);
+        final ReentrantLock lock = this.lock;
+        lock.lockInterruptibly();
+        try {
+            while (count == items.length)
+                notFull.await();
+            insert(e);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * Inserts the specified element at the tail of this queue, waiting
+     * up to the specified wait time for space to become available if
+     * the queue is full.
+     *
+     * @throws InterruptedException {@inheritDoc}
+     * @throws NullPointerException {@inheritDoc}
+     */
+    public boolean offer(E e, long timeout, TimeUnit unit)
+        throws InterruptedException {
+
+        checkNotNull(e);
+        long nanos = unit.toNanos(timeout);
+        final ReentrantLock lock = this.lock;
+        lock.lockInterruptibly();
+        try {
+            while (count == items.length) {
+                if (nanos &lt;= 0)
+                    return false;
+                nanos = notFull.awaitNanos(nanos);
+            }
+            insert(e);
+            return true;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public E poll() {
+        final ReentrantLock lock = this.lock;
+        lock.lock();
+        try {
+            return (count == 0) ? null : extract();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public E take() throws InterruptedException {
+        final ReentrantLock lock = this.lock;
+        lock.lockInterruptibly();
+        try {
+            while (count == 0)
+                notEmpty.await();
+            return extract();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public E poll(long timeout, TimeUnit unit) throws InterruptedException {
+        long nanos = unit.toNanos(timeout);
+        final ReentrantLock lock = this.lock;
+        lock.lockInterruptibly();
+        try {
+            while (count == 0) {
+                if (nanos &lt;= 0)
+                    return null;
+                nanos = notEmpty.awaitNanos(nanos);
+            }
+            return extract();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public E peek() {
+        final ReentrantLock lock = this.lock;
+        lock.lock();
+        try {
+            return (count == 0) ? null : itemAt(takeIndex);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    // this doc comment is overridden to remove the reference to collections
+    // greater in size than Integer.MAX_VALUE
+    /**
+     * Returns the number of elements in this queue.
+     *
+     * @return the number of elements in this queue
+     */
+    public int size() {
+        final ReentrantLock lock = this.lock;
+        lock.lock();
+        try {
+            return count;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    // this doc comment is a modified copy of the inherited doc comment,
+    // without the reference to unlimited queues.
+    /**
+     * Returns the number of additional elements that this queue can ideally
+     * (in the absence of memory or resource constraints) accept without
+     * blocking. This is always equal to the initial capacity of this queue
+     * less the current {@code size} of this queue.
+     *
+     * &lt;p&gt;Note that you &lt;em&gt;cannot&lt;/em&gt; always tell if an attempt to insert
+     * an element will succeed by inspecting {@code remainingCapacity}
+     * because it may be the case that another thread is about to
+     * insert or remove an element.
+     */
+    public int remainingCapacity() {
+        final ReentrantLock lock = this.lock;
+        lock.lock();
+        try {
+            return items.length - count;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * Removes a single instance of the specified element from this queue,
+     * if it is present.  More formally, removes an element {@code e} such
+     * that {@code o.equals(e)}, if this queue contains one or more such
+     * elements.
+     * Returns {@code true} if this queue contained the specified element
+     * (or equivalently, if this queue changed as a result of the call).
+     *
+     * &lt;p&gt;Removal of interior elements in circular array based queues
+     * is an intrinsically slow and disruptive operation, so should
+     * be undertaken only in exceptional circumstances, ideally
+     * only when the queue is known not to be accessible by other
+     * threads.
+     *
+     * @param o element to be removed from this queue, if present
+     * @return {@code true} if this queue changed as a result of the call
+     */
+    public boolean remove(Object o) {
+        if (o == null) return false;
+        final Object[] items = this.items;
+        final ReentrantLock lock = this.lock;
+        lock.lock();
+        try {
+            for (int i = takeIndex, k = count; k &gt; 0; i = inc(i), k--) {
+                if (o.equals(items[i])) {
+                    removeAt(i);
+                    return true;
+                }
+            }
+            return false;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * Returns {@code true} if this queue contains the specified element.
+     * More formally, returns {@code true} if and only if this queue contains
+     * at least one element {@code e} such that {@code o.equals(e)}.
+     *
+     * @param o object to be checked for containment in this queue
+     * @return {@code true} if this queue contains the specified element
+     */
+    public boolean contains(Object o) {
+        if (o == null) return false;
+        final Object[] items = this.items;
+        final ReentrantLock lock = this.lock;
+        lock.lock();
+        try {
+            for (int i = takeIndex, k = count; k &gt; 0; i = inc(i), k--)
+                if (o.equals(items[i]))
+                    return true;
+            return false;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * Returns an array containing all of the elements in this queue, in
+     * proper sequence.
+     *
+     * &lt;p&gt;The returned array will be &quot;safe&quot; in that no references to it are
+     * maintained by this queue.  (In other words, this method must allocate
+     * a new array).  The caller is thus free to modify the returned array.
+     *
+     * &lt;p&gt;This method acts as bridge between array-based and collection-based
+     * APIs.
+     *
+     * @return an array containing all of the elements in this queue
+     */
+    public Object[] toArray() {
+        final Object[] items = this.items;
+        final ReentrantLock lock = this.lock;
+        lock.lock();
+        try {
+            final int count = this.count;
+            Object[] a = new Object[count];
+            for (int i = takeIndex, k = 0; k &lt; count; i = inc(i), k++)
+                a[k] = items[i];
+            return a;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * Returns an array containing all of the elements in this queue, in
+     * proper sequence; the runtime type of the returned array is that of
+     * the specified array.  If the queue fits in the specified array, it
+     * is returned therein.  Otherwise, a new array is allocated with the
+     * runtime type of the specified array and the size of this queue.
+     *
+     * &lt;p&gt;If this queue fits in the specified array with room to spare
+     * (i.e., the array has more elements than this queue), the element in
+     * the array immediately following the end of the queue is set to
+     * {@code null}.
+     *
+     * &lt;p&gt;Like the {@link #toArray()} method, this method acts as bridge between
+     * array-based and collection-based APIs.  Further, this method allows
+     * precise control over the runtime type of the output array, and may,
+     * under certain circumstances, be used to save allocation costs.
+     *
+     * &lt;p&gt;Suppose {@code x} is a queue known to contain only strings.
+     * The following code can be used to dump the queue into a newly
+     * allocated array of {@code String}:
+     *
+     * &lt;pre&gt;
+     *     String[] y = x.toArray(new String[0]);&lt;/pre&gt;
+     *
+     * Note that {@code toArray(new Object[0])} is identical in function to
+     * {@code toArray()}.
+     *
+     * @param a the array into which the elements of the queue are to
+     *          be stored, if it is big enough; otherwise, a new array of the
+     *          same runtime type is allocated for this purpose
+     * @return an array containing all of the elements in this queue
+     * @throws ArrayStoreException if the runtime type of the specified array
+     *         is not a supertype of the runtime type of every element in
+     *         this queue
+     * @throws NullPointerException if the specified array is null
+     */
+    @SuppressWarnings(&quot;unchecked&quot;)
+    public &lt;T&gt; T[] toArray(T[] a) {
+        final Object[] items = this.items;
+        final ReentrantLock lock = this.lock;
+        lock.lock();
+        try {
+            final int count = this.count;
+            final int len = a.length;
+            if (len &lt; count)
+                a = (T[])java.lang.reflect.Array.newInstance(
+                    a.getClass().getComponentType(), count);
+            for (int i = takeIndex, k = 0; k &lt; count; i = inc(i), k++)
+                a[k] = (T) items[i];
+            if (len &gt; count)
+                a[count] = null;
+            return a;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public String toString() {
+        final ReentrantLock lock = this.lock;
+        lock.lock();
+        try {
+            int k = count;
+            if (k == 0)
+                return &quot;[]&quot;;
+
+            StringBuilder sb = new StringBuilder();
+            sb.append(&apos;[&apos;);
+            for (int i = takeIndex; ; i = inc(i)) {
+                Object e = items[i];
+                sb.append(e == this ? &quot;(this Collection)&quot; : e);
+                if (--k == 0)
+                    return sb.append(&apos;]&apos;).toString();
+                sb.append(&apos;,&apos;).append(&apos; &apos;);
+            }
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * Atomically removes all of the elements from this queue.
+     * The queue will be empty after this call returns.
+     */
+    public void clear() {
+        final Object[] items = this.items;
+        final ReentrantLock lock = this.lock;
+        lock.lock();
+        try {
+            for (int i = takeIndex, k = count; k &gt; 0; i = inc(i), k--)
+                items[i] = null;
+            count = 0;
+            putIndex = 0;
+            takeIndex = 0;
+            notFull.signalAll();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * @throws UnsupportedOperationException {@inheritDoc}
+     * @throws ClassCastException            {@inheritDoc}
+     * @throws NullPointerException          {@inheritDoc}
+     * @throws IllegalArgumentException      {@inheritDoc}
+     */
+    public int drainTo(Collection&lt;? super E&gt; c) {
+        checkNotNull(c);
+        if (c == this)
+            throw new IllegalArgumentException();
+        final Object[] items = this.items;
+        final ReentrantLock lock = this.lock;
+        lock.lock();
+        try {
+            int i = takeIndex;
+            int n = 0;
+            int max = count;
+            while (n &lt; max) {
+                c.add(this.&lt;E&gt;cast(items[i]));
+                items[i] = null;
+                i = inc(i);
+                ++n;
+            }
+            if (n &gt; 0) {
+                count = 0;
+                putIndex = 0;
+                takeIndex = 0;
+                notFull.signalAll();
+            }
+            return n;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * @throws UnsupportedOperationException {@inheritDoc}
+     * @throws ClassCastException            {@inheritDoc}
+     * @throws NullPointerException          {@inheritDoc}
+     * @throws IllegalArgumentException      {@inheritDoc}
+     */
+    public int drainTo(Collection&lt;? super E&gt; c, int maxElements) {
+        checkNotNull(c);
+        if (c == this)
+            throw new IllegalArgumentException();
+        if (maxElements &lt;= 0)
+            return 0;
+        final Object[] items = this.items;
+        final ReentrantLock lock = this.lock;
+        lock.lock();
+        try {
+            int i = takeIndex;
+            int n = 0;
+            int max = (maxElements &lt; count) ? maxElements : count;
+            while (n &lt; max) {
+                c.add(this.&lt;E&gt;cast(items[i]));
+                items[i] = null;
+                i = inc(i);
+                ++n;
+            }
+            if (n &gt; 0) {
+                count -= n;
+                takeIndex = i;
+                notFull.signalAll();
+            }
+            return n;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * Returns an iterator over the elements in this queue in proper sequence.
+     * The elements will be returned in order from first (head) to last (tail).
+     *
+     * &lt;p&gt;The returned {@code Iterator} is a &quot;weakly consistent&quot; iterator that
+     * will never throw {@link java.util.ConcurrentModificationException
+     * ConcurrentModificationException},
+     * and guarantees to traverse elements as they existed upon
+     * construction of the iterator, and may (but is not guaranteed to)
+     * reflect any modifications subsequent to construction.
+     *
+     * @return an iterator over the elements in this queue in proper sequence
+     */
+    public Iterator&lt;E&gt; iterator() {
+        return new Itr();
+    }
+
+    /**
+     * Iterator for ArrayBlockingQueue. To maintain weak consistency
+     * with respect to puts and takes, we (1) read ahead one slot, so
+     * as to not report hasNext true but then not have an element to
+     * return -- however we later recheck this slot to use the most
+     * current value; (2) ensure that each array slot is traversed at
+     * most once (by tracking &quot;remaining&quot; elements); (3) skip over
+     * null slots, which can occur if takes race ahead of iterators.
+     * However, for circular array-based queues, we cannot rely on any
+     * well established definition of what it means to be weakly
+     * consistent with respect to interior removes since these may
+     * require slot overwrites in the process of sliding elements to
+     * cover gaps. So we settle for resiliency, operating on
+     * established apparent nexts, which may miss some elements that
+     * have moved between calls to next.
+     */
+    private class Itr implements Iterator&lt;E&gt; {
+        private int remaining; // Number of elements yet to be returned
+        private int nextIndex; // Index of element to be returned by next
+        private E nextItem;    // Element to be returned by next call to next
+        private E lastItem;    // Element returned by last call to next
+        private int lastRet;   // Index of last element returned, or -1 if none
+
+        Itr() {
+            final ReentrantLock lock = ArrayBlockingQueue.this.lock;
+            lock.lock();
+            try {
+                lastRet = -1;
+                if ((remaining = count) &gt; 0)
+                    nextItem = itemAt(nextIndex = takeIndex);
+            } finally {
+                lock.unlock();
+            }
+        }
+
+        public boolean hasNext() {
+            return remaining &gt; 0;
+        }
+
+        public E next() {
+            final ReentrantLock lock = ArrayBlockingQueue.this.lock;
+            lock.lock();
+            try {
+                if (remaining &lt;= 0)
+                    throw new NoSuchElementException();
+                lastRet = nextIndex;
+                E x = itemAt(nextIndex);  // check for fresher value
+                if (x == null) {
+                    x = nextItem;         // we are forced to report old value
+                    lastItem = null;      // but ensure remove fails
+                }
+                else
+                    lastItem = x;
+                while (--remaining &gt; 0 &amp;&amp; // skip over nulls
+                       (nextItem = itemAt(nextIndex = inc(nextIndex))) == null)
+                    ;
+                return x;
+            } finally {
+                lock.unlock();
+            }
+        }
+
+        public void remove() {
+            final ReentrantLock lock = ArrayBlockingQueue.this.lock;
+            lock.lock();
+            try {
+                int i = lastRet;
+                if (i == -1)
+                    throw new IllegalStateException();
+                lastRet = -1;
+                E x = lastItem;
+                lastItem = null;
+                // only remove if item still at index
+                if (x != null &amp;&amp; x == items[i]) {
+                    boolean removingHead = (i == takeIndex);
+                    removeAt(i);
+                    if (!removingHead)
+                        nextIndex = dec(nextIndex);
+                }
+            } finally {
+                lock.unlock();
+            }
+        }
+    }
+
+}
+</code></pre><p>下面从ArrayBlockingQueue的创建，添加，取出，遍历这几个方面对ArrayBlockingQueue进行分析。</p>
+<p><a name="anchor4_1"></a></p>
+<h2 id="4-1-创建"><a href="#4-1-创建" class="headerlink" title="4.1 创建"></a>4.1 创建</h2><p>下面以ArrayBlockingQueue(int capacity, boolean fair)来进行说明。</p>
+<pre><code>public ArrayBlockingQueue(int capacity, boolean fair) {
+    if (capacity &lt;= 0)
+        throw new IllegalArgumentException();
+    this.items = new Object[capacity];
+    lock = new ReentrantLock(fair);
+    notEmpty = lock.newCondition();
+    notFull =  lock.newCondition();
+}
+</code></pre><p>说明：<br>(01) items是保存“阻塞队列”数据的数组。它的定义如下：</p>
+<pre><code>final Object[] items;
+</code></pre><p>(02) fair是“可重入的独占锁(ReentrantLock)”的类型。fair为true，表示是公平锁；fair为false，表示是非公平锁。<br>notEmpty和notFull是锁的两个Condition条件。它们的定义如下：</p>
+<pre><code>final ReentrantLock lock;
+private final Condition notEmpty;
+private final Condition notFull;
+</code></pre><p>简单对Condition和Lock的用法进行说明，更多内容请参考“Java多线程系列–“JUC锁”06之 Condition条件”。<br>Lock的作用是提供独占锁机制，来保护竞争资源；而Condition是为了更加精细的对锁进行控制，它依赖于Lock，通过某个条件对多线程进行控制。<br>notEmpty表示“锁的非空条件”。当某线程想从队列中取数据时，而此时又没有数据，则该线程通过notEmpty.await()进行等待；当其它线程向队列中插入了元素之后，就调用notEmpty.signal()唤醒“之前通过notEmpty.await()进入等待状态的线程”。<br>同理，notFull表示“锁的满条件”。当某线程想向队列中插入元素，而此时队列已满时，该线程等待；当其它线程从队列中取出元素之后，就唤醒该等待的线程。</p>
+<p><a name="anchor4_2"></a></p>
+<h2 id="4-2-添加"><a href="#4-2-添加" class="headerlink" title="4.2 添加"></a>4.2 添加</h2><p>下面以offer(E e)为例，对ArrayBlockingQueue的添加方法进行说明。</p>
+<pre><code>public boolean offer(E e) {
+    // 创建插入的元素是否为null，是的话抛出NullPointerException异常
+    checkNotNull(e);
+    // 获取“该阻塞队列的独占锁”
+    final ReentrantLock lock = this.lock;
+    lock.lock();
+    try {
+        // 如果队列已满，则返回false。
+        if (count == items.length)
+            return false;
+        else {
+        // 如果队列未满，则插入e，并返回true。
+            insert(e);
+            return true;
+        }
+    } finally {
+        // 释放锁
+        lock.unlock();
+    }
+}
+</code></pre><p>说明：offer(E e)的作用是将e插入阻塞队列的尾部。如果队列已满，则返回false，表示插入失败；否则，插入元素，并返回true。<br>(01) count表示”队列中的元素个数“。除此之外，队列中还有另外两个遍历takeIndex和putIndex。takeIndex表示下一个被取出元素的索引，putIndex表示下一个被添加元素的索引。它们的定义如下：</p>
+<pre><code>// 队列中的元素个数
+int takeIndex;
+// 下一个被取出元素的索引
+int putIndex;
+// 下一个被添加元素的索引
+int count;
+</code></pre><p>(02) insert()的源码如下：</p>
+<pre><code>private void insert(E x) {
+    // 将x添加到”队列“中
+    items[putIndex] = x;
+    // 设置”下一个被取出元素的索引“
+    putIndex = inc(putIndex);
+    // 将”队列中的元素个数”+1
+    ++count;
+    // 唤醒notEmpty上的等待线程
+    notEmpty.signal();
+}
+</code></pre><p>insert()在插入元素之后，会唤醒notEmpty上面的等待线程。</p>
+<p>inc()的源码如下：</p>
+<pre><code>final int inc(int i) {
+    return (++i == items.length) ? 0 : i;
+}
+</code></pre><p>若i+1的值等于“队列的长度”，即添加元素之后，队列满；则设置“下一个被添加元素的索引”为0。</p>
+<p><a name="anchor4_3"></a></p>
+<h2 id="4-3-取出"><a href="#4-3-取出" class="headerlink" title="4.3 取出"></a>4.3 取出</h2><p>下面以take()为例，对ArrayBlockingQueue的取出方法进行说明。</p>
+<pre><code>public E take() throws InterruptedException {
+    // 获取“队列的独占锁”
+    final ReentrantLock lock = this.lock;
+    // 获取“锁”，若当前线程是中断状态，则抛出InterruptedException异常
+    lock.lockInterruptibly();
+    try {
+        // 若“队列为空”，则一直等待。
+        while (count == 0)
+            notEmpty.await();
+        // 取出元素
+        return extract();
+    } finally {
+        // 释放“锁”
+        lock.unlock();
+    }
+}
+</code></pre><p>说明：take()的作用是取出并返回队列的头。若队列为空，则一直等待。</p>
+<p>extract()的源码如下：</p>
+<pre><code>private E extract() {
+    final Object[] items = this.items;
+    // 强制将元素转换为“泛型E”
+    E x = this.&lt;E&gt;cast(items[takeIndex]);
+    // 将第takeIndex元素设为null，即删除。同时，帮助GC回收。
+    items[takeIndex] = null;
+    // 设置“下一个被取出元素的索引”
+    takeIndex = inc(takeIndex);
+    // 将“队列中元素数量”-1
+    --count;
+    // 唤醒notFull上的等待线程。
+    notFull.signal();
+    return x;
+}
+</code></pre><p>说明：extract()在删除元素之后，会唤醒notFull上的等待线程。</p>
+<h2 id="4-4-遍历"><a href="#4-4-遍历" class="headerlink" title="4.4 遍历"></a>4.4 遍历</h2><p>下面对ArrayBlockingQueue的遍历方法进行说明。</p>
+<pre><code>public Iterator&lt;E&gt; iterator() {
+    return new Itr();
+}
+</code></pre><p>Itr是实现了Iterator接口的类，它的源码如下：</p>
+<pre><code>private class Itr implements Iterator&lt;E&gt; {
+    // 队列中剩余元素的个数
+    private int remaining; // Number of elements yet to be returned
+    // 下一次调用next()返回的元素的索引
+    private int nextIndex; // Index of element to be returned by next
+    // 下一次调用next()返回的元素
+    private E nextItem;    // Element to be returned by next call to next
+    // 上一次调用next()返回的元素
+    private E lastItem;    // Element returned by last call to next
+    // 上一次调用next()返回的元素的索引
+    private int lastRet;   // Index of last element returned, or -1 if none
+
+    Itr() {
+        // 获取“阻塞队列”的锁
+        final ReentrantLock lock = ArrayBlockingQueue.this.lock;
+        lock.lock();
+        try {
+            lastRet = -1;
+            if ((remaining = count) &gt; 0)
+                nextItem = itemAt(nextIndex = takeIndex);
+        } finally {
+            // 释放“锁”
+            lock.unlock();
+        }
+    }
+
+    public boolean hasNext() {
+        return remaining &gt; 0;
+    }
+
+    public E next() {
+        // 获取“阻塞队列”的锁
+        final ReentrantLock lock = ArrayBlockingQueue.this.lock;
+        lock.lock();
+        try {
+            // 若“剩余元素&lt;=0”，则抛出异常。
+            if (remaining &lt;= 0)
+                throw new NoSuchElementException();
+            lastRet = nextIndex;
+            // 获取第nextIndex位置的元素
+            E x = itemAt(nextIndex);  // check for fresher value
+            if (x == null) {
+                x = nextItem;         // we are forced to report old value
+                lastItem = null;      // but ensure remove fails
+            }
+            else
+                lastItem = x;
+            while (--remaining &gt; 0 &amp;&amp; // skip over nulls
+                   (nextItem = itemAt(nextIndex = inc(nextIndex))) == null)
+                ;
+            return x;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public void remove() {
+        final ReentrantLock lock = ArrayBlockingQueue.this.lock;
+        lock.lock();
+        try {
+            int i = lastRet;
+            if (i == -1)
+                throw new IllegalStateException();
+            lastRet = -1;
+            E x = lastItem;
+            lastItem = null;
+            // only remove if item still at index
+            if (x != null &amp;&amp; x == items[i]) {
+                boolean removingHead = (i == takeIndex);
+                removeAt(i);
+                if (!removingHead)
+                    nextIndex = dec(nextIndex);
+            }
+        } finally {
+            lock.unlock();
+        }
+    }
+}
+</code></pre><p><a name="anchor5"></a></p>
+<h1 id="5-ArrayBlockingQueue示例"><a href="#5-ArrayBlockingQueue示例" class="headerlink" title="5. ArrayBlockingQueue示例"></a>5. ArrayBlockingQueue示例</h1><pre><code>import java.util.*;
+import java.util.concurrent.*;
+
+/*
+ *   ArrayBlockingQueue是“线程安全”的队列，而LinkedList是非线程安全的。
+ *
+ *   下面是“多个线程同时操作并且遍历queue”的示例
+ *   (01) 当queue是ArrayBlockingQueue对象时，程序能正常运行。
+ *   (02) 当queue是LinkedList对象时，程序会产生ConcurrentModificationException异常。
+ *
+ * @author skywang
+ */
+public class ArrayBlockingQueueDemo1{
+
+    // TODO: queue是LinkedList对象时，程序会出错。
+    //private static Queue&lt;String&gt; queue = new LinkedList&lt;String&gt;();
+    private static Queue&lt;String&gt; queue = new ArrayBlockingQueue&lt;String&gt;(20);
+    public static void main(String[] args) {
+
+        // 同时启动两个线程对queue进行操作！
+        new MyThread(&quot;ta&quot;).start();
+        new MyThread(&quot;tb&quot;).start();
+    }
+
+    private static void printAll() {
+        String value;
+        Iterator iter = queue.iterator();
+        while(iter.hasNext()) {
+            value = (String)iter.next();
+            System.out.print(value+&quot;, &quot;);
+        }
+        System.out.println();
+    }
+
+    private static class MyThread extends Thread {
+        MyThread(String name) {
+            super(name);
+        }
+        @Override
+        public void run() {
+                int i = 0;
+            while (i++ &lt; 6) {
+                // “线程名” + &quot;-&quot; + &quot;序号&quot;
+                String val = Thread.currentThread().getName()+i;
+                queue.add(val);
+                // 通过“Iterator”遍历queue。
+                printAll();
+            }
+        }
+    }
+}
+</code></pre><p>(某一次)运行结果：</p>
+<pre><code>ta1, ta1, 
+tb1, ta1, 
+tb1, ta1, ta2, 
+tb1, ta1, ta2, tb1, tb2, 
+ta2, ta1, tb2, tb1, ta3, 
+ta2, ta1, tb2, tb1, ta3, ta2, tb3, 
+tb2, ta1, ta3, tb1, tb3, ta2, ta4, 
+tb2, ta1, ta3, tb1, tb3, ta2, ta4, tb2, tb4, 
+ta3, ta1, tb3, tb1, ta4, ta2, tb4, tb2, ta5, 
+ta3, ta1, tb3, tb1, ta4, ta2, tb4, tb2, ta5, ta3, tb5, 
+tb3, ta1, ta4, tb1, tb4, ta2, ta5, tb2, tb5, ta3, ta6, 
+tb3, ta4, tb4, ta5, tb5, ta6, tb6, 
+</code></pre><p>结果说明：如果将源码中的queue改成LinkedList对象时，程序会产生ConcurrentModificationException异常。</p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2018-06-27T09:39:57.949Z" itemprop="dateUpdated">2018-06-27 17:39:57</time>
+</span><br>
+
+
+        
+        本文固定链接：<a href="/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”07之 ArrayBlockingQueue/" target="_blank" rel="external">https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”07之 ArrayBlockingQueue/</a>
+        
+    </div>
+    <footer>
+        <a href="https://smuwjs.github.io">
+            <img src="/img/head.png" alt="Jeeson">
+            Jeeson
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JUC集合/">JUC集合</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java多线程系列/">Java多线程系列</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java源码分析/">Java源码分析</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”07之 ArrayBlockingQueue/&title=《Java多线程系列--“JUC集合”07之 ArrayBlockingQueue》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”07之 ArrayBlockingQueue/&title=《Java多线程系列--“JUC集合”07之 ArrayBlockingQueue》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”07之 ArrayBlockingQueue/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Java多线程系列--“JUC集合”07之 ArrayBlockingQueue》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”07之 ArrayBlockingQueue/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”07之 ArrayBlockingQueue/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”08之 LinkedBlockingQueue/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">Java多线程系列--“JUC集合”08之 LinkedBlockingQueue</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”06之 ConcurrentSkipListSet/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Java多线程系列--“JUC集合”06之 ConcurrentSkipListSet</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”07之 ArrayBlockingQueue" data-title="Java多线程系列--“JUC集合”07之 ArrayBlockingQueue" data-url="https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”07之 ArrayBlockingQueue/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'smuwjs', theme: 'none'};
+lazyScripts.push('//unpkg.com/hexo-theme-material-indigo@latest/js/embed.min.js');
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循<a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>Jeeson &copy; 2015 - 2018</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”07之 ArrayBlockingQueue/&title=《Java多线程系列--“JUC集合”07之 ArrayBlockingQueue》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”07之 ArrayBlockingQueue/&title=《Java多线程系列--“JUC集合”07之 ArrayBlockingQueue》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”07之 ArrayBlockingQueue/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Java多线程系列--“JUC集合”07之 ArrayBlockingQueue》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”07之 ArrayBlockingQueue/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”07之 ArrayBlockingQueue/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://smuwjs.github.io/2016/11/12/java-source-analysis-multi-thread-series/Java多线程系列--“JUC集合”07之 ArrayBlockingQueue/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

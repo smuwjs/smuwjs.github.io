@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>java io系列12之 BufferedInputStream详解 | Jeeson&#39;s Blog | Write the code. Change the world.</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="Java源码分析,Java IO系列">
+    <meta name="description" content="目录1. BufferedInputStream 介绍2. BufferedInputStream 源码分析(基于jdk1.7.40)3. 示例代码      1. BufferedInputStream 介绍BufferedInputStream 是缓冲输入流。它继承于FilterInputStream。 BufferedInputStream 的作用是为另一个输入流添加一些功能，例如，提供“">
+<meta name="keywords" content="Java源码分析,Java IO系列">
+<meta property="og:type" content="article">
+<meta property="og:title" content="java io系列12之 BufferedInputStream详解">
+<meta property="og:url" content="https://smuwjs.github.io/2016/10/12/java-source-analysis-io-series/java io系列12之 BufferedInputStream详解/index.html">
+<meta property="og:site_name" content="Jeeson&#39;s Blog">
+<meta property="og:description" content="目录1. BufferedInputStream 介绍2. BufferedInputStream 源码分析(基于jdk1.7.40)3. 示例代码      1. BufferedInputStream 介绍BufferedInputStream 是缓冲输入流。它继承于FilterInputStream。 BufferedInputStream 的作用是为另一个输入流添加一些功能，例如，提供“">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-06-27T09:39:57.941Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="java io系列12之 BufferedInputStream详解">
+<meta name="twitter:description" content="目录1. BufferedInputStream 介绍2. BufferedInputStream 源码分析(基于jdk1.7.40)3. 示例代码      1. BufferedInputStream 介绍BufferedInputStream 是缓冲输入流。它继承于FilterInputStream。 BufferedInputStream 的作用是为另一个输入流添加一些功能，例如，提供“">
+    
+        <link rel="alternate" type="application/atom+xml" title="Jeeson&#39;s Blog" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/head.png">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Jeeson</h5>
+          <a href="mailto:smuwjs@163.com" title="smuwjs@163.com" class="mail">smuwjs@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/smuwjs" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">java io系列12之 BufferedInputStream详解</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">java io系列12之 BufferedInputStream详解</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2016-10-11T16:00:00.000Z" itemprop="datePublished" class="page-time">
+  2016-10-12
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#1-BufferedInputStream-介绍"><span class="post-toc-number">1.</span> <span class="post-toc-text">1. BufferedInputStream 介绍</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#2-BufferedInputStream-源码分析-基于jdk1-7-40"><span class="post-toc-number">2.</span> <span class="post-toc-text">2. BufferedInputStream 源码分析(基于jdk1.7.40)</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#情况1：读取完buffer中的数据，并且buffer没有被标记"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">情况1：读取完buffer中的数据，并且buffer没有被标记</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#情况2：读取完buffer中的数据，buffer的标记位置-gt-0，并且buffer中没有多余的空间"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">情况2：读取完buffer中的数据，buffer的标记位置&gt;0，并且buffer中没有多余的空间</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#情况3：读取完buffer中的数据，buffer被标记位置-0，buffer中没有多余的空间，并且buffer-length-gt-marklimit"><span class="post-toc-number">2.3.</span> <span class="post-toc-text">情况3：读取完buffer中的数据，buffer被标记位置=0，buffer中没有多余的空间，并且buffer.length&gt;=marklimit</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#情况4：读取完buffer中的数据，buffer被标记位置-0，buffer中没有多余的空间，并且buffer-length-lt-marklimit"><span class="post-toc-number">2.4.</span> <span class="post-toc-text">情况4：读取完buffer中的数据，buffer被标记位置=0，buffer中没有多余的空间，并且buffer.length&lt;marklimit</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#情况5：除了上面4种情况之外的情况"><span class="post-toc-number">2.5.</span> <span class="post-toc-text">情况5：除了上面4种情况之外的情况</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#3-示例代码"><span class="post-toc-number">3.</span> <span class="post-toc-text">3. 示例代码</span></a></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-java-source-analysis-io-series/java io系列12之 BufferedInputStream详解"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">java io系列12之 BufferedInputStream详解</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2016-10-12 00:00:00" datetime="2016-10-11T16:00:00.000Z"  itemprop="datePublished">2016-10-12</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <blockquote>
+<p><strong>目录</strong><br><a href="#anchor1">1. BufferedInputStream 介绍</a><br><a href="#anchor2">2. BufferedInputStream 源码分析(基于jdk1.7.40)</a><br><a href="#anchor3">3. 示例代码</a>   </p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="1-BufferedInputStream-介绍"><a href="#1-BufferedInputStream-介绍" class="headerlink" title="1. BufferedInputStream 介绍"></a>1. BufferedInputStream 介绍</h1><p>BufferedInputStream 是缓冲输入流。它继承于FilterInputStream。</p>
+<p>BufferedInputStream 的作用是为另一个输入流添加一些功能，例如，提供“缓冲功能”以及支持“mark()标记”和“reset()重置方法”。<br>BufferedInputStream 本质上是通过一个内部缓冲区数组实现的。例如，在新建某输入流对应的BufferedInputStream后，当我们通过read()读取输入流的数据时，BufferedInputStream会将该输入流的数据分批的填入到缓冲区中。每当缓冲区中的数据被读完之后，输入流会再次填充数据缓冲区；如此反复，直到我们读完输入流数据位置。</p>
+<p>BufferedInputStream 函数列表</p>
+<pre><code>BufferedInputStream(InputStream in)
+BufferedInputStream(InputStream in, int size)
+
+synchronized int     available()
+void     close()
+synchronized void     mark(int readlimit)
+boolean     markSupported()
+synchronized int     read()
+synchronized int     read(byte[] buffer, int offset, int byteCount)
+synchronized void     reset()
+synchronized long     skip(long byteCount)
+</code></pre><p><a name="anchor2"></a></p>
+<h1 id="2-BufferedInputStream-源码分析-基于jdk1-7-40"><a href="#2-BufferedInputStream-源码分析-基于jdk1-7-40" class="headerlink" title="2. BufferedInputStream 源码分析(基于jdk1.7.40)"></a>2. BufferedInputStream 源码分析(基于jdk1.7.40)</h1><pre><code>package java.io;
+import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
+
+public class BufferedInputStream extends FilterInputStream {
+
+    // 默认的缓冲大小是8192字节
+    // BufferedInputStream 会根据“缓冲区大小”来逐次的填充缓冲区；
+    // 即，BufferedInputStream填充缓冲区，用户读取缓冲区，读完之后，BufferedInputStream会再次填充缓冲区。如此循环，直到读完数据...
+    private static int defaultBufferSize = 8192;
+
+    // 缓冲数组
+    protected volatile byte buf[];
+
+    // 缓存数组的原子更新器。
+    // 该成员变量与buf数组的volatile关键字共同组成了buf数组的原子更新功能实现，
+    // 即，在多线程中操作BufferedInputStream对象时，buf和bufUpdater都具有原子性(不同的线程访问到的数据都是相同的)
+    private static final
+        AtomicReferenceFieldUpdater&lt;BufferedInputStream, byte[]&gt; bufUpdater =
+        AtomicReferenceFieldUpdater.newUpdater
+        (BufferedInputStream.class,  byte[].class, &quot;buf&quot;);
+
+    // 当前缓冲区的有效字节数。
+    // 注意，这里是指缓冲区的有效字节数，而不是输入流中的有效字节数。
+    protected int count;
+
+    // 当前缓冲区的位置索引
+    // 注意，这里是指缓冲区的位置索引，而不是输入流中的位置索引。
+    protected int pos;
+
+    // 当前缓冲区的标记位置
+    // markpos和reset()配合使用才有意义。操作步骤：
+    // (01) 通过mark() 函数，保存pos的值到markpos中。
+    // (02) 通过reset() 函数，会将pos的值重置为markpos。接着通过read()读取数据时，就会从mark()保存的位置开始读取。
+    protected int markpos = -1;
+
+    // marklimit是标记的最大值。
+    // 关于marklimit的原理，我们在后面的fill()函数分析中会详细说明。这对理解BufferedInputStream相当重要。
+    protected int marklimit;
+
+    // 获取输入流
+    private InputStream getInIfOpen() throws IOException {
+        InputStream input = in;
+        if (input == null)
+            throw new IOException(&quot;Stream closed&quot;);
+        return input;
+    }
+
+    // 获取缓冲
+    private byte[] getBufIfOpen() throws IOException {
+        byte[] buffer = buf;
+        if (buffer == null)
+            throw new IOException(&quot;Stream closed&quot;);
+        return buffer;
+    }
+
+    // 构造函数：新建一个缓冲区大小为8192的BufferedInputStream
+    public BufferedInputStream(InputStream in) {
+        this(in, defaultBufferSize);
+    }
+
+    // 构造函数：新建指定缓冲区大小的BufferedInputStream
+    public BufferedInputStream(InputStream in, int size) {
+        super(in);
+        if (size &lt;= 0) {
+            throw new IllegalArgumentException(&quot;Buffer size &lt;= 0&quot;);
+        }
+        buf = new byte[size];
+    }
+
+    // 从“输入流”中读取数据，并填充到缓冲区中。
+    // 后面会对该函数进行详细说明！
+    private void fill() throws IOException {
+        byte[] buffer = getBufIfOpen();
+        if (markpos &lt; 0)
+            pos = 0;            /* no mark: throw away the buffer */
+        else if (pos &gt;= buffer.length)  /* no room left in buffer */
+            if (markpos &gt; 0) {  /* can throw away early part of the buffer */
+                int sz = pos - markpos;
+                System.arraycopy(buffer, markpos, buffer, 0, sz);
+                pos = sz;
+                markpos = 0;
+            } else if (buffer.length &gt;= marklimit) {
+                markpos = -1;   /* buffer got too big, invalidate mark */
+                pos = 0;        /* drop buffer contents */
+            } else {            /* grow buffer */
+                int nsz = pos * 2;
+                if (nsz &gt; marklimit)
+                    nsz = marklimit;
+                byte nbuf[] = new byte[nsz];
+                System.arraycopy(buffer, 0, nbuf, 0, pos);
+                if (!bufUpdater.compareAndSet(this, buffer, nbuf)) {
+                    throw new IOException(&quot;Stream closed&quot;);
+                }
+                buffer = nbuf;
+            }
+        count = pos;
+        int n = getInIfOpen().read(buffer, pos, buffer.length - pos);
+        if (n &gt; 0)
+            count = n + pos;
+    }
+
+    // 读取下一个字节
+    public synchronized int read() throws IOException {
+        // 若已经读完缓冲区中的数据，则调用fill()从输入流读取下一部分数据来填充缓冲区
+        if (pos &gt;= count) {
+            fill();
+            if (pos &gt;= count)
+                return -1;
+        }
+        // 从缓冲区中读取指定的字节
+        return getBufIfOpen()[pos++] &amp; 0xff;
+    }
+
+    // 将缓冲区中的数据写入到字节数组b中。off是字节数组b的起始位置，len是写入长度
+    private int read1(byte[] b, int off, int len) throws IOException {
+        int avail = count - pos;
+        if (avail &lt;= 0) {
+            // 加速机制。
+            // 如果读取的长度大于缓冲区的长度 并且没有markpos，
+            // 则直接从原始输入流中进行读取，从而避免无谓的COPY（从原始输入流至缓冲区，读取缓冲区全部数据，清空缓冲区， 
+            //  重新填入原始输入流数据）
+            if (len &gt;= getBufIfOpen().length &amp;&amp; markpos &lt; 0) {
+                return getInIfOpen().read(b, off, len);
+            }
+            // 若已经读完缓冲区中的数据，则调用fill()从输入流读取下一部分数据来填充缓冲区
+            fill();
+            avail = count - pos;
+            if (avail &lt;= 0) return -1;
+        }
+        int cnt = (avail &lt; len) ? avail : len;
+        System.arraycopy(getBufIfOpen(), pos, b, off, cnt);
+        pos += cnt;
+        return cnt;
+    }
+
+    // 将缓冲区中的数据写入到字节数组b中。off是字节数组b的起始位置，len是写入长度
+    public synchronized int read(byte b[], int off, int len)
+        throws IOException
+    {
+        getBufIfOpen(); // Check for closed stream
+        if ((off | len | (off + len) | (b.length - (off + len))) &lt; 0) {
+            throw new IndexOutOfBoundsException();
+        } else if (len == 0) {
+            return 0;
+        }
+
+        // 读取到指定长度的数据才返回
+        int n = 0;
+        for (;;) {
+            int nread = read1(b, off + n, len - n);
+            if (nread &lt;= 0)
+                return (n == 0) ? nread : n;
+            n += nread;
+            if (n &gt;= len)
+                return n;
+            // if not closed but no bytes available, return
+            InputStream input = in;
+            if (input != null &amp;&amp; input.available() &lt;= 0)
+                return n;
+        }
+    }
+
+    // 忽略n个字节
+    public synchronized long skip(long n) throws IOException {
+        getBufIfOpen(); // Check for closed stream
+        if (n &lt;= 0) {
+            return 0;
+        }
+        long avail = count - pos;
+
+        if (avail &lt;= 0) {
+            // If no mark position set then don&apos;t keep in buffer
+            if (markpos &lt;0)
+                return getInIfOpen().skip(n);
+
+            // Fill in buffer to save bytes for reset
+            fill();
+            avail = count - pos;
+            if (avail &lt;= 0)
+                return 0;
+        }
+
+        long skipped = (avail &lt; n) ? avail : n;
+        pos += skipped;
+        return skipped;
+    }
+
+    // 下一个字节是否存可读
+    public synchronized int available() throws IOException {
+        int n = count - pos;
+        int avail = getInIfOpen().available();
+        return n &gt; (Integer.MAX_VALUE - avail)
+                    ? Integer.MAX_VALUE
+                    : n + avail;
+    }
+
+    // 标记“缓冲区”中当前位置。
+    // readlimit是marklimit，关于marklimit的作用，参考后面的说明。
+    public synchronized void mark(int readlimit) {
+        marklimit = readlimit;
+        markpos = pos;
+    }
+
+    // 将“缓冲区”中当前位置重置到mark()所标记的位置
+    public synchronized void reset() throws IOException {
+        getBufIfOpen(); // Cause exception if closed
+        if (markpos &lt; 0)
+            throw new IOException(&quot;Resetting to invalid mark&quot;);
+        pos = markpos;
+    }
+
+    public boolean markSupported() {
+        return true;
+    }
+
+    // 关闭输入流
+    public void close() throws IOException {
+        byte[] buffer;
+        while ( (buffer = buf) != null) {
+            if (bufUpdater.compareAndSet(this, buffer, null)) {
+                InputStream input = in;
+                in = null;
+                if (input != null)
+                    input.close();
+                return;
+            }
+            // Else retry in case a new buf was CASed in fill()
+        }
+    }
+}
+</code></pre><p>说明：<br>要想读懂BufferedInputStream的源码，就要先理解它的思想。BufferedInputStream的作用是为其它输入流提供缓冲功能。创建BufferedInputStream时，我们会通过它的构造函数指定某个输入流为参数。BufferedInputStream会将该输入流数据分批读取，每次读取一部分到缓冲中；操作完缓冲中的这部分数据之后，再从输入流中读取下一部分的数据。</p>
+<p>为什么需要缓冲呢？原因很简单，效率问题！缓冲中的数据实际上是保存在内存中，而原始数据可能是保存在硬盘或NandFlash等存储介质中；而我们知道，从内存中读取数据的速度比从硬盘读取数据的速度至少快10倍以上。<br>那干嘛不干脆一次性将全部数据都读取到缓冲中呢？第一，读取全部的数据所需要的时间可能会很长。第二，内存价格很贵，容量不像硬盘那么大。</p>
+<p>下面，我就BufferedInputStream中最重要的函数fill()进行说明。其它的函数很容易理解，我就不详细介绍了，大家可以参考源码中的注释进行理解。</p>
+<p>fill() 源码如下：</p>
+<pre><code>private void fill() throws IOException {
+    byte[] buffer = getBufIfOpen();
+    if (markpos &lt; 0)
+        pos = 0;
+    else if (pos &gt;= buffer.length) {
+        if (markpos &gt; 0) {  /* can throw away early part of the buffer */
+            int sz = pos - markpos;
+            System.arraycopy(buffer, markpos, buffer, 0, sz);
+            pos = sz;
+            markpos = 0;
+        } else if (buffer.length &gt;= marklimit) {
+            markpos = -1;   /* buffer got too big, invalidate mark */
+            pos = 0;        /* drop buffer contents */
+        } else {            /* grow buffer */
+            int nsz = pos * 2;
+            if (nsz &gt; marklimit)
+                nsz = marklimit;
+            byte nbuf[] = new byte[nsz];
+            System.arraycopy(buffer, 0, nbuf, 0, pos);
+            if (!bufUpdater.compareAndSet(this, buffer, nbuf)) {
+                // Can&apos;t replace buf if there was an async close.
+                // Note: This would need to be changed if fill()
+                // is ever made accessible to multiple threads.
+                // But for now, the only way CAS can fail is via close.
+                // assert buf == null;
+                throw new IOException(&quot;Stream closed&quot;);
+            }
+            buffer = nbuf;
+        }
+    }
+
+    count = pos;
+    int n = getInIfOpen().read(buffer, pos, buffer.length - pos);
+    if (n &gt; 0)
+        count = n + pos;
+}
+</code></pre><p>根据fill()中的if…else…，下面我们将fill分为5种情况进行说明。</p>
+<h2 id="情况1：读取完buffer中的数据，并且buffer没有被标记"><a href="#情况1：读取完buffer中的数据，并且buffer没有被标记" class="headerlink" title="情况1：读取完buffer中的数据，并且buffer没有被标记"></a>情况1：读取完buffer中的数据，并且buffer没有被标记</h2><p>执行流程如下，<br>(01) read() 函数中调用 fill()<br>(02) fill() 中的 if (markpos &lt; 0) …<br>为了方便分析，我们将这种情况下fill()执行的操作等价于以下代码：</p>
+<pre><code>private void fill() throws IOException {
+    byte[] buffer = getBufIfOpen();
+    if (markpos &lt; 0)
+        pos = 0;
+
+    count = pos;
+    int n = getInIfOpen().read(buffer, pos, buffer.length - pos);
+    if (n &gt; 0)
+        count = n + pos;
+}
+</code></pre><p>说明：<br>这种情况发生的情况是 — — 输入流中有很长的数据，我们每次从中读取一部分数据到buffer中进行操作。每次当我们读取完buffer中的数据之后，并且此时输入流没有被标记；那么，就接着从输入流中读取下一部分的数据到buffer中。  </p>
+<blockquote>
+<p>判断是否读完buffer中的数据，是通过 if (pos &gt;= count) 来判断的；<br>  判断输入流有没有被标记，是通过 if (markpos &lt; 0) 来判断的。</p>
+</blockquote>
+<p>理解这个思想之后，我们再对这种情况下的fill()的代码进行分析，就特别容易理解了。<br>(01) if (markpos &lt; 0) 它的作用是判断“输入流是否被标记”。若被标记，则markpos大于/等于0；否则markpos等于-1。<br>(02) 在这种情况下：通过getInIfOpen()获取输入流，然后接着从输入流中读取buffer.length个字节到buffer中。<br>(03) count = n + pos; 这是根据从输入流中读取的实际数据的多少，来更新buffer中数据的实际大小。</p>
+<h2 id="情况2：读取完buffer中的数据，buffer的标记位置-gt-0，并且buffer中没有多余的空间"><a href="#情况2：读取完buffer中的数据，buffer的标记位置-gt-0，并且buffer中没有多余的空间" class="headerlink" title="情况2：读取完buffer中的数据，buffer的标记位置&gt;0，并且buffer中没有多余的空间"></a>情况2：读取完buffer中的数据，buffer的标记位置&gt;0，并且buffer中没有多余的空间</h2><p>执行流程如下，<br>(01) read() 函数中调用 fill()<br>(02) fill() 中的 else if (pos &gt;= buffer.length) …<br>(03) fill() 中的 if (markpos &gt; 0) …</p>
+<p>为了方便分析，我们将这种情况下fill()执行的操作等价于以下代码：</p>
+<pre><code>private void fill() throws IOException {
+    byte[] buffer = getBufIfOpen();
+    if (markpos &gt;= 0 &amp;&amp; pos &gt;= buffer.length) {
+        if (markpos &gt; 0) {
+            int sz = pos - markpos;
+            System.arraycopy(buffer, markpos, buffer, 0, sz);
+            pos = sz;
+            markpos = 0;
+        }
+    }
+
+    count = pos;
+    int n = getInIfOpen().read(buffer, pos, buffer.length - pos);
+    if (n &gt; 0)
+        count = n + pos;
+}
+</code></pre><p>说明：<br>这种情况发生的情况是 — — 输入流中有很长的数据，我们每次从中读取一部分数据到buffer中进行操作。当我们读取完buffer中的数据之后，并且此时输入流存在标记时；那么，就发生情况2。此时，我们要保留“被标记位置”到“buffer末尾”的数据，然后再从输入流中读取下一部分的数据到buffer中。  </p>
+<blockquote>
+<p> 其中，判断是否读完buffer中的数据，是通过 if (pos &gt;= count) 来判断的；<br>  判断输入流有没有被标记，是通过 if (markpos &lt; 0) 来判断的。<br>  判断buffer中没有多余的空间，是通过 if (pos &gt;= buffer.length) 来判断的。</p>
+</blockquote>
+<p>理解这个思想之后，我们再对这种情况下的fill()代码进行分析，就特别容易理解了。<br>(01) int sz = pos - markpos; 作用是“获取‘被标记位置’到‘buffer末尾’”的数据长度。<br>(02) System.arraycopy(buffer, markpos, buffer, 0, sz); 作用是“将buffer中从markpos开始的数据”拷贝到buffer中(从位置0开始填充，填充长度是sz)。接着，将sz赋值给pos，即pos就是“被标记位置”到“buffer末尾”的数据长度。<br>(03) int n = getInIfOpen().read(buffer, pos, buffer.length - pos); 从输入流中读取出“buffer.length - pos”的数据，然后填充到buffer中。<br>(04) 通过第(02)和(03)步组合起来的buffer，就是包含了“原始buffer被标记位置到buffer末尾”的数据，也包含了“从输入流中新读取的数据”。</p>
+<p>注意：<strong>执行过情况2之后，markpos的值由“大于0”变成了“等于0”！</strong></p>
+<h2 id="情况3：读取完buffer中的数据，buffer被标记位置-0，buffer中没有多余的空间，并且buffer-length-gt-marklimit"><a href="#情况3：读取完buffer中的数据，buffer被标记位置-0，buffer中没有多余的空间，并且buffer-length-gt-marklimit" class="headerlink" title="情况3：读取完buffer中的数据，buffer被标记位置=0，buffer中没有多余的空间，并且buffer.length&gt;=marklimit"></a>情况3：读取完buffer中的数据，buffer被标记位置=0，buffer中没有多余的空间，并且buffer.length&gt;=marklimit</h2><p>执行流程如下，<br>(01) read() 函数中调用 fill()<br>(02) fill() 中的 else if (pos &gt;= buffer.length) …<br>(03) fill() 中的 else if (buffer.length &gt;= marklimit) …</p>
+<p>为了方便分析，我们将这种情况下fill()执行的操作等价于以下代码：</p>
+<pre><code>private void fill() throws IOException {
+    byte[] buffer = getBufIfOpen();
+    if (markpos &gt;= 0 &amp;&amp; pos &gt;= buffer.length) {
+        if ( (markpos &lt;= 0) &amp;&amp; (buffer.length &gt;= marklimit) ) {
+            markpos = -1;   /* buffer got too big, invalidate mark */
+            pos = 0;        /* drop buffer contents */
+        }
+    }
+
+    count = pos;
+    int n = getInIfOpen().read(buffer, pos, buffer.length - pos);
+    if (n &gt; 0)
+        count = n + pos;
+}
+</code></pre><p>说明：这种情况的处理非常简单。首先，就是“取消标记”，即 markpos = -1；然后，设置初始化位置为0，即pos=0；最后，再从输入流中读取下一部分数据到buffer中。</p>
+<h2 id="情况4：读取完buffer中的数据，buffer被标记位置-0，buffer中没有多余的空间，并且buffer-length-lt-marklimit"><a href="#情况4：读取完buffer中的数据，buffer被标记位置-0，buffer中没有多余的空间，并且buffer-length-lt-marklimit" class="headerlink" title="情况4：读取完buffer中的数据，buffer被标记位置=0，buffer中没有多余的空间，并且buffer.length&lt;marklimit"></a>情况4：读取完buffer中的数据，buffer被标记位置=0，buffer中没有多余的空间，并且buffer.length&lt;marklimit</h2><p>执行流程如下，<br>(01) read() 函数中调用 fill()<br>(02) fill() 中的 else if (pos &gt;= buffer.length) …<br>(03) fill() 中的 else { int nsz = pos * 2; … }</p>
+<p>为了方便分析，我们将这种情况下fill()执行的操作等价于以下代码：</p>
+<pre><code>private void fill() throws IOException {
+    byte[] buffer = getBufIfOpen();
+    if (markpos &gt;= 0 &amp;&amp; pos &gt;= buffer.length) {
+        if ( (markpos &lt;= 0) &amp;&amp; (buffer.length &lt; marklimit) ) {
+            int nsz = pos * 2;
+            if (nsz &gt; marklimit)
+                nsz = marklimit;
+            byte nbuf[] = new byte[nsz];
+            System.arraycopy(buffer, 0, nbuf, 0, pos);
+            if (!bufUpdater.compareAndSet(this, buffer, nbuf)) {
+                throw new IOException(&quot;Stream closed&quot;);
+            }
+            buffer = nbuf;
+        }
+    }
+
+    count = pos;
+    int n = getInIfOpen().read(buffer, pos, buffer.length - pos);
+    if (n &gt; 0)
+        count = n + pos;
+}
+</code></pre><p>说明：<br>这种情况的处理非常简单。<br>(01) 新建一个字节数组nbuf。nbuf的大小是“pos*2”和“marklimit”中较小的那个数。</p>
+<pre><code>int nsz = pos * 2;
+if (nsz &gt; marklimit)
+    nsz = marklimit;
+byte nbuf[] = new byte[nsz];
+</code></pre><p>(02) 接着，将buffer中的数据拷贝到新数组nbuf中。通过System.arraycopy(buffer, 0, nbuf, 0, pos)<br>(03) 最后，从输入流读取部分新数据到buffer中。通过getInIfOpen().read(buffer, pos, buffer.length - pos);  </p>
+<p>注意：<strong>在这里，我们思考一个问题，“为什么需要marklimit，它的存在到底有什么意义？”我们结合“情况2”、“情况3”、“情况4”的情况来分析。</strong></p>
+<p>假设，marklimit是无限大的，而且我们设置了markpos。当我们从输入流中每读完一部分数据并读取下一部分数据时，都需要保存markpos所标记的数据；这就意味着，我们需要不断执行情况4中的操作，要将buffer的容量扩大……随着读取次数的增多，buffer会越来越大；这会导致我们占据的内存越来越大。所以，我们需要给出一个marklimit；当buffer&gt;=marklimit时，就不再保存markpos的值了。</p>
+<h2 id="情况5：除了上面4种情况之外的情况"><a href="#情况5：除了上面4种情况之外的情况" class="headerlink" title="情况5：除了上面4种情况之外的情况"></a>情况5：除了上面4种情况之外的情况</h2><p>执行流程如下，<br>(01) read() 函数中调用 fill()<br>(02) fill() 中的 count = pos…</p>
+<p>为了方便分析，我们将这种情况下fill()执行的操作等价于以下代码：</p>
+<pre><code>private void fill() throws IOException {
+    byte[] buffer = getBufIfOpen();
+
+    count = pos;
+    int n = getInIfOpen().read(buffer, pos, buffer.length - pos);
+    if (n &gt; 0)
+        count = n + pos;
+}
+</code></pre><p>说明：这种情况的处理非常简单。直接从输入流读取部分新数据到buffer中。</p>
+<p><a name="anchor3"></a></p>
+<h1 id="3-示例代码"><a href="#3-示例代码" class="headerlink" title="3. 示例代码"></a>3. 示例代码</h1><p>关于BufferedInputStream中API的详细用法，参考示例代码(BufferedInputStreamTest.java)：</p>
+<pre><code>import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.InputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.FileNotFoundException;
+import java.lang.SecurityException;
+
+/**
+ * BufferedInputStream 测试程序
+ *
+ * @author skywang
+ */
+public class BufferedInputStreamTest {
+
+    private static final int LEN = 5;
+
+    public static void main(String[] args) {
+        testBufferedInputStream() ;
+    }
+
+    /**
+     * BufferedInputStream的API测试函数
+     */
+    private static void testBufferedInputStream() {
+
+        // 创建BufferedInputStream字节流，内容是ArrayLetters数组
+        try {
+            File file = new File(&quot;bufferedinputstream.txt&quot;);
+            InputStream in =
+                  new BufferedInputStream(
+                      new FileInputStream(file), 512);
+
+            // 从字节流中读取5个字节。“abcde”，a对应0x61，b对应0x62，依次类推...
+            for (int i=0; i&lt;LEN; i++) {
+                // 若能继续读取下一个字节，则读取下一个字节
+                if (in.available() &gt;= 0) {
+                    // 读取“字节流的下一个字节”
+                    int tmp = in.read();
+                    System.out.printf(&quot;%d : 0x%s\n&quot;, i, Integer.toHexString(tmp));
+                }
+            }
+
+            // 若“该字节流”不支持标记功能，则直接退出
+            if (!in.markSupported()) {
+                System.out.println(&quot;make not supported!&quot;);
+                return ;
+            }
+
+            // 标记“当前索引位置”，即标记第6个位置的元素--“f”
+            // 1024对应marklimit
+            in.mark(1024);
+
+            // 跳过22个字节。
+            in.skip(22);
+
+            // 读取5个字节
+            byte[] buf = new byte[LEN];
+            in.read(buf, 0, LEN);
+            // 将buf转换为String字符串。
+            String str1 = new String(buf);
+            System.out.printf(&quot;str1=%s\n&quot;, str1);
+
+            // 重置“输入流的索引”为mark()所标记的位置，即重置到“f”处。
+            in.reset();
+            // 从“重置后的字节流”中读取5个字节到buf中。即读取“fghij”
+            in.read(buf, 0, LEN);
+            // 将buf转换为String字符串。
+            String str2 = new String(buf);
+            System.out.printf(&quot;str2=%s\n&quot;, str2);
+
+            in.close();
+       } catch (FileNotFoundException e) {
+           e.printStackTrace();
+       } catch (SecurityException e) {
+           e.printStackTrace();
+       } catch (IOException e) {
+           e.printStackTrace();
+       }
+    }
+}
+</code></pre><p>程序中读取的bufferedinputstream.txt的内容如下：</p>
+<pre><code>abcdefghijklmnopqrstuvwxyz
+0123456789
+ABCDEFGHIJKLMNOPQRSTUVWXYZ
+</code></pre><p>运行结果：</p>
+<pre><code>0 : 0x61
+1 : 0x62
+2 : 0x63
+3 : 0x64
+4 : 0x65
+str1=01234
+str2=fghij
+</code></pre>
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2018-06-27T09:39:57.941Z" itemprop="dateUpdated">2018-06-27 17:39:57</time>
+</span><br>
+
+
+        
+        本文固定链接：<a href="/2016/10/12/java-source-analysis-io-series/java io系列12之 BufferedInputStream详解/" target="_blank" rel="external">https://smuwjs.github.io/2016/10/12/java-source-analysis-io-series/java io系列12之 BufferedInputStream详解/</a>
+        
+    </div>
+    <footer>
+        <a href="https://smuwjs.github.io">
+            <img src="/img/head.png" alt="Jeeson">
+            Jeeson
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java-IO系列/">Java IO系列</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java源码分析/">Java源码分析</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/10/12/java-source-analysis-io-series/java io系列12之 BufferedInputStream详解/&title=《java io系列12之 BufferedInputStream详解》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/10/12/java-source-analysis-io-series/java io系列12之 BufferedInputStream详解/&title=《java io系列12之 BufferedInputStream详解》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/10/12/java-source-analysis-io-series/java io系列12之 BufferedInputStream详解/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《java io系列12之 BufferedInputStream详解》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/10/12/java-source-analysis-io-series/java io系列12之 BufferedInputStream详解/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/10/12/java-source-analysis-io-series/java io系列12之 BufferedInputStream详解/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2016/10/13/java-source-analysis-io-series/java io系列13之 BufferedOutputStream详解/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">java io系列13之 BufferedOutputStream详解</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2016/10/11/java-source-analysis-io-series/java io系列11之 FilterOutputStream详解/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">java io系列11之 FilterOutputStream详解</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="java-source-analysis-io-series/java io系列12之 BufferedInputStream详解" data-title="java io系列12之 BufferedInputStream详解" data-url="https://smuwjs.github.io/2016/10/12/java-source-analysis-io-series/java io系列12之 BufferedInputStream详解/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'smuwjs', theme: 'none'};
+lazyScripts.push('//unpkg.com/hexo-theme-material-indigo@latest/js/embed.min.js');
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循<a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>Jeeson &copy; 2015 - 2018</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/10/12/java-source-analysis-io-series/java io系列12之 BufferedInputStream详解/&title=《java io系列12之 BufferedInputStream详解》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/10/12/java-source-analysis-io-series/java io系列12之 BufferedInputStream详解/&title=《java io系列12之 BufferedInputStream详解》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/10/12/java-source-analysis-io-series/java io系列12之 BufferedInputStream详解/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《java io系列12之 BufferedInputStream详解》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/10/12/java-source-analysis-io-series/java io系列12之 BufferedInputStream详解/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/10/12/java-source-analysis-io-series/java io系列12之 BufferedInputStream详解/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://smuwjs.github.io/2016/10/12/java-source-analysis-io-series/java io系列12之 BufferedInputStream详解/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

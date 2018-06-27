@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>Java多线程系列--“JUC锁”11之 Semaphore信号量的原理和示例 | Jeeson&#39;s Blog | Write the code. Change the world.</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="Java源码分析,Java多线程系列,JUC锁">
+    <meta name="description" content="本章，我们对JUC包中的信号量Semaphore进行学习。   目录1. Semaphore简介2. Semaphore数据结构3. Semaphore源码分析(基于JDK1.7.0_40)4. Semaphore示例     1. Semaphore简介Semaphore是一个计数信号量，它的本质是一个”共享锁”。 信号量维护了一个信号量许可集。线程可以通过调用acquire()来获取信号量的">
+<meta name="keywords" content="Java源码分析,Java多线程系列,JUC锁">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java多线程系列--“JUC锁”11之 Semaphore信号量的原理和示例">
+<meta property="og:url" content="https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”11之 Semaphore信号量的原理和示例/index.html">
+<meta property="og:site_name" content="Jeeson&#39;s Blog">
+<meta property="og:description" content="本章，我们对JUC包中的信号量Semaphore进行学习。   目录1. Semaphore简介2. Semaphore数据结构3. Semaphore源码分析(基于JDK1.7.0_40)4. Semaphore示例     1. Semaphore简介Semaphore是一个计数信号量，它的本质是一个”共享锁”。 信号量维护了一个信号量许可集。线程可以通过调用acquire()来获取信号量的">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://wangkuiwu.github.io/media/pic/java/threads/juc-lock11-01.jpg">
+<meta property="og:updated_time" content="2018-06-27T09:39:57.945Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java多线程系列--“JUC锁”11之 Semaphore信号量的原理和示例">
+<meta name="twitter:description" content="本章，我们对JUC包中的信号量Semaphore进行学习。   目录1. Semaphore简介2. Semaphore数据结构3. Semaphore源码分析(基于JDK1.7.0_40)4. Semaphore示例     1. Semaphore简介Semaphore是一个计数信号量，它的本质是一个”共享锁”。 信号量维护了一个信号量许可集。线程可以通过调用acquire()来获取信号量的">
+<meta name="twitter:image" content="http://wangkuiwu.github.io/media/pic/java/threads/juc-lock11-01.jpg">
+    
+        <link rel="alternate" type="application/atom+xml" title="Jeeson&#39;s Blog" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/head.png">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Jeeson</h5>
+          <a href="mailto:smuwjs@163.com" title="smuwjs@163.com" class="mail">smuwjs@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/smuwjs" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Java多线程系列--“JUC锁”11之 Semaphore信号量的原理和示例</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Java多线程系列--“JUC锁”11之 Semaphore信号量的原理和示例</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2016-11-14T03:00:00.000Z" itemprop="datePublished" class="page-time">
+  2016-11-14
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#1-Semaphore简介"><span class="post-toc-number">1.</span> <span class="post-toc-text">1. Semaphore简介</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#2-Semaphore数据结构"><span class="post-toc-number">2.</span> <span class="post-toc-text">2. Semaphore数据结构</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#3-Semaphore源码分析-基于JDK1-7-0-40"><span class="post-toc-number">3.</span> <span class="post-toc-text">3. Semaphore源码分析(基于JDK1.7.0_40)</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#3-1-信号量构造函数"><span class="post-toc-number">3.1.</span> <span class="post-toc-text">3.1 信号量构造函数</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#3-2-公平信号量获取和释放"><span class="post-toc-number">3.2.</span> <span class="post-toc-text">3.2 公平信号量获取和释放</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#3-2-1-公平信号量的获取"><span class="post-toc-number">3.2.1.</span> <span class="post-toc-text">3.2.1 公平信号量的获取</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#3-2-2-公平信号量的释放"><span class="post-toc-number">3.2.2.</span> <span class="post-toc-text">3.2.2 公平信号量的释放</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#3-3-非公平信号量获取和释放"><span class="post-toc-number">3.3.</span> <span class="post-toc-text">3.3 非公平信号量获取和释放</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#4-Semaphore示例"><span class="post-toc-number">4.</span> <span class="post-toc-text">4. Semaphore示例</span></a></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”11之 Semaphore信号量的原理和示例"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Java多线程系列--“JUC锁”11之 Semaphore信号量的原理和示例</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2016-11-14 11:00:00" datetime="2016-11-14T03:00:00.000Z"  itemprop="datePublished">2016-11-14</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <blockquote>
+<p>本章，我们对JUC包中的信号量Semaphore进行学习。</p>
+</blockquote>
+<blockquote>
+<p><strong>目录</strong><br><a href="#anchor1">1. Semaphore简介</a><br><a href="#anchor2">2. Semaphore数据结构</a><br><a href="#anchor3">3. Semaphore源码分析(基于JDK1.7.0_40)</a><br><a href="#anchor4">4. Semaphore示例</a>  </p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="1-Semaphore简介"><a href="#1-Semaphore简介" class="headerlink" title="1. Semaphore简介"></a>1. Semaphore简介</h1><p>Semaphore是一个计数信号量，它的本质是一个”共享锁”。</p>
+<p>信号量维护了一个信号量许可集。线程可以通过调用acquire()来获取信号量的许可；当信号量中有可用的许可时，线程能获取该许可；否则线程必须等待，直到有可用的许可为止。 线程可以通过release()来释放它所持有的信号量许可。</p>
+<p><strong>Semaphore的函数列表</strong></p>
+<pre><code>// 创建具有给定的许可数和非公平的公平设置的 Semaphore。
+Semaphore(int permits)
+// 创建具有给定的许可数和给定的公平设置的 Semaphore。
+Semaphore(int permits, boolean fair)
+
+// 从此信号量获取一个许可，在提供一个许可前一直将线程阻塞，否则线程被中断。
+void acquire()
+// 从此信号量获取给定数目的许可，在提供这些许可前一直将线程阻塞，或者线程已被中断。
+void acquire(int permits)
+// 从此信号量中获取许可，在有可用的许可前将其阻塞。
+void acquireUninterruptibly()
+// 从此信号量获取给定数目的许可，在提供这些许可前一直将线程阻塞。
+void acquireUninterruptibly(int permits)
+// 返回此信号量中当前可用的许可数。
+int availablePermits()
+// 获取并返回立即可用的所有许可。
+int drainPermits()
+// 返回一个 collection，包含可能等待获取的线程。
+protected Collection&lt;Thread&gt; getQueuedThreads()
+// 返回正在等待获取的线程的估计数目。
+int getQueueLength()
+// 查询是否有线程正在等待获取。
+boolean hasQueuedThreads()
+// 如果此信号量的公平设置为 true，则返回 true。
+boolean isFair()
+// 根据指定的缩减量减小可用许可的数目。
+protected void reducePermits(int reduction)
+// 释放一个许可，将其返回给信号量。
+void release()
+// 释放给定数目的许可，将其返回到信号量。
+void release(int permits)
+// 返回标识此信号量的字符串，以及信号量的状态。
+String toString()
+// 仅在调用时此信号量存在一个可用许可，才从信号量获取许可。
+boolean tryAcquire()
+// 仅在调用时此信号量中有给定数目的许可时，才从此信号量中获取这些许可。
+boolean tryAcquire(int permits)
+// 如果在给定的等待时间内此信号量有可用的所有许可，并且当前线程未被中断，则从此信号量获取给定数目的许可。
+boolean tryAcquire(int permits, long timeout, TimeUnit unit)
+// 如果在给定的等待时间内，此信号量有可用的许可并且当前线程未被中断，则从此信号量获取一个许可。
+boolean tryAcquire(long timeout, TimeUnit unit)
+</code></pre><p><a name="anchor2"></a></p>
+<h1 id="2-Semaphore数据结构"><a href="#2-Semaphore数据结构" class="headerlink" title="2. Semaphore数据结构"></a>2. Semaphore数据结构</h1><p>Semaphore的UML类图如下：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://wangkuiwu.github.io/media/pic/java/threads/juc-lock11-01.jpg" alt="img" title="">
+                </div>
+                <div class="image-caption">img</div>
+            </figure>
+<p>从图中可以看出：<br>(01) 和”ReentrantLock”一样，Semaphore也包含了sync对象，sync是Sync类型；而且，Sync是一个继承于AQS的抽象类。<br>(02) Sync包括两个子类：”公平信号量”FairSync 和 “非公平信号量”NonfairSync。sync是”FairSync的实例”，或者”NonfairSync的实例”；默认情况下，sync是NonfairSync(即，默认是非公平信号量)。</p>
+<p><a name="anchor3"></a></p>
+<h1 id="3-Semaphore源码分析-基于JDK1-7-0-40"><a href="#3-Semaphore源码分析-基于JDK1-7-0-40" class="headerlink" title="3. Semaphore源码分析(基于JDK1.7.0_40)"></a>3. Semaphore源码分析(基于JDK1.7.0_40)</h1><p>Semaphore是通过共享锁实现的。根据共享锁的获取原则，Semaphore分为”公平信号量”和”非公平信号量”。</p>
+<p><strong>“公平信号量”和”非公平信号量”的区别</strong></p>
+<p>“公平信号量”和”非公平信号量”的释放信号量的机制是一样的！不同的是它们获取信号量的机制：线程在尝试获取信号量许可时，对于公平信号量而言，如果当前线程不在CLH队列的头部，则排队等候；而对于非公平信号量而言，无论当前线程是不是在CLH队列的头部，它都会直接获取信号量。该差异具体的体现在，它们的tryAcquireShared()函数的实现不同。</p>
+<p>下面，我们逐步的对它们的源码进行分析。</p>
+<h2 id="3-1-信号量构造函数"><a href="#3-1-信号量构造函数" class="headerlink" title="3.1 信号量构造函数"></a>3.1 信号量构造函数</h2><pre><code>public Semaphore(int permits) {
+    sync = new NonfairSync(permits);
+}
+
+public Semaphore(int permits, boolean fair) {
+    sync = fair ? new FairSync(permits) : new NonfairSync(permits);
+}
+</code></pre><p>从中，我们可以信号量分为“公平信号量(FairSync)”和“非公平信号量(NonfairSync)”。Semaphore(int permits)函数会默认创建“非公平信号量”。</p>
+<h2 id="3-2-公平信号量获取和释放"><a href="#3-2-公平信号量获取和释放" class="headerlink" title="3.2 公平信号量获取和释放"></a>3.2 公平信号量获取和释放</h2><h3 id="3-2-1-公平信号量的获取"><a href="#3-2-1-公平信号量的获取" class="headerlink" title="3.2.1 公平信号量的获取"></a>3.2.1 公平信号量的获取</h3><p>Semaphore中的公平信号量是FairSync。它的获取API如下：</p>
+<pre><code>public void acquire() throws InterruptedException {
+    sync.acquireSharedInterruptibly(1);
+}
+
+public void acquire(int permits) throws InterruptedException {
+    if (permits &lt; 0) throw new IllegalArgumentException();
+    sync.acquireSharedInterruptibly(permits);
+}
+</code></pre><p>信号量中的acquire()获取函数，实际上是调用的AQS中的acquireSharedInterruptibly()。</p>
+<p>acquireSharedInterruptibly()的源码如下：</p>
+<pre><code>public final void acquireSharedInterruptibly(int arg)
+        throws InterruptedException {
+    // 如果线程是中断状态，则抛出异常。
+    if (Thread.interrupted())
+        throw new InterruptedException();
+    // 否则，尝试获取“共享锁”；获取成功则直接返回，获取失败，则通过doAcquireSharedInterruptibly()获取。
+    if (tryAcquireShared(arg) &lt; 0)
+        doAcquireSharedInterruptibly(arg);
+}
+</code></pre><p>Semaphore中”公平锁“对应的tryAcquireShared()实现如下：</p>
+<pre><code>protected int tryAcquireShared(int acquires) {
+    for (;;) {
+        // 判断“当前线程”是不是CLH队列中的第一个线程线程，
+        // 若是的话，则返回-1。
+        if (hasQueuedPredecessors())
+            return -1;
+        // 设置“可以获得的信号量的许可数”
+        int available = getState();
+        // 设置“获得acquires个信号量许可之后，剩余的信号量许可数”
+        int remaining = available - acquires;
+        // 如果“剩余的信号量许可数&gt;=0”，则设置“可以获得的信号量许可数”为remaining。
+        if (remaining &lt; 0 ||
+            compareAndSetState(available, remaining))
+            return remaining;
+    }
+}
+</code></pre><p>说明：tryAcquireShared()的作用是尝试获取acquires个信号量许可数。<br>对于Semaphore而言，state表示的是“当前可获得的信号量许可数”。</p>
+<p>下面看看AQS中doAcquireSharedInterruptibly()的实现：</p>
+<pre><code>private void doAcquireSharedInterruptibly(long arg)
+    throws InterruptedException {
+    // 创建”当前线程“的Node节点，且Node中记录的锁是”共享锁“类型；并将该节点添加到CLH队列末尾。
+    final Node node = addWaiter(Node.SHARED);
+    boolean failed = true;
+    try {
+        for (;;) {
+            // 获取上一个节点。
+            // 如果上一节点是CLH队列的表头，则”尝试获取共享锁“。
+            final Node p = node.predecessor();
+            if (p == head) {
+                long r = tryAcquireShared(arg);
+                if (r &gt;= 0) {
+                    setHeadAndPropagate(node, r);
+                    p.next = null; // help GC
+                    failed = false;
+                    return;
+                }
+            }
+            // 当前线程一直等待，直到获取到共享锁。
+            // 如果线程在等待过程中被中断过，则再次中断该线程(还原之前的中断状态)。
+            if (shouldParkAfterFailedAcquire(p, node) &amp;&amp;
+                parkAndCheckInterrupt())
+                throw new InterruptedException();
+        }
+    } finally {
+        if (failed)
+            cancelAcquire(node);
+    }
+}
+</code></pre><p>说明：doAcquireSharedInterruptibly()会使当前线程一直等待，直到当前线程获取到共享锁(或被中断)才返回。<br>(01) addWaiter(Node.SHARED)的作用是，创建”当前线程“的Node节点，且Node中记录的锁的类型是”共享锁“(Node.SHARED)；并将该节点添加到CLH队列末尾。关于Node和CLH在”Java多线程系列–“JUC锁”03之 公平锁(一)”已经详细介绍过，这里就不再重复说明了。<br>(02) node.predecessor()的作用是，获取上一个节点。如果上一节点是CLH队列的表头，则”尝试获取共享锁“。<br>(03) shouldParkAfterFailedAcquire()的作用和它的名称一样，如果在尝试获取锁失败之后，线程应该等待，则返回true；否则，返回false。<br>(04) 当shouldParkAfterFailedAcquire()返回ture时，则调用parkAndCheckInterrupt()，当前线程会进入等待状态，直到获取到共享锁才继续运行。<br>doAcquireSharedInterruptibly()中的shouldParkAfterFailedAcquire(), parkAndCheckInterrupt等函数在”Java多线程系列–“JUC锁”03之 公平锁(一)”中介绍过，这里也就不再详细说明了。</p>
+<h3 id="3-2-2-公平信号量的释放"><a href="#3-2-2-公平信号量的释放" class="headerlink" title="3.2.2 公平信号量的释放"></a>3.2.2 公平信号量的释放</h3><p>Semaphore中公平信号量(FairSync)的释放API如下：</p>
+<pre><code>public void release() {
+    sync.releaseShared(1);
+}
+
+public void release(int permits) {
+    if (permits &lt; 0) throw new IllegalArgumentException();
+    sync.releaseShared(permits);
+}
+</code></pre><p>信号量的releases()释放函数，实际上是调用的AQS中的releaseShared()。</p>
+<p>releaseShared()在AQS中实现，源码如下：</p>
+<pre><code>public final boolean releaseShared(int arg) {
+    if (tryReleaseShared(arg)) {
+        doReleaseShared();
+        return true;
+    }
+    return false;
+}
+</code></pre><p>说明：releaseShared()的目的是让当前线程释放它所持有的共享锁。<br>它首先会通过tryReleaseShared()去尝试释放共享锁。尝试成功，则直接返回；尝试失败，则通过doReleaseShared()去释放共享锁。</p>
+<p>Semaphore重写了tryReleaseShared()，它的源码如下：</p>
+<pre><code>protected final boolean tryReleaseShared(int releases) {
+    for (;;) {
+        // 获取“可以获得的信号量的许可数”
+        int current = getState();
+        // 获取“释放releases个信号量许可之后，剩余的信号量许可数”
+        int next = current + releases;
+        if (next &lt; current) // overflow
+            throw new Error(&quot;Maximum permit count exceeded&quot;);
+        // 设置“可以获得的信号量的许可数”为next。
+        if (compareAndSetState(current, next))
+            return true;
+    }
+}
+</code></pre><p>如果tryReleaseShared()尝试释放共享锁失败，则会调用doReleaseShared()去释放共享锁。doReleaseShared()的源码如下：</p>
+<pre><code>private void doReleaseShared() {
+    for (;;) {
+        // 获取CLH队列的头节点
+        Node h = head;
+        // 如果头节点不为null，并且头节点不等于tail节点。
+        if (h != null &amp;&amp; h != tail) {
+            // 获取头节点对应的线程的状态
+            int ws = h.waitStatus;
+            // 如果头节点对应的线程是SIGNAL状态，则意味着“头节点的下一个节点所对应的线程”需要被unpark唤醒。
+            if (ws == Node.SIGNAL) {
+                // 设置“头节点对应的线程状态”为空状态。失败的话，则继续循环。
+                if (!compareAndSetWaitStatus(h, Node.SIGNAL, 0))
+                    continue;
+                // 唤醒“头节点的下一个节点所对应的线程”。
+                unparkSuccessor(h);
+            }
+            // 如果头节点对应的线程是空状态，则设置“文件点对应的线程所拥有的共享锁”为其它线程获取锁的空状态。
+            else if (ws == 0 &amp;&amp;
+                     !compareAndSetWaitStatus(h, 0, Node.PROPAGATE))
+                continue;                // loop on failed CAS
+        }
+        // 如果头节点发生变化，则继续循环。否则，退出循环。
+        if (h == head)                   // loop if head changed
+            break;
+    }
+}
+</code></pre><p>说明：doReleaseShared()会释放“共享锁”。它会从前往后的遍历CLH队列，依次“唤醒”然后“执行”队列中每个节点对应的线程；最终的目的是让这些线程释放它们所持有的信号量。</p>
+<h2 id="3-3-非公平信号量获取和释放"><a href="#3-3-非公平信号量获取和释放" class="headerlink" title="3.3 非公平信号量获取和释放"></a>3.3 非公平信号量获取和释放</h2><p>Semaphore中的非公平信号量是NonFairSync。在Semaphore中，“非公平信号量许可的释放(release)”与“公平信号量许可的释放(release)”是一样的。<br>不同的是它们获取“信号量许可”的机制不同，下面是非公平信号量获取信号量许可的代码。</p>
+<p>非公平信号量的tryAcquireShared()实现如下：</p>
+<pre><code>protected int tryAcquireShared(int acquires) {
+    return nonfairTryAcquireShared(acquires);
+}
+</code></pre><p>nonfairTryAcquireShared()的实现如下：</p>
+<pre><code>final int nonfairTryAcquireShared(int acquires) {
+    for (;;) {
+        // 设置“可以获得的信号量的许可数”
+        int available = getState();
+        // 设置“获得acquires个信号量许可之后，剩余的信号量许可数”
+        int remaining = available - acquires;
+        // 如果“剩余的信号量许可数&gt;=0”，则设置“可以获得的信号量许可数”为remaining。
+        if (remaining &lt; 0 ||
+            compareAndSetState(available, remaining))
+            return remaining;
+    }
+}
+</code></pre><p>说明：非公平信号量的tryAcquireShared()调用AQS中的nonfairTryAcquireShared()。而在nonfairTryAcquireShared()的for循环中，它都会直接判断“当前剩余的信号量许可数”是否足够；足够的话，则直接“设置可以获得的信号量许可数”，进而再获取信号量。<br>而公平信号量的tryAcquireShared()中，在获取信号量之前会通过if (hasQueuedPredecessors())来判断“当前线程是不是在CLH队列的头部”，是的话，则返回-1。 </p>
+<p><a name="anchor4"></a></p>
+<h1 id="4-Semaphore示例"><a href="#4-Semaphore示例" class="headerlink" title="4. Semaphore示例"></a>4. Semaphore示例</h1><pre><code>import java.util.concurrent.ExecutorService; 
+import java.util.concurrent.Executors; 
+import java.util.concurrent.Semaphore; 
+
+public class SemaphoreTest1 {
+    private static final int SEM_MAX = 10;
+    public static void main(String[] args) { 
+        Semaphore sem = new Semaphore(SEM_MAX);
+        //创建线程池
+        ExecutorService threadPool = Executors.newFixedThreadPool(3);
+        //在线程池中执行任务
+        threadPool.execute(new MyThread(sem, 5));
+        threadPool.execute(new MyThread(sem, 4));
+        threadPool.execute(new MyThread(sem, 7));
+        //关闭池
+        threadPool.shutdown();
+    }
+}
+
+class MyThread extends Thread {
+    private volatile Semaphore sem;    // 信号量
+    private int count;        // 申请信号量的大小 
+
+    MyThread(Semaphore sem, int count) {
+        this.sem = sem;
+        this.count = count;
+    }
+
+    public void run() {
+        try {
+            // 从信号量中获取count个许可
+            sem.acquire(count);
+
+            Thread.sleep(2000);
+            System.out.println(Thread.currentThread().getName() + &quot; acquire count=&quot;+count);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            // 释放给定数目的许可，将其返回到信号量。
+            sem.release(count);
+            System.out.println(Thread.currentThread().getName() + &quot; release &quot; + count + &quot;&quot;);
+        }
+    }
+}
+</code></pre><p>(某一次)运行结果：</p>
+<pre><code>pool-1-thread-1 acquire count=5
+pool-1-thread-2 acquire count=4
+pool-1-thread-1 release 5
+pool-1-thread-2 release 4
+pool-1-thread-3 acquire count=7
+pool-1-thread-3 release 7
+</code></pre><p>结果说明：信号量sem的许可总数是10个；共3个线程，分别需要获取的信号量许可数是5,4,7。前面两个线程获取到信号量的许可后，sem中剩余的可用的许可数是1；因此，最后一个线程必须等前两个线程释放了它们所持有的信号量许可之后，才能获取到7个信号量许可。</p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2018-06-27T09:39:57.945Z" itemprop="dateUpdated">2018-06-27 17:39:57</time>
+</span><br>
+
+
+        
+        本文固定链接：<a href="/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”11之 Semaphore信号量的原理和示例/" target="_blank" rel="external">https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”11之 Semaphore信号量的原理和示例/</a>
+        
+    </div>
+    <footer>
+        <a href="https://smuwjs.github.io">
+            <img src="/img/head.png" alt="Jeeson">
+            Jeeson
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JUC锁/">JUC锁</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java多线程系列/">Java多线程系列</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java源码分析/">Java源码分析</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”11之 Semaphore信号量的原理和示例/&title=《Java多线程系列--“JUC锁”11之 Semaphore信号量的原理和示例》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”11之 Semaphore信号量的原理和示例/&title=《Java多线程系列--“JUC锁”11之 Semaphore信号量的原理和示例》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”11之 Semaphore信号量的原理和示例/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Java多线程系列--“JUC锁”11之 Semaphore信号量的原理和示例》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”11之 Semaphore信号量的原理和示例/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”11之 Semaphore信号量的原理和示例/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2016/12/01/java-source-analysis-set-series/Java 集合系列01之 总体框架/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">Java 集合系列01之 总体框架</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”10之 CyclicBarrier原理和示例/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Java多线程系列--“JUC锁”10之 CyclicBarrier原理和示例</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”11之 Semaphore信号量的原理和示例" data-title="Java多线程系列--“JUC锁”11之 Semaphore信号量的原理和示例" data-url="https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”11之 Semaphore信号量的原理和示例/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'smuwjs', theme: 'none'};
+lazyScripts.push('//unpkg.com/hexo-theme-material-indigo@latest/js/embed.min.js');
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循<a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>Jeeson &copy; 2015 - 2018</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”11之 Semaphore信号量的原理和示例/&title=《Java多线程系列--“JUC锁”11之 Semaphore信号量的原理和示例》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”11之 Semaphore信号量的原理和示例/&title=《Java多线程系列--“JUC锁”11之 Semaphore信号量的原理和示例》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”11之 Semaphore信号量的原理和示例/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Java多线程系列--“JUC锁”11之 Semaphore信号量的原理和示例》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”11之 Semaphore信号量的原理和示例/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”11之 Semaphore信号量的原理和示例/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”11之 Semaphore信号量的原理和示例/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

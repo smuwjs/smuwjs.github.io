@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>java io系列03之 ByteArrayOutputStream详解 | Jeeson&#39;s Blog | Write the code. Change the world.</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="Java源码分析,Java IO系列">
+    <meta name="description" content="前面学习ByteArrayInputStream，了解了“输入流”。接下来，我们学习与ByteArrayInputStream相对应的输出流，即ByteArrayOutputStream。本章，我们会先对ByteArrayOutputStream进行介绍，在了解了它的源码之后，再通过示例来掌握如何使用它。   目录1. ByteArrayOutputStream 介绍2. OutputStrea">
+<meta name="keywords" content="Java源码分析,Java IO系列">
+<meta property="og:type" content="article">
+<meta property="og:title" content="java io系列03之 ByteArrayOutputStream详解">
+<meta property="og:url" content="https://smuwjs.github.io/2016/10/03/java-source-analysis-io-series/java io系列03之 ByteArrayOutputStream详解/index.html">
+<meta property="og:site_name" content="Jeeson&#39;s Blog">
+<meta property="og:description" content="前面学习ByteArrayInputStream，了解了“输入流”。接下来，我们学习与ByteArrayInputStream相对应的输出流，即ByteArrayOutputStream。本章，我们会先对ByteArrayOutputStream进行介绍，在了解了它的源码之后，再通过示例来掌握如何使用它。   目录1. ByteArrayOutputStream 介绍2. OutputStrea">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-06-27T09:39:57.941Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="java io系列03之 ByteArrayOutputStream详解">
+<meta name="twitter:description" content="前面学习ByteArrayInputStream，了解了“输入流”。接下来，我们学习与ByteArrayInputStream相对应的输出流，即ByteArrayOutputStream。本章，我们会先对ByteArrayOutputStream进行介绍，在了解了它的源码之后，再通过示例来掌握如何使用它。   目录1. ByteArrayOutputStream 介绍2. OutputStrea">
+    
+        <link rel="alternate" type="application/atom+xml" title="Jeeson&#39;s Blog" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/head.png">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Jeeson</h5>
+          <a href="mailto:smuwjs@163.com" title="smuwjs@163.com" class="mail">smuwjs@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/smuwjs" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">java io系列03之 ByteArrayOutputStream详解</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">java io系列03之 ByteArrayOutputStream详解</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2016-10-02T16:00:00.000Z" itemprop="datePublished" class="page-time">
+  2016-10-03
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#1-ByteArrayOutputStream-介绍"><span class="post-toc-number">1.</span> <span class="post-toc-text">1. ByteArrayOutputStream 介绍</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#2-OutputStream和ByteArrayOutputStream源码分析"><span class="post-toc-number">2.</span> <span class="post-toc-text">2. OutputStream和ByteArrayOutputStream源码分析</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#1-OutputStream-java源码分析-基于jdk1-7-40"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">1. OutputStream.java源码分析(基于jdk1.7.40)</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#2-ByteArrayOutputStream-源码分析-基于jdk1-7-40"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">2. ByteArrayOutputStream 源码分析(基于jdk1.7.40)</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#3-示例代码"><span class="post-toc-number">3.</span> <span class="post-toc-text">3. 示例代码</span></a></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-java-source-analysis-io-series/java io系列03之 ByteArrayOutputStream详解"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">java io系列03之 ByteArrayOutputStream详解</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2016-10-03 00:00:00" datetime="2016-10-02T16:00:00.000Z"  itemprop="datePublished">2016-10-03</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <blockquote>
+<p>前面学习ByteArrayInputStream，了解了“输入流”。接下来，我们学习与ByteArrayInputStream相对应的输出流，即ByteArrayOutputStream。<br>本章，我们会先对ByteArrayOutputStream进行介绍，在了解了它的源码之后，再通过示例来掌握如何使用它。</p>
+</blockquote>
+<blockquote>
+<p><strong>目录</strong><br><a href="#anchor1">1. ByteArrayOutputStream 介绍</a><br><a href="#anchor2">2. OutputStream和ByteArrayOutputStream源码分析</a><br><a href="#anchor3">3. 示例代码</a>   </p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="1-ByteArrayOutputStream-介绍"><a href="#1-ByteArrayOutputStream-介绍" class="headerlink" title="1. ByteArrayOutputStream 介绍"></a>1. ByteArrayOutputStream 介绍</h1><p>ByteArrayOutputStream 是字节数组输出流。它继承于OutputStream。</p>
+<p>ByteArrayOutputStream 中的数据被写入一个 byte 数组。缓冲区会随着数据的不断写入而自动增长。可使用 toByteArray() 和 toString() 获取数据。</p>
+<p>OutputStream 函数列表</p>
+<p>我们来看看ByteArrayOutputStream的父类OutputStream的函数接口。</p>
+<pre><code>// 构造函数
+OutputStream()
+
+         void    close()
+         void    flush()
+         void    write(byte[] buffer, int offset, int count)
+         void    write(byte[] buffer)
+abstract void    write(int oneByte)
+</code></pre><p>ByteArrayOutputStream 函数列表</p>
+<pre><code>// 构造函数
+ByteArrayOutputStream()
+ByteArrayOutputStream(int size)
+
+             void    close()
+synchronized void    reset()
+             int     size()
+synchronized byte[]  toByteArray()
+             String  toString(int hibyte)
+             String  toString(String charsetName)
+             String  toString()
+synchronized void    write(byte[] buffer, int offset, int len)
+synchronized void    write(int oneByte)
+synchronized void    writeTo(OutputStream out)
+</code></pre><p><a name="anchor2"></a></p>
+<h1 id="2-OutputStream和ByteArrayOutputStream源码分析"><a href="#2-OutputStream和ByteArrayOutputStream源码分析" class="headerlink" title="2. OutputStream和ByteArrayOutputStream源码分析"></a>2. OutputStream和ByteArrayOutputStream源码分析</h1><p>OutputStream是ByteArrayOutputStream的父类，我们先看看OutputStream的源码，然后再学ByteArrayOutputStream的源码。</p>
+<h2 id="1-OutputStream-java源码分析-基于jdk1-7-40"><a href="#1-OutputStream-java源码分析-基于jdk1-7-40" class="headerlink" title="1. OutputStream.java源码分析(基于jdk1.7.40)"></a>1. OutputStream.java源码分析(基于jdk1.7.40)</h2><pre><code>package java.io;
+
+public abstract class OutputStream implements Closeable, Flushable {
+    // 将字节b写入到“输出流”中。
+    // 它在子类中实现！
+    public abstract void write(int b) throws IOException;
+
+    // 写入字节数组b到“字节数组输出流”中。
+    public void write(byte b[]) throws IOException {
+        write(b, 0, b.length);
+    }
+
+    // 写入字节数组b到“字节数组输出流”中，并且off是“数组b的起始位置”，len是写入的长度
+    public void write(byte b[], int off, int len) throws IOException {
+        if (b == null) {
+            throw new NullPointerException();
+        } else if ((off &lt; 0) || (off &gt; b.length) || (len &lt; 0) ||
+                   ((off + len) &gt; b.length) || ((off + len) &lt; 0)) {
+            throw new IndexOutOfBoundsException();
+        } else if (len == 0) {
+            return;
+        }
+        for (int i = 0 ; i &lt; len ; i++) {
+            write(b[off + i]);
+        }
+    }
+
+    public void flush() throws IOException {
+    }
+
+    public void close() throws IOException {
+    }
+}
+</code></pre><h2 id="2-ByteArrayOutputStream-源码分析-基于jdk1-7-40"><a href="#2-ByteArrayOutputStream-源码分析-基于jdk1-7-40" class="headerlink" title="2. ByteArrayOutputStream 源码分析(基于jdk1.7.40)"></a>2. ByteArrayOutputStream 源码分析(基于jdk1.7.40)</h2><pre><code>package java.io;
+
+import java.util.Arrays;
+
+public class ByteArrayOutputStream extends OutputStream {
+
+    // 保存“字节数组输出流”数据的数组
+    protected byte buf[];
+
+    // “字节数组输出流”的计数
+    protected int count;
+
+    // 构造函数：默认创建的字节数组大小是32。
+    public ByteArrayOutputStream() {
+        this(32);
+    }
+
+    // 构造函数：创建指定数组大小的“字节数组输出流”
+    public ByteArrayOutputStream(int size) {
+        if (size &lt; 0) {
+            throw new IllegalArgumentException(&quot;Negative initial size: &quot;
+                                               + size);
+        }
+        buf = new byte[size];
+    }
+
+    // 确认“容量”。
+    // 若“实际容量 &lt; minCapacity”，则增加“字节数组输出流”的容量
+    private void ensureCapacity(int minCapacity) {
+        // overflow-conscious code
+        if (minCapacity - buf.length &gt; 0)
+            grow(minCapacity);
+    }
+
+    // 增加“容量”。
+    private void grow(int minCapacity) {
+        int oldCapacity = buf.length;
+        // “新容量”的初始化 = “旧容量”x2
+        int newCapacity = oldCapacity &lt;&lt; 1;
+        // 比较“新容量”和“minCapacity”的大小，并选取其中较大的数为“新的容量”。
+        if (newCapacity - minCapacity &lt; 0)
+            newCapacity = minCapacity;
+        if (newCapacity &lt; 0) {
+            if (minCapacity &lt; 0) // overflow
+                throw new OutOfMemoryError();
+            newCapacity = Integer.MAX_VALUE;
+        }
+        buf = Arrays.copyOf(buf, newCapacity);
+    }
+
+    // 写入一个字节b到“字节数组输出流”中，并将计数+1
+    public synchronized void write(int b) {
+        ensureCapacity(count + 1);
+        buf[count] = (byte) b;
+        count += 1;
+    }
+
+    // 写入字节数组b到“字节数组输出流”中。off是“写入字节数组b的起始位置”，len是写入的长度
+    public synchronized void write(byte b[], int off, int len) {
+        if ((off &lt; 0) || (off &gt; b.length) || (len &lt; 0) ||
+            ((off + len) - b.length &gt; 0)) {
+            throw new IndexOutOfBoundsException();
+        }
+        ensureCapacity(count + len);
+        System.arraycopy(b, off, buf, count, len);
+        count += len;
+    }
+
+    // 写入输出流outb到“字节数组输出流”中。
+    public synchronized void writeTo(OutputStream out) throws IOException {
+        out.write(buf, 0, count);
+    }
+
+    // 重置“字节数组输出流”的计数。
+    public synchronized void reset() {
+        count = 0;
+    }
+
+    // 将“字节数组输出流”转换成字节数组。
+    public synchronized byte toByteArray()[] {
+        return Arrays.copyOf(buf, count);
+    }
+
+    // 返回“字节数组输出流”当前计数值
+    public synchronized int size() {
+        return count;
+    }
+
+    public synchronized String toString() {
+        return new String(buf, 0, count);
+    }
+
+    public synchronized String toString(String charsetName)
+        throws UnsupportedEncodingException
+    {
+        return new String(buf, 0, count, charsetName);
+    }
+
+    @Deprecated
+    public synchronized String toString(int hibyte) {
+        return new String(buf, hibyte, 0, count);
+    }
+
+    public void close() throws IOException {
+    }
+}
+</code></pre><p>说明：<br>ByteArrayOutputStream实际上是将字节数据写入到“字节数组”中去。<br>(01) 通过ByteArrayOutputStream()创建的“字节数组输出流”对应的字节数组大小是32。<br>(02) 通过ByteArrayOutputStream(int size) 创建“字节数组输出流”，它对应的字节数组大小是size。<br>(03) write(int oneByte)的作用将int类型的oneByte换成byte类型，然后写入到输出流中。<br>(04) write(byte[] buffer, int offset, int len) 是将字节数组buffer写入到输出流中，offset是从buffer中读取数据的起始偏移位置，len是读取的长度。<br>(05) writeTo(OutputStream out) 将该“字节数组输出流”的数据全部写入到“输出流out”中。</p>
+<p><a name="anchor3"></a></p>
+<h1 id="3-示例代码"><a href="#3-示例代码" class="headerlink" title="3. 示例代码"></a>3. 示例代码</h1><p>关于ByteArrayOutputStream中API的详细用法，参考示例代码(ByteArrayOutputStreamTest.java)：</p>
+<pre><code>import java.io.IOException;
+import java.io.OutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ByteArrayInputStream;
+
+/**
+ * ByteArrayOutputStream 测试程序
+ *
+ * @author skywang
+ */
+public class ByteArrayOutputStreamTest {
+
+    private static final int LEN = 5;
+    // 对应英文字母“abcddefghijklmnopqrsttuvwxyz”
+    private static final byte[] ArrayLetters = {
+        0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67, 0x68, 0x69, 0x6A, 0x6B, 0x6C, 0x6D, 0x6E, 0x6F,
+        0x70, 0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77, 0x78, 0x79, 0x7A
+    };
+
+    public static void main(String[] args) {
+        //String tmp = new String(ArrayLetters);
+        //System.out.println(&quot;ArrayLetters=&quot;+tmp);
+
+        tesByteArrayOutputStream() ;
+    }
+
+    /**
+     * ByteArrayOutputStream的API测试函数
+     */
+    private static void tesByteArrayOutputStream() {
+        // 创建ByteArrayOutputStream字节流
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        // 依次写入“A”、“B”、“C”三个字母。0x41对应A，0x42对应B，0x43对应C。
+        baos.write(0x41);
+        baos.write(0x42);
+        baos.write(0x43);
+        System.out.printf(&quot;baos=%s\n&quot;, baos);
+
+        // 将ArrayLetters数组中从“3”开始的后5个字节写入到baos中。
+        // 即对应写入“0x64, 0x65, 0x66, 0x67, 0x68”，即“defgh”
+        baos.write(ArrayLetters, 3, 5);
+        System.out.printf(&quot;baos=%s\n&quot;, baos);
+
+        // 计算长度
+        int size = baos.size();
+        System.out.printf(&quot;size=%s\n&quot;, size);
+
+        // 转换成byte[]数组
+        byte[] buf = baos.toByteArray();
+        String str = new String(buf);
+        System.out.printf(&quot;str=%s\n&quot;, str);
+
+        // 将baos写入到另一个输出流中
+        try {
+            ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
+            baos.writeTo((OutputStream)baos2);
+            System.out.printf(&quot;baos2=%s\n&quot;, baos2);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+</code></pre><p>运行结果：</p>
+<pre><code>baos=ABC
+baos=ABCdefgh
+size=8
+str=ABCdefgh
+baos2=ABCdefgh
+</code></pre>
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2018-06-27T09:39:57.941Z" itemprop="dateUpdated">2018-06-27 17:39:57</time>
+</span><br>
+
+
+        
+        本文固定链接：<a href="/2016/10/03/java-source-analysis-io-series/java io系列03之 ByteArrayOutputStream详解/" target="_blank" rel="external">https://smuwjs.github.io/2016/10/03/java-source-analysis-io-series/java io系列03之 ByteArrayOutputStream详解/</a>
+        
+    </div>
+    <footer>
+        <a href="https://smuwjs.github.io">
+            <img src="/img/head.png" alt="Jeeson">
+            Jeeson
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java-IO系列/">Java IO系列</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java源码分析/">Java源码分析</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/10/03/java-source-analysis-io-series/java io系列03之 ByteArrayOutputStream详解/&title=《java io系列03之 ByteArrayOutputStream详解》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/10/03/java-source-analysis-io-series/java io系列03之 ByteArrayOutputStream详解/&title=《java io系列03之 ByteArrayOutputStream详解》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/10/03/java-source-analysis-io-series/java io系列03之 ByteArrayOutputStream详解/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《java io系列03之 ByteArrayOutputStream详解》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/10/03/java-source-analysis-io-series/java io系列03之 ByteArrayOutputStream详解/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/10/03/java-source-analysis-io-series/java io系列03之 ByteArrayOutputStream详解/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2016/10/04/java-source-analysis-io-series/java io系列04之 管道(PipedOutputStream和PipedInputStream)详解/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">java io系列04之 管道(PipedOutputStream和PipedInputStream)详解</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2016/10/02/java-source-analysis-io-series/java io系列02之 ByteArrayInputStream详解/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">java io系列02之 ByteArrayInputStream详解</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="java-source-analysis-io-series/java io系列03之 ByteArrayOutputStream详解" data-title="java io系列03之 ByteArrayOutputStream详解" data-url="https://smuwjs.github.io/2016/10/03/java-source-analysis-io-series/java io系列03之 ByteArrayOutputStream详解/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'smuwjs', theme: 'none'};
+lazyScripts.push('//unpkg.com/hexo-theme-material-indigo@latest/js/embed.min.js');
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循<a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>Jeeson &copy; 2015 - 2018</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/10/03/java-source-analysis-io-series/java io系列03之 ByteArrayOutputStream详解/&title=《java io系列03之 ByteArrayOutputStream详解》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/10/03/java-source-analysis-io-series/java io系列03之 ByteArrayOutputStream详解/&title=《java io系列03之 ByteArrayOutputStream详解》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/10/03/java-source-analysis-io-series/java io系列03之 ByteArrayOutputStream详解/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《java io系列03之 ByteArrayOutputStream详解》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/10/03/java-source-analysis-io-series/java io系列03之 ByteArrayOutputStream详解/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/10/03/java-source-analysis-io-series/java io系列03之 ByteArrayOutputStream详解/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://smuwjs.github.io/2016/10/03/java-source-analysis-io-series/java io系列03之 ByteArrayOutputStream详解/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

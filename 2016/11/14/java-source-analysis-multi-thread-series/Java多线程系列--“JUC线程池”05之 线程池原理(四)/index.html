@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>Java多线程系列--“JUC线程池”05之 线程池原理(四) | Jeeson&#39;s Blog | Write the code. Change the world.</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="Java源码分析,Java多线程系列,JUC线程池">
+    <meta name="description" content="本章介绍线程池的拒绝策略。   目录1. 拒绝策略介绍2. 拒绝策略对比和示例     1. 拒绝策略介绍线程池的拒绝策略，是指当任务添加到线程池中被拒绝，而采取的处理措施。 当任务添加到线程池中之所以被拒绝，可能是由于：第一，线程池异常关闭。第二，任务数量超过线程池的最大限制。 线程池共包括4种拒绝策略，它们分别是：AbortPolicy, CallerRunsPolicy, DiscardO">
+<meta name="keywords" content="Java源码分析,Java多线程系列,JUC线程池">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java多线程系列--“JUC线程池”05之 线程池原理(四)">
+<meta property="og:url" content="https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC线程池”05之 线程池原理(四)/index.html">
+<meta property="og:site_name" content="Jeeson&#39;s Blog">
+<meta property="og:description" content="本章介绍线程池的拒绝策略。   目录1. 拒绝策略介绍2. 拒绝策略对比和示例     1. 拒绝策略介绍线程池的拒绝策略，是指当任务添加到线程池中被拒绝，而采取的处理措施。 当任务添加到线程池中之所以被拒绝，可能是由于：第一，线程池异常关闭。第二，任务数量超过线程池的最大限制。 线程池共包括4种拒绝策略，它们分别是：AbortPolicy, CallerRunsPolicy, DiscardO">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-06-27T09:39:57.945Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java多线程系列--“JUC线程池”05之 线程池原理(四)">
+<meta name="twitter:description" content="本章介绍线程池的拒绝策略。   目录1. 拒绝策略介绍2. 拒绝策略对比和示例     1. 拒绝策略介绍线程池的拒绝策略，是指当任务添加到线程池中被拒绝，而采取的处理措施。 当任务添加到线程池中之所以被拒绝，可能是由于：第一，线程池异常关闭。第二，任务数量超过线程池的最大限制。 线程池共包括4种拒绝策略，它们分别是：AbortPolicy, CallerRunsPolicy, DiscardO">
+    
+        <link rel="alternate" type="application/atom+xml" title="Jeeson&#39;s Blog" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/head.png">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Jeeson</h5>
+          <a href="mailto:smuwjs@163.com" title="smuwjs@163.com" class="mail">smuwjs@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/smuwjs" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Java多线程系列--“JUC线程池”05之 线程池原理(四)</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Java多线程系列--“JUC线程池”05之 线程池原理(四)</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2016-11-13T21:00:00.000Z" itemprop="datePublished" class="page-time">
+  2016-11-14
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#1-拒绝策略介绍"><span class="post-toc-number">1.</span> <span class="post-toc-text">1. 拒绝策略介绍</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#2-拒绝策略对比和示例"><span class="post-toc-number">2.</span> <span class="post-toc-text">2. 拒绝策略对比和示例</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#2-1-DiscardPolicy-示例"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">2.1 DiscardPolicy 示例</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#2-2-DiscardOldestPolicy-示例"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">2.2 DiscardOldestPolicy 示例</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#2-3-AbortPolicy-示例"><span class="post-toc-number">2.3.</span> <span class="post-toc-text">2.3 AbortPolicy 示例</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#2-4-CallerRunsPolicy-示例"><span class="post-toc-number">2.4.</span> <span class="post-toc-text">2.4 CallerRunsPolicy 示例</span></a></li></ol></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-java-source-analysis-multi-thread-series/Java多线程系列--“JUC线程池”05之 线程池原理(四)"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Java多线程系列--“JUC线程池”05之 线程池原理(四)</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2016-11-14 05:00:00" datetime="2016-11-13T21:00:00.000Z"  itemprop="datePublished">2016-11-14</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <blockquote>
+<p>本章介绍线程池的拒绝策略。</p>
+</blockquote>
+<blockquote>
+<p><strong>目录</strong><br><a href="#anchor1">1. 拒绝策略介绍</a><br><a href="#anchor2">2. 拒绝策略对比和示例</a>  </p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="1-拒绝策略介绍"><a href="#1-拒绝策略介绍" class="headerlink" title="1. 拒绝策略介绍"></a>1. 拒绝策略介绍</h1><p>线程池的拒绝策略，是指当任务添加到线程池中被拒绝，而采取的处理措施。</p>
+<p>当任务添加到线程池中之所以被拒绝，可能是由于：<br>第一，线程池异常关闭。<br>第二，任务数量超过线程池的最大限制。</p>
+<p>线程池共包括4种拒绝策略，它们分别是：<strong>AbortPolicy, CallerRunsPolicy, DiscardOldestPolicy和DiscardPolicy</strong>。</p>
+<table>
+<thead>
+<tr>
+<th>策略</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AbortPolicy</td>
+<td>当任务添加到线程池中被拒绝时，它将抛出 RejectedExecutionException 异常</td>
+</tr>
+<tr>
+<td>CallerRunsPolicy</td>
+<td>当任务添加到线程池中被拒绝时，会在线程池当前正在运行的Thread线程池中处理被拒绝的任务</td>
+</tr>
+<tr>
+<td>DiscardOldestPolicy</td>
+<td>当任务添加到线程池中被拒绝时，线程池会放弃等待队列中最旧的未处理任务，然后将被拒绝的任务添加到等待队列中</td>
+</tr>
+<tr>
+<td>DiscardPolicy</td>
+<td>当任务添加到线程池中被拒绝时，线程池将丢弃被拒绝的任务</td>
+</tr>
+</tbody>
+</table>
+<p>线程池默认的处理策略是<strong>AbortPolicy</strong>！</p>
+<p><a name="anchor2"></a></p>
+<h1 id="2-拒绝策略对比和示例"><a href="#2-拒绝策略对比和示例" class="headerlink" title="2. 拒绝策略对比和示例"></a>2. 拒绝策略对比和示例</h1><p>下面通过示例，分别演示线程池的4种拒绝策略。<br>(01) DiscardPolicy 示例<br>(02) DiscardOldestPolicy 示例<br>(03) AbortPolicy 示例<br>(04) CallerRunsPolicy 示例</p>
+<p><a name="anchor2_1"></a></p>
+<h2 id="2-1-DiscardPolicy-示例"><a href="#2-1-DiscardPolicy-示例" class="headerlink" title="2.1 DiscardPolicy 示例"></a>2.1 DiscardPolicy 示例</h2><pre><code>import java.lang.reflect.Field;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ThreadPoolExecutor.DiscardPolicy;
+
+public class DiscardPolicyDemo {
+
+    private static final int THREADS_SIZE = 1;
+    private static final int CAPACITY = 1;
+
+    public static void main(String[] args) throws Exception {
+
+        // 创建线程池。线程池的&quot;最大池大小&quot;和&quot;核心池大小&quot;都为1(THREADS_SIZE)，&quot;线程池&quot;的阻塞队列容量为1(CAPACITY)。
+        ThreadPoolExecutor pool = new ThreadPoolExecutor(THREADS_SIZE, THREADS_SIZE, 0, TimeUnit.SECONDS,
+                new ArrayBlockingQueue&lt;Runnable&gt;(CAPACITY));
+        // 设置线程池的拒绝策略为&quot;丢弃&quot;
+        pool.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardPolicy());
+
+        // 新建10个任务，并将它们添加到线程池中。
+        for (int i = 0; i &lt; 10; i++) {
+            Runnable myrun = new MyRunnable(&quot;task-&quot;+i);
+            pool.execute(myrun);
+        }
+        // 关闭线程池
+        pool.shutdown();
+    }
+}
+
+class MyRunnable implements Runnable {
+    private String name;
+    public MyRunnable(String name) {
+        this.name = name;
+    }
+    @Override
+    public void run() {
+        try {
+            System.out.println(this.name + &quot; is running.&quot;);
+            Thread.sleep(100);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+</code></pre><p>运行结果：</p>
+<pre><code>task-0 is running.
+task-1 is running.
+</code></pre><p>结果说明：线程池pool的”最大池大小”和”核心池大小”都为1(THREADS_SIZE)，这意味着”线程池能同时运行的任务数量最大只能是1”。<br>线程池pool的阻塞队列是ArrayBlockingQueue，ArrayBlockingQueue是一个有界的阻塞队列，ArrayBlockingQueue的容量为1。这也意味着线程池的阻塞队列只能有一个线程池阻塞等待。<br>根据””中分析的execute()代码可知：线程池中共运行了2个任务。第1个任务直接放到Worker中，通过线程去执行；第2个任务放到阻塞队列中等待。其他的任务都被丢弃了！</p>
+<p><a name="anchor2_2"></a></p>
+<h2 id="2-2-DiscardOldestPolicy-示例"><a href="#2-2-DiscardOldestPolicy-示例" class="headerlink" title="2.2 DiscardOldestPolicy 示例"></a>2.2 DiscardOldestPolicy 示例</h2><pre><code>import java.lang.reflect.Field;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ThreadPoolExecutor.DiscardOldestPolicy;
+
+public class DiscardOldestPolicyDemo {
+
+    private static final int THREADS_SIZE = 1;
+    private static final int CAPACITY = 1;
+
+    public static void main(String[] args) throws Exception {
+
+        // 创建线程池。线程池的&quot;最大池大小&quot;和&quot;核心池大小&quot;都为1(THREADS_SIZE)，&quot;线程池&quot;的阻塞队列容量为1(CAPACITY)。
+        ThreadPoolExecutor pool = new ThreadPoolExecutor(THREADS_SIZE, THREADS_SIZE, 0, TimeUnit.SECONDS,
+                new ArrayBlockingQueue&lt;Runnable&gt;(CAPACITY));
+        // 设置线程池的拒绝策略为&quot;DiscardOldestPolicy&quot;
+        pool.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardOldestPolicy());
+
+        // 新建10个任务，并将它们添加到线程池中。
+        for (int i = 0; i &lt; 10; i++) {
+            Runnable myrun = new MyRunnable(&quot;task-&quot;+i);
+            pool.execute(myrun);
+        }
+        // 关闭线程池
+        pool.shutdown();
+    }
+}
+
+class MyRunnable implements Runnable {
+    private String name;
+    public MyRunnable(String name) {
+        this.name = name;
+    }
+    @Override
+    public void run() {
+        try {
+            System.out.println(this.name + &quot; is running.&quot;);
+            Thread.sleep(200);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+</code></pre><p>运行结果：</p>
+<pre><code>task-0 is running.
+task-9 is running.
+</code></pre><p>结果说明：将”线程池的拒绝策略”由DiscardPolicy修改为DiscardOldestPolicy之后，当有任务添加到线程池被拒绝时，线程池会丢弃阻塞队列中末尾的任务，然后将被拒绝的任务添加到末尾。</p>
+<p><a name="anchor2_3"></a></p>
+<h2 id="2-3-AbortPolicy-示例"><a href="#2-3-AbortPolicy-示例" class="headerlink" title="2.3 AbortPolicy 示例"></a>2.3 AbortPolicy 示例</h2><pre><code>import java.lang.reflect.Field;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ThreadPoolExecutor.AbortPolicy;
+import java.util.concurrent.RejectedExecutionException;
+
+public class AbortPolicyDemo {
+
+    private static final int THREADS_SIZE = 1;
+    private static final int CAPACITY = 1;
+
+    public static void main(String[] args) throws Exception {
+
+        // 创建线程池。线程池的&quot;最大池大小&quot;和&quot;核心池大小&quot;都为1(THREADS_SIZE)，&quot;线程池&quot;的阻塞队列容量为1(CAPACITY)。
+        ThreadPoolExecutor pool = new ThreadPoolExecutor(THREADS_SIZE, THREADS_SIZE, 0, TimeUnit.SECONDS,
+                new ArrayBlockingQueue&lt;Runnable&gt;(CAPACITY));
+        // 设置线程池的拒绝策略为&quot;抛出异常&quot;
+        pool.setRejectedExecutionHandler(new ThreadPoolExecutor.AbortPolicy());
+
+        try {
+
+            // 新建10个任务，并将它们添加到线程池中。
+            for (int i = 0; i &lt; 10; i++) {
+                Runnable myrun = new MyRunnable(&quot;task-&quot;+i);
+                pool.execute(myrun);
+            }
+        } catch (RejectedExecutionException e) {
+            e.printStackTrace();
+            // 关闭线程池
+            pool.shutdown();
+        }
+    }
+}
+
+class MyRunnable implements Runnable {
+    private String name;
+    public MyRunnable(String name) {
+        this.name = name;
+    }
+    @Override
+    public void run() {
+        try {
+            System.out.println(this.name + &quot; is running.&quot;);
+            Thread.sleep(200);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+</code></pre><p>(某一次)运行结果：</p>
+<pre><code>java.util.concurrent.RejectedExecutionException
+    at java.util.concurrent.ThreadPoolExecutor$AbortPolicy.rejectedExecution(ThreadPoolExecutor.java:1774)
+    at java.util.concurrent.ThreadPoolExecutor.reject(ThreadPoolExecutor.java:768)
+    at java.util.concurrent.ThreadPoolExecutor.execute(ThreadPoolExecutor.java:656)
+    at AbortPolicyDemo.main(AbortPolicyDemo.java:27)
+task-0 is running.
+task-1 is running.
+</code></pre><p>结果说明：将”线程池的拒绝策略”由DiscardPolicy修改为AbortPolicy之后，当有任务添加到线程池被拒绝时，会抛出RejectedExecutionException。</p>
+<p><a name="anchor2_4"></a></p>
+<h2 id="2-4-CallerRunsPolicy-示例"><a href="#2-4-CallerRunsPolicy-示例" class="headerlink" title="2.4 CallerRunsPolicy 示例"></a>2.4 CallerRunsPolicy 示例</h2><pre><code>import java.lang.reflect.Field;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy;
+
+public class CallerRunsPolicyDemo {
+
+    private static final int THREADS_SIZE = 1;
+    private static final int CAPACITY = 1;
+
+    public static void main(String[] args) throws Exception {
+
+        // 创建线程池。线程池的&quot;最大池大小&quot;和&quot;核心池大小&quot;都为1(THREADS_SIZE)，&quot;线程池&quot;的阻塞队列容量为1(CAPACITY)。
+        ThreadPoolExecutor pool = new ThreadPoolExecutor(THREADS_SIZE, THREADS_SIZE, 0, TimeUnit.SECONDS,
+                new ArrayBlockingQueue&lt;Runnable&gt;(CAPACITY));
+        // 设置线程池的拒绝策略为&quot;CallerRunsPolicy&quot;
+        pool.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+
+        // 新建10个任务，并将它们添加到线程池中。
+        for (int i = 0; i &lt; 10; i++) {
+            Runnable myrun = new MyRunnable(&quot;task-&quot;+i);
+            pool.execute(myrun);
+        }
+
+        // 关闭线程池
+        pool.shutdown();
+    }
+}
+
+class MyRunnable implements Runnable {
+    private String name;
+    public MyRunnable(String name) {
+        this.name = name;
+    }
+    @Override
+    public void run() {
+        try {
+            System.out.println(this.name + &quot; is running.&quot;);
+            Thread.sleep(100);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+</code></pre><p>(某一次)运行结果：</p>
+<pre><code>task-2 is running.
+task-3 is running.
+task-4 is running.
+task-5 is running.
+task-6 is running.
+task-7 is running.
+task-8 is running.
+task-9 is running.
+task-0 is running.
+task-1 is running.
+</code></pre><p>结果说明：将”线程池的拒绝策略”由DiscardPolicy修改为CallerRunsPolicy之后，当有任务添加到线程池被拒绝时，线程池会将被拒绝的任务添加到”线程池正在运行的线程”中取运行。</p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2018-06-27T09:39:57.945Z" itemprop="dateUpdated">2018-06-27 17:39:57</time>
+</span><br>
+
+
+        
+        本文固定链接：<a href="/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC线程池”05之 线程池原理(四)/" target="_blank" rel="external">https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC线程池”05之 线程池原理(四)/</a>
+        
+    </div>
+    <footer>
+        <a href="https://smuwjs.github.io">
+            <img src="/img/head.png" alt="Jeeson">
+            Jeeson
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JUC线程池/">JUC线程池</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java多线程系列/">Java多线程系列</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java源码分析/">Java源码分析</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC线程池”05之 线程池原理(四)/&title=《Java多线程系列--“JUC线程池”05之 线程池原理(四)》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC线程池”05之 线程池原理(四)/&title=《Java多线程系列--“JUC线程池”05之 线程池原理(四)》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC线程池”05之 线程池原理(四)/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Java多线程系列--“JUC线程池”05之 线程池原理(四)》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC线程池”05之 线程池原理(四)/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC线程池”05之 线程池原理(四)/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC线程池”06之 Callable和Future/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">Java多线程系列--“JUC线程池”06之 Callable和Future</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC锁”05之 非公平锁/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Java多线程系列--“JUC锁”05之 非公平锁</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="java-source-analysis-multi-thread-series/Java多线程系列--“JUC线程池”05之 线程池原理(四)" data-title="Java多线程系列--“JUC线程池”05之 线程池原理(四)" data-url="https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC线程池”05之 线程池原理(四)/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'smuwjs', theme: 'none'};
+lazyScripts.push('//unpkg.com/hexo-theme-material-indigo@latest/js/embed.min.js');
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循<a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>Jeeson &copy; 2015 - 2018</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC线程池”05之 线程池原理(四)/&title=《Java多线程系列--“JUC线程池”05之 线程池原理(四)》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC线程池”05之 线程池原理(四)/&title=《Java多线程系列--“JUC线程池”05之 线程池原理(四)》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC线程池”05之 线程池原理(四)/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Java多线程系列--“JUC线程池”05之 线程池原理(四)》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC线程池”05之 线程池原理(四)/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC线程池”05之 线程池原理(四)/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://smuwjs.github.io/2016/11/14/java-source-analysis-multi-thread-series/Java多线程系列--“JUC线程池”05之 线程池原理(四)/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

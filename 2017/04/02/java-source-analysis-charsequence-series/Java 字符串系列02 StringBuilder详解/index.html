@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>Java 字符串系列02 StringBuilder详解 | Jeeson&#39;s Blog | Write the code. Change the world.</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="Java源码分析,Java 字符串系列">
+    <meta name="description" content="本章介绍StringBuilder以及它的API的详细使用方法。   目录1. StringBuilder 简介2. StringBuilder的API测试代码3. StringBuilder 完整示例      1. StringBuilder 简介StringBuilder 是一个可变的字符序列。它继承于AbstractStringBuilder，实现了CharSequence接口。Stri">
+<meta name="keywords" content="Java源码分析,Java 字符串系列">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java 字符串系列02 StringBuilder详解">
+<meta property="og:url" content="https://smuwjs.github.io/2017/04/02/java-source-analysis-charsequence-series/Java 字符串系列02 StringBuilder详解/index.html">
+<meta property="og:site_name" content="Jeeson&#39;s Blog">
+<meta property="og:description" content="本章介绍StringBuilder以及它的API的详细使用方法。   目录1. StringBuilder 简介2. StringBuilder的API测试代码3. StringBuilder 完整示例      1. StringBuilder 简介StringBuilder 是一个可变的字符序列。它继承于AbstractStringBuilder，实现了CharSequence接口。Stri">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://wangkuiwu.github.io/media/pic/java/charsequence/charsequence-02.jpg">
+<meta property="og:updated_time" content="2018-06-27T09:39:57.937Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java 字符串系列02 StringBuilder详解">
+<meta name="twitter:description" content="本章介绍StringBuilder以及它的API的详细使用方法。   目录1. StringBuilder 简介2. StringBuilder的API测试代码3. StringBuilder 完整示例      1. StringBuilder 简介StringBuilder 是一个可变的字符序列。它继承于AbstractStringBuilder，实现了CharSequence接口。Stri">
+<meta name="twitter:image" content="http://wangkuiwu.github.io/media/pic/java/charsequence/charsequence-02.jpg">
+    
+        <link rel="alternate" type="application/atom+xml" title="Jeeson&#39;s Blog" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/head.png">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Jeeson</h5>
+          <a href="mailto:smuwjs@163.com" title="smuwjs@163.com" class="mail">smuwjs@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/smuwjs" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Java 字符串系列02 StringBuilder详解</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Java 字符串系列02 StringBuilder详解</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2017-04-01T16:00:00.000Z" itemprop="datePublished" class="page-time">
+  2017-04-02
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#1-StringBuilder-简介"><span class="post-toc-number">1.</span> <span class="post-toc-text">1. StringBuilder 简介</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#2-StringBuilder的API测试代码"><span class="post-toc-number">2.</span> <span class="post-toc-text">2. StringBuilder的API测试代码</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#2-1-StringBuilder-中插入-insert-相关的API"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">2.1 StringBuilder 中插入(insert)相关的API</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#2-2-StringBuilder-中追加-append-相关的API"><span class="post-toc-number">3.</span> <span class="post-toc-text">2.2 StringBuilder 中追加(append)相关的API</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#2-3-StringBuilder-中替换-replace-相关的API"><span class="post-toc-number">3.1.</span> <span class="post-toc-text">2.3 StringBuilder 中替换(replace)相关的API</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#2-4-StringBuilder-中删除-delete-相关的API"><span class="post-toc-number">3.2.</span> <span class="post-toc-text">2.4 StringBuilder 中删除(delete)相关的API</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#2-5-StringBuilder-中index相关的API"><span class="post-toc-number">3.3.</span> <span class="post-toc-text">2.5 StringBuilder 中index相关的API</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#2-6-StringBuilder-剩余的API"><span class="post-toc-number">3.4.</span> <span class="post-toc-text">2.6 StringBuilder 剩余的API</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#3-StringBuilder-完整示例"><span class="post-toc-number">4.</span> <span class="post-toc-text">3. StringBuilder 完整示例</span></a></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-java-source-analysis-charsequence-series/Java 字符串系列02 StringBuilder详解"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Java 字符串系列02 StringBuilder详解</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2017-04-02 00:00:00" datetime="2017-04-01T16:00:00.000Z"  itemprop="datePublished">2017-04-02</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <blockquote>
+<p>本章介绍StringBuilder以及它的API的详细使用方法。</p>
+</blockquote>
+<blockquote>
+<p><strong>目录</strong><br><a href="#anchor1">1. StringBuilder 简介</a><br><a href="#anchor2">2. StringBuilder的API测试代码</a><br><a href="#anchor3">3. StringBuilder 完整示例</a>   </p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="1-StringBuilder-简介"><a href="#1-StringBuilder-简介" class="headerlink" title="1. StringBuilder 简介"></a>1. StringBuilder 简介</h1><p>StringBuilder 是一个可变的字符序列。它继承于AbstractStringBuilder，实现了CharSequence接口。<br>StringBuffer 也是继承于AbstractStringBuilder的子类；但是，StringBuilder和StringBuffer不同，前者是非线程安全的，后者是线程安全的。</p>
+<p>StringBuilder 和 CharSequence之间的关系图如下：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://wangkuiwu.github.io/media/pic/java/charsequence/charsequence-02.jpg" alt="img" title="">
+                </div>
+                <div class="image-caption">img</div>
+            </figure>
+<p>StringBuilder函数列表</p>
+<pre><code>StringBuilder()
+StringBuilder(int capacity)
+StringBuilder(CharSequence seq)
+StringBuilder(String str)
+
+StringBuilder     append(float f)
+StringBuilder     append(double d)
+StringBuilder     append(boolean b)
+StringBuilder     append(int i)
+StringBuilder     append(long l)
+StringBuilder     append(char c)
+StringBuilder     append(char[] chars)
+StringBuilder     append(char[] str, int offset, int len)
+StringBuilder     append(String str)
+StringBuilder     append(Object obj)
+StringBuilder     append(StringBuffer sb)
+StringBuilder     append(CharSequence csq)
+StringBuilder     append(CharSequence csq, int start, int end)
+StringBuilder     appendCodePoint(int codePoint)
+int     capacity()
+char     charAt(int index)
+int     codePointAt(int index)
+int     codePointBefore(int index)
+int     codePointCount(int start, int end)
+StringBuilder     delete(int start, int end)
+StringBuilder     deleteCharAt(int index)
+void     ensureCapacity(int min)
+void     getChars(int start, int end, char[] dst, int dstStart)
+int     indexOf(String subString, int start)
+int     indexOf(String string)
+StringBuilder     insert(int offset, boolean b)
+StringBuilder     insert(int offset, int i)
+StringBuilder     insert(int offset, long l)
+StringBuilder     insert(int offset, float f)
+StringBuilder     insert(int offset, double d)
+StringBuilder     insert(int offset, char c)
+StringBuilder     insert(int offset, char[] ch)
+StringBuilder     insert(int offset, char[] str, int strOffset, int strLen)
+StringBuilder     insert(int offset, String str)
+StringBuilder     insert(int offset, Object obj)
+StringBuilder     insert(int offset, CharSequence s)
+StringBuilder     insert(int offset, CharSequence s, int start, int end)
+int     lastIndexOf(String string)
+int     lastIndexOf(String subString, int start)
+int     length()
+int     offsetByCodePoints(int index, int codePointOffset)
+StringBuilder     replace(int start, int end, String string)
+StringBuilder     reverse()
+void     setCharAt(int index, char ch)
+void     setLength(int length)
+CharSequence     subSequence(int start, int end)
+String     substring(int start)
+String     substring(int start, int end)
+String     toString()
+void     trimToSize()
+</code></pre><p>由于AbstractStringBuilder和StringBuilder源码太长，这里就不列出源码了。感兴趣的读者可以自行研究。</p>
+<p><a name="anchor2"></a></p>
+<h1 id="2-StringBuilder的API测试代码"><a href="#2-StringBuilder的API测试代码" class="headerlink" title="2. StringBuilder的API测试代码"></a>2. StringBuilder的API测试代码</h1><h2 id="2-1-StringBuilder-中插入-insert-相关的API"><a href="#2-1-StringBuilder-中插入-insert-相关的API" class="headerlink" title="2.1 StringBuilder 中插入(insert)相关的API"></a>2.1 StringBuilder 中插入(insert)相关的API</h2><p>源码如下(StringBuilderInsertTest.java):</p>
+<pre><code>/**
+ * StringBuilder 的insert()示例
+ *
+ * @author skywang
+ */
+import java.util.HashMap;
+
+public class StringBuilderInsertTest {
+
+    public static void main(String[] args) {
+        testInsertAPIs() ;
+    }
+
+    /**
+     * StringBuilder 的insert()示例
+     */
+    private static void testInsertAPIs() {
+
+        System.out.println(&quot;-------------------------------- testInsertAPIs -------------------------------&quot;);
+
+        StringBuilder sbuilder = new StringBuilder();
+
+        // 在位置0处插入字符数组
+        sbuilder.insert(0, new char[]{&apos;a&apos;,&apos;b&apos;,&apos;c&apos;,&apos;d&apos;,&apos;e&apos;});
+        // 在位置0处插入字符数组。0表示字符数组起始位置，3表示长度
+        sbuilder.insert(0, new char[]{&apos;A&apos;,&apos;B&apos;,&apos;C&apos;,&apos;D&apos;,&apos;E&apos;}, 0, 3);
+        // 在位置0处插入float
+        sbuilder.insert(0, 1.414f);
+        // 在位置0处插入double
+        sbuilder.insert(0, 3.14159d);
+        // 在位置0处插入boolean
+        sbuilder.insert(0, true);
+        // 在位置0处插入char
+        sbuilder.insert(0, &apos;\n&apos;);
+        // 在位置0处插入int
+        sbuilder.insert(0, 100);
+        // 在位置0处插入long
+        sbuilder.insert(0, 12345L);
+        // 在位置0处插入StringBuilder对象
+        sbuilder.insert(0, new StringBuilder(&quot;StringBuilder&quot;));
+        // 在位置0处插入StringBuilder对象。6表示被在位置0处插入对象的起始位置(包括)，13是结束位置(不包括)
+        sbuilder.insert(0, new StringBuilder(&quot;STRINGBUILDER&quot;), 6, 13);
+        // 在位置0处插入StringBuffer对象。
+        sbuilder.insert(0, new StringBuffer(&quot;StringBuffer&quot;));
+        // 在位置0处插入StringBuffer对象。6表示被在位置0处插入对象的起始位置(包括)，12是结束位置(不包括)
+        sbuilder.insert(0, new StringBuffer(&quot;STRINGBUFFER&quot;), 6, 12);
+        // 在位置0处插入String对象。
+        sbuilder.insert(0, &quot;String&quot;);
+        // 在位置0处插入String对象。1表示被在位置0处插入对象的起始位置(包括)，6是结束位置(不包括)
+        sbuilder.insert(0, &quot;0123456789&quot;, 1, 6);
+        sbuilder.insert(0, &apos;\n&apos;);
+
+        // 在位置0处插入Object对象。此处以HashMap为例
+        HashMap map = new HashMap();
+        map.put(&quot;1&quot;, &quot;one&quot;);
+        map.put(&quot;2&quot;, &quot;two&quot;);
+        map.put(&quot;3&quot;, &quot;three&quot;);
+        sbuilder.insert(0, map);
+
+        System.out.printf(&quot;%s\n\n&quot;, sbuilder);
+    }
+}
+</code></pre><p>运行结果：</p>
+<pre><code>-------------------------------- testInsertAPIs -------------------------------
+{3=three, 2=two, 1=one}
+12345StringBUFFERStringBufferBUILDERStringBuilder12345100
+true3.141591.414ABCabcde
+</code></pre><h1 id="2-2-StringBuilder-中追加-append-相关的API"><a href="#2-2-StringBuilder-中追加-append-相关的API" class="headerlink" title="2.2 StringBuilder 中追加(append)相关的API"></a>2.2 StringBuilder 中追加(append)相关的API</h1><p>源码如下(StringBuilderAppendTest.java):</p>
+<pre><code>/**
+ * StringBuilder 的append()示例
+ *
+ * @author skywang
+ */
+import java.util.HashMap;
+
+public class StringBuilderAppendTest {
+
+    public static void main(String[] args) {
+        testAppendAPIs() ;
+    }
+
+    /**
+     * StringBuilder 的append()示例
+     */
+    private static void testAppendAPIs() {
+
+        System.out.println(&quot;-------------------------------- testAppendAPIs -------------------------------&quot;);
+
+        StringBuilder sbuilder = new StringBuilder();
+
+        // 追加字符数组
+        sbuilder.append(new char[]{&apos;a&apos;,&apos;b&apos;,&apos;c&apos;,&apos;d&apos;,&apos;e&apos;});
+        // 追加字符数组。0表示字符数组起始位置，3表示长度
+        sbuilder.append(new char[]{&apos;A&apos;,&apos;B&apos;,&apos;C&apos;,&apos;D&apos;,&apos;E&apos;}, 0, 3);
+        // 追加float
+        sbuilder.append(1.414f);
+        // 追加double
+        sbuilder.append(3.14159d);
+        // 追加boolean
+        sbuilder.append(true);
+        // 追加char
+        sbuilder.append(&apos;\n&apos;);
+        // 追加int
+        sbuilder.append(100);
+        // 追加long
+        sbuilder.append(12345L);
+        // 追加StringBuilder对象
+        sbuilder.append(new StringBuilder(&quot;StringBuilder&quot;));
+        // 追加StringBuilder对象。6表示被追加对象的起始位置(包括)，13是结束位置(不包括)
+        sbuilder.append(new StringBuilder(&quot;STRINGBUILDER&quot;), 6, 13);
+        // 追加StringBuffer对象。
+        sbuilder.append(new StringBuffer(&quot;StringBuffer&quot;));
+        // 追加StringBuffer对象。6表示被追加对象的起始位置(包括)，12是结束位置(不包括)
+        sbuilder.append(new StringBuffer(&quot;STRINGBUFFER&quot;), 6, 12);
+        // 追加String对象。
+        sbuilder.append(&quot;String&quot;);
+        // 追加String对象。1表示被追加对象的起始位置(包括)，6是结束位置(不包括)
+        sbuilder.append(&quot;0123456789&quot;, 1, 6);
+        sbuilder.append(&apos;\n&apos;);
+
+        // 追加Object对象。此处以HashMap为例
+        HashMap map = new HashMap();
+        map.put(&quot;1&quot;, &quot;one&quot;);
+        map.put(&quot;2&quot;, &quot;two&quot;);
+        map.put(&quot;3&quot;, &quot;three&quot;);
+        sbuilder.append(map);
+        sbuilder.append(&apos;\n&apos;);
+
+        // 追加unicode编码
+        sbuilder.appendCodePoint(0x5b57);    // 0x5b57是“字”的unicode编码
+        sbuilder.appendCodePoint(0x7b26);    // 0x7b26是“符”的unicode编码
+        sbuilder.appendCodePoint(0x7f16);    // 0x7f16是“编”的unicode编码
+        sbuilder.appendCodePoint(0x7801);    // 0x7801是“码”的unicode编码
+
+        System.out.printf(&quot;%s\n\n&quot;, sbuilder);
+    }
+}
+</code></pre><p>运行结果：</p>
+<pre><code>-------------------------------- testAppendAPIs -------------------------------
+abcdeABC1.4143.14159true
+10012345StringBuilderBUILDERStringBufferBUFFERString12345
+{3=three, 2=two, 1=one}
+字符编码
+</code></pre><h2 id="2-3-StringBuilder-中替换-replace-相关的API"><a href="#2-3-StringBuilder-中替换-replace-相关的API" class="headerlink" title="2.3 StringBuilder 中替换(replace)相关的API"></a>2.3 StringBuilder 中替换(replace)相关的API</h2><p>源码如下(StringBuilderReplaceTest.java):</p>
+<pre><code>/**
+ * StringBuilder 的replace()示例
+ *
+ * @author skywang
+ */
+import java.util.HashMap;
+
+public class StringBuilderReplaceTest {
+
+    public static void main(String[] args) {
+        testReplaceAPIs() ;
+    }
+
+    /**
+     * StringBuilder 的replace()示例
+     */
+    private static void testReplaceAPIs() {
+
+        System.out.println(&quot;-------------------------------- testReplaceAPIs ------------------------------&quot;);
+
+        StringBuilder sbuilder;
+
+        sbuilder = new StringBuilder(&quot;0123456789&quot;);
+        sbuilder.replace(0, 3, &quot;ABCDE&quot;);
+        System.out.printf(&quot;sbuilder=%s\n&quot;, sbuilder);
+
+        sbuilder = new StringBuilder(&quot;0123456789&quot;);
+        sbuilder.reverse();
+        System.out.printf(&quot;sbuilder=%s\n&quot;, sbuilder);
+
+        sbuilder = new StringBuilder(&quot;0123456789&quot;);
+        sbuilder.setCharAt(0, &apos;M&apos;);
+        System.out.printf(&quot;sbuilder=%s\n&quot;, sbuilder);
+
+        System.out.println();
+    }
+}
+</code></pre><p>运行结果：</p>
+<pre><code>-------------------------------- testReplaceAPIs ------------------------------
+sbuilder=ABCDE3456789
+sbuilder=9876543210
+sbuilder=M123456789
+</code></pre><h2 id="2-4-StringBuilder-中删除-delete-相关的API"><a href="#2-4-StringBuilder-中删除-delete-相关的API" class="headerlink" title="2.4 StringBuilder 中删除(delete)相关的API"></a>2.4 StringBuilder 中删除(delete)相关的API</h2><pre><code>源码如下(StringBuilderDeleteTest.java):
+
+/**
+ * StringBuilder 的delete()示例
+ *
+ * @author skywang
+ */
+import java.util.HashMap;
+
+public class StringBuilderDeleteTest {
+
+    public static void main(String[] args) {
+        testDeleteAPIs() ;
+    }
+
+    /**
+     * StringBuilder 的delete()示例
+     */
+    private static void testDeleteAPIs() {
+
+        System.out.println(&quot;-------------------------------- testDeleteAPIs -------------------------------&quot;);
+
+        StringBuilder sbuilder = new StringBuilder(&quot;0123456789&quot;);
+
+        // 删除位置0的字符，剩余字符是“123456789”。
+        sbuilder.deleteCharAt(0);
+        // 删除位置3(包括)到位置6(不包括)之间的字符，剩余字符是“123789”。
+        sbuilder.delete(3,6);
+
+        // 获取sb中从位置1开始的字符串
+        String str1 = sbuilder.substring(1);
+        // 获取sb中从位置3(包括)到位置5(不包括)之间的字符串
+        String str2 = sbuilder.substring(3, 5);
+        // 获取sb中从位置3(包括)到位置5(不包括)之间的字符串，获取的对象是CharSequence对象，此处转型为String
+        String str3 = (String)sbuilder.subSequence(3, 5);
+
+        System.out.printf(&quot;sbuilder=%s\nstr1=%s\nstr2=%s\nstr3=%s\n&quot;, 
+                sbuilder, str1, str2, str3);
+    }
+}
+</code></pre><p>运行结果：</p>
+<pre><code>-------------------------------- testDeleteAPIs -------------------------------
+sbuilder=123789
+str1=23789
+str2=78
+str3=78
+</code></pre><h2 id="2-5-StringBuilder-中index相关的API"><a href="#2-5-StringBuilder-中index相关的API" class="headerlink" title="2.5 StringBuilder 中index相关的API"></a>2.5 StringBuilder 中index相关的API</h2><p>源码如下(StringBuilderIndexTest.java):</p>
+<pre><code>/**
+ * StringBuilder 中index相关API演示
+ *
+ * @author skywang
+ */
+import java.util.HashMap;
+
+public class StringBuilderIndexTest {
+
+    public static void main(String[] args) {
+        testIndexAPIs() ;
+    }
+
+    /**
+     * StringBuilder 中index相关API演示
+     */
+    private static void testIndexAPIs() {
+        System.out.println(&quot;-------------------------------- testIndexAPIs --------------------------------&quot;);
+
+        StringBuilder sbuilder = new StringBuilder(&quot;abcAbcABCabCaBcAbCaBCabc&quot;);
+        System.out.printf(&quot;sbuilder=%s\n&quot;, sbuilder);
+
+        // 1. 从前往后，找出&quot;bc&quot;第一次出现的位置
+        System.out.printf(&quot;%-30s = %d\n&quot;, &quot;sbuilder.indexOf(\&quot;bc\&quot;)&quot;, sbuilder.indexOf(&quot;bc&quot;));
+
+        // 2. 从位置5开始，从前往后，找出&quot;bc&quot;第一次出现的位置
+        System.out.printf(&quot;%-30s = %d\n&quot;, &quot;sbuilder.indexOf(\&quot;bc\&quot;, 5)&quot;, sbuilder.indexOf(&quot;bc&quot;, 5));
+
+        // 3. 从后往前，找出&quot;bc&quot;第一次出现的位置
+        System.out.printf(&quot;%-30s = %d\n&quot;, &quot;sbuilder.lastIndexOf(\&quot;bc\&quot;)&quot;, sbuilder.lastIndexOf(&quot;bc&quot;));
+
+        // 4. 从位置4开始，从后往前，找出&quot;bc&quot;第一次出现的位置
+        System.out.printf(&quot;%-30s = %d\n&quot;, &quot;sbuilder.lastIndexOf(\&quot;bc\&quot;, 4)&quot;, sbuilder.lastIndexOf(&quot;bc&quot;, 4));
+
+        System.out.println();
+    }
+}
+</code></pre><p>运行结果：</p>
+<pre><code>-------------------------------- testIndexAPIs --------------------------------
+sbuilder=abcAbcABCabCaBcAbCaBCabc
+sbuilder.indexOf(&quot;bc&quot;)         = 1
+sbuilder.indexOf(&quot;bc&quot;, 5)      = 22
+sbuilder.lastIndexOf(&quot;bc&quot;)     = 22
+sbuilder.lastIndexOf(&quot;bc&quot;, 4)  = 4
+</code></pre><h2 id="2-6-StringBuilder-剩余的API"><a href="#2-6-StringBuilder-剩余的API" class="headerlink" title="2.6 StringBuilder 剩余的API"></a>2.6 StringBuilder 剩余的API</h2><p>源码如下(StringBuilderOtherTest.java):</p>
+<pre><code>/**
+ * StringBuilder 的其它API示例
+ *
+ * @author skywang
+ */
+import java.util.HashMap;
+
+public class StringBuilderOtherTest {
+
+    public static void main(String[] args) {
+        testOtherAPIs() ;
+    }
+
+    /**
+     * StringBuilder 的其它API示例
+     */
+    private static void testOtherAPIs() {
+
+        System.out.println(&quot;-------------------------------- testOtherAPIs --------------------------------&quot;);
+
+        StringBuilder sbuilder = new StringBuilder(&quot;0123456789&quot;);
+
+        int cap = sbuilder.capacity();
+        System.out.printf(&quot;cap=%d\n&quot;, cap);
+
+        char c = sbuilder.charAt(6);
+        System.out.printf(&quot;c=%c\n&quot;, c);
+
+        char[] carr = new char[4];
+        sbuilder.getChars(3, 7, carr, 0);
+        for (int i=0; i&lt;carr.length; i++)
+            System.out.printf(&quot;carr[%d]=%c &quot;, i, carr[i]);
+        System.out.println();
+
+        System.out.println();
+    }
+}
+</code></pre><p>运行结果：</p>
+<pre><code>-------------------------------- testOtherAPIs --------------------------------
+cap=26
+c=6
+carr[0]=3 carr[1]=4 carr[2]=5 carr[3]=6 
+</code></pre><p><a name="anchor3"></a></p>
+<h1 id="3-StringBuilder-完整示例"><a href="#3-StringBuilder-完整示例" class="headerlink" title="3. StringBuilder 完整示例"></a>3. StringBuilder 完整示例</h1><p>下面的示例是整合上面的几个示例的完整的StringBuilder演示程序，源码如下(StringBuilderTest.java):</p>
+<pre><code>/**
+ * StringBuilder 演示程序
+ *
+ * @author skywang
+ */
+import java.util.HashMap;
+
+public class StringBuilderTest {
+
+    public static void main(String[] args) {
+        testOtherAPIs() ;
+        testIndexAPIs() ;
+        testInsertAPIs() ;
+        testAppendAPIs() ;
+        testReplaceAPIs() ;
+        testDeleteAPIs() ;
+    }
+
+    /**
+     * StringBuilder 的其它API示例
+     */
+    private static void testOtherAPIs() {
+
+        System.out.println(&quot;-------------------------------- testOtherAPIs --------------------------------&quot;);
+
+        StringBuilder sbuilder = new StringBuilder(&quot;0123456789&quot;);
+
+        int cap = sbuilder.capacity();
+        System.out.printf(&quot;cap=%d\n&quot;, cap);
+
+        char c = sbuilder.charAt(6);
+        System.out.printf(&quot;c=%c\n&quot;, c);
+
+        char[] carr = new char[4];
+        sbuilder.getChars(3, 7, carr, 0);
+        for (int i=0; i&lt;carr.length; i++)
+            System.out.printf(&quot;carr[%d]=%c &quot;, i, carr[i]);
+        System.out.println();
+
+        System.out.println();
+    }
+
+    /**
+     * StringBuilder 中index相关API演示
+     */
+    private static void testIndexAPIs() {
+        System.out.println(&quot;-------------------------------- testIndexAPIs --------------------------------&quot;);
+
+        StringBuilder sbuilder = new StringBuilder(&quot;abcAbcABCabCaBcAbCaBCabc&quot;);
+        System.out.printf(&quot;sbuilder=%s\n&quot;, sbuilder);
+
+        // 1. 从前往后，找出&quot;bc&quot;第一次出现的位置
+        System.out.printf(&quot;%-30s = %d\n&quot;, &quot;sbuilder.indexOf(\&quot;bc\&quot;)&quot;, sbuilder.indexOf(&quot;bc&quot;));
+
+        // 2. 从位置5开始，从前往后，找出&quot;bc&quot;第一次出现的位置
+        System.out.printf(&quot;%-30s = %d\n&quot;, &quot;sbuilder.indexOf(\&quot;bc\&quot;, 5)&quot;, sbuilder.indexOf(&quot;bc&quot;, 5));
+
+        // 3. 从后往前，找出&quot;bc&quot;第一次出现的位置
+        System.out.printf(&quot;%-30s = %d\n&quot;, &quot;sbuilder.lastIndexOf(\&quot;bc\&quot;)&quot;, sbuilder.lastIndexOf(&quot;bc&quot;));
+
+        // 4. 从位置4开始，从后往前，找出&quot;bc&quot;第一次出现的位置
+        System.out.printf(&quot;%-30s = %d\n&quot;, &quot;sbuilder.lastIndexOf(\&quot;bc\&quot;, 4)&quot;, sbuilder.lastIndexOf(&quot;bc&quot;, 4));
+
+        System.out.println();
+    }
+
+    /**
+     * StringBuilder 的replace()示例
+     */
+    private static void testReplaceAPIs() {
+
+        System.out.println(&quot;-------------------------------- testReplaceAPIs ------------------------------&quot;);
+
+        StringBuilder sbuilder;
+
+        sbuilder = new StringBuilder(&quot;0123456789&quot;);
+        sbuilder.replace(0, 3, &quot;ABCDE&quot;);
+        System.out.printf(&quot;sbuilder=%s\n&quot;, sbuilder);
+
+        sbuilder = new StringBuilder(&quot;0123456789&quot;);
+        sbuilder.reverse();
+        System.out.printf(&quot;sbuilder=%s\n&quot;, sbuilder);
+
+        sbuilder = new StringBuilder(&quot;0123456789&quot;);
+        sbuilder.setCharAt(0, &apos;M&apos;);
+        System.out.printf(&quot;sbuilder=%s\n&quot;, sbuilder);
+
+        System.out.println();
+    }
+
+    /**
+     * StringBuilder 的delete()示例
+     */
+    private static void testDeleteAPIs() {
+
+        System.out.println(&quot;-------------------------------- testDeleteAPIs -------------------------------&quot;);
+
+        StringBuilder sbuilder = new StringBuilder(&quot;0123456789&quot;);
+
+        // 删除位置0的字符，剩余字符是“123456789”。
+        sbuilder.deleteCharAt(0);
+        // 删除位置3(包括)到位置6(不包括)之间的字符，剩余字符是“123789”。
+        sbuilder.delete(3,6);
+
+        // 获取sb中从位置1开始的字符串
+        String str1 = sbuilder.substring(1);
+        // 获取sb中从位置3(包括)到位置5(不包括)之间的字符串
+        String str2 = sbuilder.substring(3, 5);
+        // 获取sb中从位置3(包括)到位置5(不包括)之间的字符串，获取的对象是CharSequence对象，此处转型为String
+        String str3 = (String)sbuilder.subSequence(3, 5);
+
+        System.out.printf(&quot;sbuilder=%s\nstr1=%s\nstr2=%s\nstr3=%s\n&quot;, 
+                sbuilder, str1, str2, str3);
+    }
+
+    /**
+     * StringBuilder 的insert()示例
+     */
+    private static void testInsertAPIs() {
+
+        System.out.println(&quot;-------------------------------- testInsertAPIs -------------------------------&quot;);
+
+        StringBuilder sbuilder = new StringBuilder();
+
+        // 在位置0处插入字符数组
+        sbuilder.insert(0, new char[]{&apos;a&apos;,&apos;b&apos;,&apos;c&apos;,&apos;d&apos;,&apos;e&apos;});
+        // 在位置0处插入字符数组。0表示字符数组起始位置，3表示长度
+        sbuilder.insert(0, new char[]{&apos;A&apos;,&apos;B&apos;,&apos;C&apos;,&apos;D&apos;,&apos;E&apos;}, 0, 3);
+        // 在位置0处插入float
+        sbuilder.insert(0, 1.414f);
+        // 在位置0处插入double
+        sbuilder.insert(0, 3.14159d);
+        // 在位置0处插入boolean
+        sbuilder.insert(0, true);
+        // 在位置0处插入char
+        sbuilder.insert(0, &apos;\n&apos;);
+        // 在位置0处插入int
+        sbuilder.insert(0, 100);
+        // 在位置0处插入long
+        sbuilder.insert(0, 12345L);
+        // 在位置0处插入StringBuilder对象
+        sbuilder.insert(0, new StringBuilder(&quot;StringBuilder&quot;));
+        // 在位置0处插入StringBuilder对象。6表示被在位置0处插入对象的起始位置(包括)，13是结束位置(不包括)
+        sbuilder.insert(0, new StringBuilder(&quot;STRINGBUILDER&quot;), 6, 13);
+        // 在位置0处插入StringBuffer对象。
+        sbuilder.insert(0, new StringBuffer(&quot;StringBuffer&quot;));
+        // 在位置0处插入StringBuffer对象。6表示被在位置0处插入对象的起始位置(包括)，12是结束位置(不包括)
+        sbuilder.insert(0, new StringBuffer(&quot;STRINGBUFFER&quot;), 6, 12);
+        // 在位置0处插入String对象。
+        sbuilder.insert(0, &quot;String&quot;);
+        // 在位置0处插入String对象。1表示被在位置0处插入对象的起始位置(包括)，6是结束位置(不包括)
+        sbuilder.insert(0, &quot;0123456789&quot;, 1, 6);
+        sbuilder.insert(0, &apos;\n&apos;);
+
+        // 在位置0处插入Object对象。此处以HashMap为例
+        HashMap map = new HashMap();
+        map.put(&quot;1&quot;, &quot;one&quot;);
+        map.put(&quot;2&quot;, &quot;two&quot;);
+        map.put(&quot;3&quot;, &quot;three&quot;);
+        sbuilder.insert(0, map);
+
+        System.out.printf(&quot;%s\n\n&quot;, sbuilder);
+    }
+
+    /**
+     * StringBuilder 的append()示例
+     */
+    private static void testAppendAPIs() {
+
+        System.out.println(&quot;-------------------------------- testAppendAPIs -------------------------------&quot;);
+
+        StringBuilder sbuilder = new StringBuilder();
+
+        // 追加字符数组
+        sbuilder.append(new char[]{&apos;a&apos;,&apos;b&apos;,&apos;c&apos;,&apos;d&apos;,&apos;e&apos;});
+        // 追加字符数组。0表示字符数组起始位置，3表示长度
+        sbuilder.append(new char[]{&apos;A&apos;,&apos;B&apos;,&apos;C&apos;,&apos;D&apos;,&apos;E&apos;}, 0, 3);
+        // 追加float
+        sbuilder.append(1.414f);
+        // 追加double
+        sbuilder.append(3.14159d);
+        // 追加boolean
+        sbuilder.append(true);
+        // 追加char
+        sbuilder.append(&apos;\n&apos;);
+        // 追加int
+        sbuilder.append(100);
+        // 追加long
+        sbuilder.append(12345L);
+        // 追加StringBuilder对象
+        sbuilder.append(new StringBuilder(&quot;StringBuilder&quot;));
+        // 追加StringBuilder对象。6表示被追加对象的起始位置(包括)，13是结束位置(不包括)
+        sbuilder.append(new StringBuilder(&quot;STRINGBUILDER&quot;), 6, 13);
+        // 追加StringBuffer对象。
+        sbuilder.append(new StringBuffer(&quot;StringBuffer&quot;));
+        // 追加StringBuffer对象。6表示被追加对象的起始位置(包括)，12是结束位置(不包括)
+        sbuilder.append(new StringBuffer(&quot;STRINGBUFFER&quot;), 6, 12);
+        // 追加String对象。
+        sbuilder.append(&quot;String&quot;);
+        // 追加String对象。1表示被追加对象的起始位置(包括)，6是结束位置(不包括)
+        sbuilder.append(&quot;0123456789&quot;, 1, 6);
+        sbuilder.append(&apos;\n&apos;);
+
+        // 追加Object对象。此处以HashMap为例
+        HashMap map = new HashMap();
+        map.put(&quot;1&quot;, &quot;one&quot;);
+        map.put(&quot;2&quot;, &quot;two&quot;);
+        map.put(&quot;3&quot;, &quot;three&quot;);
+        sbuilder.append(map);
+        sbuilder.append(&apos;\n&apos;);
+
+        // 追加unicode编码
+        sbuilder.appendCodePoint(0x5b57);    // 0x5b57是“字”的unicode编码
+        sbuilder.appendCodePoint(0x7b26);    // 0x7b26是“符”的unicode编码
+        sbuilder.appendCodePoint(0x7f16);    // 0x7f16是“编”的unicode编码
+        sbuilder.appendCodePoint(0x7801);    // 0x7801是“码”的unicode编码
+
+        System.out.printf(&quot;%s\n\n&quot;, sbuilder);
+    }
+}
+</code></pre>
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2018-06-27T09:39:57.937Z" itemprop="dateUpdated">2018-06-27 17:39:57</time>
+</span><br>
+
+
+        
+        本文固定链接：<a href="/2017/04/02/java-source-analysis-charsequence-series/Java 字符串系列02 StringBuilder详解/" target="_blank" rel="external">https://smuwjs.github.io/2017/04/02/java-source-analysis-charsequence-series/Java 字符串系列02 StringBuilder详解/</a>
+        
+    </div>
+    <footer>
+        <a href="https://smuwjs.github.io">
+            <img src="/img/head.png" alt="Jeeson">
+            Jeeson
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java-字符串系列/">Java 字符串系列</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java源码分析/">Java源码分析</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2017/04/02/java-source-analysis-charsequence-series/Java 字符串系列02 StringBuilder详解/&title=《Java 字符串系列02 StringBuilder详解》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2017/04/02/java-source-analysis-charsequence-series/Java 字符串系列02 StringBuilder详解/&title=《Java 字符串系列02 StringBuilder详解》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2017/04/02/java-source-analysis-charsequence-series/Java 字符串系列02 StringBuilder详解/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Java 字符串系列02 StringBuilder详解》 — Jeeson's Blog&url=https://smuwjs.github.io/2017/04/02/java-source-analysis-charsequence-series/Java 字符串系列02 StringBuilder详解/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2017/04/02/java-source-analysis-charsequence-series/Java 字符串系列02 StringBuilder详解/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2017/04/03/java-source-analysis-charsequence-series/Java 字符串系列03 StringBuffer详解/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">Java 字符串系列03 StringBuffer详解</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2017/04/01/java-source-analysis-charsequence-series/Java 字符串系列01 String和CharSequence详解/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Java 字符串系列01 String和CharSequence详解</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="java-source-analysis-charsequence-series/Java 字符串系列02 StringBuilder详解" data-title="Java 字符串系列02 StringBuilder详解" data-url="https://smuwjs.github.io/2017/04/02/java-source-analysis-charsequence-series/Java 字符串系列02 StringBuilder详解/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'smuwjs', theme: 'none'};
+lazyScripts.push('//unpkg.com/hexo-theme-material-indigo@latest/js/embed.min.js');
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循<a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>Jeeson &copy; 2015 - 2018</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2017/04/02/java-source-analysis-charsequence-series/Java 字符串系列02 StringBuilder详解/&title=《Java 字符串系列02 StringBuilder详解》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2017/04/02/java-source-analysis-charsequence-series/Java 字符串系列02 StringBuilder详解/&title=《Java 字符串系列02 StringBuilder详解》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2017/04/02/java-source-analysis-charsequence-series/Java 字符串系列02 StringBuilder详解/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Java 字符串系列02 StringBuilder详解》 — Jeeson's Blog&url=https://smuwjs.github.io/2017/04/02/java-source-analysis-charsequence-series/Java 字符串系列02 StringBuilder详解/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2017/04/02/java-source-analysis-charsequence-series/Java 字符串系列02 StringBuilder详解/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://smuwjs.github.io/2017/04/02/java-source-analysis-charsequence-series/Java 字符串系列02 StringBuilder详解/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

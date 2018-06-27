@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>Android Studio系列教程六--Gradle多渠道打包 | Jeeson&#39;s Blog | Write the code. Change the world.</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="AndroidStudio">
+    <meta name="description" content="blog">
+<meta name="keywords" content="blog">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android Studio系列教程六--Gradle多渠道打包">
+<meta property="og:url" content="https://smuwjs.github.io/2016/09/12/android-studio-tutorial6/index.html">
+<meta property="og:site_name" content="Jeeson&#39;s Blog">
+<meta property="og:description" content="blog">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-06-27T09:39:57.937Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android Studio系列教程六--Gradle多渠道打包">
+<meta name="twitter:description" content="blog">
+    
+        <link rel="alternate" type="application/atom+xml" title="Jeeson&#39;s Blog" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/head.png">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Jeeson</h5>
+          <a href="mailto:smuwjs@163.com" title="smuwjs@163.com" class="mail">smuwjs@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/smuwjs" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Android Studio系列教程六--Gradle多渠道打包</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Android Studio系列教程六--Gradle多渠道打包</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2016-09-11T17:01:06.000Z" itemprop="datePublished" class="page-time">
+  2016-09-12
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/DevTools/">DevTools</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#友盟多渠道打包"><span class="post-toc-number">1.</span> <span class="post-toc-text">友盟多渠道打包</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#assemble结合Build-Variants来创建task"><span class="post-toc-number">2.</span> <span class="post-toc-text">assemble结合Build Variants来创建task</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#完整的gradle脚本"><span class="post-toc-number">3.</span> <span class="post-toc-text">完整的gradle脚本</span></a></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-android-studio-tutorial6"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Android Studio系列教程六--Gradle多渠道打包</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2016-09-12 01:01:06" datetime="2016-09-11T17:01:06.000Z"  itemprop="datePublished">2016-09-12</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/DevTools/">DevTools</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <blockquote>
+<p><a href="http://stormzhang.com/devtools/2014/11/25/android-studio-tutorial6/" target="_blank" rel="noopener">原文地址</a></p>
+</blockquote>
+<p>由于国内Android市场众多渠道，为了统计每个渠道的下载及其它数据统计，就需要我们针对每个渠道单独打包，如果让你打几十个市场的包岂不烦死了，不过有了Gradle，这再也不是事了。</p>
+<h2 id="友盟多渠道打包"><a href="#友盟多渠道打包" class="headerlink" title="友盟多渠道打包"></a>友盟多渠道打包</h2><p>废话不多说，以友盟统计为例，在AndroidManifest.xml里面会有这么一段：</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;meta-data</span><br><span class="line"><span class="symbol">    android:</span>name=<span class="string">"UMENG_CHANNEL"</span></span><br><span class="line"><span class="symbol">    android:</span>value=<span class="string">"Channel_ID"</span> /&gt;</span><br></pre></td></tr></table></figure>
+<p>里面的Channel_ID就是渠道标示。我们的目标就是在编译的时候这个值能够自动变化。</p>
+<ul>
+<li>第一步 在AndroidManifest.xml里配置PlaceHolder</li>
+</ul>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;meta-data</span><br><span class="line"><span class="symbol">    android:</span>name=<span class="string">"UMENG_CHANNEL"</span></span><br><span class="line"><span class="symbol">    android:</span>value=<span class="string">"$&#123;UMENG_CHANNEL_VALUE&#125;"</span> /&gt;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>第二步 在build.gradle设置productFlavors</li>
+</ul>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">android &#123;  </span><br><span class="line">    productFlavors &#123;</span><br><span class="line">        xiaomi &#123;</span><br><span class="line">            manifestPlaceholders = [<span class="string">UMENG_CHANNEL_VALUE:</span> <span class="string">"xiaomi"</span>]</span><br><span class="line">        &#125;</span><br><span class="line">        _360 &#123;</span><br><span class="line">            manifestPlaceholders = [<span class="string">UMENG_CHANNEL_VALUE:</span> <span class="string">"_360"</span>]</span><br><span class="line">        &#125;</span><br><span class="line">        baidu &#123;</span><br><span class="line">            manifestPlaceholders = [<span class="string">UMENG_CHANNEL_VALUE:</span> <span class="string">"baidu"</span>]</span><br><span class="line">        &#125;</span><br><span class="line">        wandoujia &#123;</span><br><span class="line">            manifestPlaceholders = [<span class="string">UMENG_CHANNEL_VALUE:</span> <span class="string">"wandoujia"</span>]</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>或者批量修改</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">android &#123;  </span><br><span class="line">    productFlavors &#123;</span><br><span class="line">        xiaomi &#123;&#125;</span><br><span class="line">        _360 &#123;&#125;</span><br><span class="line">        baidu &#123;&#125;</span><br><span class="line">        wandoujia &#123;&#125;</span><br><span class="line">    &#125;  </span><br><span class="line">    </span><br><span class="line">    productFlavors.all &#123; </span><br><span class="line">        flavor -&gt; flavor.manifestPlaceholders = [<span class="string">UMENG_CHANNEL_VALUE:</span> name] </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>很简单清晰有没有？直接执行 <strong>./gradlew assembleRelease</strong> ， 然后就可以静静的喝杯咖啡等待打包完成吧。</p>
+<h2 id="assemble结合Build-Variants来创建task"><a href="#assemble结合Build-Variants来创建task" class="headerlink" title="assemble结合Build Variants来创建task"></a>assemble结合Build Variants来创建task</h2><p>上一篇博客介绍了 <strong>assemble</strong> 这个命令，会结合 <strong>Build Type</strong> 创建自己的task，如:</p>
+<ul>
+<li><p>./gradlew assembleDebug</p>
+</li>
+<li><p>./gradlew assembleRelease</p>
+</li>
+</ul>
+<p>除此之外 <strong>assemble</strong> 还能和 <strong>Product Flavor</strong> 结合创建新的任务，其实 <strong>assemble</strong> 是和 <strong>Build Variants</strong> 一起结合使用的，而 <strong>Build Variants</strong> = <strong>Build Type</strong> + <strong>Product Flavor</strong> ， 举个例子大家就明白了：</p>
+<p>如果我们想打包wandoujia渠道的release版本，执行如下命令就好了：</p>
+<ul>
+<li>./gradlew assembleWandoujiaRelease</li>
+</ul>
+<p>如果我们只打wandoujia渠道版本，则：</p>
+<ul>
+<li>./gradlew assembleWandoujia</li>
+</ul>
+<p>此命令会生成wandoujia渠道的Release和Debug版本</p>
+<p>同理我想打全部Release版本：</p>
+<ul>
+<li>./gradlew assembleRelease</li>
+</ul>
+<p>这条命令会把Product Flavor下的所有渠道的Release版本都打出来。</p>
+<p>总之，<strong>assemble</strong> 命令创建task有如下用法：</p>
+<ul>
+<li><p><strong>assemble<variant name=""></variant></strong>： 允许直接构建一个Variant版本，例如assembleFlavor1Debug。</p>
+</li>
+<li><p><strong>assemble<build type="" name=""></build></strong>： 允许构建指定Build Type的所有APK，例如assembleDebug将会构建Flavor1Debug和Flavor2Debug两个Variant版本。</p>
+</li>
+<li><p><strong>assemble<product flavor="" name=""></product></strong>： 允许构建指定flavor的所有APK，例如assembleFlavor1将会构建Flavor1Debug和Flavor1Release两个Variant版本。</p>
+</li>
+</ul>
+<h2 id="完整的gradle脚本"><a href="#完整的gradle脚本" class="headerlink" title="完整的gradle脚本"></a>完整的gradle脚本</h2><p>最后福利大放送，来一份我在项目中使用的完整的gradle文件配置：</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br></pre></td><td class="code"><pre><span class="line">apply <span class="string">plugin:</span> <span class="string">'com.android.application'</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> releaseTime() &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> Date().format(<span class="string">"yyyy-MM-dd"</span>, TimeZone.getTimeZone(<span class="string">"UTC"</span>))</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">android &#123;</span><br><span class="line">    compileSdkVersion <span class="number">21</span></span><br><span class="line">    buildToolsVersion <span class="string">'21.1.2'</span></span><br><span class="line">    </span><br><span class="line">    defaultConfig &#123;</span><br><span class="line">        applicationId <span class="string">"com.boohee.*"</span></span><br><span class="line">        minSdkVersion <span class="number">14</span></span><br><span class="line">        targetSdkVersion <span class="number">21</span></span><br><span class="line">        versionCode <span class="number">1</span></span><br><span class="line">        versionName <span class="string">"1.0"</span></span><br><span class="line">        </span><br><span class="line">        <span class="comment">// dex突破65535的限制</span></span><br><span class="line">        multiDexEnabled <span class="literal">true</span></span><br><span class="line">        <span class="comment">// 默认是umeng的渠道</span></span><br><span class="line">        manifestPlaceholders = [<span class="string">UMENG_CHANNEL_VALUE:</span> <span class="string">"umeng"</span>]</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    lintOptions &#123;</span><br><span class="line">        abortOnError <span class="literal">false</span></span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    signingConfigs &#123;</span><br><span class="line">        debug &#123;</span><br><span class="line">            <span class="comment">// No debug config</span></span><br><span class="line">        &#125;</span><br><span class="line">    </span><br><span class="line">        release &#123;</span><br><span class="line">            storeFile file(<span class="string">"../yourapp.keystore"</span>)</span><br><span class="line">            storePassword <span class="string">"your password"</span></span><br><span class="line">            keyAlias <span class="string">"your alias"</span></span><br><span class="line">            keyPassword <span class="string">"your password"</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    buildTypes &#123;</span><br><span class="line">        debug &#123;</span><br><span class="line">            <span class="comment">// 显示Log</span></span><br><span class="line">            buildConfigField <span class="string">"boolean"</span>, <span class="string">"LOG_DEBUG"</span>, <span class="string">"true"</span></span><br><span class="line">    </span><br><span class="line">            versionNameSuffix <span class="string">"-debug"</span></span><br><span class="line">            minifyEnabled <span class="literal">false</span></span><br><span class="line">            zipAlignEnabled <span class="literal">false</span></span><br><span class="line">            shrinkResources <span class="literal">false</span></span><br><span class="line">            signingConfig signingConfigs.debug</span><br><span class="line">        &#125;</span><br><span class="line">    </span><br><span class="line">        release &#123;</span><br><span class="line">            <span class="comment">// 不显示Log</span></span><br><span class="line">            buildConfigField <span class="string">"boolean"</span>, <span class="string">"LOG_DEBUG"</span>, <span class="string">"false"</span></span><br><span class="line">    </span><br><span class="line">            minifyEnabled <span class="literal">true</span></span><br><span class="line">            zipAlignEnabled <span class="literal">true</span></span><br><span class="line">            <span class="comment">// 移除无用的resource文件</span></span><br><span class="line">            shrinkResources <span class="literal">true</span></span><br><span class="line">            proguardFiles getDefaultProguardFile(<span class="string">'proguard-android.txt'</span>), <span class="string">'proguard-rules.pro'</span></span><br><span class="line">            signingConfig signingConfigs.release</span><br><span class="line">    </span><br><span class="line">            applicationVariants.all &#123; variant -&gt;</span><br><span class="line">                variant.outputs.each &#123; output -&gt;</span><br><span class="line">                    <span class="keyword">def</span> outputFile = output.outputFile</span><br><span class="line">                    <span class="keyword">if</span> (outputFile != <span class="literal">null</span> &amp;&amp; outputFile.name.endsWith(<span class="string">'.apk'</span>)) &#123;</span><br><span class="line">                    	<span class="comment">// 输出apk名称为boohee_v1.0_2015-01-15_wandoujia.apk</span></span><br><span class="line">                        <span class="keyword">def</span> fileName = <span class="string">"boohee_v$&#123;defaultConfig.versionName&#125;_$&#123;releaseTime()&#125;_$&#123;variant.productFlavors[0].name&#125;.apk"</span></span><br><span class="line">                        output.outputFile = <span class="keyword">new</span> File(outputFile.parent, fileName)</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 友盟多渠道打包</span></span><br><span class="line">    productFlavors &#123;</span><br><span class="line">        wandoujia &#123;&#125;</span><br><span class="line">        _360 &#123;&#125;</span><br><span class="line">        baidu &#123;&#125;</span><br><span class="line">        xiaomi &#123;&#125;</span><br><span class="line">        tencent &#123;&#125;</span><br><span class="line">        taobao &#123;&#125;</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    productFlavors.all &#123; flavor -&gt;</span><br><span class="line">        flavor.manifestPlaceholders = [<span class="string">UMENG_CHANNEL_VALUE:</span> name]</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">dependencies &#123;</span><br><span class="line">    compile fileTree(<span class="string">dir:</span> <span class="string">'libs'</span>, <span class="string">include:</span> [<span class="string">'*.jar'</span>])</span><br><span class="line">    compile <span class="string">'com.android.support:support-v4:21.0.3'</span></span><br><span class="line">    compile <span class="string">'com.jakewharton:butterknife:6.0.0'</span></span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>大家有问题或疑问、建议欢迎博客留言，Android Studio的教程暂且到这里结束了，相信大家基本的都已会使用了，还有其他技巧与操作靠大家自己摸索了，之后有时间也会在博客上整理下一些Tips之类的，欢迎大家关注。</p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2018-06-27T09:39:57.937Z" itemprop="dateUpdated">2018-06-27 17:39:57</time>
+</span><br>
+
+
+        
+        本文固定链接：<a href="/2016/09/12/android-studio-tutorial6/" target="_blank" rel="external">https://smuwjs.github.io/2016/09/12/android-studio-tutorial6/</a>
+        
+    </div>
+    <footer>
+        <a href="https://smuwjs.github.io">
+            <img src="/img/head.png" alt="Jeeson">
+            Jeeson
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/AndroidStudio/">AndroidStudio</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/09/12/android-studio-tutorial6/&title=《Android Studio系列教程六--Gradle多渠道打包》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/09/12/android-studio-tutorial6/&title=《Android Studio系列教程六--Gradle多渠道打包》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/09/12/android-studio-tutorial6/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Android Studio系列教程六--Gradle多渠道打包》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/09/12/android-studio-tutorial6/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/09/12/android-studio-tutorial6/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2016/10/01/java-source-analysis-io-series/java io系列01之 IO框架/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">java io系列01之 IO框架</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2016/09/12/android-studio-tutorial5/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Android Studio系列教程五--Gradle命令详解与导入第三方包</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="android-studio-tutorial6" data-title="Android Studio系列教程六--Gradle多渠道打包" data-url="https://smuwjs.github.io/2016/09/12/android-studio-tutorial6/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'smuwjs', theme: 'none'};
+lazyScripts.push('//unpkg.com/hexo-theme-material-indigo@latest/js/embed.min.js');
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循<a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>Jeeson &copy; 2015 - 2018</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/09/12/android-studio-tutorial6/&title=《Android Studio系列教程六--Gradle多渠道打包》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/09/12/android-studio-tutorial6/&title=《Android Studio系列教程六--Gradle多渠道打包》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/09/12/android-studio-tutorial6/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Android Studio系列教程六--Gradle多渠道打包》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/09/12/android-studio-tutorial6/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/09/12/android-studio-tutorial6/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://smuwjs.github.io/2016/09/12/android-studio-tutorial6/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

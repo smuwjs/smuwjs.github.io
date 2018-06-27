@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>java io系列01之 IO框架 | Jeeson&#39;s Blog | Write the code. Change the world.</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="Java源码分析,Java IO系列">
+    <meta name="description" content="关于java的io部分，以前学习过。当时学习的节奏是，首先了解io的相关介绍，再查看io的使用示例，最后才是打开API参考文档并参考文档通过写demo来学习。结果，当时是了解了API的使用方法；可是一段时间之后，只能零零碎碎的记得一些片段，再要自己讲出个所以然来，已经非常之艰难。之所以造成这种困境，我想主要是：一，学习的时候，理解的不够彻底，没有真正理解它的思想和框架。二，加之后来使用的较少，加">
+<meta name="keywords" content="Java源码分析,Java IO系列">
+<meta property="og:type" content="article">
+<meta property="og:title" content="java io系列01之 IO框架">
+<meta property="og:url" content="https://smuwjs.github.io/2016/10/01/java-source-analysis-io-series/java io系列01之 IO框架/index.html">
+<meta property="og:site_name" content="Jeeson&#39;s Blog">
+<meta property="og:description" content="关于java的io部分，以前学习过。当时学习的节奏是，首先了解io的相关介绍，再查看io的使用示例，最后才是打开API参考文档并参考文档通过写demo来学习。结果，当时是了解了API的使用方法；可是一段时间之后，只能零零碎碎的记得一些片段，再要自己讲出个所以然来，已经非常之艰难。之所以造成这种困境，我想主要是：一，学习的时候，理解的不够彻底，没有真正理解它的思想和框架。二，加之后来使用的较少，加">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://wangkuiwu.github.io/media/pic/java/io/io01.jpg">
+<meta property="og:image" content="http://wangkuiwu.github.io/media/pic/java/io/io02.jpg">
+<meta property="og:image" content="http://wangkuiwu.github.io/media/pic/java/io/io03.jpg">
+<meta property="og:image" content="http://wangkuiwu.github.io/media/pic/java/io/io04.jpg">
+<meta property="og:image" content="http://wangkuiwu.github.io/media/pic/java/io/io05.jpg">
+<meta property="og:image" content="http://wangkuiwu.github.io/media/pic/java/io/io06.jpg">
+<meta property="og:image" content="http://wangkuiwu.github.io/media/pic/java/io/io07.jpg">
+<meta property="og:image" content="http://wangkuiwu.github.io/media/pic/java/io/io08.jpg">
+<meta property="og:image" content="http://wangkuiwu.github.io/media/pic/java/io/io09.jpg">
+<meta property="og:updated_time" content="2018-06-27T09:39:57.941Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="java io系列01之 IO框架">
+<meta name="twitter:description" content="关于java的io部分，以前学习过。当时学习的节奏是，首先了解io的相关介绍，再查看io的使用示例，最后才是打开API参考文档并参考文档通过写demo来学习。结果，当时是了解了API的使用方法；可是一段时间之后，只能零零碎碎的记得一些片段，再要自己讲出个所以然来，已经非常之艰难。之所以造成这种困境，我想主要是：一，学习的时候，理解的不够彻底，没有真正理解它的思想和框架。二，加之后来使用的较少，加">
+<meta name="twitter:image" content="http://wangkuiwu.github.io/media/pic/java/io/io01.jpg">
+    
+        <link rel="alternate" type="application/atom+xml" title="Jeeson&#39;s Blog" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/head.png">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Jeeson</h5>
+          <a href="mailto:smuwjs@163.com" title="smuwjs@163.com" class="mail">smuwjs@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/smuwjs" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">java io系列01之 IO框架</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">java io系列01之 IO框架</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2016-09-30T16:00:00.000Z" itemprop="datePublished" class="page-time">
+  2016-10-01
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#1-java-io简介"><span class="post-toc-number">1.</span> <span class="post-toc-text">1. java io简介</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#2-java-io框架"><span class="post-toc-number">2.</span> <span class="post-toc-text">2. java io框架</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#2-1-以字节为单位的输入流的框架图"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">2.1 以字节为单位的输入流的框架图</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#2-2-以字节为单位的输出流的框架图"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">2.2 以字节为单位的输出流的框架图</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#2-3-以字节为单位的输入流和输出流关联的框架图"><span class="post-toc-number">2.3.</span> <span class="post-toc-text">2.3 以字节为单位的输入流和输出流关联的框架图</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#2-4-以字符为单位的输入流的框架图"><span class="post-toc-number">2.4.</span> <span class="post-toc-text">2.4 以字符为单位的输入流的框架图</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#2-5-以字符为单位的输出流的框架图"><span class="post-toc-number">2.5.</span> <span class="post-toc-text">2.5 以字符为单位的输出流的框架图</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#2-6-以字符为单位的输入流和输出流关联的框架图"><span class="post-toc-number">2.6.</span> <span class="post-toc-text">2.6 以字符为单位的输入流和输出流关联的框架图</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#2-7-字节转换为字符流的框架图"><span class="post-toc-number">2.7.</span> <span class="post-toc-text">2.7 字节转换为字符流的框架图</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#2-8-字节和字符的输入流对应关系"><span class="post-toc-number">2.8.</span> <span class="post-toc-text">2.8 字节和字符的输入流对应关系</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#2-9-字节和字符的输出流对应关系"><span class="post-toc-number">2.9.</span> <span class="post-toc-text">2.9 字节和字符的输出流对应关系</span></a></li></ol></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-java-source-analysis-io-series/java io系列01之 IO框架"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">java io系列01之 IO框架</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2016-10-01 00:00:00" datetime="2016-09-30T16:00:00.000Z"  itemprop="datePublished">2016-10-01</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/source-analysis/">source analysis</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <blockquote>
+<p>关于java的io部分，以前学习过。当时学习的节奏是，首先了解io的相关介绍，再查看io的使用示例，最后才是打开API参考文档并参考文档通过写demo来学习。结果，当时是了解了API的使用方法；可是一段时间之后，只能零零碎碎的记得一些片段，再要自己讲出个所以然来，已经非常之艰难。之所以造成这种困境，我想主要是：一，学习的时候，理解的不够彻底，没有真正理解它的思想和框架。二，加之后来使用的较少，加速了遗忘的速度。在这里面，最根本的问题还是理解，使用的目的也是为了更加深入的理解。</p>
+</blockquote>
+<blockquote>
+<p>最近，抽空整理以前所学的java基础。整理也就是重新学习的过程，在这个学习过程中，我一直尝试着站在一个更高的角度来看问题，将这些类和接口的原理和思想理解的更加透彻一些！在这里，将所学的东西分享出来，一是共同提高；再者，有不足的地方或好的建议，还希望各位读者能指出。谢谢！</p>
+</blockquote>
+<p><a name="anchor1"></a></p>
+<h1 id="1-java-io简介"><a href="#1-java-io简介" class="headerlink" title="1. java io简介"></a>1. java io简介</h1><p>java io系统的设计初衷，就是为了实现“文件、控制台、网络设备”这些io设置的通信。例如，对于一个文件，我们可以打开文件，然后进行读取和写入。</p>
+<p>在java 1.0中，java提供的类都是以字节(byte)为单位，例如，FileInputStream和FileOutputStream。而到了java 1.1，为了与国际化进行接轨，在java io中添加了许多以字符(Unicode)为单位进行操作的类。</p>
+<p>在java io的称呼中，我们经常会提到“输入流”、“输出流”等等概念。首先，什么是流呢？<br>所谓“流”，就是一种抽象的数据的总称，它的本质是能够进行传输。<br>&nbsp;&nbsp;&nbsp;&nbsp; a) 按照“流”的数据流向，可以将其化分为：输入流和输出流。<br>&nbsp;&nbsp;&nbsp;&nbsp; b) 按照“流”中处理数据的单位，可以将其区分为：字节流和字符流。在java中，字节是占1个Byte，即8位；而字符是占2个Byte，即16位。而且，需要注意的是，java的字节是有符号类型，而字符是无符号类型！</p>
+<p><a name="anchor2"></a></p>
+<h1 id="2-java-io框架"><a href="#2-java-io框架" class="headerlink" title="2. java io框架"></a>2. java io框架</h1><p>有了上面的基本概念之后，我们看看java io的框架。</p>
+<h2 id="2-1-以字节为单位的输入流的框架图"><a href="#2-1-以字节为单位的输入流的框架图" class="headerlink" title="2.1 以字节为单位的输入流的框架图"></a>2.1 以字节为单位的输入流的框架图</h2><p>下面，是以字节为单位的输入流的框架图。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://wangkuiwu.github.io/media/pic/java/io/io01.jpg" alt="img" title="">
+                </div>
+                <div class="image-caption">img</div>
+            </figure>
+<p>从中，我们可以看出。<br>(01) InputStream 是以字节为单位的输入流的超类。InputStream提供了read()接口从输入流中读取字节数据。<br>(02) ByteArrayInputStream 是字节数组输入流。它包含一个内部缓冲区，该缓冲区包含从流中读取的字节；通俗点说，它的内部缓冲区就是一个字节数组，而ByteArrayInputStream本质就是通过字节数组来实现的。<br>(03) PipedInputStream 是管道输入流，它和PipedOutputStream一起使用，能实现多线程间的管道通信。<br>(04) FilterInputStream 是过滤输入流。它是DataInputStream和BufferedInputStream的超类。<br>(05) DataInputStream 是数据输入流。它是用来装饰其它输入流，它“允许应用程序以与机器无关方式从底层输入流中读取基本 Java 数据类型”。<br>(06) BufferedInputStream 是缓冲输入流。它的作用是为另一个输入流添加缓冲功能。<br>(07) File 是“文件”和“目录路径名”的抽象表示形式。关于File，注意两点：<br>&nbsp;&nbsp;&nbsp;&nbsp; a), File不仅仅只是表示文件，它也可以表示目录！<br>&nbsp;&nbsp;&nbsp;&nbsp; b), File虽然在io保重定义，但是它的超类是Object，而不是InputStream。<br>(08) FileDescriptor 是“文件描述符”。它可以被用来表示开放文件、开放套接字等。<br>(09) FileInputStream 是文件输入流。它通常用于对文件进行读取操作。<br>(10) ObjectInputStream 是对象输入流。它和ObjectOutputStream一起，用来提供对“基本数据或对象”的持久存储。</p>
+<h2 id="2-2-以字节为单位的输出流的框架图"><a href="#2-2-以字节为单位的输出流的框架图" class="headerlink" title="2.2 以字节为单位的输出流的框架图"></a>2.2 以字节为单位的输出流的框架图</h2><p>下面，是以字节为单位的输出流的框架图。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://wangkuiwu.github.io/media/pic/java/io/io02.jpg" alt="img" title="">
+                </div>
+                <div class="image-caption">img</div>
+            </figure>
+<p>从中，我们可以看出。以字节为单位的输出流的公共父类是OutputStream。<br>(01) OutputStream 是以字节为单位的输出流的超类。OutputStream提供了write()接口从输出流中读取字节数据。<br>(02) ByteArrayOutputStream 是字节数组输出流。写入ByteArrayOutputStream的数据被写入一个 byte 数组。缓冲区会随着数据的不断写入而自动增长。可使用 toByteArray() 和 toString() 获取数据。<br>(03) PipedOutputStream 是管道输出流，它和PipedInputStream一起使用，能实现多线程间的管道通信。<br>(04) FilterOutputStream 是过滤输出流。它是DataOutputStream，BufferedOutputStream和PrintStream的超类。<br>(05) DataOutputStream 是数据输出流。它是用来装饰其它输出流，它“允许应用程序以与机器无关方式向底层写入基本 Java 数据类型”。<br>(06) BufferedOutputStream 是缓冲输出流。它的作用是为另一个输出流添加缓冲功能。<br>(07) PrintStream 是打印输出流。它是用来装饰其它输出流，能为其他输出流添加了功能，使它们能够方便地打印各种数据值表示形式。<br>(08) FileOutputStream 是文件输出流。它通常用于向文件进行写入操作。<br>(09) ObjectOutputStream 是对象输出流。它和ObjectInputStream一起，用来提供对“基本数据或对象”的持久存储。  </p>
+<h2 id="2-3-以字节为单位的输入流和输出流关联的框架图"><a href="#2-3-以字节为单位的输入流和输出流关联的框架图" class="headerlink" title="2.3 以字节为单位的输入流和输出流关联的框架图"></a>2.3 以字节为单位的输入流和输出流关联的框架图</h2><p>输入流和输出流都有对应的关系，下面是将以字节为单位的输入流和输出流关联起来的图片。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://wangkuiwu.github.io/media/pic/java/io/io03.jpg" alt="img" title="">
+                </div>
+                <div class="image-caption">img</div>
+            </figure>
+<h2 id="2-4-以字符为单位的输入流的框架图"><a href="#2-4-以字符为单位的输入流的框架图" class="headerlink" title="2.4 以字符为单位的输入流的框架图"></a>2.4 以字符为单位的输入流的框架图</h2><p>下面，是以字符为单位的输入流的框架图。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://wangkuiwu.github.io/media/pic/java/io/io04.jpg" alt="img" title="">
+                </div>
+                <div class="image-caption">img</div>
+            </figure>
+<p>从中，我们可以看出。以字符为单位的输入流的公共父类是Reader。<br>(01) Reader 是以字符为单位的输入流的超类。它提供了read()接口来取字符数据。<br>(02) CharArrayReader 是字符数组输入流。它用于读取字符数组，它继承于Reader。操作的数据是以字符为单位！<br>(03) PipedReader 是字符类型的管道输入流。它和PipedWriter一起是可以通过管道进行线程间的通讯。在使用管道通信时，必须将PipedWriter和PipedReader配套使用。<br>(04) FilterReader 是字符类型的过滤输入流。<br>(05) BufferedReader 是字符缓冲输入流。它的作用是为另一个输入流添加缓冲功能。<br>(06) InputStreamReader 是字节转字符的输入流。它是字节流通向字符流的桥梁：它使用指定的 charset 读取字节并将其解码为字符。<br>(07) FileReader 是字符类型的文件输入流。它通常用于对文件进行读取操作。</p>
+<h2 id="2-5-以字符为单位的输出流的框架图"><a href="#2-5-以字符为单位的输出流的框架图" class="headerlink" title="2.5 以字符为单位的输出流的框架图"></a>2.5 以字符为单位的输出流的框架图</h2><p>下面，是以字符为单位的输出流的框架图。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://wangkuiwu.github.io/media/pic/java/io/io05.jpg" alt="img" title="">
+                </div>
+                <div class="image-caption">img</div>
+            </figure>
+<p>(01) Writer 是以字符为单位的输出流的超类。它提供了write()接口往其中写入数据。<br>(02) CharArrayWriter 是字符数组输出流。它用于读取字符数组，它继承于Writer。操作的数据是以字符为单位！<br>(03) PipedWriter 是字符类型的管道输出流。它和PipedReader一起是可以通过管道进行线程间的通讯。在使用管道通信时，必须将PipedWriter和PipedWriter配套使用。<br>(04) FilterWriter 是字符类型的过滤输出流。<br>(05) BufferedWriter 是字符缓冲输出流。它的作用是为另一个输出流添加缓冲功能。<br>(06) OutputStreamWriter 是字节转字符的输出流。它是字节流通向字符流的桥梁：它使用指定的 charset 将字节转换为字符并写入。<br>(07) FileWriter 是字符类型的文件输出流。它通常用于对文件进行读取操作。<br>(08) PrintWriter 是字符类型的打印输出流。它是用来装饰其它输出流，能为其他输出流添加了功能，使它们能够方便地打印各种数据值表示形式。</p>
+<h2 id="2-6-以字符为单位的输入流和输出流关联的框架图"><a href="#2-6-以字符为单位的输入流和输出流关联的框架图" class="headerlink" title="2.6 以字符为单位的输入流和输出流关联的框架图"></a>2.6 以字符为单位的输入流和输出流关联的框架图</h2><p>下面是将以字符为单位的输入流和输出流关联起来的图片。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://wangkuiwu.github.io/media/pic/java/io/io06.jpg" alt="img" title="">
+                </div>
+                <div class="image-caption">img</div>
+            </figure>
+<h2 id="2-7-字节转换为字符流的框架图"><a href="#2-7-字节转换为字符流的框架图" class="headerlink" title="2.7 字节转换为字符流的框架图"></a>2.7 字节转换为字符流的框架图</h2><p>在java中，字节流能转换为字符流，下面是它们的转换关系图。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://wangkuiwu.github.io/media/pic/java/io/io07.jpg" alt="img" title="">
+                </div>
+                <div class="image-caption">img</div>
+            </figure>
+<p>从中，我们可以看出。<br>(01) FileReader继承于InputStreamReader，而InputStreamReader依赖于InputStream。具体表现在InputStreamReader的构造函数是以InputStream为参数。我们传入InputStream，在InputStreamReader内部通过转码，将字节转换成字符。<br>(02) FileWriter继承于OutputStreamWriter，而OutputStreamWriter依赖于OutputStream。具体表现在OutputStreamWriter的构造函数是以OutputStream为参数。我们传入OutputStream，在OutputStreamWriter内部通过转码，将字节转换成字符。</p>
+<h2 id="2-8-字节和字符的输入流对应关系"><a href="#2-8-字节和字符的输入流对应关系" class="headerlink" title="2.8 字节和字符的输入流对应关系"></a>2.8 字节和字符的输入流对应关系</h2><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://wangkuiwu.github.io/media/pic/java/io/io08.jpg" alt="img" title="">
+                </div>
+                <div class="image-caption">img</div>
+            </figure>
+<h2 id="2-9-字节和字符的输出流对应关系"><a href="#2-9-字节和字符的输出流对应关系" class="headerlink" title="2.9 字节和字符的输出流对应关系"></a>2.9 字节和字符的输出流对应关系</h2><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://wangkuiwu.github.io/media/pic/java/io/io09.jpg" alt="img" title="">
+                </div>
+                <div class="image-caption">img</div>
+            </figure>
+<p>认识了java io的总体框架之后。接下来，我们可以开始对其中的各个类进入学习，包括“它的作用和用法，源码的探索”等方面。</p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2018-06-27T09:39:57.941Z" itemprop="dateUpdated">2018-06-27 17:39:57</time>
+</span><br>
+
+
+        
+        本文固定链接：<a href="/2016/10/01/java-source-analysis-io-series/java io系列01之 IO框架/" target="_blank" rel="external">https://smuwjs.github.io/2016/10/01/java-source-analysis-io-series/java io系列01之 IO框架/</a>
+        
+    </div>
+    <footer>
+        <a href="https://smuwjs.github.io">
+            <img src="/img/head.png" alt="Jeeson">
+            Jeeson
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java-IO系列/">Java IO系列</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java源码分析/">Java源码分析</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/10/01/java-source-analysis-io-series/java io系列01之 IO框架/&title=《java io系列01之 IO框架》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/10/01/java-source-analysis-io-series/java io系列01之 IO框架/&title=《java io系列01之 IO框架》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/10/01/java-source-analysis-io-series/java io系列01之 IO框架/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《java io系列01之 IO框架》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/10/01/java-source-analysis-io-series/java io系列01之 IO框架/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/10/01/java-source-analysis-io-series/java io系列01之 IO框架/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2016/10/02/java-source-analysis-io-series/java io系列02之 ByteArrayInputStream详解/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">java io系列02之 ByteArrayInputStream详解</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2016/09/12/android-studio-tutorial6/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Android Studio系列教程六--Gradle多渠道打包</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="java-source-analysis-io-series/java io系列01之 IO框架" data-title="java io系列01之 IO框架" data-url="https://smuwjs.github.io/2016/10/01/java-source-analysis-io-series/java io系列01之 IO框架/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'smuwjs', theme: 'none'};
+lazyScripts.push('//unpkg.com/hexo-theme-material-indigo@latest/js/embed.min.js');
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循<a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>Jeeson &copy; 2015 - 2018</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2016/10/01/java-source-analysis-io-series/java io系列01之 IO框架/&title=《java io系列01之 IO框架》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2016/10/01/java-source-analysis-io-series/java io系列01之 IO框架/&title=《java io系列01之 IO框架》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2016/10/01/java-source-analysis-io-series/java io系列01之 IO框架/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《java io系列01之 IO框架》 — Jeeson's Blog&url=https://smuwjs.github.io/2016/10/01/java-source-analysis-io-series/java io系列01之 IO框架/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2016/10/01/java-source-analysis-io-series/java io系列01之 IO框架/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://smuwjs.github.io/2016/10/01/java-source-analysis-io-series/java io系列01之 IO框架/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

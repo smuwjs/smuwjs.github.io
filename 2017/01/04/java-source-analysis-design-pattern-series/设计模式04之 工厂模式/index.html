@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>设计模式04之 工厂模式 | Jeeson&#39;s Blog | Write the code. Change the world.</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="Java,Java设计模式">
+    <meta name="description" content="工厂模式设计原则 六：依赖倒置原则 (Dependency Inversion Principe) 要依赖抽象，不要依赖具体类。 不要让高层组件依赖低层组件，要让“二者”依赖抽象。  变量不可以持有具体类的引用（如果使用 new 就会有具体类的引用，可以使用工厂模式帮助我们避开此问题）  不要让类派生自具体类（可以派生自接口或抽象类）  不要实现基类中已经实现的方法。（若覆盖基类已实现的方法，那此">
+<meta name="keywords" content="Java,Java设计模式">
+<meta property="og:type" content="article">
+<meta property="og:title" content="设计模式04之 工厂模式">
+<meta property="og:url" content="https://smuwjs.github.io/2017/01/04/java-source-analysis-design-pattern-series/设计模式04之 工厂模式/index.html">
+<meta property="og:site_name" content="Jeeson&#39;s Blog">
+<meta property="og:description" content="工厂模式设计原则 六：依赖倒置原则 (Dependency Inversion Principe) 要依赖抽象，不要依赖具体类。 不要让高层组件依赖低层组件，要让“二者”依赖抽象。  变量不可以持有具体类的引用（如果使用 new 就会有具体类的引用，可以使用工厂模式帮助我们避开此问题）  不要让类派生自具体类（可以派生自接口或抽象类）  不要实现基类中已经实现的方法。（若覆盖基类已实现的方法，那此">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://oov0wb0gl.bkt.clouddn.com/2017-06-06-14965702919588.jpg?imageMogr2/thumbnail/!50p/blur/1x0/quality/75|imageslim">
+<meta property="og:image" content="http://oov0wb0gl.bkt.clouddn.com/2017-06-06-14965707463136.jpg?imageMogr2/thumbnail/!50p/blur/1x0/quality/75|imageslim">
+<meta property="og:image" content="http://oov0wb0gl.bkt.clouddn.com/2017-06-06-14965704463626.jpg?imageMogr2/thumbnail/!50p/blur/1x0/quality/75|imageslim">
+<meta property="og:image" content="http://oov0wb0gl.bkt.clouddn.com/2017-06-06-14965717879510.jpg?imageMogr2/thumbnail/!50p/blur/1x0/quality/75|imageslim">
+<meta property="og:updated_time" content="2018-06-27T09:39:57.937Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="设计模式04之 工厂模式">
+<meta name="twitter:description" content="工厂模式设计原则 六：依赖倒置原则 (Dependency Inversion Principe) 要依赖抽象，不要依赖具体类。 不要让高层组件依赖低层组件，要让“二者”依赖抽象。  变量不可以持有具体类的引用（如果使用 new 就会有具体类的引用，可以使用工厂模式帮助我们避开此问题）  不要让类派生自具体类（可以派生自接口或抽象类）  不要实现基类中已经实现的方法。（若覆盖基类已实现的方法，那此">
+<meta name="twitter:image" content="http://oov0wb0gl.bkt.clouddn.com/2017-06-06-14965702919588.jpg?imageMogr2/thumbnail/!50p/blur/1x0/quality/75|imageslim">
+    
+        <link rel="alternate" type="application/atom+xml" title="Jeeson&#39;s Blog" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/head.png">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Jeeson</h5>
+          <a href="mailto:smuwjs@163.com" title="smuwjs@163.com" class="mail">smuwjs@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/smuwjs" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">设计模式04之 工厂模式</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">设计模式04之 工厂模式</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2017-01-03T16:00:00.000Z" itemprop="datePublished" class="page-time">
+  2017-01-04
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Java设计模式/">Java设计模式</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#工厂模式"><span class="post-toc-number">1.</span> <span class="post-toc-text">工厂模式</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#设计原则-六："><span class="post-toc-number">1.1.</span> <span class="post-toc-text">设计原则 六：</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#简单工厂模式-Simple-Factory-Pattern"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">简单工厂模式 Simple Factory Pattern</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#工厂模式-Factory-Pattern"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">工厂模式 Factory Pattern</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#类图"><span class="post-toc-number">1.3.1.</span> <span class="post-toc-text">类图</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#例图"><span class="post-toc-number">1.3.2.</span> <span class="post-toc-text">例图</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#抽象工厂模式-Abstract-Factory-Pattern"><span class="post-toc-number">1.4.</span> <span class="post-toc-text">抽象工厂模式 Abstract Factory Pattern</span></a></li></ol></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-java-source-analysis-design-pattern-series/设计模式04之 工厂模式"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">设计模式04之 工厂模式</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2017-01-04 00:00:00" datetime="2017-01-03T16:00:00.000Z"  itemprop="datePublished">2017-01-04</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Java设计模式/">Java设计模式</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h1 id="工厂模式"><a href="#工厂模式" class="headerlink" title="工厂模式"></a>工厂模式</h1><h2 id="设计原则-六："><a href="#设计原则-六：" class="headerlink" title="设计原则 六："></a>设计原则 六：</h2><p>依赖倒置原则 (Dependency Inversion Principe)</p>
+<p>要依赖抽象，不要依赖具体类。</p>
+<p>不要让高层组件依赖低层组件，要让“二者”依赖抽象。</p>
+<ol>
+<li><p>变量不可以持有具体类的引用（如果使用 new 就会有具体类的引用，可以使用工厂模式帮助我们避开此问题）</p>
+</li>
+<li><p>不要让类派生自具体类（可以派生自接口或抽象类）</p>
+</li>
+<li><p>不要实现基类中已经实现的方法。（若覆盖基类已实现的方法，那此基类就不是真正适合被继承的抽象。基类中已实现的方法应该由所有子类共享。）</p>
+</li>
+</ol>
+<h2 id="简单工厂模式-Simple-Factory-Pattern"><a href="#简单工厂模式-Simple-Factory-Pattern" class="headerlink" title="简单工厂模式 Simple Factory Pattern"></a>简单工厂模式 Simple Factory Pattern</h2><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://oov0wb0gl.bkt.clouddn.com/2017-06-06-14965702919588.jpg?imageMogr2/thumbnail/!50p/blur/1x0/quality/75|imageslim" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>也就是常用的在Factory类中定义静态方法负责new对象的方式。</p>
+<p>严格地说，这种被称为“简单工厂模式”的方式根本不能称之为“模式”，虽然静态工厂方法并不是真正的“设计模式”，但这种方式的应用也很广泛，也能带来一些好处，所以我们不能因为它不是“设计模式”就抛弃它。</p>
+<h2 id="工厂模式-Factory-Pattern"><a href="#工厂模式-Factory-Pattern" class="headerlink" title="工厂模式 Factory Pattern"></a>工厂模式 Factory Pattern</h2><p>定义了一个创建对象的接口，但由子类来决定要实例化的类是哪一个。工厂方法让类把实例化推迟到了子类。</p>
+<h3 id="类图"><a href="#类图" class="headerlink" title="类图"></a>类图</h3><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://oov0wb0gl.bkt.clouddn.com/2017-06-06-14965707463136.jpg?imageMogr2/thumbnail/!50p/blur/1x0/quality/75|imageslim" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<h3 id="例图"><a href="#例图" class="headerlink" title="例图"></a>例图</h3><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://oov0wb0gl.bkt.clouddn.com/2017-06-06-14965704463626.jpg?imageMogr2/thumbnail/!50p/blur/1x0/quality/75|imageslim" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<h2 id="抽象工厂模式-Abstract-Factory-Pattern"><a href="#抽象工厂模式-Abstract-Factory-Pattern" class="headerlink" title="抽象工厂模式 Abstract Factory Pattern"></a>抽象工厂模式 Abstract Factory Pattern</h2><p>提供一个接口，用创建相关或依赖对象的家族，而不需要明确指定具体类。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://oov0wb0gl.bkt.clouddn.com/2017-06-06-14965717879510.jpg?imageMogr2/thumbnail/!50p/blur/1x0/quality/75|imageslim" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2018-06-27T09:39:57.937Z" itemprop="dateUpdated">2018-06-27 17:39:57</time>
+</span><br>
+
+
+        
+        本文固定链接：<a href="/2017/01/04/java-source-analysis-design-pattern-series/设计模式04之 工厂模式/" target="_blank" rel="external">https://smuwjs.github.io/2017/01/04/java-source-analysis-design-pattern-series/设计模式04之 工厂模式/</a>
+        
+    </div>
+    <footer>
+        <a href="https://smuwjs.github.io">
+            <img src="/img/head.png" alt="Jeeson">
+            Jeeson
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/">Java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java设计模式/">Java设计模式</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2017/01/04/java-source-analysis-design-pattern-series/设计模式04之 工厂模式/&title=《设计模式04之 工厂模式》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2017/01/04/java-source-analysis-design-pattern-series/设计模式04之 工厂模式/&title=《设计模式04之 工厂模式》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2017/01/04/java-source-analysis-design-pattern-series/设计模式04之 工厂模式/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《设计模式04之 工厂模式》 — Jeeson's Blog&url=https://smuwjs.github.io/2017/01/04/java-source-analysis-design-pattern-series/设计模式04之 工厂模式/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2017/01/04/java-source-analysis-design-pattern-series/设计模式04之 工厂模式/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2017/01/05/java-source-analysis-design-pattern-series/设计模式05之 单例模式/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">设计模式05之 单例模式</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2017/01/03/java-source-analysis-design-pattern-series/设计模式03之 装饰者模式/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">设计模式03之 装饰者模式</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="java-source-analysis-design-pattern-series/设计模式04之 工厂模式" data-title="设计模式04之 工厂模式" data-url="https://smuwjs.github.io/2017/01/04/java-source-analysis-design-pattern-series/设计模式04之 工厂模式/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'smuwjs', theme: 'none'};
+lazyScripts.push('//unpkg.com/hexo-theme-material-indigo@latest/js/embed.min.js');
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循<a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>Jeeson &copy; 2015 - 2018</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://smuwjs.github.io/2017/01/04/java-source-analysis-design-pattern-series/设计模式04之 工厂模式/&title=《设计模式04之 工厂模式》 — Jeeson's Blog&pic=https://smuwjs.github.io/img/head.png" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://smuwjs.github.io/2017/01/04/java-source-analysis-design-pattern-series/设计模式04之 工厂模式/&title=《设计模式04之 工厂模式》 — Jeeson's Blog&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://smuwjs.github.io/2017/01/04/java-source-analysis-design-pattern-series/设计模式04之 工厂模式/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《设计模式04之 工厂模式》 — Jeeson's Blog&url=https://smuwjs.github.io/2017/01/04/java-source-analysis-design-pattern-series/设计模式04之 工厂模式/&via=https://smuwjs.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://smuwjs.github.io/2017/01/04/java-source-analysis-design-pattern-series/设计模式04之 工厂模式/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://smuwjs.github.io/2017/01/04/java-source-analysis-design-pattern-series/设计模式04之 工厂模式/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>
